@@ -1,0 +1,36 @@
+# ── PlatformIO ───────────────────────────────────────────────────────────────
+.pio/
+.pioenvs/
+.piolibdeps/
+*.elf
+*.bin
+*.map
+
+# ── PlatformIO / editor metadata (kept local) ────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+.clangd/
+compile_commands.json
+
+# ── Build / test artefacts ───────────────────────────────────────────────────
+build/
+dist/
+*.o
+*.a
+
+# ── OS cruft ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Secrets / local config (never commit) ────────────────────────────────────
+secrets.h
+*.local
+.env
+
+# ── Large / derived hardware & mechanical exports (commit deliberately) ──────
+# Source files (schematics, CAD) ARE tracked. Uncomment to ignore bulky
+# generated exports if they become a problem, and attach them to releases instead.
+# *.gbr
+# *.step
+# *.stl

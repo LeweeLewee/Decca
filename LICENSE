@@ -1,0 +1,22 @@
+decca — Licence Placeholder
+===========================
+
+A licence has not yet been chosen for this project.
+
+Until a licence is selected and this file is replaced, all rights are reserved
+by the copyright holder. No permission is granted to use, copy, modify, or
+distribute this software, hardware design, or documentation except as required
+to evaluate the project.
+
+TODO: Replace this file with the chosen licence text.
+
+Candidates under consideration:
+  - MIT               (permissive; simple)
+  - Apache-2.0        (permissive; patent grant)
+  - GPL-3.0           (copyleft)
+  - CERN-OHL / TAPR   (for the hardware design, if licensed separately)
+
+Note: firmware and hardware may warrant different licences. Decide whether the
+contents of hardware/ and mechanical/ are covered by the same terms as src/.
+
+Copyright (c) 2025 The decca authors. All rights reserved (pending licence).
