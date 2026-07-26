@@ -2,8 +2,8 @@
  * @file    buttons.h
  * @brief   Front-panel button input: debounced, event-based reads.
  *
- * buttons reads the physical front-panel buttons (source, transport, power)
- * and turns raw, noisy GPIO transitions into clean, debounced events that the
+ * buttons reads the retained on/off switch and four working source buttons,
+ * turning raw, noisy GPIO transitions into clean, debounced events that the
  * rest of the firmware can consume without worrying about contact bounce.
  *
  * Responsibility:  read and debounce buttons; expose press/hold events.
@@ -17,16 +17,14 @@ namespace decca::buttons {
 
 /**
  * @brief Logical buttons on the front panel.
- *
- * Placeholder set — expand to match the restored control layout.
  */
 enum class Button {
     None,
-    Power,
-    Source,
-    PlayPause,
-    Next,
-    Previous,
+    OnOff,
+    Vhf,
+    Mw,
+    Lw,
+    Gram,
 };
 
 /**

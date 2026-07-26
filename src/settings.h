@@ -21,13 +21,12 @@ namespace decca::settings {
 
 /**
  * @brief Input source selection.
- *
- * Placeholder set — expand as sources are added (Phase 2 adds WiiM inputs).
  */
 enum class Source {
-    Off,
-    Aux,
-    // Phase 2: Streamer, Bluetooth, ...
+    Vhf,
+    Mw,
+    Lw,
+    Gram,
 };
 
 /**
@@ -36,10 +35,9 @@ enum class Source {
  * Kept as a small plain struct so any module can read a coherent snapshot.
  */
 struct State {
-    Source  source     = Source::Off;
-    uint8_t volume     = 0;    // 0–255
-    uint8_t dial       = 0;    // dial brightness 0–255
-    uint8_t cabinet    = 0;    // cabinet brightness 0–255
+    Source source = Source::Vhf;
+    uint8_t volume = 0;  // 0–255
+    uint8_t dial = 0;    // dial brightness 0–255
 };
 
 /**

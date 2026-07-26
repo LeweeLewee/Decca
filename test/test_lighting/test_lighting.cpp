@@ -13,12 +13,11 @@
 
 using decca::lighting::Zone;
 
-// Brightness must be settable across the full range for each zone.
+// Dial brightness must be settable across the full range.
 void test_lighting_set_brightness_callable() {
     decca::lighting::init();
     decca::lighting::setBrightness(Zone::Dial, 0);
     decca::lighting::setBrightness(Zone::Dial, 255);
-    decca::lighting::setBrightness(Zone::Cabinet, 128);
     decca::lighting::update();
     TEST_PASS();
 }

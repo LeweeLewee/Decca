@@ -1,10 +1,10 @@
 /**
  * @file    lighting.h
- * @brief   Dial and cabinet illumination (PWM-driven).
+ * @brief   Dial illumination (PWM-driven).
  *
- * lighting replaces the original lamps with PWM-controlled LEDs. It handles
- * brightness, standby dimming, and any warm-up / fade effects that keep the
- * lighting feeling period-appropriate rather than abruptly digital.
+ * lighting replaces the original dial lamps with PWM-controlled LEDs. It
+ * handles brightness, standby dimming, and fade effects that keep the lighting
+ * feeling period-appropriate rather than abruptly digital.
  *
  * Responsibility:  drive illumination outputs; own brightness and effects.
  * Depends on:      hardware (pin map), settings (brightness/standby prefs).
@@ -19,12 +19,9 @@ namespace decca::lighting {
 
 /**
  * @brief Illumination zones.
- *
- * Placeholder set — expand to match the restored lighting layout.
  */
 enum class Zone {
     Dial,
-    Cabinet,
 };
 
 /**

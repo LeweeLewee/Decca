@@ -18,26 +18,23 @@ using decca::settings::Source;
 void test_settings_defaults() {
     decca::settings::init();
     const State& s = decca::settings::get();
-    TEST_ASSERT_EQUAL(static_cast<int>(Source::Off), static_cast<int>(s.source));
+    TEST_ASSERT_EQUAL(static_cast<int>(Source::Vhf), static_cast<int>(s.source));
     TEST_ASSERT_EQUAL_UINT8(0, s.volume);
     TEST_ASSERT_EQUAL_UINT8(0, s.dial);
-    TEST_ASSERT_EQUAL_UINT8(0, s.cabinet);
 }
 
 // set() then get() must round-trip the values.
 void test_settings_set_get_roundtrip() {
     State next;
-    next.source  = Source::Aux;
-    next.volume  = 42;
-    next.dial    = 128;
-    next.cabinet = 200;
+    next.source = Source::Gram;
+    next.volume = 42;
+    next.dial = 128;
     decca::settings::set(next);
 
     const State& s = decca::settings::get();
-    TEST_ASSERT_EQUAL(static_cast<int>(Source::Aux), static_cast<int>(s.source));
+    TEST_ASSERT_EQUAL(static_cast<int>(Source::Gram), static_cast<int>(s.source));
     TEST_ASSERT_EQUAL_UINT8(42, s.volume);
     TEST_ASSERT_EQUAL_UINT8(128, s.dial);
-    TEST_ASSERT_EQUAL_UINT8(200, s.cabinet);
 }
 
 // save() must be callable without faulting (no-op until NVS lands).
