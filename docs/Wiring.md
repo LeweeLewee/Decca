@@ -6,8 +6,8 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` is not populated yet; it will be set to
-match the assignments below when firmware work begins.
+(see Specification `HW-06`). `hardware.h` now matches the proposed assignments
+below; neither representation is bench-verified.
 
 ## Wiring Colour Standard
 

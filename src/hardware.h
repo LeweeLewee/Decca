@@ -19,17 +19,16 @@
 namespace decca::hardware {
 
 // ── Pin assignments ─────────────────────────────────────────────────────────
-// Placeholder values. Confirm against docs/Wiring.md and hardware/Wiring/
-// before wiring any hardware. GPIO numbers below are examples only.
-//
-// constexpr uint8_t kButtonSource   = 0;
-// constexpr uint8_t kButtonPower     = 0;
-// constexpr uint8_t kPotVolume       = 0;   // ADC-capable pin
-// constexpr uint8_t kPotTone         = 0;   // ADC-capable pin
-// constexpr uint8_t kLedDial         = 0;   // PWM-capable pin
-// constexpr uint8_t kLedCabinet      = 0;   // PWM-capable pin
-// constexpr uint8_t kDisplaySda      = 0;
-// constexpr uint8_t kDisplayScl      = 0;
+// These assignments match the proposed map in docs/Wiring.md. They have not
+// been bench-verified and must remain labelled proposed until physical testing.
+constexpr uint8_t kPotVolume = 32;       // ADC1 (proposed)
+constexpr uint8_t kPotBass = 33;         // ADC1 (proposed)
+constexpr uint8_t kPotTreble = 34;       // ADC1, input-only (proposed)
+constexpr uint8_t kPotBalance = 35;      // ADC1, input-only (proposed)
+constexpr uint8_t kSwitchOnOff = 19;      // Digital input, internal pull-up (proposed)
+constexpr uint8_t kDisplaySda = 21;       // I2C SDA (proposed)
+constexpr uint8_t kDisplayScl = 22;       // I2C SCL (proposed)
+constexpr uint8_t kDialLightingPwm = 25;  // LEDC PWM output (proposed)
 
 /**
  * @brief Configure pin modes and board-level peripherals.

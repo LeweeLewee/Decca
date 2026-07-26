@@ -19,6 +19,7 @@ that source control alone does not express well.
 | _TBD_      | Project | Repository foundation created            |
 | _TBD_      | Docs    | Specification baselined (v0.1)           |
 | _TBD_      | Docs    | Phase 1 wiring facts documented; Wiring, Hardware Architecture, Parts List, Firmware Architecture, README and Specification (v0.2) updated; ADR-0001..0006 added. Proposed GPIOs labelled proposed. |
+| 2026-07-26 | Firmware | Reconciled named firmware pin constants with the proposed Phase 1 wiring map; assignments remain unverified. |
 
 ## Hardware Revisions
 
