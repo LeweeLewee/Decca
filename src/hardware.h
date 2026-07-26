@@ -30,9 +30,17 @@ constexpr uint8_t kDisplaySda = 21;       // I2C SDA (proposed)
 constexpr uint8_t kDisplayScl = 22;       // I2C SCL (proposed)
 constexpr uint8_t kDialLightingPwm = 25;  // LEDC PWM output (proposed)
 
+// ── Board-level peripheral configuration ────────────────────────────────────
+constexpr uint8_t kAdcResolutionBits = 12;
+constexpr uint8_t kDialLightingPwmChannel = 0;
+constexpr uint32_t kDialLightingPwmFrequencyHz = 5000;
+constexpr uint8_t kDialLightingPwmResolutionBits = 8;
+
 /**
  * @brief Configure pin modes and board-level peripherals.
  *
+ * Configures all currently assigned Phase 1 pins, ADC1 and the dial-lighting
+ * PWM channel. Source-button pins remain untouched until they are assigned.
  * Call once from setup(), before any other module init.
  */
 void init();

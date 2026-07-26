@@ -2,9 +2,8 @@
  * @file    test_hardware.cpp
  * @brief   Interface smoke tests for the hardware module.
  *
- * These confirm the proposed pin-map contract and that the module entry point
- * is callable. Expand into pin-mode/ADC/PWM behaviour tests as init() gains
- * real logic.
+ * These confirm the proposed pin-map contract and exercise the real
+ * board-initialisation entry point.
  */
 
 #include "unity_runner.h"
@@ -23,6 +22,15 @@ void test_hardware_proposed_pin_map() {
     TEST_ASSERT_EQUAL_UINT8(25, decca::hardware::kDialLightingPwm);
 }
 
+void test_hardware_peripheral_configuration() {
+    TEST_ASSERT_EQUAL_UINT8(12, decca::hardware::kAdcResolutionBits);
+    TEST_ASSERT_EQUAL_UINT8(0, decca::hardware::kDialLightingPwmChannel);
+    TEST_ASSERT_EQUAL_UINT32(5000,
+                             decca::hardware::kDialLightingPwmFrequencyHz);
+    TEST_ASSERT_EQUAL_UINT8(
+        8, decca::hardware::kDialLightingPwmResolutionBits);
+}
+
 // init() must be callable and return cleanly.
 void test_hardware_init_is_callable() {
     decca::hardware::init();
@@ -31,5 +39,6 @@ void test_hardware_init_is_callable() {
 
 void runAll() {
     RUN_TEST(test_hardware_proposed_pin_map);
+    RUN_TEST(test_hardware_peripheral_configuration);
     RUN_TEST(test_hardware_init_is_callable);
 }

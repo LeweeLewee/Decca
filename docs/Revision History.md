@@ -22,6 +22,7 @@ that source control alone does not express well.
 | 2026-07-26 | Firmware | Reconciled named firmware pin constants with the proposed Phase 1 wiring map; assignments remain unverified. |
 | 2026-07-26 | Firmware | Reconciled source, button, lighting, and shared-state contracts with the confirmed Phase 1 controls. |
 | 2026-07-26 | Firmware | Implemented versioned settings persistence and behavioural NVS round-trip coverage (Specification v0.3). |
+| 2026-07-26 | Firmware | Implemented board initialisation for assigned Phase 1 inputs, ADC1, I²C and safe-off dial-lighting PWM (Specification v0.4); all GPIO assignments remain proposed. |
 
 ## Hardware Revisions
 

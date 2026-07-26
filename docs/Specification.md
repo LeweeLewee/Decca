@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings persistence implemented. ESP32 pin assignments remain proposed, not bench-verified. |
-| Version  | 0.3                                               |
+| Status   | Draft. Phase 1 hardware layer in progress; board initialisation and settings persistence implemented. ESP32 pin assignments remain proposed, not bench-verified. |
+| Version  | 0.4                                               |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
