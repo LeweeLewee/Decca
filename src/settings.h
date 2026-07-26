@@ -22,7 +22,7 @@ namespace decca::settings {
 /**
  * @brief Input source selection.
  */
-enum class Source {
+enum class Source : uint8_t {
     Vhf,
     Mw,
     Lw,

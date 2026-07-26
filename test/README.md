@@ -10,7 +10,7 @@ interface declared in each module's header.
 test/
 ├── unity_runner.h          shared setup()/loop() runner (included by each suite)
 ├── test_hardware/          hardware::init()
-├── test_settings/          state defaults + set/get round-trip
+├── test_settings/          state defaults + RAM/NVS round-trips
 ├── test_buttons/           idle event queue
 ├── test_pots/              value range
 ├── test_display/           interface smoke
@@ -38,11 +38,11 @@ board attached.
 
 ## Status
 
-Foundation stage: these are **interface / smoke tests** that pass against the
-current documented stubs (the `settings` round-trip is already behavioural).
-Each file notes how to grow it into a behavioural test as the module gains
-logic. Keeping one suite per module reinforces the low-coupling design in
-`docs/Firmware Architecture.md`.
+Phase 1 is in progress. The settings suite exercises real NVS persistence using
+a test-only namespace; the remaining suites are interface / smoke tests pending
+their module implementations. Each file notes how to grow it into a behavioural
+test as the module gains logic. Keeping one suite per module reinforces the
+low-coupling design in `docs/Firmware Architecture.md`.
 
 ## Future: native tests
 

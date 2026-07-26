@@ -39,5 +39,6 @@ for the design that governs all firmware changes.
 - Follow Conventional Commits (see `CONTRIBUTING.md`).
 
 ## Status
-Foundation only — no firmware logic implemented yet. Files under `src/` are
-documented skeletons with `TODO(phaseN)` markers.
+Phase 1 hardware-layer work is in progress. The proposed pin map and confirmed
+control contracts are reconciled, and `settings` implements NVS persistence.
+Other modules remain documented skeletons with `TODO(phaseN)` markers.
