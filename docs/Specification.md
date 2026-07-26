@@ -5,10 +5,10 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft (foundation stage — no firmware implemented) |
-| Version  | 0.1                                               |
+| Status   | Draft. Reflects confirmed Phase 1 wiring facts; ESP32 pin assignments proposed, not bench-verified. No firmware implemented. |
+| Version  | 0.2                                               |
 | Owner    | LeweeLewee                                        |
-| Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md` |
+| Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
 Requirements are identified as `FR-*` (functional), `NFR-*` (non-functional),
 `HW-*` (hardware), and `IF-*` (interface). IDs are stable once assigned so they
@@ -34,10 +34,21 @@ networked source is introduced in Phase 2.
 ## 3. System Overview
 
 An ESP32 reads the restored front-panel controls, drives an OLED behind the dial
-glass and the dial/cabinet lighting, and persists user state. From Phase 2 it
-also controls a WiiM Pro streamer over its local HTTP API. The firmware is built
-from independent modules coordinated by a top-level scheduler, as defined in
-`docs/Firmware Architecture.md`.
+glass and the warm dial illumination, and persists user state. The ESP32 handles
+**control and user interface only and does not process or carry audio**. From
+Phase 2 it also controls a WiiM Pro streamer over its local API. The firmware is
+built from independent modules coordinated by a top-level scheduler, as defined
+in `docs/Firmware Architecture.md`.
+
+Confirmed Phase 1 front-panel controls:
+
+- Four rotary controls as 10 kΩ position sensors: **Balance, Treble, Bass, Volume**.
+- Retained original **on/off switch** (low-voltage logic input).
+- Original **source button bank**: **VHF, MW, LW, Gram** working; **SW deferred
+  (no function in Phase 1)**. Stereo/Mono retained but unwired.
+- **OLED** display and **warm dial illumination**.
+
+See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 ## 4. Definitions
 
@@ -67,34 +78,49 @@ from independent modules coordinated by a top-level scheduler, as defined in
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-BTN-01 | The system shall read all front-panel buttons and debounce them.             | 1     |
+| FR-BTN-01 | The system shall read the working source buttons and the on/off switch and debounce them in software. | 1 |
 | FR-BTN-02 | The system shall emit a discrete event per confirmed press.                  | 1     |
-| FR-BTN-03 | Buttons shall control power/standby, source selection, and transport.        | 1     |
+| FR-BTN-03 | The system shall support power/standby (retained on/off switch, low-voltage input) and source selection across the four working inputs (VHF, MW, LW, Gram). | 1 |
+| FR-BTN-04 | SW shall have **no function** in Phase 1 (no unique contact; deferred). The design shall not claim all five source buttons are available. | 1 |
+
+> Transport/playback control is not a Phase 1 hardware capability; playback
+> control arrives with the WiiM integration (see 5.7). Source-button-to-WiiM
+> mappings are configurable in software (ADR-0004).
 
 ### 5.3 Potentiometers
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-POT-01 | The system shall read the volume and tone potentiometers.                    | 1     |
-| FR-POT-02 | Pot readings shall be filtered so a settled knob yields a stable value.      | 1     |
+| FR-POT-01 | The system shall read the four rotary controls (Balance, Treble, Bass, Volume) as position sensors via ADC1. | 1 |
+| FR-POT-02 | Pot readings shall be filtered (smoothing) so a settled knob yields a stable value. | 1 |
 | FR-POT-03 | Pot values shall be exposed on a normalised scale (0–1000).                  | 1     |
+| FR-POT-04 | The system shall support per-pot calibration, deadband, and optional inversion. | 1 |
+| FR-POT-05 | Pot changes shall produce stable display updates without flicker or jitter.  | 1     |
+
+> The potentiometers are **position sensors only** and are **not in the audio
+> path** (ADR-0002).
 
 ### 5.4 Display
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-DSP-01 | The system shall render an idle/now-playing screen on the OLED.              | 1     |
-| FR-DSP-02 | The system shall show transient status for volume and source changes.        | 1     |
-| FR-DSP-03 | The display shall show streamer metadata (title/artist/source) when present. | 2     |
+| FR-DSP-01 | The system shall render startup state, system on/off state, the selected working source, and the four control values (volume, bass, treble, balance). | 1 |
+| FR-DSP-02 | The system shall show transient status for control and source changes, and shall render diagnostic messages. | 1 |
+| FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
+| FR-DSP-03 | The display shall show streamer metadata (title/artist/source, playback state) when present. | 2 |
 | FR-DSP-04 | The display shall render configuration menus.                                | 3     |
 
 ### 5.5 Lighting
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-LGT-01 | The system shall drive dial and cabinet illumination via PWM.                | 1     |
-| FR-LGT-02 | Lighting shall support brightness control and standby dimming.               | 1     |
-| FR-LGT-03 | Lighting transitions shall fade rather than switch abruptly.                 | 1     |
+| FR-LGT-01 | The system shall drive the warm dial illumination via PWM through a logic-level N-channel MOSFET. | 1 |
+| FR-LGT-02 | Lighting shall support configurable idle brightness and standby dimming.     | 1     |
+| FR-LGT-03 | Lighting transitions shall fade (up/down) rather than switch abruptly.       | 1     |
+| FR-LGT-04 | Lighting shall adopt a defined safe state at boot.                           | 1     |
+
+> Confirmed Phase 1 lighting is the **dial illumination** only. Cabinet lighting
+> is not part of the confirmed Phase 1 build.
 
 ### 5.6 Settings
 
@@ -152,6 +178,10 @@ from independent modules coordinated by a top-level scheduler, as defined in
 | HW-06  | The pin map in `src/hardware.h` shall match `docs/Wiring.md` at all times.      |
 | HW-07  | Power supply shall provide stable 5 V and 3.3 V rails sized to the load budget. |
 | HW-08  | Original controls shall be preserved and reused; modifications shall be reversible where practical. |
+| HW-09  | The retained on/off switch shall be interfaced as a **low-voltage logic input only** (internal pull-up). It shall **not** switch 230 V mains. |
+| HW-10  | The original source-selector **PCB shall be retained** as the mechanical carrier for the interlocked selector mechanism (ADR-0001); it shall not be discarded. |
+| HW-11  | Proposed GPIO assignments (see `docs/Wiring.md`) shall be treated as **proposed** until bench-verified, and `src/hardware.h` reconciled to them (HW-06). |
+| HW-12  | Dial lighting shall be switched by a logic-level N-channel MOSFET under ESP32 PWM, with ESP32 and lighting grounds common. |
 
 ---
 
@@ -159,10 +189,10 @@ from independent modules coordinated by a top-level scheduler, as defined in
 
 | ID     | Interface                                                                       |
 |--------|---------------------------------------------------------------------------------|
-| IF-01  | **Front panel:** buttons (digital, debounced) and potentiometers (ADC1).        |
-| IF-02  | **Display:** OLED over I²C (or SPI), mounted behind the dial glass.             |
-| IF-03  | **Lighting:** PWM-driven LED zones (dial, cabinet).                             |
-| IF-04  | **WiiM Pro HTTP API (Phase 2):** local-network HTTP control for source, volume, and metadata. Endpoint and command set to be documented in `docs/Hardware Architecture.md` / a dedicated interface note when implemented. |
+| IF-01  | **Front panel:** four 10 kΩ pots on ADC1 (position sensors); on/off switch and four working source buttons (VHF, MW, LW, Gram) as debounced low-voltage digital inputs. SW deferred; Stereo/Mono unwired. |
+| IF-02  | **Display:** 1.3-inch 128×64 OLED over **I²C** (SH1106/SSD1306-compatible), behind the dial glass. |
+| IF-03  | **Lighting:** PWM-driven warm dial illumination via logic-level N-channel MOSFET (dial only in Phase 1). |
+| IF-04  | **WiiM Pro local API (Phase 2):** source selection, volume control, and metadata/playback-state feedback. Endpoint and command set to be documented in a dedicated interface note when implemented. |
 | IF-05  | **Serial console:** 115200 baud for diagnostics and bring-up.                   |
 
 ---
@@ -205,6 +235,7 @@ from independent modules coordinated by a top-level scheduler, as defined in
 ## 12. Traceability
 
 - **Requirements → design:** `docs/Firmware Architecture.md` (modules, phase map).
+- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 SW deferred, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2).
 - **Requirements → hardware:** `docs/Hardware Architecture.md`, `docs/Wiring.md`.
 - **Requirements → verification:** test suites under `test/`, one per module.
 - **Change history:** `docs/Revision History.md`.

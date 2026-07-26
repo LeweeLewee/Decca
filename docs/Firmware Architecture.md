@@ -24,15 +24,30 @@ AI-assisted editing.
 |------------|--------------------------------------------------|-----------------------|
 | `hardware` | Pin map and board-level init                     | —                     |
 | `settings` | Persisted config + shared runtime state (NVS)    | —                     |
-| `buttons`  | Debounced front-panel button events              | `hardware`            |
-| `pots`     | Filtered analogue reads (volume/tone)            | `hardware`            |
-| `display`  | OLED rendering behind the dial glass             | `hardware`, `settings`|
-| `lighting` | Dial/cabinet illumination (PWM, effects)         | `hardware`, `settings`|
-| `power`    | Power/standby sequencing *(planned)*             | `hardware`, `settings`|
-| WiiM iface | WiiM Pro HTTP control *(Phase 2)*                | `settings`, Wi-Fi     |
+| `buttons`  | Debounced on/off switch + source buttons (VHF, MW, LW, Gram) | `hardware`  |
+| `pots`     | Filtered ADC1 reads of the four position pots (Balance, Treble, Bass, Volume) | `hardware` |
+| `display`  | OLED rendering behind the dial glass              | `hardware`, `settings`|
+| `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|
+| `power`    | On/off state handling *(planned)*                | `hardware`, `settings`|
+| WiiM iface | WiiM Pro local-API control *(Phase 2)*           | `settings`, Wi-Fi     |
 
 > `power` and the WiiM interface are documented here as intended modules; they
 > are added in later phases and are not yet present in `src/`.
+
+### Module notes (confirmed Phase 1 build)
+
+- **`buttons`** reads the retained on/off switch (low-voltage input, internal
+  pull-up) and the four working source buttons with software debounce. **SW has
+  no function in Phase 1** (no unique contact; ADR-0004). No transport controls
+  exist in Phase 1.
+- **`pots`** treats the four pots as **position sensors only** (not in the audio
+  path). It applies calibration, smoothing, deadband, and optional inversion, and
+  emits values suitable for stable display updates (FR-POT-01..05).
+- **`lighting`** drives the warm dial illumination only (dial, not cabinet) via a
+  logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
+  brightness, and a safe boot state.
+- **`display`** presents on/off state, the selected working source, the four
+  control values, and diagnostics, and shows SW as unavailable.
 
 ## Data Flow
 
