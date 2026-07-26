@@ -42,7 +42,9 @@ AI-assisted editing.
   exist in Phase 1.
 - **`pots`** treats the four pots as **position sensors only** (not in the audio
   path). It applies calibration, smoothing, deadband, and optional inversion, and
-  emits values suitable for stable display updates (FR-POT-01..05).
+  emits values suitable for stable display updates (FR-POT-01..05). Sampling is
+  fixed at 100 Hz; an integer low-pass filter precedes normalisation and output
+  deadband so `update()` remains deterministic and non-blocking.
 - **`lighting`** drives the warm dial illumination only (dial, not cabinet) via a
   logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
   brightness, and a safe boot state.

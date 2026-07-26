@@ -12,7 +12,7 @@ test/
 ├── test_hardware/          hardware::init()
 ├── test_settings/          state defaults + RAM/NVS round-trips
 ├── test_buttons/           idle event queue
-├── test_pots/              value range
+├── test_pots/              ADC mapping, smoothing, calibration + deadband
 ├── test_display/           interface smoke
 └── test_lighting/          brightness interface
 ```
@@ -39,10 +39,12 @@ board attached.
 ## Status
 
 Phase 1 is in progress. The settings suite exercises real NVS persistence using
-a test-only namespace; the remaining suites are interface / smoke tests pending
-their module implementations. Each file notes how to grow it into a behavioural
-test as the module gains logic. Keeping one suite per module reinforces the
-low-coupling design in `docs/Firmware Architecture.md`.
+a test-only namespace. The pots suite injects deterministic ADC samples to
+exercise mapping, normalisation, smoothing, calibration, inversion and deadband;
+it also prints one `POT_SNAPSHOT` line from the real ADC pins for bench
+verification. The remaining suites are interface / smoke tests pending their
+module implementations. Keeping one suite per module reinforces the low-coupling
+design in `docs/Firmware Architecture.md`.
 
 ## Future: native tests
 

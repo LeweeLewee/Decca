@@ -41,6 +41,7 @@ for the design that governs all firmware changes.
 ## Status
 Phase 1 hardware-layer work is in progress. The proposed pin map and confirmed
 control contracts are reconciled, board initialisation is implemented for all
-assigned pins, and `settings` implements NVS persistence. GPIO assignments
-remain proposed pending bench verification. Other modules remain documented
+assigned pins, `settings` implements NVS persistence, and `pots` implements
+filtered/calibrated four-channel ADC1 reads. GPIO assignments remain proposed
+pending the procedure in `docs/Build Guide.md`. Other modules remain documented
 skeletons with `TODO(phaseN)` markers.
