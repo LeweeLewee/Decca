@@ -104,16 +104,18 @@ no inversion.
 The proposed H3 inputs are active-low and use the ESP32's internal pull-ups.
 Keep the Decca disconnected from mains and power only the ESP32 by USB.
 
-| Button contact | Proposed GPIO | Other side of contact |
-|----------------|---------------|-----------------------|
-| VHF            | GPIO16        | GND                   |
-| MW             | GPIO17        | GND                   |
-| LW             | GPIO18        | GND                   |
-| Gram           | GPIO23        | GND                   |
+| Button | Signal wire | Proposed GPIO | Board label | Return / treatment |
+|--------|-------------|---------------|-------------|--------------------|
+| VHF    | Blue        | GPIO16        | RX2         | Brown → GND        |
+| SW     | Purple      | —             | —           | Label and insulate; no Phase 1 connection |
+| MW     | Green       | GPIO17        | TX2         | Brown → GND        |
+| LW     | Yellow      | GPIO18        | D18         | Brown → GND        |
+| Gram   | Grey        | GPIO23        | D23         | Brown → GND        |
 
-1. Label each contact pair by function; button-harness colours are not locked.
-2. Connect one side of each usable contact to its named GPIO and the other side
-   to GND. Do not connect the contacts to 3.3 V or 5 V.
+1. Confirm the locked H3 colours against the table before termination.
+2. Connect each usable signal wire to its named GPIO and the Brown common wire
+   to GND. Do not connect the contacts to 3.3 V or 5 V. Keep the Purple SW wire
+   disconnected and insulated.
 3. Connect the ESP32 by USB and run:
 
    ```powershell
@@ -132,7 +134,9 @@ Pass criteria:
 - all nine behavioural tests pass;
 - SW remains unwired and has no reported input.
 
-Keep GPIO16/17/18/23 labelled proposed until these checks pass.
+On the pictured ESP32 board, GPIO16 and GPIO17 are printed as RX2 and TX2;
+GPIO18 and GPIO23 are printed as D18 and D23. Keep GPIO16/17/18/23 labelled
+proposed until these checks pass.
 
 ### 7.3 Remaining commissioning
 

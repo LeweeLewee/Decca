@@ -25,8 +25,10 @@ its original conductors, **Red** and **Green**. These are pre-existing and are
 **not** to be recoloured or reinterpreted under the general loom standard above.
 See the on/off section.
 
-For the button harness, wires are identified by **function label**, not by colour
-(button-harness colours are not yet fully locked).
+The H3 button-harness colours are locked separately from the general loom
+standard: **Brown common ground, Blue VHF, Purple SW, Green MW, Yellow LW and
+Grey Gram**. The Purple SW conductor is labelled and insulated at the
+controller end because SW has no Phase 1 function.
 
 ## Harnesses
 
@@ -141,19 +143,22 @@ The four working inputs are treated as simple low-voltage GPIO signals with
 software debounce. Final Phase 2 WiiM source mappings remain configurable in
 software (see Specification and ADR-0004).
 
-Proposed controller termination:
+Proposed controller termination (fascia order):
 
-| Button contact | ESP32 input | Return |
-|----------------|-------------|--------|
-| VHF            | GPIO16      | GND    |
-| MW             | GPIO17      | GND    |
-| LW             | GPIO18      | GND    |
-| Gram           | GPIO23      | GND    |
+| Button contact | Signal wire | ESP32 input | Board label | Return / treatment |
+|----------------|-------------|-------------|-------------|--------------------|
+| VHF            | Blue        | GPIO16      | RX2         | Brown → GND        |
+| SW             | Purple      | —           | —           | Label and insulate; no Phase 1 connection |
+| MW             | Green       | GPIO17      | TX2         | Brown → GND        |
+| LW             | Yellow      | GPIO18      | D18         | Brown → GND        |
+| Gram           | Grey        | GPIO23      | D23         | Brown → GND        |
 
-Each contact is active-low: selecting it closes the contact between its named
-GPIO and GND. The ESP32 provides the pull-up; do not connect these contacts to
-3.3 V or 5 V. Firmware accepts a changed state after 25 ms of stability and
-emits one event on each confirmed selection without repeating while held.
+Each working contact is active-low: selecting it closes the contact between its
+coloured signal wire and the Brown common ground. The ESP32 provides the
+pull-up; do not connect these contacts to 3.3 V or 5 V. RX2 and TX2 are the
+board's silkscreen labels for GPIO16 and GPIO17 and are available because UART2
+is unused. Firmware accepts a changed state after 25 ms of stability and emits
+one event on each confirmed selection without repeating while held.
 
 ## Stereo/Mono Control
 
