@@ -1,0 +1,7 @@
+item,quantity,specification,supplier,part_number,status
+ESP32 DevKit,1,"dual-core; Wi-Fi; at least 4 MB flash; control/UI only",TBD,TBD,acquired
+10 kOhm linear potentiometer,4,"position sensor; not in audio path",TBD,TBD,installed-and-verified
+OLED display,1,"1.3-inch; white; 128x64; SH1106; four-pin I2C; 3.3 V",The Pi Hut,SKU 105630,purchased-awaiting-bench-test
+N-channel MOSFET,1,"logic-level at 3.3 V; switches 5 V dial lighting under PWM",TBD,TBD,open
+Warm-white LED lighting,1 set,"5 V dial illumination",TBD,TBD,open
+Power supply / rails,1,"stable 5 V rail; 3.3 V from controller regulator",TBD,TBD,open

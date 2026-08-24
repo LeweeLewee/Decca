@@ -52,8 +52,11 @@ AI-assisted editing.
   target from `settings`, and advances one PWM count every 10 ms without
   blocking. `main` selects normal or standby targets; `lighting` does not read
   buttons or power state directly.
-- **`display`** presents on/off state, the selected working source, the four
-  control values, and diagnostics, and shows SW as unavailable.
+- **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C
+  address 0x3C. It presents a timed non-blocking startup frame, standby or the
+  selected working source and four normalised control values, transient status
+  and diagnostics, and an explicit SW unavailable message. It redraws only
+  when its semantic frame changes or a transient expires.
 
 ## Data Flow
 

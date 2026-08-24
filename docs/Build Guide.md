@@ -149,7 +149,44 @@ On the pictured ESP32 board, GPIO16 and GPIO17 are printed as RX2 and TX2;
 GPIO18 and GPIO23 are printed as D18 and D23. GPIO16, GPIO17 and GPIO23 are
 bench-verified. Keep GPIO18 proposed until the repaired LW pair passes.
 
-### 7.3 Dial-lighting bench verification
+### 7.3 OLED bench verification
+
+GPIO21 and GPIO22 remain proposed until this procedure passes. Keep the Decca
+disconnected from mains and power only the ESP32 by USB.
+
+1. Read the labels printed beside the delivered OLED header. Do not infer its
+   physical pin order from another module or online photograph.
+2. Connect the purchased Pi Hut SH1106 panel:
+   - OLED GND → ESP32 GND (Brown);
+   - OLED VCC → ESP32 3V3 (Red), never 5 V for this build;
+   - OLED SDA → GPIO21 (signal conductor labelled SDA);
+   - OLED SCL → GPIO22 (signal conductor labelled SCL).
+3. In the PlatformIO terminal run:
+
+   ```powershell
+   git pull origin main
+   pio test -e esp32dev -f test_display
+   ```
+
+4. Confirm the OLED first shows `DECCA` / `STARTING`, then an on-state GRAM
+   dashboard with Volume 75% and the other three controls at 50%.
+5. Confirm the output contains:
+
+   ```text
+   DISPLAY_SNAPSHOT controller=SH1106 address=0x3C ready=1
+   ```
+
+Pass criteria:
+
+- the panel is detected at 0x3C;
+- the startup and dashboard frames are upright, complete and not offset;
+- white pixels are clear with no persistent noise or clipped columns;
+- all seven display tests pass.
+
+Record the result before marking GPIO21 and GPIO22 bench-verified. If the panel
+is blank, disconnect USB before checking VCC/GND order and the SDA/SCL labels.
+
+### 7.4 Dial-lighting bench verification
 
 GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
 from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
@@ -182,7 +219,7 @@ Pass criteria:
 - the MOSFET and wiring remain cool;
 - all seven behavioural tests pass.
 
-### 7.4 Remaining commissioning
+### 7.5 Remaining commissioning
 
 - Selecting the final normal and standby dial brightness
 - Verifying the on/off control

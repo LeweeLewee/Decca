@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input and non-blocking dial-light PWM fades are implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.10                                              |
+| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and SH1106 display rendering are implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
+| Version  | 0.11                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -190,7 +190,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | ID     | Interface                                                                       |
 |--------|---------------------------------------------------------------------------------|
 | IF-01  | **Front panel:** four 10 kΩ pots on ADC1 (position sensors); on/off switch and four working source buttons (VHF, MW, LW, Gram) as debounced low-voltage digital inputs. SW deferred; Stereo/Mono unwired. |
-| IF-02  | **Display:** 1.3-inch 128×64 OLED over **I²C** (SH1106/SSD1306-compatible), behind the dial glass. |
+| IF-02  | **Display:** purchased Pi Hut 1.3-inch white 128×64 **SH1106** OLED over **I²C** at address 0x3C, powered from 3.3 V and mounted behind the dial glass. |
 | IF-03  | **Lighting:** PWM-driven warm dial illumination via logic-level N-channel MOSFET (dial only in Phase 1). |
 | IF-04  | **WiiM Pro local API (Phase 2):** source selection, volume control, and metadata/playback-state feedback. Endpoint and command set to be documented in a dedicated interface note when implemented. |
 | IF-05  | **Serial console:** 115200 baud for diagnostics and bring-up.                   |

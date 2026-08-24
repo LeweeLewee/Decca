@@ -73,8 +73,8 @@ The Stereo/Mono control is retained but **unwired** (ADR-0005).
 ## Outputs
 
 ### OLED display (H4)
-1.3-inch 128×64 I²C panel (SH1106/SSD1306-compatible), proposed SDA GPIO21 /
-SCL GPIO22.
+Purchased Pi Hut 1.3-inch white 128×64 SH1106 I²C panel (SKU 105630), powered
+from 3.3 V at address 0x3C. Proposed SDA GPIO21 / SCL GPIO22 remain unverified.
 
 ### Dial lighting (H5)
 5 V warm-white LEDs driven via a **logic-level N-channel MOSFET**, gate driven by

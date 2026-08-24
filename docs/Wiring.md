@@ -58,8 +58,8 @@ All ESP32 pin numbers below are **(proposed)** unless stated otherwise.
 | Source: LW            | GPIO18 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
 | Source: Gram          | GPIO23 (bench-verified) | Digital in  | H3      | Internal pull-up + software debounce     |
 | Source: SW            | —               | —           | H3      | **NO FUNCTION in Phase 1** (see below)   |
-| OLED SDA              | GPIO21 (proposed) | I²C         | H4      | SH1106/SSD1306-compatible                |
-| OLED SCL              | GPIO22 (proposed) | I²C         | H4      | Standard I²C SCL                         |
+| OLED SDA              | GPIO21 (proposed) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
+| OLED SCL              | GPIO22 (proposed) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (proposed) | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
 
 > The four source-button GPIOs avoid strapping pins and support internal
@@ -174,10 +174,17 @@ future use. **No function assigned.** See ADR-0005.
 
 ## H4 — OLED Display
 
-1.3-inch, 128×64, **I²C**, SH1106- or SSD1306-compatible.
+Purchased panel: Pi Hut SKU 105630, 1.3-inch white 128×64 **SH1106 I²C** OLED
+with a pre-soldered four-pin header. Expected address: **0x3C**.
 
+- VCC → 3.3 V (Red)
+- GND → GND (Brown)
 - SDA → GPIO21 (proposed)
 - SCL → GPIO22 (proposed)
+
+Check the labels printed on the delivered module before applying power because
+four-pin OLED modules do not all use the same physical pin order. GPIO21 and
+GPIO22 remain proposed until the H4 bench procedure passes.
 
 ## H5 — Dial Illumination
 

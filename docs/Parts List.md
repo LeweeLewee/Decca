@@ -9,7 +9,7 @@
 |-----------------------|-----|-----------------------------------------------------------|--------|
 | ESP32 DevKit          | 1   | Dual-core, Wi-Fi, ADC1, LEDC PWM. Control/UI only, no audio. | _TBD_ |
 | Potentiometer, 10 kΩ linear | 4 | Position sensors (Balance, Treble, Bass, Volume). Not in audio path. | _TBD_ |
-| OLED display          | 1   | 1.3-inch, 128×64, I²C, SH1106/SSD1306-compatible          | _TBD_  |
+| OLED display          | 1   | **Purchased:** Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V | The Pi Hut |
 | N-channel MOSFET      | 1   | Logic-level; switches 5 V dial lighting under ESP32 PWM   | _TBD_  |
 | Warm-white LED lighting | 1 set | 5 V; dial illumination                                  | _TBD_  |
 | Power supply / rails  | 1   | 5 V rail; 3.3 V from board regulator                      | _TBD_  |

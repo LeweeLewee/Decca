@@ -13,7 +13,7 @@ test/
 ├── test_settings/          state defaults + RAM/NVS round-trips
 ├── test_buttons/           active-low debounce, state + event queue
 ├── test_pots/              ADC mapping, smoothing, calibration + deadband
-├── test_display/           interface smoke
+├── test_display/           SH1106 frames, timing, refresh + physical bring-up
 └── test_lighting/          PWM safe-off, target and fade behaviour
 ```
 
@@ -47,8 +47,12 @@ and buttons suites also report physical snapshots through Unity for bench
 verification. The lighting suite exercises a real low-duty fade for physical
 bring-up and injects its clock and PWM writer for deterministic safe-off,
 fade-up, fade-down, target-clamping and invalid-zone coverage. The display suite
-remains an interface smoke test pending implementation. Keeping one suite per
-module reinforces the low-coupling design in `docs/Firmware Architecture.md`.
+injects its clock, panel initialiser and semantic frame writer to exercise
+startup timing, standby/on dashboards, all four control values, change-only
+refresh, transient expiry, diagnostics, SW-unavailable presentation and safe
+initialisation failure. It also performs a real SH1106 address/frame snapshot
+for H4 bench verification. Keeping one suite per module reinforces the
+low-coupling design in `docs/Firmware Architecture.md`.
 
 ## Future: native tests
 
