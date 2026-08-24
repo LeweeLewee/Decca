@@ -29,6 +29,7 @@ that source control alone does not express well.
 | 2026-08-24 | Firmware | Assigned proposed active-low source inputs VHF GPIO16, MW GPIO17, LW GPIO18 and Gram GPIO23 with internal pull-ups (Specification v0.7); assignments remain unverified. |
 | 2026-08-24 | Firmware | Implemented 25 ms active-low debounce, stable latching state, fixed press-event queue, behavioural coverage and source-button bench diagnostics (Specification v0.8). |
 | 2026-08-24 | Docs | Recorded the locked H3 colour code and the controller board labels for the proposed source-button GPIOs (HW-06, ADR-0004). |
+| 2026-08-24 | Docs | Corrected H3 from an unsupported common-return colour map to four photographed, isolated two-wire pairs in provisional physical order; bench verification remains required (HW-06, ADR-0004). |
 
 ## Hardware Revisions
 

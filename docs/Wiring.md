@@ -25,10 +25,9 @@ its original conductors, **Red** and **Green**. These are pre-existing and are
 **not** to be recoloured or reinterpreted under the general loom standard above.
 See the on/off section.
 
-The H3 button-harness colours are locked separately from the general loom
-standard: **Brown common ground, Blue VHF, Purple SW, Green MW, Yellow LW and
-Grey Gram**. The Purple SW conductor is labelled and insulated at the
-controller end because SW has no Phase 1 function.
+H3 uses separate two-wire contact pairs; it has no common-return conductor.
+The photographed pairs are recorded in physical left-to-right order under H3,
+but their source assignments remain proposed until bench verification.
 
 ## Harnesses
 
@@ -143,22 +142,25 @@ The four working inputs are treated as simple low-voltage GPIO signals with
 software debounce. Final Phase 2 WiiM source mappings remain configurable in
 software (see Specification and ADR-0004).
 
-Proposed controller termination (fascia order):
+Proposed controller termination, derived from the photographed pair order and
+to be verified one pair at a time:
 
-| Button contact | Signal wire | ESP32 input | Board label | Return / treatment |
-|----------------|-------------|-------------|-------------|--------------------|
-| VHF            | Blue        | GPIO16      | RX2         | Brown → GND        |
-| SW             | Purple      | —           | —           | Label and insulate; no Phase 1 connection |
-| MW             | Green       | GPIO17      | TX2         | Brown → GND        |
-| LW             | Yellow      | GPIO18      | D18         | Brown → GND        |
-| Gram           | Grey        | GPIO23      | D23         | Brown → GND        |
+| Physical order | Proposed button | Contact pair | ESP32 input | Board label | Individual return |
+|----------------|-----------------|--------------|-------------|-------------|-------------------|
+| Leftmost / top | VHF             | Yellow + Green (left-hand pair) | GPIO16 | RX2 | Green → GND |
+| —              | SW              | No unique isolated pair | — | — | No Phase 1 connection |
+| Second working pair | MW         | Purple + Blue | GPIO17 | TX2 | Blue → GND |
+| Third working pair | LW          | Orange + Red | GPIO18 | D18 | Red → GND |
+| Rightmost / bottom | Gram        | Green + Yellow (right-hand pair) | GPIO23 | D23 | Yellow → GND |
 
-Each working contact is active-low: selecting it closes the contact between its
-coloured signal wire and the Brown common ground. The ESP32 provides the
-pull-up; do not connect these contacts to 3.3 V or 5 V. RX2 and TX2 are the
-board's silkscreen labels for GPIO16 and GPIO17 and are available because UART2
-is unused. Firmware accepts a changed state after 25 ms of stability and emits
-one event on each confirmed selection without repeating while held.
+For the proposed termination above, the first colour in each working pair is
+the GPIO conductor and the second is its individual GND return. These are dry
+contacts, so the two conductors within a pair may be swapped without changing
+operation. There is no shared return in H3. The ESP32 provides the pull-up; do
+not connect any contact to 3.3 V or 5 V. RX2 and TX2 are the board's silkscreen
+labels for GPIO16 and GPIO17 and are available because UART2 is unused.
+Firmware accepts a changed state after 25 ms of stability and emits one event
+on each confirmed selection without repeating while held.
 
 ## Stereo/Mono Control
 

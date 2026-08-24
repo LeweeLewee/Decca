@@ -104,18 +104,21 @@ no inversion.
 The proposed H3 inputs are active-low and use the ESP32's internal pull-ups.
 Keep the Decca disconnected from mains and power only the ESP32 by USB.
 
-| Button | Signal wire | Proposed GPIO | Board label | Return / treatment |
-|--------|-------------|---------------|-------------|--------------------|
-| VHF    | Blue        | GPIO16        | RX2         | Brown → GND        |
-| SW     | Purple      | —             | —           | Label and insulate; no Phase 1 connection |
-| MW     | Green       | GPIO17        | TX2         | Brown → GND        |
-| LW     | Yellow      | GPIO18        | D18         | Brown → GND        |
-| Gram   | Grey        | GPIO23        | D23         | Brown → GND        |
+| Physical order | Proposed button | Contact pair | Proposed test termination |
+|----------------|-----------------|--------------|-----------------------------|
+| Leftmost / top | VHF             | Yellow + Green (left-hand pair) | Yellow → GPIO16 / RX2; Green → GND |
+| —              | SW              | No unique isolated pair | Leave disconnected |
+| Second working pair | MW         | Purple + Blue | Purple → GPIO17 / TX2; Blue → GND |
+| Third working pair | LW          | Orange + Red | Orange → GPIO18 / D18; Red → GND |
+| Rightmost / bottom | Gram        | Green + Yellow (right-hand pair) | Green → GPIO23 / D23; Yellow → GND |
 
-1. Confirm the locked H3 colours against the table before termination.
-2. Connect each usable signal wire to its named GPIO and the Brown common wire
-   to GND. Do not connect the contacts to 3.3 V or 5 V. Keep the Purple SW wire
-   disconnected and insulated.
+1. Identify the four pairs by their physical left-to-right order. Distinguish
+   the left-hand and right-hand Green/Yellow pairs before connecting either.
+2. Test only one pair at a time. Connect one conductor to its proposed GPIO and
+   the other conductor from the same pair to GND as shown. Each pair has its own
+   return; H3 has no common-return wire. Do not connect any contact to 3.3 V or
+   5 V. Because these are dry contacts, swapping the two conductors within one
+   pair does not affect the result.
 3. Connect the ESP32 by USB and run:
 
    ```powershell
@@ -124,8 +127,9 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
 
 4. Record the line beginning `BUTTON_SNAPSHOT`. A selected source is shown as
    `1`; an open contact is shown as `0`.
-5. Repeat with VHF, MW, LW and Gram selected in turn. Ignore `onoff` during this
-   procedure unless the H2 harness is also connected.
+5. Repeat with the proposed VHF, MW, LW and Gram pairs in turn, disconnecting
+   the previous pair before connecting the next. Ignore `onoff` unless the H2
+   harness is also connected.
 
 Pass criteria:
 
@@ -133,6 +137,9 @@ Pass criteria:
 - changing selection returns the previous contact to `0`;
 - all nine behavioural tests pass;
 - SW remains unwired and has no reported input.
+
+If a pair responds to a different physical button, stop and amend the pair
+assignment from the observed result rather than moving GPIO definitions.
 
 On the pictured ESP32 board, GPIO16 and GPIO17 are printed as RX2 and TX2;
 GPIO18 and GPIO23 are printed as D18 and D23. Keep GPIO16/17/18/23 labelled
