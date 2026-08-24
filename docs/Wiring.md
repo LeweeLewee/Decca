@@ -51,18 +51,18 @@ All ESP32 pin numbers below are **(proposed)** unless stated otherwise.
 | Treble pot wiper      | GPIO34 (bench-verified) | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | ADC1, in-only | H1    | ADC1; input-only pin                     |
 | On/off switch (Red)   | GPIO19 (proposed) | Digital in  | H2      | Internal pull-up; low-voltage logic only |
-| Source: VHF           | (proposed)      | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: MW            | (proposed)      | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: LW            | (proposed)      | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: Gram          | (proposed)      | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: VHF           | GPIO16 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: MW            | GPIO17 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: LW            | GPIO18 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: Gram          | GPIO23 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
 | Source: SW            | —               | —           | H3      | **NO FUNCTION in Phase 1** (see below)   |
 | OLED SDA              | GPIO21 (proposed) | I²C         | H4      | SH1106/SSD1306-compatible                |
 | OLED SCL              | GPIO22 (proposed) | I²C         | H4      | Standard I²C SCL                         |
 | Dial lighting PWM     | GPIO25 (proposed) | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
 
-> Specific GPIOs for the four working source buttons are **not yet assigned**;
-> they are to be selected from free digital-capable, pull-up-capable pins during
-> firmware bring-up and recorded here.
+> The four source-button GPIOs avoid strapping pins and support internal
+> pull-ups. They remain proposed until the H3 bench-verification procedure
+> passes.
 
 ## H1 — Potentiometers
 
@@ -140,6 +140,19 @@ Phase 1 behaviour:
 The four working inputs are treated as simple low-voltage GPIO signals with
 software debounce. Final Phase 2 WiiM source mappings remain configurable in
 software (see Specification and ADR-0004).
+
+Proposed controller termination:
+
+| Button contact | ESP32 input | Return |
+|----------------|-------------|--------|
+| VHF            | GPIO16      | GND    |
+| MW             | GPIO17      | GND    |
+| LW             | GPIO18      | GND    |
+| Gram           | GPIO23      | GND    |
+
+Each contact is active-low: selecting it closes the contact between its named
+GPIO and GND. The ESP32 provides the pull-up; do not connect these contacts to
+3.3 V or 5 V.
 
 ## Stereo/Mono Control
 

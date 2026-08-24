@@ -26,6 +26,10 @@ constexpr uint8_t kPotBass = 33;         // ADC1 (bench-verified)
 constexpr uint8_t kPotTreble = 34;       // ADC1, input-only (bench-verified)
 constexpr uint8_t kPotBalance = 35;      // ADC1, input-only (bench-verified)
 constexpr uint8_t kSwitchOnOff = 19;      // Digital input, internal pull-up (proposed)
+constexpr uint8_t kButtonVhf = 16;         // Digital input, internal pull-up (proposed)
+constexpr uint8_t kButtonMw = 17;          // Digital input, internal pull-up (proposed)
+constexpr uint8_t kButtonLw = 18;          // Digital input, internal pull-up (proposed)
+constexpr uint8_t kButtonGram = 23;        // Digital input, internal pull-up (proposed)
 constexpr uint8_t kDisplaySda = 21;       // I2C SDA (proposed)
 constexpr uint8_t kDisplayScl = 22;       // I2C SCL (proposed)
 constexpr uint8_t kDialLightingPwm = 25;  // LEDC PWM output (proposed)
@@ -40,8 +44,7 @@ constexpr uint8_t kDialLightingPwmResolutionBits = 8;
  * @brief Configure pin modes and board-level peripherals.
  *
  * Configures all currently assigned Phase 1 pins, ADC1 and the dial-lighting
- * PWM channel. Source-button pins remain untouched until they are assigned.
- * Call once from setup(), before any other module init.
+ * PWM channel. Call once from setup(), before any other module init.
  */
 void init();
 

@@ -23,6 +23,10 @@ void init() {
     analogSetPinAttenuation(kPotBalance, ADC_11db);
 
     pinMode(kSwitchOnOff, INPUT_PULLUP);
+    pinMode(kButtonVhf, INPUT_PULLUP);
+    pinMode(kButtonMw, INPUT_PULLUP);
+    pinMode(kButtonLw, INPUT_PULLUP);
+    pinMode(kButtonGram, INPUT_PULLUP);
 
     Wire.begin(kDisplaySda, kDisplayScl);
 
