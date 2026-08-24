@@ -152,7 +152,8 @@ Proposed controller termination:
 
 Each contact is active-low: selecting it closes the contact between its named
 GPIO and GND. The ESP32 provides the pull-up; do not connect these contacts to
-3.3 V or 5 V.
+3.3 V or 5 V. Firmware accepts a changed state after 25 ms of stability and
+emits one event on each confirmed selection without repeating while held.
 
 ## Stereo/Mono Control
 

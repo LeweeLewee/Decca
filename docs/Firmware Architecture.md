@@ -37,9 +37,10 @@ AI-assisted editing.
 ### Module notes (confirmed Phase 1 build)
 
 - **`buttons`** reads the retained on/off switch (low-voltage input, internal
-  pull-up) and the four working source buttons with software debounce. **SW has
-  no function in Phase 1** (no unique contact; ADR-0004). No transport controls
-  exist in Phase 1.
+  pull-up) and the four working active-low source buttons with a 25 ms software
+  debounce. It exposes stable state for latching controls and queues one event
+  per confirmed press without hold repeats. **SW has no function in Phase 1**
+  (no unique contact; ADR-0004). No transport controls exist in Phase 1.
 - **`pots`** treats the four pots as **position sensors only** (not in the audio
   path). It applies calibration, smoothing, deadband, and optional inversion, and
   emits values suitable for stable display updates (FR-POT-01..05). Sampling is

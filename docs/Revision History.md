@@ -27,6 +27,7 @@ that source control alone does not express well.
 | 2026-08-24 | Firmware | Routed the physical pot snapshot through Unity diagnostics so PlatformIO retains the four raw ADC readings during bench verification. |
 | 2026-08-24 | Hardware | Bench-verified Volume GPIO32, Bass GPIO33, Treble GPIO34 and Balance GPIO35 across the full 0–4095 ADC range; default calibration retained (Specification v0.6). |
 | 2026-08-24 | Firmware | Assigned proposed active-low source inputs VHF GPIO16, MW GPIO17, LW GPIO18 and Gram GPIO23 with internal pull-ups (Specification v0.7); assignments remain unverified. |
+| 2026-08-24 | Firmware | Implemented 25 ms active-low debounce, stable latching state, fixed press-event queue, behavioural coverage and source-button bench diagnostics (Specification v0.8). |
 
 ## Hardware Revisions
 

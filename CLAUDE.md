@@ -42,8 +42,9 @@ for the design that governs all firmware changes.
 Phase 1 hardware-layer work is in progress. The proposed pin map and confirmed
 control contracts are reconciled, board initialisation is implemented for all
 assigned pins, `settings` implements NVS persistence, and `pots` implements
-filtered/calibrated four-channel ADC1 reads. GPIO assignments remain proposed
+filtered/calibrated four-channel ADC1 reads. `buttons` implements active-low,
+25 ms debounced stable state and press events. GPIO assignments remain proposed
 except for the four pot inputs (GPIO32–35), which passed the procedure in
 `docs/Build Guide.md` on 2026-08-24. Source-button GPIO16/17/18/23 are assigned
-but remain proposed. Other modules remain documented skeletons with
-`TODO(phaseN)` markers.
+but remain proposed pending their documented bench test. Other modules remain
+documented skeletons with `TODO(phaseN)` markers.

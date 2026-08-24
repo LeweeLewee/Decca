@@ -99,7 +99,42 @@ All six `test_pots` cases passed. Midpoint variation is expected because the
 controls have no centre detent. The default 0–4095 calibration is retained with
 no inversion.
 
-### 7.2 Remaining commissioning
+### 7.2 Source-button bench verification
+
+The proposed H3 inputs are active-low and use the ESP32's internal pull-ups.
+Keep the Decca disconnected from mains and power only the ESP32 by USB.
+
+| Button contact | Proposed GPIO | Other side of contact |
+|----------------|---------------|-----------------------|
+| VHF            | GPIO16        | GND                   |
+| MW             | GPIO17        | GND                   |
+| LW             | GPIO18        | GND                   |
+| Gram           | GPIO23        | GND                   |
+
+1. Label each contact pair by function; button-harness colours are not locked.
+2. Connect one side of each usable contact to its named GPIO and the other side
+   to GND. Do not connect the contacts to 3.3 V or 5 V.
+3. Connect the ESP32 by USB and run:
+
+   ```powershell
+   pio test -e esp32dev -f test_buttons
+   ```
+
+4. Record the line beginning `BUTTON_SNAPSHOT`. A selected source is shown as
+   `1`; an open contact is shown as `0`.
+5. Repeat with VHF, MW, LW and Gram selected in turn. Ignore `onoff` during this
+   procedure unless the H2 harness is also connected.
+
+Pass criteria:
+
+- each selection sets only its matching named value to `1`;
+- changing selection returns the previous contact to `0`;
+- all nine behavioural tests pass;
+- SW remains unwired and has no reported input.
+
+Keep GPIO16/17/18/23 labelled proposed until these checks pass.
+
+### 7.3 Remaining commissioning
 
 - Calibrating dial brightness
-- Verifying source and on/off controls
+- Verifying the on/off control

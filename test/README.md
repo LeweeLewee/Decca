@@ -11,7 +11,7 @@ test/
 ├── unity_runner.h          shared setup()/loop() runner (included by each suite)
 ├── test_hardware/          hardware::init()
 ├── test_settings/          state defaults + RAM/NVS round-trips
-├── test_buttons/           idle event queue
+├── test_buttons/           active-low debounce, state + event queue
 ├── test_pots/              ADC mapping, smoothing, calibration + deadband
 ├── test_display/           interface smoke
 └── test_lighting/          brightness interface
@@ -40,9 +40,10 @@ board attached.
 
 Phase 1 is in progress. The settings suite exercises real NVS persistence using
 a test-only namespace. The pots suite injects deterministic ADC samples to
-exercise mapping, normalisation, smoothing, calibration, inversion and deadband;
-it also reports one `POT_SNAPSHOT` Unity diagnostic from the real ADC pins so it
-is retained in PlatformIO test and serial-monitor output during bench
+exercise mapping, normalisation, smoothing, calibration, inversion and deadband.
+The buttons suite injects digital levels to exercise active-low debounce, bounce
+rejection, stable latching state, re-arming and fixed-queue ordering. The pots
+and buttons suites also report physical snapshots through Unity for bench
 verification. The remaining suites are interface / smoke tests pending their
 module implementations. Keeping one suite per module reinforces the low-coupling
 design in `docs/Firmware Architecture.md`.
