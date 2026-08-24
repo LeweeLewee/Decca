@@ -15,3 +15,4 @@ Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
 | 0004 | Reuse VHF, MW, LW and Gram; defer SW                        | Accepted |
 | 0005 | Leave Stereo/Mono unwired in Phase 1                        | Accepted |
 | 0006 | Keep WiiM Pro integration in Phase 2                        | Accepted |
+| 0007 | Present logical function and now-playing context            | Accepted |

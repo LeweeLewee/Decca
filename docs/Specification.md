@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and SH1106 display rendering are implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.11                                              |
+| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and initial SH1106 display rendering are implemented. The revised display presentation contract is specified but not yet implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
+| Version  | 0.12                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -104,11 +104,13 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-DSP-01 | The system shall render startup state, system on/off state, the selected working source, and the four control values (volume, bass, treble, balance). | 1 |
-| FR-DSP-02 | The system shall show transient status for control and source changes, and shall render diagnostic messages. | 1 |
-| FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
-| FR-DSP-03 | The display shall show streamer metadata (title/artist/source, playback state) when present. | 2 |
+| FR-DSP-01 | The system shall render system on/off state and the four control values (volume, bass, treble, balance). | 1 |
+| FR-DSP-02 | The system shall show a transient control view for approximately 2 s when a pot is adjusted, including the control name, bar and percentage; source/function changes shall receive transient confirmation and diagnostic messages shall remain available. | 1 |
+| FR-DSP-03 | While a streaming source is playing, the default on-state view shall show available now-playing information, including mapped function/source, title and artist. If metadata is absent, it shall fall back to the mapped function rather than a blank or stale now-playing view. | 2 |
 | FR-DSP-04 | The display shall render configuration menus.                                | 3     |
+| FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
+| FR-DSP-06 | Startup shall show a short, non-blocking monochrome Decca-logo animation lasting approximately 1 s. | 1 |
+| FR-DSP-07 | The display shall identify the mapped logical function prominently and show the originating legacy fascia button only as secondary context in parentheses, for example `BBC RADIO 2` with `(VHF BUTTON)` beneath it. | 2 |
 
 ### 5.5 Lighting
 
@@ -216,13 +218,13 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ## 11. Acceptance Criteria
 
 ### Phase 1 — Local Control
-- FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02, FR-LGT, FR-SET satisfied.
+- FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06, FR-LGT, FR-SET satisfied.
 - Device is fully usable with no network connected.
 - All Phase 1 module test suites pass (`pio test`).
 - Build is clean per NFR-04.
 
 ### Phase 2 — WiiM Integration
-- FR-WIM-01..04 and FR-DSP-03 satisfied.
+- FR-WIM-01..04 and FR-DSP-03/07 satisfied.
 - Source selection, volume sync, and metadata verified against a live WiiM Pro.
 - Loss of the streamer does not impair local control (FR-SYS-05, NFR-09).
 

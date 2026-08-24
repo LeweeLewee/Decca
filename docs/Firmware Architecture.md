@@ -53,10 +53,15 @@ AI-assisted editing.
   blocking. `main` selects normal or standby targets; `lighting` does not read
   buttons or power state directly.
 - **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C
-  address 0x3C. It presents a timed non-blocking startup frame, standby or the
-  selected working source and four normalised control values, transient status
-  and diagnostics, and an explicit SW unavailable message. It redraws only
-  when its semantic frame changes or a transient expires.
+  address 0x3C. Its presentation contract is defined by ADR-0007: a short
+  non-blocking monochrome Decca-logo startup animation; standby; transient
+  control views; diagnostics; and an explicit SW unavailable message. In Phase
+  2 the default on-state view prioritises now-playing metadata, falls back to
+  the mapped logical function, and treats the legacy fascia label only as
+  secondary context. The display consumes coherent state supplied by `main`;
+  it does not call input or WiiM modules. It redraws only when its semantic
+  frame changes or a transient expires. The initial static startup/dashboard
+  implementation predates ADR-0007 and remains to be reconciled.
 
 ## Data Flow
 

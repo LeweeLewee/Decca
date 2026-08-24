@@ -33,6 +33,7 @@ that source control alone does not express well.
 | 2026-08-24 | Hardware | Bench-verified VHF Yellow/Green on GPIO16, MW Purple/Blue on GPIO17 and Gram Yellow/Green on GPIO23; corrected LW to Yellow/Orange and retained GPIO18 as proposed pending solder repair and retest (Specification v0.9, HW-06, ADR-0004). |
 | 2026-08-24 | Firmware | Implemented safe-off dial PWM, persisted idle target, non-blocking 10 ms fade steps and behavioural/physical test coverage (Specification v0.10, FR-LGT-01..04, HW-05). GPIO25 remains proposed pending bench verification. |
 | 2026-08-24 | Firmware | Locked the purchased Pi Hut SH1106 panel and implemented non-blocking startup, standby/dashboard, status, SW-unavailable and diagnostic frames with change-only refresh and behavioural/physical coverage (Specification v0.11, FR-DSP-01/02/05, IF-02). GPIO21/22 remain proposed pending bench verification. |
+| 2026-08-24 | Docs | Locked the revised display presentation contract: animated Decca startup, transient control overlays, mapped function prioritised over legacy button label, and Phase 2 now-playing metadata with mapped-function fallback (Specification v0.12, ADR-0007, FR-DSP-02/03/06/07). |
 
 ## Hardware Revisions
 
