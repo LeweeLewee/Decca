@@ -168,8 +168,9 @@ disconnected from mains and power only the ESP32 by USB.
    pio test -e esp32dev -f test_display
    ```
 
-4. Confirm the OLED first shows `DECCA` / `STARTING`, then an on-state GRAM
-   dashboard with Volume 75% and the other three controls at 50%.
+4. Confirm the OLED reveals the `DECCA` wordmark from left to right over roughly
+   1 s, then shows `VINYL` prominently with `(GRAM BUTTON)` beneath it and a
+   local dashboard with Volume 75% and the other three controls at 50%.
 5. Confirm the output contains:
 
    ```text
@@ -179,9 +180,10 @@ disconnected from mains and power only the ESP32 by USB.
 Pass criteria:
 
 - the panel is detected at 0x3C;
-- the startup and dashboard frames are upright, complete and not offset;
+- all five startup frames and the dashboard are upright, complete and not
+  offset;
 - white pixels are clear with no persistent noise or clipped columns;
-- all seven display tests pass.
+- all ten display tests pass.
 
 Record the result before marking GPIO21 and GPIO22 bench-verified. If the panel
 is blank, disconnect USB before checking VCC/GND order and the SDA/SCL labels.

@@ -60,8 +60,9 @@ AI-assisted editing.
   the mapped logical function, and treats the legacy fascia label only as
   secondary context. The display consumes coherent state supplied by `main`;
   it does not call input or WiiM modules. It redraws only when its semantic
-  frame changes or a transient expires. The initial static startup/dashboard
-  implementation predates ADR-0007 and remains to be reconciled.
+  frame changes, an animation frame advances, or a transient expires. Mapped
+  names and metadata use fixed-size copied text fields, so Phase 2 can supply
+  them without allocation or changing the display interface.
 
 ## Data Flow
 

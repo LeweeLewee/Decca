@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and initial SH1106 display rendering are implemented. The revised display presentation contract is specified but not yet implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.12                                              |
+| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and the ADR-0007 SH1106 display presentation contract are implemented. Phase 2 metadata inputs are display-ready but have no WiiM producer yet. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
+| Version  | 0.13                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -237,7 +237,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ## 12. Traceability
 
 - **Requirements → design:** `docs/Firmware Architecture.md` (modules, phase map).
-- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 SW deferred, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2).
+- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 SW deferred, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2, 0007 display presentation).
 - **Requirements → hardware:** `docs/Hardware Architecture.md`, `docs/Wiring.md`.
 - **Requirements → verification:** test suites under `test/`, one per module.
 - **Change history:** `docs/Revision History.md`.

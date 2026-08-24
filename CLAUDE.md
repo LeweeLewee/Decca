@@ -44,12 +44,10 @@ control contracts are reconciled, board initialisation is implemented for all
 assigned pins, `settings` implements NVS persistence, and `pots` implements
 filtered/calibrated four-channel ADC1 reads. `buttons` implements active-low,
 25 ms debounced stable state and press events. `lighting` implements safe-off
-PWM control and non-blocking dial fades. `display` implements SH1106 startup,
-standby/dashboard, transient status and diagnostic rendering with change-only
-refreshes. ADR-0007 specifies the next display revision: an animated Decca
-startup, transient control overlays, and Phase 2 mapped-function/now-playing
-presentation; that revision is not yet implemented. Pot GPIO32–35 and
+PWM control and non-blocking dial fades. `display` implements the ADR-0007
+presentation contract: animated Decca startup, standby/local dashboard,
+transient controls and function confirmations, diagnostics, and Phase 2-ready
+mapped-function/now-playing views with change-only refreshes. Pot GPIO32–35 and
 source-button GPIO16, GPIO17 and GPIO23 are bench-verified; GPIO18 awaits an LW
-harness repair. The
-on/off switch, lighting GPIO25, OLED GPIO21/22 and remaining assigned pins stay
-proposed until their documented bench tests.
+harness repair. The on/off switch, lighting GPIO25, OLED GPIO21/22 and remaining
+assigned pins stay proposed until their documented bench tests.
