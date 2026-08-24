@@ -1,8 +1,8 @@
 # Hardware Architecture
 
-> **Status:** active. Reflects the confirmed Phase 1 physical build. ESP32 pin
-> assignments are **(proposed)** and not yet bench-verified; see `docs/Wiring.md`
-> for the authoritative interconnect detail.
+> **Status:** active. Reflects the confirmed Phase 1 physical build. Pot inputs
+> GPIO32–35 are bench-verified; remaining ESP32 assignments are **(proposed)**
+> or unassigned. See `docs/Wiring.md` for the authoritative interconnect detail.
 
 Describes the electrical system: the boards, how power flows, and how the ESP32
 connects to the front panel, display, and lighting.
@@ -50,7 +50,9 @@ analogue audio path is entirely separate and outside the controller.
 Four **10 kΩ linear** pots (Balance, Treble, Bass, Volume) wired GND / wiper /
 3.3 V (Brown / White / Red). Wipers read on ADC1. Firmware applies calibration,
 smoothing, deadband, and optional inversion (see Firmware Architecture).
-Proposed pins: Volume GPIO32, Bass GPIO33, Treble GPIO34, Balance GPIO35.
+Bench-verified pins: Volume GPIO32, Bass GPIO33, Treble GPIO34, Balance GPIO35.
+Each channel measured 0 anticlockwise, approximately 2047 at centre, and 4095
+clockwise on 2026-08-24, so the default 0–4095 calibration remains applicable.
 
 ### On/off switch (H2)
 Retained original switch and cable, active conductors **Red** and **Green**. A

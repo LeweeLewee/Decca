@@ -41,23 +41,24 @@ from parts.
 
 ### 7.1 Potentiometer bench verification
 
-The four GPIO assignments remain **proposed** until this procedure passes.
-Keep the Decca disconnected from mains; power only the ESP32 and the low-voltage
-pot harness by USB during this test.
+This procedure passed on 2026-08-24, confirming the four GPIO assignments. Keep
+it as the commissioning method after any harness rework or controller
+replacement. Keep the Decca disconnected from mains; power only the ESP32 and
+the low-voltage pot harness by USB during this test.
 
 1. With the harness disconnected, measure each 10 kΩ linear pot:
    - resistance between the two outside lugs should remain approximately 10 kΩ;
    - resistance from centre wiper to each outside lug should change smoothly
      and in opposite directions through the full travel.
 2. Viewed from the rear of each installed pot, connect left lug to GND (Brown),
-   centre wiper to its proposed ADC1 pin (White), and right lug to 3.3 V (Red):
+   centre wiper to its ADC1 pin (White), and right lug to 3.3 V (Red):
 
-   | Control | Proposed wiper pin |
-   |---------|--------------------|
-   | Volume  | GPIO32             |
-   | Bass    | GPIO33             |
-   | Treble  | GPIO34             |
-   | Balance | GPIO35             |
+   | Control | Bench-verified wiper pin |
+   |---------|---------------------------|
+   | Volume  | GPIO32                    |
+   | Bass    | GPIO33                    |
+   | Treble  | GPIO34                    |
+   | Balance | GPIO35                    |
 
 3. Set all four controls fully anticlockwise, connect the ESP32 by USB, and run:
 
@@ -83,8 +84,20 @@ Pass criteria:
 Record the observed low/high endpoints before applying per-pot calibration.
 If a control is electrically sound but its value falls as it turns clockwise,
 use the firmware's per-pot `inverted` calibration option rather than placing the
-ESP32 in any audio path. Do not relabel the proposed GPIOs as verified until the
-channel-identity checks above pass.
+ESP32 in any audio path.
+
+Recorded result (2026-08-24):
+
+| Control | GPIO | Anticlockwise | Approx. centre | Clockwise | Direction |
+|---------|------|---------------|----------------|-----------|-----------|
+| Volume  | 32   | 0             | 2047           | 4095      | Increasing clockwise |
+| Bass    | 33   | 0             | 2047           | 4095      | Increasing clockwise |
+| Treble  | 34   | 0             | 2047           | 4095      | Increasing clockwise |
+| Balance | 35   | 0             | 2047           | 4095      | Increasing clockwise |
+
+All six `test_pots` cases passed. Midpoint variation is expected because the
+controls have no centre detent. The default 0–4095 calibration is retained with
+no inversion.
 
 ### 7.2 Remaining commissioning
 

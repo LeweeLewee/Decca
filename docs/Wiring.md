@@ -6,8 +6,8 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` now matches the proposed assignments
-below; neither representation is bench-verified.
+(see Specification `HW-06`). `hardware.h` matches the status recorded below:
+the four pot inputs are bench-verified; all other assigned pins remain proposed.
 
 ## Wiring Colour Standard
 
@@ -46,10 +46,10 @@ All ESP32 pin numbers below are **(proposed)** unless stated otherwise.
 
 | Signal                | ESP32 Pin       | Type        | Harness | Notes                                    |
 |-----------------------|-----------------|-------------|---------|------------------------------------------|
-| Volume pot wiper      | GPIO32 (proposed) | ADC1        | H1      | ADC1 required (Wi-Fi in Phase 2)         |
-| Bass pot wiper        | GPIO33 (proposed) | ADC1        | H1      | ADC1 required                            |
-| Treble pot wiper      | GPIO34 (proposed) | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
-| Balance pot wiper     | GPIO35 (proposed) | ADC1, in-only | H1    | ADC1; input-only pin                     |
+| Volume pot wiper      | GPIO32 (bench-verified) | ADC1        | H1      | ADC1 required (Wi-Fi in Phase 2)         |
+| Bass pot wiper        | GPIO33 (bench-verified) | ADC1        | H1      | ADC1 required                            |
+| Treble pot wiper      | GPIO34 (bench-verified) | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
+| Balance pot wiper     | GPIO35 (bench-verified) | ADC1, in-only | H1    | ADC1; input-only pin                     |
 | On/off switch (Red)   | GPIO19 (proposed) | Digital in  | H2      | Internal pull-up; low-voltage logic only |
 | Source: VHF           | (proposed)      | Digital in  | H3      | Internal pull-up + software debounce     |
 | Source: MW            | (proposed)      | Digital in  | H3      | Internal pull-up + software debounce     |
@@ -84,6 +84,21 @@ installed potentiometer:
 Termination (confirmed): ends soldered directly to the lugs, insulated with
 heat-shrink, mechanically strain-relieved, and terminated through a removable
 connector at the controller end.
+
+Bench verification completed 2026-08-24 with each control connected to its
+named ADC1 channel. All readings increased clockwise and the on-target
+`test_pots` suite passed all six test cases.
+
+| Control | GPIO | Anticlockwise | Approx. centre | Clockwise |
+|---------|------|---------------|----------------|-----------|
+| Volume  | 32   | 0             | 2047           | 4095      |
+| Bass    | 33   | 0             | 2047           | 4095      |
+| Treble  | 34   | 0             | 2047           | 4095      |
+| Balance | 35   | 0             | 2047           | 4095      |
+
+The controls have no centre detent, so the centre readings vary slightly with
+manual positioning. The observed endpoints match the firmware's default
+0–4095 calibration; no per-pot endpoint override or inversion is required.
 
 ## H2 — Original On/Off Switch
 

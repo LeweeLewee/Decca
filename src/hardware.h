@@ -19,12 +19,12 @@
 namespace decca::hardware {
 
 // ── Pin assignments ─────────────────────────────────────────────────────────
-// These assignments match the proposed map in docs/Wiring.md. They have not
-// been bench-verified and must remain labelled proposed until physical testing.
-constexpr uint8_t kPotVolume = 32;       // ADC1 (proposed)
-constexpr uint8_t kPotBass = 33;         // ADC1 (proposed)
-constexpr uint8_t kPotTreble = 34;       // ADC1, input-only (proposed)
-constexpr uint8_t kPotBalance = 35;      // ADC1, input-only (proposed)
+// These assignments match docs/Wiring.md. Pot inputs GPIO32–35 were
+// bench-verified on 2026-08-24; all other assigned pins remain proposed.
+constexpr uint8_t kPotVolume = 32;       // ADC1 (bench-verified)
+constexpr uint8_t kPotBass = 33;         // ADC1 (bench-verified)
+constexpr uint8_t kPotTreble = 34;       // ADC1, input-only (bench-verified)
+constexpr uint8_t kPotBalance = 35;      // ADC1, input-only (bench-verified)
 constexpr uint8_t kSwitchOnOff = 19;      // Digital input, internal pull-up (proposed)
 constexpr uint8_t kDisplaySda = 21;       // I2C SDA (proposed)
 constexpr uint8_t kDisplayScl = 22;       // I2C SCL (proposed)
