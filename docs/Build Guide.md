@@ -104,13 +104,13 @@ no inversion.
 The proposed H3 inputs are active-low and use the ESP32's internal pull-ups.
 Keep the Decca disconnected from mains and power only the ESP32 by USB.
 
-| Physical order | Proposed button | Contact pair | Proposed test termination |
-|----------------|-----------------|--------------|-----------------------------|
-| Leftmost / top | VHF             | Yellow + Green (left-hand pair) | Yellow → GPIO16 / RX2; Green → GND |
-| —              | SW              | No unique isolated pair | Leave disconnected |
-| Second working pair | MW         | Purple + Blue | Purple → GPIO17 / TX2; Blue → GND |
-| Third working pair | LW          | Orange + Red | Orange → GPIO18 / D18; Red → GND |
-| Rightmost / bottom | Gram        | Green + Yellow (right-hand pair) | Green → GPIO23 / D23; Yellow → GND |
+| Physical order | Button | Contact pair | Test termination | Status |
+|----------------|--------|--------------|------------------|--------|
+| Leftmost / top | VHF    | Yellow + Green (left-hand pair) | Yellow → GPIO16 / RX2; Green → GND | Passed |
+| —              | SW     | No unique isolated pair | Leave disconnected | Deferred |
+| Second working pair | MW | Purple + Blue | Purple → GPIO17 / TX2; Blue → GND | Passed |
+| Third working pair | LW | Yellow + Orange | Yellow → GPIO18 / D18; Orange → GND | Repair and retest |
+| Rightmost / bottom | Gram | Green + Yellow (right-hand pair) | Green → GPIO23 / D23; Yellow → GND | Passed |
 
 1. Identify the four pairs by their physical left-to-right order. Distinguish
    the left-hand and right-hand Green/Yellow pairs before connecting either.
@@ -141,9 +141,13 @@ Pass criteria:
 If a pair responds to a different physical button, stop and amend the pair
 assignment from the observed result rather than moving GPIO definitions.
 
+Recorded result (2026-08-24): VHF, MW and Gram passed their individual pair
+tests. The LW pair was identified as Yellow + Orange but failed because its wire
+joint requires resoldering. Repair that joint and repeat the LW test only.
+
 On the pictured ESP32 board, GPIO16 and GPIO17 are printed as RX2 and TX2;
-GPIO18 and GPIO23 are printed as D18 and D23. Keep GPIO16/17/18/23 labelled
-proposed until these checks pass.
+GPIO18 and GPIO23 are printed as D18 and D23. GPIO16, GPIO17 and GPIO23 are
+bench-verified. Keep GPIO18 proposed until the repaired LW pair passes.
 
 ### 7.3 Remaining commissioning
 

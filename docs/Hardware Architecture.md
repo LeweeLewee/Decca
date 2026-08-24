@@ -65,9 +65,10 @@ Original interlocked selector on its **original PCB**, which is retained as the
 **mechanical carrier** for the mechanism (ADR-0001). Four working contact pairs
 (VHF, MW, LW, Gram) are read as low-voltage digital inputs with internal pull-ups
 and software debounce. **SW has no unique contact and is deferred (no function in
-Phase 1).** Proposed inputs are VHF GPIO16, MW GPIO17, LW GPIO18 and Gram
-GPIO23; all avoid strapping pins and remain unverified. The Stereo/Mono control
-is retained but **unwired** (ADR-0005).
+Phase 1).** Inputs are VHF GPIO16, MW GPIO17, LW GPIO18 and Gram GPIO23; all
+avoid strapping pins. GPIO16, GPIO17 and GPIO23 are bench-verified. GPIO18
+remains proposed pending repair and retest of the LW Yellow/Orange contact pair.
+The Stereo/Mono control is retained but **unwired** (ADR-0005).
 
 ## Outputs
 
