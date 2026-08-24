@@ -41,7 +41,8 @@ board attached.
 Phase 1 is in progress. The settings suite exercises real NVS persistence using
 a test-only namespace. The pots suite injects deterministic ADC samples to
 exercise mapping, normalisation, smoothing, calibration, inversion and deadband;
-it also prints one `POT_SNAPSHOT` line from the real ADC pins for bench
+it also reports one `POT_SNAPSHOT` Unity diagnostic from the real ADC pins so it
+is retained in PlatformIO test and serial-monitor output during bench
 verification. The remaining suites are interface / smoke tests pending their
 module implementations. Keeping one suite per module reinforces the low-coupling
 design in `docs/Firmware Architecture.md`.

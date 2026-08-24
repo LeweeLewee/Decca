@@ -5,6 +5,8 @@
 
 #include "unity_runner.h"
 
+#include <cstdio>
+
 #include "hardware.h"
 #include "pots.h"
 
@@ -38,21 +40,29 @@ void test_pots_physical_snapshot_is_in_adc_range() {
     decca::pots::init();
     decca::pots::update();
 
-    Serial.printf(
-        "POT_SNAPSHOT raw volume=%u bass=%u treble=%u balance=%u\n",
-        decca::pots::rawValue(Pot::Volume),
-        decca::pots::rawValue(Pot::Bass),
-        decca::pots::rawValue(Pot::Treble),
-        decca::pots::rawValue(Pot::Balance));
+    const uint16_t volume = decca::pots::rawValue(Pot::Volume);
+    const uint16_t bass = decca::pots::rawValue(Pot::Bass);
+    const uint16_t treble = decca::pots::rawValue(Pot::Treble);
+    const uint16_t balance = decca::pots::rawValue(Pot::Balance);
+
+    char snapshot[96]{};
+    std::snprintf(snapshot,
+                  sizeof(snapshot),
+                  "POT_SNAPSHOT raw volume=%u bass=%u treble=%u balance=%u",
+                  static_cast<unsigned int>(volume),
+                  static_cast<unsigned int>(bass),
+                  static_cast<unsigned int>(treble),
+                  static_cast<unsigned int>(balance));
+    TEST_MESSAGE(snapshot);
 
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(
-        decca::pots::kAdcRawMax, decca::pots::rawValue(Pot::Volume));
+        decca::pots::kAdcRawMax, volume);
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(
-        decca::pots::kAdcRawMax, decca::pots::rawValue(Pot::Bass));
+        decca::pots::kAdcRawMax, bass);
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(
-        decca::pots::kAdcRawMax, decca::pots::rawValue(Pot::Treble));
+        decca::pots::kAdcRawMax, treble);
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(
-        decca::pots::kAdcRawMax, decca::pots::rawValue(Pot::Balance));
+        decca::pots::kAdcRawMax, balance);
 }
 
 void test_pots_read_all_four_named_adc_channels() {
