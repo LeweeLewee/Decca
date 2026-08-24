@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots and debounced button input implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.9                                               |
+| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input and non-blocking dial-light PWM fades are implemented. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
+| Version  | 0.10                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 

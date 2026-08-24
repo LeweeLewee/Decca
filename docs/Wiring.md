@@ -187,7 +187,8 @@ future use. **No function assigned.** See ADR-0005.
 - ESP32 and lighting grounds are **common**.
 
 Expected behaviours: fade up, fade down, configurable idle brightness, safe boot
-state.
+state. Firmware support is implemented; GPIO25 and the MOSFET/load wiring remain
+proposed until the dial-lighting bench procedure passes.
 
 ## Power Distribution
 

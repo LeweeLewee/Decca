@@ -149,7 +149,40 @@ On the pictured ESP32 board, GPIO16 and GPIO17 are printed as RX2 and TX2;
 GPIO18 and GPIO23 are printed as D18 and D23. GPIO16, GPIO17 and GPIO23 are
 bench-verified. Keep GPIO18 proposed until the repaired LW pair passes.
 
-### 7.3 Remaining commissioning
+### 7.3 Dial-lighting bench verification
 
-- Calibrating dial brightness
+GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
+from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
+for the ESP32.
+
+1. Check the MOSFET stage before applying power:
+   - GPIO25 connects only to the logic-level N-channel MOSFET gate;
+   - the MOSFET source connects to GND;
+   - the dial-light negative lead connects to the MOSFET drain;
+   - the dial-light positive lead connects to 5 V;
+   - the ESP32 and 5 V lighting supply share GND.
+2. Confirm there is no direct connection from the dial-light load to GPIO25 and
+   no connection to the Decca mains wiring.
+3. Connect the ESP32 by USB and run:
+
+   ```powershell
+   pio test -e esp32dev -f test_lighting
+   ```
+
+4. Observe the dial lighting. It should fade gently from off to a low test duty
+   and back to off, without flashing at full brightness.
+5. Confirm the output contains `LIGHTING_SNAPSHOT duty=32` and all seven tests
+   pass.
+
+Pass criteria:
+
+- the light starts and finishes fully off;
+- brightness changes smoothly in both directions;
+- no full-brightness flash occurs at reset or test start;
+- the MOSFET and wiring remain cool;
+- all seven behavioural tests pass.
+
+### 7.4 Remaining commissioning
+
+- Selecting the final normal and standby dial brightness
 - Verifying the on/off control

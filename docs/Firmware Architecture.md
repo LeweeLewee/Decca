@@ -48,7 +48,10 @@ AI-assisted editing.
   deadband so `update()` remains deterministic and non-blocking.
 - **`lighting`** drives the warm dial illumination only (dial, not cabinet) via a
   logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
-  brightness, and a safe boot state.
+  brightness, and a safe boot state. It starts at duty 0, reads its initial
+  target from `settings`, and advances one PWM count every 10 ms without
+  blocking. `main` selects normal or standby targets; `lighting` does not read
+  buttons or power state directly.
 - **`display`** presents on/off state, the selected working source, the four
   control values, and diagnostics, and shows SW as unavailable.
 

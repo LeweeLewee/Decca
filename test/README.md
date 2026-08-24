@@ -14,7 +14,7 @@ test/
 ├── test_buttons/           active-low debounce, state + event queue
 ├── test_pots/              ADC mapping, smoothing, calibration + deadband
 ├── test_display/           interface smoke
-└── test_lighting/          brightness interface
+└── test_lighting/          PWM safe-off, target and fade behaviour
 ```
 
 ## Running
@@ -44,9 +44,11 @@ exercise mapping, normalisation, smoothing, calibration, inversion and deadband.
 The buttons suite injects digital levels to exercise active-low debounce, bounce
 rejection, stable latching state, re-arming and fixed-queue ordering. The pots
 and buttons suites also report physical snapshots through Unity for bench
-verification. The remaining suites are interface / smoke tests pending their
-module implementations. Keeping one suite per module reinforces the low-coupling
-design in `docs/Firmware Architecture.md`.
+verification. The lighting suite exercises a real low-duty fade for physical
+bring-up and injects its clock and PWM writer for deterministic safe-off,
+fade-up, fade-down, target-clamping and invalid-zone coverage. The display suite
+remains an interface smoke test pending implementation. Keeping one suite per
+module reinforces the low-coupling design in `docs/Firmware Architecture.md`.
 
 ## Future: native tests
 
