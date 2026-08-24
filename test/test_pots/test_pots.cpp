@@ -5,8 +5,6 @@
 
 #include "unity_runner.h"
 
-#include <cstdio>
-
 #include "hardware.h"
 #include "pots.h"
 
@@ -45,15 +43,15 @@ void test_pots_physical_snapshot_is_in_adc_range() {
     const uint16_t treble = decca::pots::rawValue(Pot::Treble);
     const uint16_t balance = decca::pots::rawValue(Pot::Balance);
 
-    char snapshot[96]{};
-    std::snprintf(snapshot,
-                  sizeof(snapshot),
-                  "POT_SNAPSHOT raw volume=%u bass=%u treble=%u balance=%u",
-                  static_cast<unsigned int>(volume),
-                  static_cast<unsigned int>(bass),
-                  static_cast<unsigned int>(treble),
-                  static_cast<unsigned int>(balance));
-    TEST_MESSAGE(snapshot);
+    UnityPrint("POT_SNAPSHOT raw volume=");
+    UnityPrintNumberUnsigned(volume);
+    UnityPrint(" bass=");
+    UnityPrintNumberUnsigned(bass);
+    UnityPrint(" treble=");
+    UnityPrintNumberUnsigned(treble);
+    UnityPrint(" balance=");
+    UnityPrintNumberUnsigned(balance);
+    UNITY_PRINT_EOL();
 
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(
         decca::pots::kAdcRawMax, volume);
