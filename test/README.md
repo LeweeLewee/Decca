@@ -49,12 +49,13 @@ bring-up and injects its clock and PWM writer for deterministic safe-off,
 fade-up, fade-down, target-clamping and invalid-zone coverage. The display suite
 injects its clock, panel initialiser and semantic frame writer to exercise the
 five-frame startup animation, standby/local dashboards, mapped function and
-legacy-button identity, copied now-playing metadata and fallback, all four
-control values, two-second control overlays, function confirmation, change-only
-refresh, diagnostics, SW-unavailable presentation and safe initialisation
-failure. It also performs a real SH1106 address/frame snapshot for H4 bench
-verification. Keeping one suite per module reinforces the low-coupling design
-in `docs/Firmware Architecture.md`.
+source identity retained in state but omitted from the user-facing layout,
+copied now-playing metadata and fallback, all four control values, two-second
+control overlays, function confirmation, change-only refresh, diagnostics,
+SW-unavailable presentation and safe initialisation failure. It also performs a
+real SH1106 address/frame snapshot for H4 bench verification. Keeping one suite
+per module reinforces the low-coupling design in
+`docs/Firmware Architecture.md`.
 
 ## Future: native tests
 

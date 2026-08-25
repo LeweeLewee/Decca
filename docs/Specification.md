@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and the ADR-0007 SH1106 display presentation contract are implemented. Phase 2 metadata inputs are display-ready but have no WiiM producer yet. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.13                                              |
+| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and the ADR-0007/0009 SH1106 display presentation contract are implemented. Phase 2 metadata inputs are display-ready but have no WiiM producer yet. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
+| Version  | 0.14                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -110,7 +110,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-DSP-04 | The display shall render configuration menus.                                | 3     |
 | FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
 | FR-DSP-06 | Startup shall show a short, non-blocking monochrome Decca-logo animation lasting approximately 1 s. | 1 |
-| FR-DSP-07 | The display shall identify the mapped logical function prominently and show the originating legacy fascia button only as secondary context in parentheses, for example `BBC RADIO 2` with `(VHF BUTTON)` beneath it. | 2 |
+| FR-DSP-07 | The display shall identify the mapped logical function prominently. Legacy fascia button labels shall not consume space in normal, now-playing or function-confirmation views. | 2 |
 
 ### 5.5 Lighting
 
@@ -237,7 +237,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ## 12. Traceability
 
 - **Requirements → design:** `docs/Firmware Architecture.md` (modules, phase map).
-- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 SW deferred, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2, 0007 display presentation).
+- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 SW deferred, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2, 0007 display presentation, 0008 streamer/amplifier architecture, 0009 function-only display hierarchy).
 - **Requirements → hardware:** `docs/Hardware Architecture.md`, `docs/Wiring.md`.
 - **Requirements → verification:** test suites under `test/`, one per module.
 - **Change history:** `docs/Revision History.md`.

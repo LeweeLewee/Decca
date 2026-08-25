@@ -36,6 +36,7 @@ that source control alone does not express well.
 | 2026-08-24 | Docs | Locked the revised display presentation contract: animated Decca startup, transient control overlays, mapped function prioritised over legacy button label, and Phase 2 now-playing metadata with mapped-function fallback (Specification v0.12, ADR-0007, FR-DSP-02/03/06/07). |
 | 2026-08-24 | Firmware | Implemented ADR-0007 display presentation: five-frame Decca wordmark animation, mapped-function hierarchy, fixed-size Phase 2 metadata state and fallback, two-second control overlays, function confirmation and expanded behavioural/physical coverage (Specification v0.13, FR-DSP-01/02/03/06/07, NFR-02/03/05). |
 | 2026-08-25 | Hardware | Locked Phase 2 audio architecture as **WiiM Pro -> separate stereo power amplifier -> passive speakers**; WiiM Pro model is locked, separate amplification is architecturally locked, exact amplifier model remains explicitly open, and dual monoblocks are rejected for the current build (ADR-0008; `hardware/BOM/phase2.csv`). |
+| 2026-08-25 | Firmware | Removed legacy fascia-button labels from normal, now-playing and function-confirmation views after physical OLED review; reclaimed the line for mapped function, metadata and control spacing while retaining source identity in state (Specification v0.14, ADR-0009, FR-DSP-07). |
 
 ## Hardware Revisions
 

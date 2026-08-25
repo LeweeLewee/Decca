@@ -106,7 +106,7 @@ void setState(const ViewState& state);
  */
 void showControl(Control control, uint16_t value);
 
-/** @brief Confirm the current mapped function and legacy button for 1.5 s. */
+/** @brief Confirm the current mapped function for 1.5 s. */
 void showFunction();
 
 /** @brief Show a short transient status message. */

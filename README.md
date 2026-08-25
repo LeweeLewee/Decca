@@ -16,3 +16,5 @@ Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
 | 0005 | Leave Stereo/Mono unwired in Phase 1                        | Accepted |
 | 0006 | Keep WiiM Pro integration in Phase 2                        | Accepted |
 | 0007 | Present logical function and now-playing context            | Accepted |
+| 0008 | Lock WiiM Pro with separate power amplification             | Accepted |
+| 0009 | Omit legacy button labels from user-facing display views    | Accepted |

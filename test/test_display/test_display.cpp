@@ -141,7 +141,7 @@ void test_display_animates_startup_without_blocking() {
                       static_cast<int>(g_lastKind));
 }
 
-void test_display_dashboard_carries_function_button_and_controls() {
+void test_display_dashboard_carries_function_and_controls() {
     startInjected();
     ViewState state;
     state.power = PowerState::On;
@@ -313,7 +313,7 @@ void test_display_begin_failure_is_safe() {
 void runAll() {
     RUN_TEST(test_display_physical_sh1106_snapshot);
     RUN_TEST(test_display_animates_startup_without_blocking);
-    RUN_TEST(test_display_dashboard_carries_function_button_and_controls);
+    RUN_TEST(test_display_dashboard_carries_function_and_controls);
     RUN_TEST(test_display_copies_and_clears_now_playing_metadata);
     RUN_TEST(test_display_control_view_clamps_and_expires);
     RUN_TEST(test_display_confirms_mapped_function_then_returns);

@@ -73,20 +73,6 @@ void copyText(char (&destination)[Capacity], const char* source) {
     destination[Capacity - 1U] = '\0';
 }
 
-const char* buttonName(settings::Source source) {
-    switch (source) {
-        case settings::Source::Vhf:
-            return "VHF";
-        case settings::Source::Mw:
-            return "MW";
-        case settings::Source::Lw:
-            return "LW";
-        case settings::Source::Gram:
-            return "GRAM";
-    }
-    return "?";
-}
-
 const char* controlName(Control control) {
     switch (control) {
         case Control::Volume:
@@ -122,12 +108,6 @@ void printClipped(const char* text, uint8_t maxCharacters) {
     std::strncpy(buffer, textOrEmpty(text), limit);
     buffer[limit] = '\0';
     g_panel.print(buffer);
-}
-
-void printButtonContext(settings::Source source) {
-    g_panel.print('(');
-    g_panel.print(buttonName(source));
-    g_panel.print(" BUTTON)");
 }
 
 void renderStartup(uint8_t frame) {
@@ -180,22 +160,20 @@ void renderPrimaryFunction(int16_t y) {
 void renderLocalDashboard() {
     renderPrimaryFunction(0);
     g_panel.setTextSize(1);
-    g_panel.setCursor(0, 18);
-    printButtonContext(g_state.source);
-    g_panel.drawFastHLine(0, 28, kWidth, SH110X_WHITE);
+    g_panel.drawFastHLine(0, 21, kWidth, SH110X_WHITE);
 
-    g_panel.setCursor(0, 34);
+    g_panel.setCursor(0, 28);
     g_panel.print("VOL ");
     g_panel.print(percent(g_state.volume));
     g_panel.print('%');
-    g_panel.setCursor(68, 34);
+    g_panel.setCursor(68, 28);
     g_panel.print("BASS ");
     g_panel.print(percent(g_state.bass));
 
-    g_panel.setCursor(0, 50);
+    g_panel.setCursor(0, 47);
     g_panel.print("TREB ");
     g_panel.print(percent(g_state.treble));
-    g_panel.setCursor(68, 50);
+    g_panel.setCursor(68, 47);
     g_panel.print("BAL  ");
     g_panel.print(percent(g_state.balance));
 }
@@ -204,15 +182,13 @@ void renderNowPlaying() {
     g_panel.setTextSize(1);
     g_panel.setCursor(0, 0);
     printClipped(primaryFunction(), 20);
-    g_panel.setCursor(0, 10);
-    printButtonContext(g_state.source);
-    g_panel.drawFastHLine(0, 20, kWidth, SH110X_WHITE);
+    g_panel.drawFastHLine(0, 10, kWidth, SH110X_WHITE);
 
-    g_panel.setCursor(0, 25);
+    g_panel.setCursor(0, 17);
     printClipped(g_title, 20);
-    g_panel.setCursor(0, 39);
+    g_panel.setCursor(0, 34);
     printClipped(g_artist, 20);
-    g_panel.setCursor(0, 54);
+    g_panel.setCursor(0, 52);
     g_panel.print("PLAYING");
 }
 
@@ -274,10 +250,7 @@ void renderFunctionConfirmation() {
     g_panel.setCursor(0, 0);
     g_panel.print("SELECTED");
     g_panel.drawFastHLine(0, 11, kWidth, SH110X_WHITE);
-    renderPrimaryFunction(18);
-    g_panel.setTextSize(1);
-    g_panel.setCursor(0, 49);
-    printButtonContext(g_state.source);
+    renderPrimaryFunction(24);
     g_panel.display();
 }
 

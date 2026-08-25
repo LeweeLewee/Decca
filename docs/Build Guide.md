@@ -169,8 +169,8 @@ disconnected from mains and power only the ESP32 by USB.
    ```
 
 4. Confirm the OLED reveals the `DECCA` wordmark from left to right over roughly
-   1 s, then shows `VINYL` prominently with `(GRAM BUTTON)` beneath it and a
-   local dashboard with Volume 75% and the other three controls at 50%.
+   1 s, then shows `VINYL` prominently without a legacy button label and a local
+   dashboard with Volume 75% and the other three controls at 50%.
 5. Confirm the output contains:
 
    ```text

@@ -57,8 +57,8 @@ AI-assisted editing.
   non-blocking monochrome Decca-logo startup animation; standby; transient
   control views; diagnostics; and an explicit SW unavailable message. In Phase
   2 the default on-state view prioritises now-playing metadata, falls back to
-  the mapped logical function, and treats the legacy fascia label only as
-  secondary context. The display consumes coherent state supplied by `main`;
+  the mapped logical function, and omits legacy fascia labels from user-facing
+  views under ADR-0009. The display consumes coherent state supplied by `main`;
   it does not call input or WiiM modules. It redraws only when its semantic
   frame changes, an animation frame advances, or a transient expires. Mapped
   names and metadata use fixed-size copied text fields, so Phase 2 can supply
