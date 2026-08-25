@@ -1,7 +1,8 @@
 # Parts List
 
 > **Status:** active. Human-readable summary; the formal BOM lives in
-> `hardware/BOM/`. Reflects the confirmed Phase 1 build.
+> `hardware/BOM/`. Reflects the confirmed build decisions. Where a component
+> model is not yet selected, that is stated explicitly rather than inferred.
 
 ## Electronics (Phase 1)
 
@@ -24,11 +25,19 @@
 | Original Stereo/Mono control | Retained mechanically, **unwired**, decorative in Phase 1 (ADR-0005). |
 | Original Decca knobs    | Retained via mechanical adaptor strategy (see `mechanical/Knob Adaptors/`). |
 
-## Streamer (Phase 2)
+## Audio Path / Phase 2
 
-| Item      | Qty | Notes                                              | Source |
-|-----------|-----|----------------------------------------------------|--------|
-| WiiM Pro  | 1   | Networked source; local API (source, volume, metadata) | _TBD_ |
+| Item | Qty | Decision status | Notes | Source |
+|------|-----|-----------------|-------|--------|
+| WiiM Pro | 1 | **LOCKED** | Networked streamer/source. ESP32 integration via local API for source selection, volume and metadata. **Do not substitute WiiM Amp / Amp Pro without a new ADR.** | _TBD / price watch active_ |
+| Separate stereo power amplifier | 1 | **ARCHITECTURE LOCKED; MODEL OPEN** | WiiM Pro line output feeds a separate analogue power amplifier, then passive speakers. Exact amp model is intentionally not yet locked. Fosi V3 was the initial recommendation; used conventional hi-fi amplification was subsequently reopened for comparison. | _TBD_ |
+| Monoblock power amplifiers | 2 | **REJECTED for current build** | Considered, but added cost/complexity was not justified for the expected audible benefit in this installation. Revisit only if speaker/amp requirements materially change. | n/a |
+| Passive speakers | 2 | **Separate selection** | Driven only by the power amplifier. Speaker selection is outside ESP32 firmware control. | _TBD_ |
+
+**Locked signal architecture:** `WiiM Pro -> separate power amplifier -> passive speakers`.
+
+See ADR-0008 for the decision boundary between the locked architecture and the
+still-open amplifier model selection.
 
 ## Mechanical / Fasteners
 
