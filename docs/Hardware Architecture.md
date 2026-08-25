@@ -55,6 +55,10 @@ The audio-path architecture is locked by ADR-0008 as:
 - **Dual monoblocks:** rejected for the current build unless requirements change.
 - **Integrated WiiM amplifier variants:** WiiM Amp / Amp Pro are not substitutes
   for the selected architecture without a new ADR.
+- **Cabinet thermal constraint:** none for normal hi-fi amplifier selection. The
+  Decca cabinet has ample rear ventilation, so thermal performance is not a
+  differentiating selection criterion beyond the amplifier's normal operating
+  requirements.
 - The ESP32 communicates with the WiiM Pro only for control and metadata. It never
   sits in the audio signal path.
 
@@ -65,8 +69,9 @@ The audio-path architecture is locked by ADR-0008 as:
 - ESP32 and dial-lighting **grounds are common**.
 - No mains switching by the ESP32 (see Controller / on-off below).
 - Streamer and power-amplifier mains/power arrangements are part of the separate
-  audio subsystem and must be finalised alongside the amplifier model and cabinet
-  thermal/layout design.
+  audio subsystem and will be finalised alongside the amplifier model and physical
+  installation. The cabinet's existing rear ventilation is adequate and imposes
+  no additional thermal-design restriction.
 
 ## Controller
 
