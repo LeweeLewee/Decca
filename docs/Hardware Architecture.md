@@ -1,17 +1,19 @@
 # Hardware Architecture
 
-> **Status:** active. Reflects the confirmed Phase 1 physical build. Pot inputs
-> GPIO32–35 are bench-verified; remaining ESP32 assignments are **(proposed)**
-> or unassigned. See `docs/Wiring.md` for the authoritative interconnect detail.
+> **Status:** active. Reflects the confirmed Phase 1 physical build plus the
+> locked Phase 2 audio architecture. Pot inputs GPIO32–35 are bench-verified;
+> remaining ESP32 assignments are **(proposed)** or unassigned. See
+> `docs/Wiring.md` for the authoritative controller interconnect detail and
+> ADR-0008 for the streamer/amplifier decision boundary.
 
 Describes the electrical system: the boards, how power flows, and how the ESP32
-connects to the front panel, display, and lighting.
+connects to the front panel, display, lighting, streamer and external audio path.
 
 ## Scope Boundary
 
 The ESP32 is a **control and user-interface system only**. It **must not process
 or carry audio**. All potentiometers are position sensors read by the ADC; the
-analogue audio path is entirely separate and outside the controller.
+audio signal path is separate from the controller.
 
 ## System Block Diagram
 
@@ -27,7 +29,34 @@ analogue audio path is entirely separate and outside the controller.
      │ Bass/Volume   │ │switch│ │LW Gram│ │128x64│ │ dial LEDs │
      │ (position)    │ │Red/Grn│ │(SW n/f)│ │ SH1106│ │ (N-ch FET)│
      └───────────────┘ └──────┘ └───────┘ └──────┘ └───────────┘
+
+                  local network control / metadata
+                 ESP32  <-------------------->  WiiM Pro
+                                                   │
+                                                   │ line-level audio
+                                                   ▼
+                                      Separate stereo power amp
+                                                   │
+                                                   ▼
+                                           Passive speakers
 ```
+
+## Locked Audio Architecture
+
+The audio-path architecture is locked by ADR-0008 as:
+
+`WiiM Pro -> separate stereo power amplifier -> passive speakers`
+
+- **Streamer:** WiiM Pro, specifically. This is a locked model decision.
+- **Power amplification:** separate from the WiiM Pro. This architecture is locked.
+- **Power-amplifier model:** intentionally **open** pending final selection.
+  Fosi V3 remains a candidate; used conventional stereo amplification also remains
+  valid for assessment.
+- **Dual monoblocks:** rejected for the current build unless requirements change.
+- **Integrated WiiM amplifier variants:** WiiM Amp / Amp Pro are not substitutes
+  for the selected architecture without a new ADR.
+- The ESP32 communicates with the WiiM Pro only for control and metadata. It never
+  sits in the audio signal path.
 
 ## Power
 
@@ -35,6 +64,9 @@ analogue audio path is entirely separate and outside the controller.
   logic). 3.3 V is taken from the board regulator.
 - ESP32 and dial-lighting **grounds are common**.
 - No mains switching by the ESP32 (see Controller / on-off below).
+- Streamer and power-amplifier mains/power arrangements are part of the separate
+  audio subsystem and must be finalised alongside the amplifier model and cabinet
+  thermal/layout design.
 
 ## Controller
 
@@ -85,7 +117,8 @@ fade up/down, configurable idle brightness, safe boot state.
 
 Wi-Fi is used only in Phase 2 for **WiiM Pro local API** integration (source
 selection, volume, metadata/playback state). This is the reason ADC1 is mandated
-for all analogue inputs. See Firmware Architecture → WiiM interface and ADR-0006.
+for all analogue inputs. See Firmware Architecture → WiiM interface, ADR-0006
+and ADR-0008.
 
 ## Revisions
 
