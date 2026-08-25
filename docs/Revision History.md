@@ -35,6 +35,7 @@ that source control alone does not express well.
 | 2026-08-24 | Firmware | Locked the purchased Pi Hut SH1106 panel and implemented non-blocking startup, standby/dashboard, status, SW-unavailable and diagnostic frames with change-only refresh and behavioural/physical coverage (Specification v0.11, FR-DSP-01/02/05, IF-02). GPIO21/22 remain proposed pending bench verification. |
 | 2026-08-24 | Docs | Locked the revised display presentation contract: animated Decca startup, transient control overlays, mapped function prioritised over legacy button label, and Phase 2 now-playing metadata with mapped-function fallback (Specification v0.12, ADR-0007, FR-DSP-02/03/06/07). |
 | 2026-08-24 | Firmware | Implemented ADR-0007 display presentation: five-frame Decca wordmark animation, mapped-function hierarchy, fixed-size Phase 2 metadata state and fallback, two-second control overlays, function confirmation and expanded behavioural/physical coverage (Specification v0.13, FR-DSP-01/02/03/06/07, NFR-02/03/05). |
+| 2026-08-25 | Hardware | Locked Phase 2 audio architecture as **WiiM Pro -> separate stereo power amplifier -> passive speakers**; WiiM Pro model is locked, separate amplification is architecturally locked, exact amplifier model remains explicitly open, and dual monoblocks are rejected for the current build (ADR-0008; `hardware/BOM/phase2.csv`). |
 
 ## Hardware Revisions
 
