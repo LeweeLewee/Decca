@@ -1,0 +1,4 @@
+designator,item,quantity,manufacturer,model,status,notes
+A1,Network streamer,1,WiiM,WiiM Pro,LOCKED,"Local API integration; line-level source only. Do not substitute WiiM Amp/Amp Pro without new ADR."
+A2,Stereo power amplifier,1,TBD,TBD,MODEL OPEN,"Separate analogue power amp required. Fosi V3 is a candidate; used conventional stereo amp remains allowed."
+A3L/A3R,Passive speakers,2,TBD,TBD,OPEN,"Driven by A2; final speaker selection tracked separately."
