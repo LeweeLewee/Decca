@@ -151,8 +151,9 @@ bench-verified. Keep GPIO18 proposed until the repaired LW pair passes.
 
 ### 7.3 OLED bench verification
 
-GPIO21 and GPIO22 remain proposed until this procedure passes. Keep the Decca
-disconnected from mains and power only the ESP32 by USB.
+This procedure passed on 2026-08-25, confirming GPIO21 and GPIO22. Keep it as
+the commissioning method after any display, harness or controller replacement.
+Keep the Decca disconnected from mains and power only the ESP32 by USB.
 
 1. Read the labels printed beside the delivered OLED header. Do not infer its
    physical pin order from another module or online photograph.
@@ -185,8 +186,13 @@ Pass criteria:
 - white pixels are clear with no persistent noise or clipped columns;
 - all ten display tests pass.
 
-Record the result before marking GPIO21 and GPIO22 bench-verified. If the panel
-is blank, disconnect USB before checking VCC/GND order and the SDA/SCL labels.
+Recorded result (2026-08-25): the purchased SH1106 panel was detected at 0x3C,
+all ten `test_display` cases passed, and the animated startup and revised
+dashboard were upright, complete, unclipped and free of persistent display
+artefacts. GPIO21 (SDA) and GPIO22 (SCL) are bench-verified.
+
+If the panel is blank, disconnect USB before checking VCC/GND order and the
+SDA/SCL labels.
 
 ### 7.4 Dial-lighting bench verification
 

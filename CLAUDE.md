@@ -49,6 +49,6 @@ presentation contract: animated Decca startup, standby/local dashboard,
 transient controls and function confirmations, diagnostics, and Phase 2-ready
 mapped-function/now-playing views without legacy button labels and with
 change-only refreshes. Pot GPIO32–35 and
-source-button GPIO16, GPIO17 and GPIO23 are bench-verified; GPIO18 awaits an LW
-harness repair. The on/off switch, lighting GPIO25, OLED GPIO21/22 and remaining
-assigned pins stay proposed until their documented bench tests.
+source-button GPIO16, GPIO17 and GPIO23 and OLED GPIO21/22 are bench-verified;
+GPIO18 awaits an LW harness repair. The on/off switch, lighting GPIO25 and
+remaining assigned pins stay proposed until their documented bench tests.

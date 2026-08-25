@@ -1,8 +1,9 @@
 # Hardware Architecture
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
-> locked Phase 2 audio architecture. Pot inputs GPIO32–35 are bench-verified;
-> remaining ESP32 assignments are **(proposed)** or unassigned. See
+> locked Phase 2 audio architecture. Pot inputs GPIO32–35 and OLED I²C
+> GPIO21/22 are bench-verified; remaining ESP32 assignments are **(proposed)**
+> or unassigned. See
 > `docs/Wiring.md` for the authoritative controller interconnect detail and
 > ADR-0008 for the streamer/amplifier decision boundary.
 
@@ -111,7 +112,8 @@ The Stereo/Mono control is retained but **unwired** (ADR-0005).
 
 ### OLED display (H4)
 Purchased Pi Hut 1.3-inch white 128×64 SH1106 I²C panel (SKU 105630), powered
-from 3.3 V at address 0x3C. Proposed SDA GPIO21 / SCL GPIO22 remain unverified.
+from 3.3 V at address 0x3C. SDA GPIO21 / SCL GPIO22 were bench-verified on
+2026-08-25 with the on-target display suite and a visual layout inspection.
 
 ### Dial lighting (H5)
 5 V warm-white LEDs driven via a **logic-level N-channel MOSFET**, gate driven by

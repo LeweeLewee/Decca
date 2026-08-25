@@ -7,8 +7,8 @@
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
 (see Specification `HW-06`). `hardware.h` matches the status recorded below:
-the four pot inputs and the VHF, MW and Gram source inputs are bench-verified;
-LW and all other assigned pins remain proposed.
+the four pot inputs, the VHF, MW and Gram source inputs, and OLED I²C GPIO21/22
+are bench-verified; LW and all other assigned pins remain proposed.
 
 ## Wiring Colour Standard
 
@@ -58,8 +58,8 @@ All ESP32 pin numbers below are **(proposed)** unless stated otherwise.
 | Source: LW            | GPIO18 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
 | Source: Gram          | GPIO23 (bench-verified) | Digital in  | H3      | Internal pull-up + software debounce     |
 | Source: SW            | —               | —           | H3      | **NO FUNCTION in Phase 1** (see below)   |
-| OLED SDA              | GPIO21 (proposed) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| OLED SCL              | GPIO22 (proposed) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
+| OLED SDA              | GPIO21 (bench-verified) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
+| OLED SCL              | GPIO22 (bench-verified) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (proposed) | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
 
 > The four source-button GPIOs avoid strapping pins and support internal
@@ -179,12 +179,16 @@ with a pre-soldered four-pin header. Expected address: **0x3C**.
 
 - VCC → 3.3 V (Red)
 - GND → GND (Brown)
-- SDA → GPIO21 (proposed)
-- SCL → GPIO22 (proposed)
+- SDA → GPIO21 (bench-verified)
+- SCL → GPIO22 (bench-verified)
 
 Check the labels printed on the delivered module before applying power because
-four-pin OLED modules do not all use the same physical pin order. GPIO21 and
-GPIO22 remain proposed until the H4 bench procedure passes.
+four-pin OLED modules do not all use the same physical pin order.
+
+Bench verification completed 2026-08-25. The panel responded as an SH1106 at
+0x3C on GPIO21/GPIO22, all ten on-target `test_display` cases passed, and visual
+inspection confirmed the startup and revised dashboard were upright, complete,
+unclipped and free of persistent display artefacts.
 
 ## H5 — Dial Illumination
 

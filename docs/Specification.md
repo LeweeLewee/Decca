@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and the ADR-0007/0009 SH1106 display presentation contract are implemented. Phase 2 metadata inputs are display-ready but have no WiiM producer yet. Pot inputs GPIO32–35 and source-button GPIO16/17/23 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.14                                              |
+| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and the ADR-0007/0009 SH1106 display presentation contract are implemented. Phase 2 metadata inputs are display-ready but have no WiiM producer yet. Pot inputs GPIO32–35, source-button GPIO16/17/23 and OLED GPIO21/22 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
+| Version  | 0.15                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 

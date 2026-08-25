@@ -20,8 +20,9 @@ namespace decca::hardware {
 
 // ── Pin assignments ─────────────────────────────────────────────────────────
 // These assignments match docs/Wiring.md. Pot inputs GPIO32–35 and source
-// inputs GPIO16, GPIO17 and GPIO23 were bench-verified on 2026-08-24. GPIO18
-// and all other assigned pins remain proposed.
+// inputs GPIO16, GPIO17 and GPIO23 were bench-verified on 2026-08-24. Display
+// I2C GPIO21/22 were bench-verified on 2026-08-25. GPIO18 and the remaining
+// assigned pins remain proposed.
 constexpr uint8_t kPotVolume = 32;       // ADC1 (bench-verified)
 constexpr uint8_t kPotBass = 33;         // ADC1 (bench-verified)
 constexpr uint8_t kPotTreble = 34;       // ADC1, input-only (bench-verified)
@@ -31,8 +32,8 @@ constexpr uint8_t kButtonVhf = 16;         // Digital input, internal pull-up (b
 constexpr uint8_t kButtonMw = 17;          // Digital input, internal pull-up (bench-verified)
 constexpr uint8_t kButtonLw = 18;          // Digital input, internal pull-up (proposed)
 constexpr uint8_t kButtonGram = 23;        // Digital input, internal pull-up (bench-verified)
-constexpr uint8_t kDisplaySda = 21;       // I2C SDA (proposed)
-constexpr uint8_t kDisplayScl = 22;       // I2C SCL (proposed)
+constexpr uint8_t kDisplaySda = 21;       // I2C SDA (bench-verified)
+constexpr uint8_t kDisplayScl = 22;       // I2C SCL (bench-verified)
 constexpr uint8_t kDialLightingPwm = 25;  // LEDC PWM output (proposed)
 
 // ── Board-level peripheral configuration ────────────────────────────────────
