@@ -1,4 +1,5 @@
 designator,item,quantity,manufacturer,model,status,notes
-A1,Network streamer,1,WiiM,WiiM Pro,LOCKED,"Local API integration; line-level source only. Do not substitute WiiM Amp/Amp Pro without new ADR."
-A2,Stereo power amplifier,1,TBD,TBD,MODEL OPEN,"Separate analogue power amp required. Fosi V3 is a candidate; used conventional stereo amp remains allowed."
+A1,Network streamer,1,WiiM,WiiM Pro,LOCKED,"Local API integration; line-level source only. Continuously powered; uses WiiM automatic standby. Do not substitute WiiM Amp/Amp Pro without new ADR."
+A2,Stereo power amplifier,1,Fosi Audio,ZA3,LOCKED,"Separate analogue power amp. Power state controlled by ZA3 12 V trigger from an ESP32-controlled driver; amp gain/volume fixed during commissioning while user volume is controlled through WiiM."
 A3L/A3R,Passive speakers,2,TBD,TBD,OPEN,"Driven by A2; final speaker selection tracked separately."
+A4,ZA3 trigger driver,1,TBD,TBD,OPEN,"ESP32-controlled interface that generates/switches the ZA3 12 V trigger signal. Exact transistor/MOSFET, 12 V source and GPIO remain to be selected and bench-verified."
