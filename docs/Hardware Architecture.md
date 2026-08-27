@@ -1,11 +1,11 @@
 # Hardware Architecture
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
-> locked Phase 2 audio architecture. Pot inputs GPIO32–35 and OLED I²C
-> GPIO21/22 are bench-verified; remaining ESP32 assignments are **(proposed)**
-> or unassigned. See
-> `docs/Wiring.md` for the authoritative controller interconnect detail and
-> ADR-0008 for the streamer/amplifier decision boundary.
+> locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35 and
+> OLED I²C GPIO21/22 are bench-verified; remaining ESP32 assignments are
+> **(proposed)** or unassigned. See `docs/Wiring.md` for the authoritative
+> controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
+> amplifier and power-control decisions.
 
 Describes the electrical system: the boards, how power flows, and how the ESP32
 connects to the front panel, display, lighting, streamer and external audio path.
@@ -36,23 +36,22 @@ audio signal path is separate from the controller.
                                                    │
                                                    │ line-level audio
                                                    ▼
-                                      Separate stereo power amp
+                                             Fosi Audio ZA3
                                                    │
                                                    ▼
                                            Passive speakers
+
+                 Decca on/off -> ESP32 -> 12 V trigger driver -> ZA3 trigger
 ```
 
 ## Locked Audio Architecture
 
-The audio-path architecture is locked by ADR-0008 as:
+The audio-path architecture is locked by ADR-0008 and ADR-0010 as:
 
-`WiiM Pro -> separate stereo power amplifier -> passive speakers`
+`WiiM Pro -> Fosi Audio ZA3 -> passive speakers`
 
 - **Streamer:** WiiM Pro, specifically. This is a locked model decision.
-- **Power amplification:** separate from the WiiM Pro. This architecture is locked.
-- **Power-amplifier model:** intentionally **open** pending final selection.
-  Fosi V3 remains a candidate; used conventional stereo amplification also remains
-  valid for assessment.
+- **Power amplifier:** **Fosi Audio ZA3 stereo amplifier**, locked.
 - **Dual monoblocks:** rejected for the current build unless requirements change.
 - **Integrated WiiM amplifier variants:** WiiM Amp / Amp Pro are not substitutes
   for the selected architecture without a new ADR.
@@ -62,6 +61,10 @@ The audio-path architecture is locked by ADR-0008 as:
   requirements.
 - The ESP32 communicates with the WiiM Pro only for control and metadata. It never
   sits in the audio signal path.
+- User volume is controlled by the original Decca volume potentiometer as an ESP32
+  position input, with the ESP32 commanding WiiM output volume. The ZA3 volume/gain
+  control is set during commissioning as a fixed hardware ceiling rather than used
+  as the normal user volume control.
 
 ## Power
 
@@ -90,17 +93,46 @@ The audio-path architecture is locked by ADR-0008 as:
 - The ESP32 may later issue a deterministic wake/control request if bench testing
   confirms a suitable supported local-API behaviour, but the hardware design does
   **not depend on that**.
-- On Decca off, the ESP32 may stop playback and/or issue a WiiM control command if
-  useful, but WiiM auto-standby remains the fallback and required baseline.
+- On Decca off, the ESP32 should stop playback or issue an appropriate supported
+  control action where useful, then allow WiiM auto-standby to provide the normal
+  idle state.
 
-### Amplifier power behaviour — open
+### Fosi Audio ZA3 power behaviour — locked
 
-- The separate power amplifier does **not** inherit the WiiM always-on decision.
-- Its mains/DC switching approach remains **open** pending the final amplifier
-  model and selection of the mains-rated switching hardware.
-- If the standard Fosi V3 is selected, an ESP32-controlled isolated mains-switching
-  solution remains the preferred direction because that model has no useful
-  automatic standby behaviour for this build.
+- The ZA3 is the locked stereo power amplifier for this build.
+- The ZA3 is **not mains-switched by the original Decca switch**.
+- Its PSU may remain energised; amplifier operating state is controlled through
+  the ZA3's **12 V trigger input**.
+- The ESP32 controls a dedicated low-voltage trigger-driver stage that generates
+  or switches the required 12 V trigger signal. The exact transistor/MOSFET,
+  12 V source and ESP32 GPIO remain open implementation details pending component
+  selection and bench verification.
+- No ESP32-controlled 230 V relay is required for the amplifier in the locked
+  architecture.
+
+### Front-panel power-state behaviour — locked
+
+The original Decca on/off control is a **system-state command**, not a mains
+switch.
+
+**ON sequence**
+1. Original switch closes and the ESP32 detects the active state.
+2. ESP32 asserts the ZA3 12 V trigger through the trigger-driver stage.
+3. ESP32 fades the three dial lamps up to their stored commissioning brightness.
+4. ESP32 enables the OLED and runs the normal startup/dashboard sequence.
+5. WiiM remains physically powered and wakes from automatic standby when playback
+   or supported network/control activity requires it.
+
+**OFF sequence**
+1. ESP32 detects the original switch opening.
+2. ESP32 stops playback / sends an appropriate WiiM control action where useful;
+   WiiM then uses its own automatic standby behaviour.
+3. ESP32 fades the dial lamps to zero.
+4. ESP32 blanks the OLED.
+5. ESP32 removes the 12 V trigger so the ZA3 enters its trigger-controlled off/
+   standby state.
+6. ESP32 and its 5 V control supply remain powered so the next switch-on can be
+   detected immediately.
 
 The cabinet's existing rear ventilation is adequate and imposes no additional
 thermal-design restriction.
@@ -127,7 +159,8 @@ clockwise on 2026-08-24, so the default 0–4095 calibration remains applicable.
 Retained original switch and cable, active conductors **Red** and **Green**. A
 simple open/close contact read as a **low-voltage digital input** with the ESP32
 **internal pull-up** enabled (proposed GPIO19). **Not a mains switch.** Optional
-firmware inversion after bench testing.
+firmware inversion after bench testing. Its logical state drives the locked
+system-power sequence documented above.
 
 ### Source button bank (H3)
 Original interlocked selector on its **original PCB**, which is retained as the
@@ -162,12 +195,18 @@ temporary commissioning input if convenient, but it is not reserved as a
 permanent lighting control. Behaviours: fade up/down, configurable stored
 brightness, safe boot state.
 
+### ZA3 trigger output
+The ESP32 controls a dedicated interface to the ZA3 **12 V trigger input**. The
+ESP32 GPIO must not source 12 V directly. A suitable transistor/MOSFET or isolated
+low-voltage driver and a 12 V source are required. Exact implementation and GPIO
+remain **open/proposed** until the driver is selected and bench-tested.
+
 ## Networking (Phase 2)
 
 Wi-Fi is used only in Phase 2 for **WiiM Pro local API** integration (source
 selection, volume, metadata/playback state). This is the reason ADC1 is mandated
-for all analogue inputs. See Firmware Architecture → WiiM interface, ADR-0006
-and ADR-0008.
+for all analogue inputs. See Firmware Architecture → WiiM interface, ADR-0006,
+ADR-0008 and ADR-0010.
 
 ## Revisions
 
