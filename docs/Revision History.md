@@ -39,6 +39,7 @@ that source control alone does not express well.
 | 2026-08-25 | Firmware | Removed legacy fascia-button labels from normal, now-playing and function-confirmation views after physical OLED review; reclaimed the line for mapped function, metadata and control spacing while retaining source identity in state (Specification v0.14, ADR-0009, FR-DSP-07). |
 | 2026-08-25 | Hardware | Bench-verified the Pi Hut SH1106 OLED at 0x3C on SDA GPIO21 / SCL GPIO22; all ten on-target display tests passed and visual inspection confirmed the revised layout was upright, complete and unclipped (Specification v0.15, HW-06, IF-02). |
 | 2026-08-27 | Mechanical | Built the Rev B parametric Fusion 360 CAD for the OLED display mount from Display Mount Spec v1.0: front bezel and rear OLED carrier, reference Decca panel and SH1106 module. Validated interference-free with the 0.30 mm glass-to-Perspex gap and the active area exactly centred on the opening. Three SH1106 reference dimensions remain assumed pending physical measurement (see the CAD review note). |
+| 2026-08-27 | Mechanical | Rev C display mount after the Rev B print test. Corrected two spec-locked panel dimensions from physical measurement: fixing pitch 48.00 -> 49.00 mm and opening 35.50 x 15.80 -> 35.20 x 15.30 mm. Root-caused the PCB not seating flush to the header's display-side solder protrusions fouling a 0.60 mm relief pocket; the relief is now a full through-slot. Replaced the broken split snap pegs with four plain locating posts, two rigid bottom hooks and one top leaf spring. Bezel lip resized to fit the true opening. |
 
 ## Hardware Revisions
 
@@ -52,3 +53,4 @@ that source control alone does not express well.
 |-----|-------|---------------------------------|-------|
 | A   | _TBD_ | Initial knob adaptor design     |       |
 | B   | 2026-08-27 | Display mount — Front_Bezel + Rear_Display_Carrier initial CAD | From Spec v1.0. PETG. 2 x M2 heat-set inserts @ 48.00 mm. Not yet prototyped. |
+| C   | 2026-08-27 | Display mount — solder-relief through-slot, non-sprung retention, corrected panel geometry | Supersedes B. Fixing pitch 49.00. Opening 35.20 x 15.30. Carrier 56.50 mm wide (0.50 mm outside spec 5 range, forced by the pitch correction). Requires firmware to mask 2 pixel rows top and bottom. |
