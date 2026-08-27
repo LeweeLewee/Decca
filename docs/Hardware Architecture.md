@@ -26,8 +26,8 @@ audio signal path is separate from the controller.
        ADC1 (H1) │       │ H2    │ H3     │ H4    │ H5 (PWM)
         4× 10k   │       │ on/off│ source │ I²C   │ MOSFET gate
      ┌───────────┴──┐ ┌──┴───┐ ┌─┴─────┐ ┌┴─────┐ ┌┴──────────┐
-     │ Balance/Treble│ │orig. │ │VHF MW │ │ OLED │ │ 5V warm   │
-     │ Bass/Volume   │ │switch│ │LW Gram│ │128x64│ │ dial LEDs │
+     │ Balance/Treble│ │orig. │ │VHF MW │ │ OLED │ │ 3× 5V     │
+     │ Bass/Volume   │ │switch│ │LW Gram│ │128x64│ │ E10 LEDs  │
      │ (position)    │ │Red/Grn│ │(SW n/f)│ │ SH1106│ │ (N-ch FET)│
      └───────────────┘ └──────┘ └───────┘ └──────┘ └───────────┘
 
@@ -65,8 +65,16 @@ The audio-path architecture is locked by ADR-0008 as:
 
 ## Power
 
-- Rails: **5 V** (lighting, board input) and **3.3 V** (ESP32, pot references,
-  logic). 3.3 V is taken from the board regulator.
+- Controller/lighting architecture is locked to a **single regulated 5 V control
+  rail** plus **3.3 V** from the ESP32 board regulator for logic, ADC references
+  and the OLED where applicable.
+- The 5 V rail powers the ESP32 board input and the three dial-lighting lamps.
+- The dial lighting does **not** receive a separate 6 V or 6.3 V rail. A dedicated
+  lamp-only supply is explicitly rejected unless a later hardware constraint
+  requires an ADR change.
+- Exact 5 V PSU/regulator model and current rating remain **open procurement
+  items** and must be selected with adequate margin for the controller, OLED and
+  all three lamps.
 - ESP32 and dial-lighting **grounds are common**.
 - No mains switching by the ESP32 (see Controller / on-off below).
 - Streamer and power-amplifier mains/power arrangements are part of the separate
@@ -116,9 +124,20 @@ from 3.3 V at address 0x3C. SDA GPIO21 / SCL GPIO22 were bench-verified on
 2026-08-25 with the on-target display suite and a visual layout inspection.
 
 ### Dial lighting (H5)
-5 V warm-white LEDs driven via a **logic-level N-channel MOSFET**, gate driven by
-ESP32 **PWM (LEDC)**, proposed GPIO25. Common ground with the ESP32. Behaviours:
-fade up/down, configurable idle brightness, safe boot state.
+Three identical **E10/MES warm-white LED lamps**, target approximately **24 mm
+overall length** to match the originals. Preferred colour temperature is
+**2200–3000 K**. Lamps must be suitable for the locked 5 V rail, either nominal
+5 V devices or explicitly specified as compatible across a range including 5 V
+(e.g. 1–5 V or 3–6 V). They are wired **in parallel** and driven together through
+a **logic-level N-channel MOSFET**, gate driven by ESP32 **PWM (LEDC)**, proposed
+GPIO25. Common ground with the ESP32.
+
+Brightness is a commissioning/configuration value rather than a permanent front-
+panel user control. Firmware stores the selected PWM level in non-volatile
+settings and applies it at startup. The unused aerial control may be used as a
+temporary commissioning input if convenient, but it is not reserved as a
+permanent lighting control. Behaviours: fade up/down, configurable stored
+brightness, safe boot state.
 
 ## Networking (Phase 2)
 
