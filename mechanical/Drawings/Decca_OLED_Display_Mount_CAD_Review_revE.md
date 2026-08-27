@@ -1,11 +1,11 @@
-# Decca OLED Display Mount — CAD Build Review (Rev D)
+# Decca OLED Display Mount — CAD Build Review (Rev E)
 
-Supersedes Rev C. Corrections from the Rev C fit test.
+Supersedes Rev D. Cable-tie anchor redesigned for rear access.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
 ---
 
-## 1. Changes from Rev C
+## 1. Change from Rev D — cable-tie anchor
 
 ### 1.1 Top leaf spring and its anchor legs — removed
 
@@ -59,11 +59,33 @@ Bezel envelope grows to 40.00 × 20.30 × 4.00 mm as a result.
 - Opening **35.20 × 15.30**, bezel lip envelope 34.90 × 15.00 (0.15 mm/side clearance).
 - Header solder relief as a **full through-slot**, 16.00 × 6.50 mm.
 - Carrier width 56.50 mm (derived; 0.50 mm outside §5's range, forced by the pitch).
-- **Cable-tie flange** — the 3.00 mm tab below the tray carrying two 4.00 × 1.80 mm
-  slots. This is §9's optional strain relief: pass a tie (≤3.5 mm wide) through both
-  slots and around the tab to restrain the I²C harness, so cable movement never loads
-  the OLED's 4-pin header. Retained at Lewis's request. Controlled by `tie_flange_h`;
-  set it to zero to delete the tab and the slots together.
+### 1.5 Cable-tie anchor — redesigned for rear access (Rev E)
+
+The Rev D anchor was two slots cut straight through the flange in Z. That face is the
+Perspex seating plane, so the slots opened onto the panel with zero gap — no tie could
+be threaded. The concept was unbuildable, not merely tight.
+
+A first attempt at a stand-off bar failed too, and the validator caught it: the aperture
+ran in Y, straight into the tray wall 0.25 mm beyond its exit. Blocked at one end.
+
+**Final form:** two stand-off bar anchors on the flange's **rear** face, with the
+aperture running in **X** so both ends open into free space.
+
+| | |
+|---|---:|
+| Aperture | 3.70 (Y) × 1.60 (Z) mm |
+| Tunnel length | 6.00 mm, at x ±5.0 to ±11.0 |
+| Stand-off from flange face | 1.60 mm |
+| Bar section | 1.40 mm |
+
+Everything is behind the carrier; nothing depends on the Perspex-seating face, and the
+tie never touches the original panel. Verified by sweeping a 3.5 × 1.4 mm tie section
+along X with 6 mm overshoot at each end — **clear through both anchors**.
+
+The flange grows from 3.00 to 7.00 mm tall to carry the anchors, taking the carrier to
+45.10 mm overall height. Purpose is §9's optional strain relief: tie the I²C harness so
+cable movement never loads the OLED's 4-pin header. Set `tie_flange_h` to zero to delete
+the flange and both anchors together.
 
 ---
 
@@ -91,8 +113,8 @@ resists.
 
 | Part | Envelope | Volume |
 |---|---|---:|
-| Front_Bezel | 40.00 × 20.30 × 4.00 mm | 0.464 cm³ |
-| Rear_Display_Carrier | 56.50 × 41.10 × 5.80 mm | 3.205 cm³ |
+| Front_Bezel | 40.00 × 20.30 × 4.00 mm | 0.465 cm³ |
+| Rear_Display_Carrier | 56.50 × 45.10 × 6.20 mm | 3.908 cm³ |
 
 Both closed manifold solids.
 
