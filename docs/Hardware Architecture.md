@@ -76,11 +76,34 @@ The audio-path architecture is locked by ADR-0008 as:
   items** and must be selected with adequate margin for the controller, OLED and
   all three lamps.
 - ESP32 and dial-lighting **grounds are common**.
-- No mains switching by the ESP32 (see Controller / on-off below).
-- Streamer and power-amplifier mains/power arrangements are part of the separate
-  audio subsystem and will be finalised alongside the amplifier model and physical
-  installation. The cabinet's existing rear ventilation is adequate and imposes
-  no additional thermal-design restriction.
+- The original Decca on/off switch remains a **low-voltage ESP32 input only**; it
+  does not carry 230 V mains.
+
+### WiiM Pro power behaviour — locked
+
+- The **WiiM Pro remains continuously powered** from its own supply in normal use.
+- The WiiM is **not hard power-cycled** by the Decca front-panel on/off control.
+- WiiM **automatic standby** is the preferred idle/off-state behaviour so that the
+  unit remains network-aware and can wake without a full boot cycle.
+- Turning the Decca on does not require mains switching of the WiiM. Playback or a
+  supported WiiM/network control action may wake it from standby.
+- The ESP32 may later issue a deterministic wake/control request if bench testing
+  confirms a suitable supported local-API behaviour, but the hardware design does
+  **not depend on that**.
+- On Decca off, the ESP32 may stop playback and/or issue a WiiM control command if
+  useful, but WiiM auto-standby remains the fallback and required baseline.
+
+### Amplifier power behaviour — open
+
+- The separate power amplifier does **not** inherit the WiiM always-on decision.
+- Its mains/DC switching approach remains **open** pending the final amplifier
+  model and selection of the mains-rated switching hardware.
+- If the standard Fosi V3 is selected, an ESP32-controlled isolated mains-switching
+  solution remains the preferred direction because that model has no useful
+  automatic standby behaviour for this build.
+
+The cabinet's existing rear ventilation is adequate and imposes no additional
+thermal-design restriction.
 
 ## Controller
 
