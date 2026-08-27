@@ -192,18 +192,35 @@ unclipped and free of persistent display artefacts.
 
 ## H5 — Dial Illumination
 
-- 5 V warm-white lighting.
-- Driven through a **logic-level N-channel MOSFET**; ESP32 drives the gate.
+- **Three identical E10/MES warm-white LED lamps** in the three original holders.
+- Target lamp geometry: approximately **24 mm overall length**, matching the
+  original bulb form factor closely enough to retain the original optics/position.
+- Preferred colour temperature: **2200–3000 K**.
+- Lamps must be compatible with the locked **5 V lighting rail**. Accept nominal
+  5 V devices or a specified operating range that includes 5 V (for example
+  1–5 V or 3–6 V).
+- The three lamps are wired **in parallel**.
+- One **logic-level N-channel MOSFET** low-side switches the complete lamp bank;
+  ESP32 drives the gate.
 - **PWM** controlled by the ESP32 (proposed **GPIO25**, LEDC).
 - ESP32 and lighting grounds are **common**.
+- Brightness is set during commissioning, stored in non-volatile settings and
+  then treated as a setup value rather than a normal user control. The unused
+  aerial control may be used temporarily for commissioning if convenient, but is
+  not reserved permanently for lighting.
 
-Expected behaviours: fade up, fade down, configurable idle brightness, safe boot
-state. Firmware support is implemented; GPIO25 and the MOSFET/load wiring remain
-proposed until the dial-lighting bench procedure passes.
+Expected behaviours: fade up, fade down, stored/configurable brightness, safe
+boot state. Firmware support is implemented; GPIO25 and the MOSFET/load wiring
+remain proposed until the dial-lighting bench procedure passes.
 
 ## Power Distribution
 
-- Rails: 5 V and 3.3 V (see Hardware Architecture for the budget).
+- Locked controller architecture: **one regulated 5 V control rail**, with 3.3 V
+  derived by the ESP32 board regulator for logic/ADC and the OLED as documented.
+- The 5 V rail supplies the ESP32 board input and the three E10 dial lamps.
+- **No dedicated 6 V/6.3 V lighting rail** is required or planned.
+- Exact 5 V PSU/regulator model and current rating remain **open procurement** and
+  must be selected with adequate current margin before final assembly.
 - The ESP32 carries **control and UI only**. It does **not** process or carry
   audio.
 
