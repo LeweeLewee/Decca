@@ -1,6 +1,6 @@
-# Decca OLED Display Mount — CAD Build Review (Rev E)
+# Decca OLED Display Mount — CAD Build Review (Rev F)
 
-Supersedes Rev D. Cable-tie anchor redesigned for rear access.
+Supersedes Rev E. Aesthetic reshaping of the carrier; no functional change.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
 ---
@@ -87,6 +87,38 @@ The flange grows from 3.00 to 7.00 mm tall to carry the anchors, taking the carr
 cable movement never loads the OLED's 4-pin header. Set `tie_flange_h` to zero to delete
 the flange and both anchors together.
 
+### 1.6 Carrier reshaped (Rev F)
+
+The Rev E carrier was functionally sound but visually crude — plain rectangular slabs
+butt-joined at hard 90° steps, with no blending or rhythm. Reshaped for appearance only.
+Every change is built from primitives, so the geometry is deterministic and symmetric by
+construction rather than dependent on feature-fillet luck.
+
+| | Rev E | **Rev F** |
+|---|---|---|
+| Tray corner radius | R2.5 | **R4.0** |
+| Boss arms | 12.00 mm rectangular slabs | **7.50 mm stadium bar**, ends R3.75 centred exactly on the bolts, tangent to the Ø7.50 bosses |
+| Arm ↔ tray junction | hard step | **R2.50 concave blend** |
+| Tie flange | 40.0 mm full-width plain rectangle | **27.0 mm wide, R3.0 corners** |
+| Flange ↔ tray junction | hard step | **R2.50 concave blend** |
+| Tie anchor bars | square blocks | **R0.80 rounded** |
+
+The arm ends and the bosses now share a radius, so the mounting lug reads as one
+continuous form instead of a slab with a cylinder stuck on it. Mass drops from 3.908 to
+**3.448 cm³** — the part got lighter as well as better looking.
+
+**Edge softening was only partly successful.** Fusion's chamfer failed on the whole-face
+edge sets (`ASM_BL_UNFIN`) at both 0.50 and 0.30 mm. A per-edge fallback applied 31
+chamfers at 0.30 mm; **49 edges remain crisp**. The dominant visual improvement is the
+primitive-built shaping, which is unaffected, and the residual crisp edges are not
+noticeable at this scale — but they are there, and a manual chamfer pass in Fusion would
+finish the job if you want it perfect.
+
+**Nothing functional moved.** Re-validated after reshaping: all interference pairs clear,
+both tie paths clear, PCB insertion corridor still meets only the 0.43 mm³ snap hooks,
+driver corridors clear, carrier still seats on the Perspex plane, PCB datum bearing
+unchanged at 133.0 mm², glass-to-Perspex still 0.300 mm.
+
 ---
 
 ## 2. Validation
@@ -114,7 +146,7 @@ resists.
 | Part | Envelope | Volume |
 |---|---|---:|
 | Front_Bezel | 40.00 × 20.30 × 4.00 mm | 0.465 cm³ |
-| Rear_Display_Carrier | 56.50 × 45.10 × 6.20 mm | 3.908 cm³ |
+| Rear_Display_Carrier | 56.50 × 45.10 × 6.20 mm | 3.448 cm³ |
 
 Both closed manifold solids.
 
