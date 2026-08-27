@@ -1,4 +1,4 @@
-# Decca OLED Display Mount — CAD Build Review (Rev A)
+# Decca OLED Display Mount — CAD Build Review (Rev B)
 
 Built from: `mechanical/Drawings/Decca_OLED_Display_Mount_Spec_v1.0.md`
 Platform: Autodesk Fusion 360, script-generated parametric build

@@ -38,7 +38,7 @@ that source control alone does not express well.
 | 2026-08-25 | Hardware | Locked Phase 2 audio architecture as **WiiM Pro -> separate stereo power amplifier -> passive speakers**; WiiM Pro model is locked, separate amplification is architecturally locked, exact amplifier model remains explicitly open, and dual monoblocks are rejected for the current build (ADR-0008; `hardware/BOM/phase2.csv`). |
 | 2026-08-25 | Firmware | Removed legacy fascia-button labels from normal, now-playing and function-confirmation views after physical OLED review; reclaimed the line for mapped function, metadata and control spacing while retaining source identity in state (Specification v0.14, ADR-0009, FR-DSP-07). |
 | 2026-08-25 | Hardware | Bench-verified the Pi Hut SH1106 OLED at 0x3C on SDA GPIO21 / SCL GPIO22; all ten on-target display tests passed and visual inspection confirmed the revised layout was upright, complete and unclipped (Specification v0.15, HW-06, IF-02). |
-| 2026-08-27 | Mechanical | Built the Rev A parametric Fusion 360 CAD for the OLED display mount from Display Mount Spec v1.0: front bezel and rear OLED carrier, reference Decca panel and SH1106 module. Validated interference-free with the 0.30 mm glass-to-Perspex gap and the active area exactly centred on the opening. Three SH1106 reference dimensions remain assumed pending physical measurement (see the CAD review note). |
+| 2026-08-27 | Mechanical | Built the Rev B parametric Fusion 360 CAD for the OLED display mount from Display Mount Spec v1.0: front bezel and rear OLED carrier, reference Decca panel and SH1106 module. Validated interference-free with the 0.30 mm glass-to-Perspex gap and the active area exactly centred on the opening. Three SH1106 reference dimensions remain assumed pending physical measurement (see the CAD review note). |
 
 ## Hardware Revisions
 
@@ -51,4 +51,4 @@ that source control alone does not express well.
 | Rev | Date  | Part / Change                   | Notes |
 |-----|-------|---------------------------------|-------|
 | A   | _TBD_ | Initial knob adaptor design     |       |
-| A   | 2026-08-27 | Display mount — Front_Bezel + Rear_Display_Carrier initial CAD | From Spec v1.0. PETG. 2 x M2 heat-set inserts @ 48.00 mm. Not yet prototyped. |
+| B   | 2026-08-27 | Display mount — Front_Bezel + Rear_Display_Carrier initial CAD | From Spec v1.0. PETG. 2 x M2 heat-set inserts @ 48.00 mm. Not yet prototyped. |
