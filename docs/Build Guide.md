@@ -160,8 +160,11 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
 2. Connect the purchased Pi Hut SH1106 panel:
    - OLED GND → ESP32 GND (Brown);
    - OLED VCC → ESP32 3V3 (Red), never 5 V for this build;
-   - OLED SDA → GPIO21 (signal conductor labelled SDA);
-   - OLED SCL → GPIO22 (signal conductor labelled SCL).
+   - OLED SDA → GPIO21 (Orange);
+   - OLED SCL → GPIO22 (Yellow).
+
+   H4 is a documented colour-standard exception: its Orange conductor is SDA,
+   not 5 V. Never connect that Orange wire to the 5 V rail.
 3. In the PlatformIO terminal run:
 
    ```powershell

@@ -26,6 +26,11 @@ its original conductors, **Red** and **Green**. These are pre-existing and are
 **not** to be recoloured or reinterpreted under the general loom standard above.
 See the on/off section.
 
+**Exception — H4 OLED harness.** The installed and bench-verified screen loom
+uses **Orange for SDA** and **Yellow for SCL**. These are signal conductors in H4:
+the Orange SDA wire must **never** be connected to the 5 V rail. H4 retains Red
+for 3.3 V and Brown for GND. See the OLED section.
+
 H3 uses separate two-wire contact pairs; it has no common-return conductor.
 The pairs are recorded in physical left-to-right order under H3. VHF, MW and
 Gram are bench-verified; LW awaits repair and retest.
@@ -188,8 +193,12 @@ with a pre-soldered four-pin header. Expected address: **0x3C**.
 
 - VCC → 3.3 V (Red)
 - GND → GND (Brown)
-- SDA → GPIO21 (bench-verified)
-- SCL → GPIO22 (bench-verified)
+- SDA → GPIO21 (Orange, bench-verified)
+- SCL → GPIO22 (Yellow, bench-verified)
+
+The H4 Orange and Yellow signal colours are a documented exception to the
+general loom colour standard. In particular, do not treat the Orange SDA
+conductor as 5 V.
 
 Check the labels printed on the delivered module before applying power because
 four-pin OLED modules do not all use the same physical pin order.
