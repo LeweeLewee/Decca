@@ -19,5 +19,6 @@ Dimensioned engineering drawings for fabrication, measurement, and reference.
 | `Decca_OLED_Display_Mount_revP_rear.png` | Rev P rear three-quarter — the rear-entry pocket, fingers and flange |
 | `Decca_OLED_Display_Mount_revP_sections.png` | Rev P section at x = +10 through a snap finger, with the Perspex, bezel, glass and PCB |
 
-Current mechanical revision: **P**. Not yet released for print — see the Rev P
-build review §8.
+Current mechanical revision: **P**, released for the geometry-validation
+prototype print. Requires one module-preparation step — front-side solder
+protrusion ≤ 1.00 mm; see the Rev P build review §8.

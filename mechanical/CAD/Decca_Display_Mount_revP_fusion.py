@@ -92,7 +92,14 @@ P = {
     "oled_header_h": 3.00,
     "oled_header_off_y": 19.25,
     "oled_header_depth": 8.10,     # rearward from the PCB rear face
-    "oled_tip_proud": 1.50,        # front-side solder protrusion after trim
+    # Front-side solder protrusion after module preparation. The budget is
+    # oled_perspex_gap + oled_glass_proud = 1.10 mm before anything on the
+    # PCB front face reaches the Perspex, so 1.00 mm is the accepted
+    # preparation limit and leaves 0.10 mm of clearance. The brief's
+    # untrimmed-trim figure of 1.50 mm strikes the Perspex by 0.40 mm; it is
+    # retained in the validation tip sweep as evidence, not as an input.
+    # Confirmed by the project owner 2026-08-28: the tips will be reduced.
+    "oled_tip_proud": 1.00,
     "oled_tip_d": 1.20,
     "oled_tip_pitch": 2.54,
     "oled_tip_cx": 0.50,

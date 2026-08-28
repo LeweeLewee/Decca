@@ -54,7 +54,8 @@ R = dict(
     glass_proud=0.80,                 # MEASURED at Rev N
     hole_d=3.00, hole_pitch_x=30.00, hole_pitch_y=28.50,
     header_w=10.00, header_h=3.00, header_off_y=19.25, header_depth=8.10,
-    tip_proud=1.50,                   # the brief's trimmed worst case
+    # accepted module-preparation limit; 1.10 mm is the zero-margin ceiling
+    tip_proud=1.00,
     tip_d=1.20, tip_pitch=2.54, tip_cx=0.50,
     tip_y_top=18.55, tip_y_bot=-10.55,
     # Rev P design intent

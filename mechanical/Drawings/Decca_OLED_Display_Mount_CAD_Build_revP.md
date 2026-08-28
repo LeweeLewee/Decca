@@ -4,11 +4,12 @@ Supersedes Rev N. Implements the corrected rear-loaded architecture specified in
 `Decca_OLED_Display_Mount_CAD_Review_revO.md`.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
-> **Status: NOT released for print.** The carrier geometry is complete and
-> **every** mandatory validation passes except one, and that one cannot be fixed
-> by any carrier geometry: the brief's 1.50 mm trimmed solder tips strike the
-> original Perspex by 0.40 mm. See **§8**. It is a one-line decision, not a
-> measurement, and it does not change the carrier.
+> **Status: RELEASED for the geometry-validation prototype print.**
+> All 20 mandatory validations pass, on the real solid and again independently on
+> the exported mesh. One mandatory **assembly-preparation** step applies: nothing
+> on the OLED's display-side face may stand more than **1.00 mm** proud. The
+> project owner confirmed on 2026-08-28 that the tips will be reduced, which
+> closed the only open item. See **§8**.
 
 Sources:
 
@@ -39,7 +40,7 @@ bar was the primary retention. Rev P inverts the whole arrangement.
 | Snap features | 4 sprung pegs, 0.100 mm hook, 3.06 % strain | **4 cantilever fingers, 0.40 mm shoulder, 1.73 % strain** |
 | Features entering the PCB mounting holes | 4 pegs | **none** |
 | Parts to print | 3 | **2** (carrier + unchanged bezel) |
-| Carrier | 56.50 × 45.10 × 6.20, 3.004 cm³ | **56.60 × 47.20 × 9.60, 7.151 cm³** |
+| Carrier | 56.50 × 45.10 × 6.20, 3.004 cm³ | **56.60 × 47.20 × 9.60, 7.154 cm³** |
 | Carrier × solder tips | needed a relief slot | **impossible to interfere, at any tip length** |
 
 The carrier got deeper and heavier. That is bought deliberately: the rear support
@@ -233,7 +234,7 @@ impossible to fudge.
 | Swept body, 12 mm travel | Fusion boolean | STL triangle/AABB |
 |---|---|---|
 | OLED glass | **CLEAR** | **CLEAR** |
-| Solder tips @ 1.50 mm proud | **CLEAR** | **CLEAR** |
+| Solder tips @ 1.00 mm proud | **CLEAR** | **CLEAR** |
 | Header body | **CLEAR** | **CLEAR** |
 | OLED PCB | HIT 5.8641 mm³ | — |
 | OLED PCB, outside the four spring footprints | **CLEAR** | **CLEAR** |
@@ -280,7 +281,7 @@ measurement is no longer required.**
 
 ---
 
-## 8. ⚠ The one blocking item: 1.50 mm solder tips versus a 0.30 mm gap
+## 8. The solder-tip budget — resolved by module preparation
 
 This is arithmetic between the module and the original panel. The carrier is not
 in the path, and no carrier architecture can change it.
@@ -291,44 +292,55 @@ Anything standing on the PCB's display-side face has a budget of exactly
 oled_perspex_gap 0.30  +  oled_glass_proud 0.80  =  1.10 mm
 ```
 
-before it reaches z = 0 and strikes the Perspex. Modelled at the brief's
-1.50 mm, the tips reach **z = +0.40 and interfere with the Perspex by
-3.6191 mm³**.
+before it reaches z = 0 and strikes the Perspex.
+
+**Decision, 2026-08-28: the tips will be reduced.** `oled_tip_proud` is
+therefore modelled at **1.00 mm**, which is the preparation limit with 0.10 mm of
+clearance. Validated CLEAR against both the Perspex and the carrier.
+
+The full sweep is retained as evidence, because it is what sets the limit:
 
 | Tip proud of the PCB face | vs Perspex | vs carrier | Verdict |
 |---:|---|---|---|
 | 0.40 | CLEAR | CLEAR | PASS |
 | 0.80 | CLEAR | CLEAR | PASS |
-| **1.00** | **CLEAR (+0.10)** | CLEAR | **PASS — the release limit** |
-| 1.10 | CLEAR (0.00) | CLEAR | zero margin |
+| **1.00** | **CLEAR (+0.10)** | CLEAR | **PASS — the modelled design input** |
+| 1.10 | CLEAR (0.00) | CLEAR | zero margin — do not aim here |
 | 1.20 | HIT 0.905 mm³ | CLEAR | FAIL |
-| **1.50** | **HIT 3.619 mm³** | CLEAR | **FAIL** |
-| 2.00 | HIT 8.143 mm³ | CLEAR | FAIL |
+| 1.50 | HIT 3.619 mm³ | CLEAR | FAIL — the brief's original figure |
+| 2.00 | HIT 8.143 mm³ | CLEAR | FAIL — untrimmed |
 
-What Rev P *does* deliver, and unconditionally, is the carrier's own
-contribution: **carrier × tips is CLEAR at every length**, by the §5 corollary.
-Reversing the load direction moved the carrier out of the tips' way. It cannot
-move the Perspex.
+Two things are worth recording.
 
-### Two resolutions. Both are one line, neither changes the carrier.
+First, **the 1.50 mm figure in the brief was never compatible with a 0.30 mm
+optical gap**, and would not have been compatible with any carrier geometry.
+Reversing the load direction moved the *carrier* out of the tips' way — that part
+Rev P does deliver, unconditionally — but it cannot move the Perspex. Had the
+tips been fixed at 1.50 mm, the only remedy would have been to open the gap to
+0.80 mm, which is 2.7× the approved 0.15–0.30 band and puts the screen visibly
+deeper behind the fascia. Reducing the tips was the right call.
 
-1. **Prepare the module to ≤ 1.00 mm front-side protrusion.** Optical gap stays
-   at 0.30 mm; the carrier STL in this PR is already correct and is released the
-   moment this is accepted. Preferred method: remove the pin header and solder
-   the four leads to the pads **from the rear**, dressing the front-side joints
-   flush. Rev P leaves the entire rear of the board open, so this is easy.
-   Acceptable alternative: keep the header and trim the front-side pins and
-   solder below 1.00 mm.
-2. **Accept 1.50 mm tips and open the gap.** Set `oled_perspex_gap = 0.80` and
-   re-run the generator. No topology change, no other parameter moves. But
-   0.80 mm is 2.7× the approved 0.15–0.30 band and puts the screen visibly
-   deeper behind the fascia, which is the opposite of the brief's governing
-   objective.
+Second, **carrier × tips is CLEAR at every length**, up to and beyond the
+untrimmed 2.00 mm, with 1.853 mm of clearance. That is the §5 corollary: because
+the carrier has no material forward of z = −1.20 inside the module aperture,
+carrier-to-tip interference is geometrically impossible. Rev N needed a
+dedicated relief slot for this; Rev P cannot have the problem. **The tip length
+is now purely a module-to-panel matter, with no carrier sensitivity at all.**
 
-**Rev P is built at gap 0.30 with a stated preparation limit of 1.00 mm**,
-because the brief's governing objective is to place the glass close to the
-Perspex. Both cases are validated in the model. **This decision is the only
-thing standing between this PR and print release.**
+### Required preparation
+
+Prepare the module so that nothing on its display-side face stands more than
+**1.00 mm** proud:
+
+- **Preferred** — remove the pin header and solder the four leads to the pads
+  **from the rear**, dressing the front-side joints flush. Rev P leaves the
+  entire rear of the board open and the header region unenclosed, so this is
+  comfortable to do and gives the largest margin.
+- **Acceptable** — keep the header, trim the front-side pins and dress the solder
+  below 1.00 mm proud.
+
+Check it with a depth gauge or a straight edge before assembly. 1.10 mm is the
+hard ceiling; aim for 1.00 mm or less.
 
 ---
 
@@ -343,8 +355,8 @@ Run with `main()` then `validate()` inside Fusion, and
 | 2 | carrier × OLED glass | **CLEAR** (0.707 mm) |
 | 3 | carrier × PCB | 2.4000 mm³ — the designed 0.10 mm edge grip, at the four tongues only |
 | 4 | carrier × header | **CLEAR** (0.250 mm) |
-| 5 | carrier × trimmed 1.50 mm tips | **CLEAR** (1.853 mm) |
-| 6 | trimmed 1.50 mm tips × Perspex | **FAIL — 3.6191 mm³, see §8** |
+| 5 | carrier × tips, any length to 2.00 mm | **CLEAR** (1.853 mm) |
+| 6 | prepared 1.00 mm tips × Perspex | **CLEAR** (+0.10 mm) — see §8 for the sweep |
 | 7 | OLED glass × Perspex nominal gap | **0.300 mm** |
 | 8 | rear PCB datum correctness | **6.40 mm² at z = −2.70, one-sided, 4 of 4** |
 | 9 | M2 load path | **terminates at the seating face, 707.8 mm²** |
@@ -360,7 +372,8 @@ Run with `main()` then `validate()` inside Fusion, and
 | 19 | front bezel × everything | **CLEAR, unchanged from Rev N** |
 | 20 | cable-tie path | **3.50 × 1.40 mm section passes, never reaches z = 0** |
 
-**One failure, #6, and it is §8.**
+**All 20 pass.** The Fusion gate reports `GATE RESULT: ALL CHECKS PASS` and
+the independent STL checker exits 0.
 
 ### Clearance table
 
@@ -525,7 +538,7 @@ added.
 
 | # | Item | Blocks print? | Blocks CAD? |
 |---|---|---|---|
-| 1 | **Front-side solder protrusion — the §8 decision** | **YES** | no |
+| ~~1~~ | ~~Front-side solder protrusion~~ | **CLOSED** 2026-08-28 — tips will be reduced; modelled at 1.00 mm, §8 | — |
 | 2 | `oled_glass_proud` = 0.80 mm from a single sample; it sets the whole chain | no | no |
 | 3 | `oled_pcb_off_y` = 4.00 mm still assumed — affects active-area centring only | no | no |
 | 4 | Anything on the PCB front face other than glass and solder tips is assumed absent | no | no |
@@ -533,8 +546,11 @@ added.
 | 6 | Bezel retention is removable adhesive on recessed pads | no | no |
 | ~~7~~ | ~~Glass envelope relative to the four mounting holes~~ | **CLOSED** — designed out, §7 | — |
 
-Rev O listed four unmeasured OLED properties as gating items. Rev P closes the
-one that was blocking, by not depending on it.
+Rev O listed four unmeasured OLED properties as gating items. Both of the
+blocking ones are now closed: the glass envelope by designing the dependency out,
+and the solder-tip length by the owner's decision to reduce the tips. **Nothing
+outstanding blocks the print.** Items 2 to 6 are prototype-measurement and
+firmware items, all correctable in a single parameter or a single commit.
 
 ---
 
@@ -587,18 +603,18 @@ source for each file.
 
 ## 16. Design decision
 
-**Rev P is not released for print, pending one decision.**
+**Rev P is released for the geometry-validation prototype print.**
 
 The architecture is delivered in full and validated on the real solid and again,
 independently, on the exported mesh: rear-loaded, rear PCB Z datum, separate
 carrier-to-Perspex hard stops carrying all M2 preload, nothing whatsoever between
-the PCB front face and the Perspex, locating and light-retention snaps only,
-no separate retainer bar, active area centred, both swept corridors clear, and
-Rev O's blocking unknown designed out rather than deferred.
+the PCB front face and the Perspex, locating and light-retention snaps only, no
+separate retainer bar, active area centred, both swept corridors clear in both
+directions, and Rev O's blocking unknown designed out rather than deferred.
 
-The single open item is §8: at the brief's 1.50 mm the solder tips foul the
-Perspex by 0.40 mm. Choose the ≤ 1.00 mm preparation limit and this PR is
-released unchanged; choose 1.50 mm and set `oled_perspex_gap = 0.80`, rebuild,
-and accept a visibly deeper screen.
+Print one carrier, prepare one module to ≤ 1.00 mm front-side protrusion, and run
+the §14 acceptance tests. The two figures most worth measuring on that print are
+the actual glass-to-Perspex gap and the real `oled_pcb_off_y`; both are single
+parameters if they move.
 
 Rev N receives no further work.

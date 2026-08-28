@@ -268,7 +268,7 @@ measurement (§8).
 | 1 | `oled_glass_proud` = 0.80 | measured, single sample (Rev N) | no | no — sets the chain; a second sample is 10 minutes well spent |
 | 2 | Glass envelope vs the four PCB holes | **never measured** | **no — designed out** | **no** |
 | 3 | `oled_active_off_y` = 4.00 | assumed | no | no — affects centring only, correctable in one parameter |
-| 4 | Front-side solder protrusion | see §8 | no | **yes** |
+| 4 | Front-side solder protrusion | resolved — reduced to <= 1.00 mm | no | no |
 | 5 | Anything else on the PCB front face besides glass and solder tips | assumed: nothing | no | flag for the fit test |
 
 Item 2 was Rev O's blocking failure. Rev P removes it as a dependency: nothing
@@ -278,7 +278,7 @@ enters the PCB mounting holes, and the nearest sprung feature to the glass is
 
 ---
 
-## 8. The one real conflict: 1.50 mm solder tips cannot coexist with a 0.30 mm gap
+## 8. The one real conflict — RESOLVED 2026-08-28: the tips will be reduced
 
 This is arithmetic, not architecture, and no carrier topology can change it.
 
@@ -310,18 +310,18 @@ Perspex.
 1. **Remove the pin header; solder the four leads to the pads from the rear and
    dress the front-side joints below 1.00 mm proud.** Rev P leaves the entire
    rear of the board open, so this is easy. Optical gap stays at 0.30 mm.
-   ← **built as the default**
+   ← **CHOSEN, and built**
 2. Keep the header, trim the front-side pins and solder below 1.00 mm proud.
    Same geometry, same result, tighter trim than 1.50 mm.
 3. Accept 1.50 mm tips and open `oled_perspex_gap` to **0.80 mm**. One parameter,
    rebuild, no topology change — but 2.7× the approved 0.15–0.30 band, and the
    screen sits visibly deeper behind the fascia.
 
-Rev P is built at gap 0.30 with a stated assembly-preparation limit of 1.00 mm,
-because the brief's governing objective is to place the glass *close* to the
-Perspex. The model is validated at **both** 1.50 mm (the brief's worst case,
-which fails) and 1.00 mm (the release limit, which passes), and the tip length
-is a single user parameter either way.
+**Resolution, confirmed by the project owner on 2026-08-28: option 1 — the tips
+will be reduced.** `oled_tip_proud` is modelled at **1.00 mm**, the optical gap
+stays at 0.30 mm, and the carrier geometry is unchanged by the decision (the
+carrier is not in the tips' path at any length). The 1.50 mm case is retained in
+the validation tip sweep as evidence of where the limit comes from.
 
 ---
 
@@ -358,6 +358,6 @@ design. Rev P takes no feature into those holes at all.
 | No separate retainer bar | PASS — deleted |
 | Sections 2–3 mm where geometry allows | PASS — 3.00 mm wall; 0.75 mm fingers are springs by intent |
 | Blocking measurement gap | NONE |
-| Blocking conflict | ONE — §8, front-side solder protrusion |
+| Blocking conflict | NONE — §8 resolved: tips reduced, modelled at 1.00 mm |
 
 **Topology approved for CAD.** Proceed to the Fusion 360 build.
