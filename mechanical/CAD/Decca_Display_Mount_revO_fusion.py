@@ -476,7 +476,85 @@ def volume_of_intersection(tbm, a, b):
     return ca.volume * 1000.0        # cm3 -> mm3
 
 
-def validate(app, design, comps):
+def check_insertion(P, d, carrier):
+    """Sweep the module forward onto its seat and look for solid carrier.
+
+    Rev O reverses the load direction, which makes the insertion path a NEW
+    failure mode. Every other check in this file is static, on the final
+    seated position - and a part can be perfectly clear where it ends up
+    while having no way to get there. Revs H/J/K carried this check for the
+    front-loaded design; it must exist for the rear-loaded one too.
+    """
+    tbm = adsk.fusion.TemporaryBRepManager.get()
+    B = Builder()
+    rear = d["z_carrier_rear"] - 20.0
+
+    glass = B.box(d["glass_x0"], d["glass_x1"], d["glass_y0"], d["glass_y1"],
+                  rear, d["z_glass_front"])
+    pcb = B.box(d["pcb_x0"], d["pcb_x1"], d["pcb_y0"], d["pcb_y1"],
+                rear, d["z_pcb_front"])
+    for (px, py) in d["pins"]:
+        B.sub(pcb, B.cyl(P["oled_hole_d"], px, py, rear - 1.0, 1.0))
+    tips = None
+    for ty in (P["oled_tip_y_top"], P["oled_tip_y_bot"]):
+        for tx in d["tip_x"]:
+            c = B.cyl(P["oled_tip_d"], tx, ty, rear,
+                      d["z_pcb_front"] + P["oled_tip_proud"])
+            tips = c if tips is None else B.uni(tips, c)
+    header = B.box(-P["oled_header_w"] / 2.0, P["oled_header_w"] / 2.0,
+                   P["oled_header_off_y"] - P["oled_header_h"] / 2.0,
+                   P["oled_header_off_y"] + P["oled_header_h"] / 2.0,
+                   rear, d["z_pcb_rear"])
+
+    print("")
+    print("--- insertion corridor (module swept forward onto its seat) ---")
+    blocked = []
+    for name, body in (("OLED glass", glass), ("solder tips", tips),
+                       ("header body", header)):
+        v = volume_of_intersection(tbm, body, carrier)
+        print("  %-12s swept x carrier   %s"
+              % (name, "CLEAR" if v < 1e-6 else "** HIT %.4f mm3 **" % v))
+        if v >= 1e-6:
+            blocked.append((name, v))
+
+    v = volume_of_intersection(tbm, pcb, carrier)
+    defl = (P["locating_pin_d"] + 2 * P["pin_barb"] - P["oled_hole_d"]) / 2.0
+    print("  %-12s swept x carrier   %s"
+          % ("OLED PCB", "CLEAR" if v < 1e-6 else "HIT %.4f mm3" % v))
+    print("               ^ barb interference fit, %.3f mm deflection per leg,"
+          % defl)
+    print("                 by design - the legs are sprung, the glass is not")
+
+    if blocked:
+        print("")
+        print("  ** THE MODULE CANNOT REACH ITS SEAT **")
+        for (px, py) in d["pins"]:
+            loc = B.box(px - 3.5, px + 3.5, py - 3.5, py + 3.5, rear, 0.0)
+            near = tbm.copy(carrier)
+            tbm.booleanOperation(
+                near, loc, adsk.fusion.BooleanTypes.IntersectionBooleanType)
+            vv = (volume_of_intersection(tbm, glass, near)
+                  if near.faces.count else 0.0)
+            print("     glass x post (%+6.2f, %+6.2f)   %s"
+                  % (px, py, "clear" if vv < 1e-6 else "FOUL %.4f mm3" % vv))
+        head_r = (P["locating_pin_d"] + 2 * P["pin_barb"]) / 2.0
+        for (px, py) in d["pins"]:
+            if py < d["glass_y0"] < py + head_r:
+                print("")
+                print("     barb head at y %+.3f reaches y %+.3f; the glass lower"
+                      % (py, py + head_r))
+                print("     edge is at y %+.3f - they overlap by %.3f mm. The glass"
+                      % (d["glass_y0"], py + head_r - d["glass_y0"]))
+                print("     is rigid, and its rear face is coplanar with the PCB")
+                print("     front face, so it meets the barb BEFORE the PCB hole")
+                print("     does: the barb is at full diameter when they touch.")
+                print("     Root cause is the reference module - the glass envelope")
+                print("     overlaps the two bottom mounting holes. MEASURE IT.")
+                break
+    return blocked
+
+
+def validate(app, design, comps, P, d):
     print("")
     print("--- Rev O interference matrix (mm3 of overlap) ---")
     carrier = comps["carrier"]
@@ -494,6 +572,7 @@ def validate(app, design, comps):
             print("  %-24s -> %-22s %.3f" % (a_name, b_name, r.value * 10.0))
         except Exception as e:
             print("  %-24s -> %-22s FAILED (%s)" % (a_name, b_name, e))
+    return check_insertion(P, d, comps["carrier"])
 
 
 # ---------------------------------------------------------------------------
@@ -544,7 +623,9 @@ def run(_context):
         if "OLED_Solder_Tips" in by:
             pairs.append(("OLED_Solder_Tips", by["OLED_Solder_Tips"],
                           "Rear_Display_Carrier", carrier))
-        validate(app, design, {"carrier": carrier, "ref": ref, "pairs": pairs})
+        blocked = validate(app, design,
+                           {"carrier": carrier, "ref": ref, "pairs": pairs},
+                           P, d)
 
         # Exports
         cad = os.path.join(OUT_DIR, "CAD")
@@ -569,6 +650,13 @@ def run(_context):
         print("Chosen glass-to-Perspex gap: %.2f mm" % P["oled_perspex_gap"])
         print("Solder-tip trim threshold  : %.2f mm proud of the PCB front face"
               % (P["oled_glass_proud"] + P["oled_perspex_gap"]))
+        if blocked:
+            print("")
+            print("BLOCKING: the module cannot be inserted -")
+            for n, v in blocked:
+                print("  %s fouls the carrier through %.4f mm3 of its travel"
+                      % (n, v))
+            print("Rev O is NOT ready to print. See the build review, s.6a.")
     except Exception:
         # Print rather than messageBox: a modal dialog blocks Fusion and
         # hangs any non-interactive (MCP) run. The re-raise still gives the

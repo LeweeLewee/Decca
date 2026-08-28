@@ -3,6 +3,11 @@
 Supersedes Rev N. Clean redesign; nothing from the Rev N feature tree is reused.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
+> **Status: NOT released for print.** Built in Fusion and consistent throughout,
+> but the module cannot be inserted as drawn — the OLED glass fouls the two
+> bottom snap posts by 0.500 mm. See **§6a**. Two measurements on the physical
+> module gate the first print; neither is a carrier change. See §12.
+
 Sources:
 `mechanical/CAD/Decca_Display_Mount_revO_fusion.py` (the model),
 `mechanical/CAD/Decca_Display_Mount_revO_verify.py` (the checks below).
@@ -157,6 +162,10 @@ The forward datum is the lands, not the posts.
 If the first print shows the retention is too light, `pin_barb` has headroom —
 0.60 mm still only reaches 2.6 % strain.
 
+⚠ The **bottom** pair of posts is what blocks assembly in §6a. Raising
+`pin_barb` widens the barb head and makes that foul worse, not better — do not
+touch it until §6a is resolved.
+
 ---
 
 ## 6. ⚠ The solder tips: Rev O cannot remove this requirement
@@ -207,9 +216,67 @@ still the Rev N worst-case assumption of 2.00 mm and has never been measured.
 
 ---
 
+## 6a. ⚠ BLOCKING — the module cannot be inserted
+
+Rev O reverses the load direction. That makes the **insertion path** a new
+failure mode, and it was not checked: §7's matrix, §4's load path and the
+19-point probe all evaluate the *final seated position*. A part can be clear
+where it ends up and still have no way to get there. Revs H, J and K each
+carried an insertion-corridor check for the front-loaded design; Rev O dropped
+it at exactly the revision that reversed the direction of travel.
+
+Swept forward along the new axis, the module does not fit:
+
+| Swept onto its seat | × carrier |
+|---|---|
+| **OLED glass** | **HIT 0.1908 mm³** |
+| OLED PCB | HIT 1.6729 mm³ — barb interference fit, 0.200 mm per leg, by design |
+| solder tips | CLEAR |
+| header body | CLEAR |
+
+The glass fouls the **two bottom snap posts**, 0.0954 mm³ each; the top two are
+clear.
+
+| | y |
+|---|---:|
+| glass lower edge | −9.050 |
+| bottom post centre | −10.250 |
+| barb head, r 1.700 | reaches **−8.550** |
+| PCB hole, r 1.500 | reaches −8.750 |
+
+A **0.500 mm** lateral overlap against bonded glass. The glass cannot deflect,
+and because its rear face is coplanar with the PCB front face it reaches the
+barb *before* the PCB hole does — so the barb is at its full 3.40 mm diameter
+when they meet, not sprung inward. The PCB's own 1.6729 mm³ is the intended
+0.200 mm-per-leg snap deflection; the legs are sprung, the glass is not.
+
+**Root cause.** The reference module has the glass envelope overlapping the two
+bottom mounting holes by 0.30 mm radially: `oled_glass_h` 23.00 at
+`oled_glass_off_y` 2.45 puts the lower edge at y −9.05, while the bottom holes
+sit at y −10.25 with r 1.50, reaching −8.75. That overlap was inert in every
+front-loaded revision, where nothing had to travel past it, and became blocking
+the moment the load direction reversed. It has never been measured.
+
+**Resolve this first, and cheaply.** Earlier revisions put pegs through these
+same four holes, and boards were physically fitted at the Rev C and Rev D fit
+tests. If a board really went on, then the glass does *not* overhang the bottom
+holes, the defect is in `oled_glass_h` / `oled_glass_off_y` rather than in the
+carrier, and the fix is to correct the reference and re-run. If it does
+overhang, bottom retention cannot be a through-hole barb at all and needs
+rethinking — bottom-edge lands with top-only snaps, or side clips clear of the
+glass.
+
+Either way the answer is one measurement: **the glass envelope relative to the
+four mounting holes.** Until it exists, Rev O must not be printed.
+
+---
+
 ## 7. Validation
 
-Booleans and clearances computed on the real solid (OpenCascade), not asserted.
+Booleans and clearances computed on the real solid, not asserted — and
+reproduced independently by Fusion. **All of it is static: it describes the
+final seated position only.** For whether the module can reach that
+position, see §6a — it currently cannot.
 
 | Pair | Result |
 |---|---|
@@ -240,6 +307,16 @@ holes, so they touch that plane without bearing on the glass.
 A 19-point solid-membership probe confirms every feature is where the design says
 it is (lands, window, tip relief, post legs and split slots, barb heads, insert
 bores, blind backing, tie slots, wire notch, seating pads). All 19 pass.
+
+| Swept insertion path | Result |
+|---|---|
+| OLED glass swept × carrier | **HIT 0.1908 mm³ — see §6a** |
+| solder tips swept × carrier | CLEAR |
+| header body swept × carrier | CLEAR |
+| OLED PCB swept × carrier | HIT 1.6729 mm³ (designed snap deflection) |
+
+Both the Fusion generator and the offline verifier now run this check and both
+report the failure.
 
 ### Optical alignment
 
@@ -299,7 +376,9 @@ without checking against the 1.10 mm blind backing.
 2. Prepare the module per §6 and check nothing on the display-side face stands
    more than 1.10 mm proud.
 3. Push the OLED into the carrier pocket from the rear until all four barbs
-   click. It should seat on the lands with no force.
+   click. It should seat on the lands with no force. **⚠ As currently modelled
+   this step fails — the glass strikes the two bottom barbs 0.500 mm before the
+   holes reach them. Do not print until §6a is resolved.**
 4. Offer the carrier to the rear of the Perspex and fit the two M2 screws from
    the front. Tighten until the carrier is flat — it will not go further.
 5. Fit the bezel to the front of the aperture.
@@ -309,16 +388,24 @@ without checking against the 1.10 mm blind backing.
 
 ## 10. Open items
 
-1. ~~**Panel geometry.**~~ Closed. §2. Rev O is built at 49.00 / 35.20 × 15.30,
-   confirmed by the project owner as the correct measured geometry.
+1. **Glass envelope vs the mounting holes — BLOCKING.** §6a. As modelled, the
+   glass overhangs the two bottom holes by 0.30 mm and fouls both bottom snap
+   posts by 0.500 mm on insertion, so the module cannot be assembled. Never
+   measured. This is the first thing to settle.
 2. **Solder-tip length — blocking.** §6. Never measured; still the Rev N
    worst-case 2.00 mm assumption.
-3. **`oled_glass_proud` = 0.80 mm** is from a single measured sample. It sets
+3. ~~**Panel geometry.**~~ Closed. §2. Rev O is built at 49.00 / 35.20 × 15.30,
+   confirmed by the project owner as the correct measured geometry.
+4. **`oled_glass_proud` = 0.80 mm** is from a single measured sample. It sets
    the whole depth chain. A second sample would be worth ten minutes.
-4. **`oled_active_off_y` = 4.00 mm** remains assumed. Light the display and
+5. **`oled_active_off_y` = 4.00 mm** remains assumed. Light the display and
    report the offset.
-5. **Firmware must mask 2 pixel rows top and bottom.** Unchanged from Rev N.
-6. **Bezel retention is adhesive** on recessed pads. Unchanged since Rev G.
+6. **Firmware must mask 2 pixel rows top and bottom.** Unchanged from Rev N.
+7. **Bezel retention is adhesive** on recessed pads. Unchanged since Rev G.
+
+Items 1, 2, 4 and 5 are all the same shape: unmeasured properties of the OLED
+module carried over from Rev N. One session with the real module and a set of
+calipers closes all four.
 
 ---
 
@@ -339,28 +426,55 @@ Rev N file — writes all 60-odd values into `design.userParameters`, builds
 unchanged bezel, prints the interference matrix and clearance table to the text
 console, and exports the `.f3d`, both STEPs and the STL.
 
-**Built and verified in Fusion on 2026-08-28.** The generator ran unmodified
-apart from `OUT_DIR`, and Fusion reproduced every figure the offline check had
+**Built in Fusion on 2026-08-28.** The generator ran unmodified apart from
+`OUT_DIR`, and Fusion reproduced every static figure the offline check had
 published — carrier 56.60 × 42.20 × 5.60 mm and 3.512 cm³, seating face
 833.3 mm², PCB datum bearing 218.9 mm², M2 seating pads 40.3 mm² each,
 glass-to-Perspex 0.300 mm, active area 1.850 mm, header 0.250 mm, solder tips
 1.850 mm, and every carrier interference pair CLEAR. The solder tips still
-strike the Perspex at 8.143 mm³, exactly as §6 predicts. Two kernels, one
-recipe, no disagreement.
+strike the Perspex at 8.143 mm³, exactly as §6 predicts.
+
+That agreement is worth what it is and no more. **Both sides run the same recipe
+parsed from the same file, so agreement proves the recipe was transcribed
+faithfully — it cannot find a check that is missing from both.** The insertion
+failure in §6a was invisible to every figure listed above and to the screenshots,
+which show the seated assembly with all four barbs engaged; it was found only by
+asking what the check set did not cover. Both the generator and the verifier now
+carry an insertion-corridor check, and both report the failure.
 
 `Decca_Display_Mount_revO.f3d`, `Rear_Display_Carrier_revO.step`,
 `Decca_Display_Mount_revO_assembly.step` and `Rear_Display_Carrier_revO.stl`
-in this repository are now the Fusion exports. They replaced equivalent files
-built offline by `Decca_Display_Mount_revO_verify.py`, which parses the
-parameter table and the body recipes straight out of the generator and rebuilds
-them on OpenCascade — so what was validated is the same recipe Fusion ran, not
-a second description of it. That check remains the fast way to re-validate a
-parameter change without opening Fusion: `pip install cadquery && python3
-mechanical/CAD/Decca_Display_Mount_revO_verify.py`.
+in this repository are the Fusion exports. They replaced equivalent files built
+offline by `Decca_Display_Mount_revO_verify.py`, which parses the parameter table
+and the body recipes straight out of the generator and rebuilds them on
+OpenCascade — so what is validated is the same recipe Fusion ran, not a second
+description of it. That check remains the fast way to re-validate a parameter
+change without opening Fusion:
+
+```
+pip install cadquery && python3 mechanical/CAD/Decca_Display_Mount_revO_verify.py
+```
+
+It exits non-zero when the carrier interferes or the insertion corridor is
+blocked, so it is usable as a gate. Note that it **rewrites the STEP and STL in
+place** — re-export from Fusion afterwards, or discard those two files, so the
+repository keeps a single source for the CAD artefacts.
 
 ---
 
 ## 12. Design decision
 
-Rev O is accepted for a geometry-validation prototype print, subject to the one
-remaining blocking measurement in §10 — the solder-tip length. Rev N receives no further work.
+**Rev O is not released for print.** The architecture stands — the load path,
+the depth chain, the optical alignment and the seating-land design are all sound
+and independently reproduced by two kernels — but §6a shows the module cannot be
+assembled as drawn, and §6's solder-tip length is still unmeasured.
+
+Two measurements gate the first print, both on the physical OLED module and
+neither on the carrier:
+
+1. the glass envelope relative to the four mounting holes (§6a);
+2. `oled_tip_proud` (§6).
+
+The Fusion model, the `.f3d` and the exports are current and correct as a record
+of the design; they are simply a record of a design that is not yet buildable.
+Rev N receives no further work.

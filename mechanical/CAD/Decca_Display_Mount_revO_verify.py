@@ -260,6 +260,71 @@ def main():
     if strain > 4.0:
         print("  ** WARNING: strain over the PETG working limit **")
 
+    rule("Insertion corridor - can the module actually reach that seat?")
+    # Rev O reverses the load direction, so the swept path is a NEW failure
+    # mode. Everything above is static, on the final seated position, and a
+    # part can be clear where it ends up while having no way to get there.
+    rear = d["z_carrier_rear"] - 20.0
+    Bs = Builder()
+
+    g_sw = Bs.box(d["glass_x0"], d["glass_x1"], d["glass_y0"], d["glass_y1"],
+                  rear, d["z_glass_front"])
+    p_sw = Bs.box(d["pcb_x0"], d["pcb_x1"], d["pcb_y0"], d["pcb_y1"],
+                  rear, d["z_pcb_front"])
+    for (px, py) in d["pins"]:
+        Bs.sub(p_sw, Bs.cyl(P["oled_hole_d"], px, py, rear - 1.0, 1.0))
+    t_sw = None
+    for ty in (P["oled_tip_y_top"], P["oled_tip_y_bot"]):
+        for tx in d["tip_x"]:
+            c = Bs.cyl(P["oled_tip_d"], tx, ty, rear,
+                       d["z_pcb_front"] + P["oled_tip_proud"])
+            t_sw = c if t_sw is None else Bs.uni(t_sw, c)
+    h_sw = Bs.box(-P["oled_header_w"] / 2.0, P["oled_header_w"] / 2.0,
+                  P["oled_header_off_y"] - P["oled_header_h"] / 2.0,
+                  P["oled_header_off_y"] + P["oled_header_h"] / 2.0,
+                  rear, d["z_pcb_rear"])
+
+    blocked = []
+    for name, body in (("OLED glass", g_sw), ("solder tips", t_sw),
+                       ("header body", h_sw)):
+        v = overlap(body, carrier)
+        print("  %-12s swept x carrier   %s"
+              % (name, "CLEAR" if v == 0.0 else "** HIT %.4f mm3 **" % v))
+        if v != 0.0:
+            blocked.append((name, v))
+    v = overlap(p_sw, carrier)
+    print("  %-12s swept x carrier   %s"
+          % ("OLED PCB", "CLEAR" if v == 0.0 else "HIT %.4f mm3" % v))
+    print("               ^ barb interference fit, %.3f mm deflection per leg,"
+          % defl)
+    print("                 by design - the legs are sprung, the glass is not")
+
+    if blocked:
+        print("")
+        print("  ** THE MODULE CANNOT REACH ITS SEAT **")
+        for (px, py) in d["pins"]:
+            loc = Bs.box(px - 3.5, px + 3.5, py - 3.5, py + 3.5, rear, 0.0)
+            try:
+                vv = overlap(g_sw, Body(carrier.s.intersect(loc.s)))
+            except Exception:
+                vv = 0.0
+            print("     glass x post (%+6.2f, %+6.2f)   %s"
+                  % (px, py, "clear" if vv == 0.0 else "FOUL %.4f mm3" % vv))
+        head_r = (P["locating_pin_d"] + 2 * P["pin_barb"]) / 2.0
+        for (px, py) in d["pins"]:
+            if py < d["glass_y0"] < py + head_r:
+                print("")
+                print("     barb head at y %+.3f reaches y %+.3f; the glass lower"
+                      % (py, py + head_r))
+                print("     edge is at y %+.3f - they overlap by %.3f mm. The glass"
+                      % (d["glass_y0"], py + head_r - d["glass_y0"]))
+                print("     is rigid, and its rear face is coplanar with the PCB")
+                print("     front face, so it meets the barb BEFORE the PCB hole")
+                print("     does: the barb is at full diameter when they touch.")
+                print("     Root cause is the reference module - the glass envelope")
+                print("     overlaps the two bottom mounting holes. MEASURE IT.")
+                break
+
     rule("Load path - the M2 preload must never reach the glass")
     cz = bbox(carrier)[5]
     gz = bbox(oled["OLED_Glass"])[5]
@@ -389,9 +454,17 @@ def main():
 
     fails = [n for n, v in worst if v != 0.0]
     print("")
-    print("RESULT: %s" % ("carrier CLEAR against every reference body"
-                          if not fails else "INTERFERENCE: " + ", ".join(fails)))
-    return 0 if not fails else 1
+    if fails:
+        print("RESULT: INTERFERENCE: %s" % ", ".join(fails))
+    elif blocked:
+        print("RESULT: the seated state is clear, but the module cannot be")
+        print("        assembled - %s"
+              % ", ".join("%s fouls the carrier on insertion" % n
+                          for n, v in blocked))
+    else:
+        print("RESULT: carrier CLEAR against every reference body, and the")
+        print("        insertion corridor is clear")
+    return 0 if not (fails or blocked) else 1
 
 
 if __name__ == "__main__":
