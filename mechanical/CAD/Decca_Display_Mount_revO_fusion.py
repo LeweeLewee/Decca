@@ -134,7 +134,7 @@ P = {
 }
 
 # Where to write the outputs. Point this at your clone of the repo.
-OUT_DIR = os.path.expanduser("~/Decca/mechanical")
+OUT_DIR = r"D:\GitHub\Decca\mechanical"
 # Validated Rev N bezel, imported unchanged. Leave as None to skip the bezel.
 BEZEL_STEP = os.path.join(OUT_DIR, "CAD", "Front_Bezel_revN.step")
 
@@ -499,7 +499,6 @@ def validate(app, design, comps):
 # ---------------------------------------------------------------------------
 def run(_context):
     app = adsk.core.Application.get()
-    ui = app.userInterface
     try:
         d = derive(P)
 
@@ -571,6 +570,9 @@ def run(_context):
         print("Solder-tip trim threshold  : %.2f mm proud of the PCB front face"
               % (P["oled_glass_proud"] + P["oled_perspex_gap"]))
     except Exception:
-        if ui:
-            ui.messageBox("Rev O build failed:\n%s" % traceback.format_exc())
+        # Print rather than messageBox: a modal dialog blocks Fusion and
+        # hangs any non-interactive (MCP) run. The re-raise still gives the
+        # Scripts UI its own error dialog when the script is run by hand.
+        print("Rev O build failed:")
+        print(traceback.format_exc())
         raise

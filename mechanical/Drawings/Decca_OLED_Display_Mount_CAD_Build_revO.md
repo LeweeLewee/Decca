@@ -329,7 +329,8 @@ without checking against the 1.10 mm blind backing.
 1. Open Fusion 360 with nothing important unsaved.
 2. Utilities → Add-Ins → Scripts and Add-Ins → Scripts → the green `+` → pick
    `mechanical/CAD/Decca_Display_Mount_revO_fusion.py`.
-3. Edit `OUT_DIR` at the top of the script to point at your clone.
+3. Set `OUT_DIR` at the top of the script to your clone's `mechanical`
+   folder. It is currently `D:\GitHub\Decca\mechanical`.
 4. Run.
 
 It creates a **new** design document — it does not open, modify or Save-As the
@@ -338,11 +339,23 @@ Rev N file — writes all 60-odd values into `design.userParameters`, builds
 unchanged bezel, prints the interference matrix and clearance table to the text
 console, and exports the `.f3d`, both STEPs and the STL.
 
-The STEP and STL in this repository were produced offline by
-`Decca_Display_Mount_revO_verify.py`, which parses the parameter table and the
-body recipes straight out of the generator and rebuilds them on OpenCascade — so
-what was validated is the same recipe Fusion will run, not a second description
-of it. Run it with `pip install cadquery && python3
+**Built and verified in Fusion on 2026-08-28.** The generator ran unmodified
+apart from `OUT_DIR`, and Fusion reproduced every figure the offline check had
+published — carrier 56.60 × 42.20 × 5.60 mm and 3.512 cm³, seating face
+833.3 mm², PCB datum bearing 218.9 mm², M2 seating pads 40.3 mm² each,
+glass-to-Perspex 0.300 mm, active area 1.850 mm, header 0.250 mm, solder tips
+1.850 mm, and every carrier interference pair CLEAR. The solder tips still
+strike the Perspex at 8.143 mm³, exactly as §6 predicts. Two kernels, one
+recipe, no disagreement.
+
+`Decca_Display_Mount_revO.f3d`, `Rear_Display_Carrier_revO.step`,
+`Decca_Display_Mount_revO_assembly.step` and `Rear_Display_Carrier_revO.stl`
+in this repository are now the Fusion exports. They replaced equivalent files
+built offline by `Decca_Display_Mount_revO_verify.py`, which parses the
+parameter table and the body recipes straight out of the generator and rebuilds
+them on OpenCascade — so what was validated is the same recipe Fusion ran, not
+a second description of it. That check remains the fast way to re-validate a
+parameter change without opening Fusion: `pip install cadquery && python3
 mechanical/CAD/Decca_Display_Mount_revO_verify.py`.
 
 ---
