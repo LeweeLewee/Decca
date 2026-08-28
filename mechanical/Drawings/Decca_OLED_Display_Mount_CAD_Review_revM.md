@@ -1,6 +1,6 @@
-# Decca OLED Display Mount — CAD Build Review (Rev L)
+# Decca OLED Display Mount — CAD Build Review (Rev M)
 
-Supersedes Rev K. Retainer bar moved to the centre of the board.
+Supersedes Rev L. Retainer bar shifted 4 mm toward the tie-flange edge.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
 ---
@@ -56,7 +56,7 @@ and nothing else.
 
 ## 3. Optional retainer bar — now across the centre of the board
 
-Moved from the end to the centre, spanning the board's short axis and dropping into a
+Spans the board's short axis and dropping into a
 notch in each **side** wall. Three reasons it is better there:
 
 1. **Clear of the header at either end.** An end bar always sits next to one possible
@@ -69,9 +69,14 @@ notch in each **side** wall. Three reasons it is better there:
 |---|---:|
 | Size | 38.65 × 6.00 × 1.85 mm |
 | Volume | 0.427 cm³ |
+| Position (final model) | **y +5.00 … +11.00** — offset 4.00 mm toward the tie-flange edge |
+| Clearance to the header keep-out | 6.75 mm |
 | Ends captured | 1.12 mm into a notch in each side wall |
 | Notches | x ±18.20…19.40, side walls only |
 | Rear face | flush with the tray rear — nothing protrudes |
+
+Position is driven by `bar_y_off` (4.00 mm), measured toward the tie-flange / header edge
+in the final model. The side-wall notches move with it.
 
 ### It must be a stop, not a clamp
 
