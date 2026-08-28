@@ -1,6 +1,6 @@
-# Decca OLED Display Mount — CAD Build Review (Rev I)
+# Decca OLED Display Mount — CAD Build Review (Rev J)
 
-Supersedes Rev H. Header relief opened at both ends; carrier is now orientation-proof.
+Supersedes Rev I. Retaining lip completed with a lead-in ramp; end walls restored to full height.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
 ---
@@ -59,7 +59,48 @@ Building the peg without the relief gives a **short, unfilleted** peg:
 6.25% is past PETG yield. That is the Rev B geometry that snapped, and it would snap
 again. So the answer is not four identical pegs.
 
+### 2.0 End walls restored to full height (Rev J)
+
+Rev I cut a notch through both outside tray walls for rearward pin clearance. It was never
+needed: the header sits ~0.50 mm *inside* the cavity, and its pins project straight back
+past a tray only 5.80 mm deep, so they clear the walls entirely. Both notches removed —
+**both end walls are now full height**, verified at the rear face.
+
 ### 2.3 What replaces it — a sprung retaining lip
+
+**Yes — the bar is a retainer, and it is there instead of four sprung pegs**, for the
+reason in §2.2. Rev J finishes it properly.
+
+**What was missing: a lead-in ramp.** As built in Rev H/I the lip presented a square face
+to the incoming board — it had nothing to cam it open, so it would have fought insertion
+rather than snapping. The lip now tapers **28.1° over 1.50 mm**, going from full overlap
+at the PCB rear plane to zero at the tip, while the **retaining face stays square** so it
+still holds once seated.
+
+Measured off the finished solid rather than assumed:
+
+| Depth behind the PCB rear plane | Lip overlap onto the board |
+|---|---:|
+| 0.05 mm (retaining face) | **0.77 mm** |
+| 0.75 mm (mid ramp) | 0.40 mm |
+| 1.45 mm (tip) | **0.03 mm** |
+
+That is a proper cam: the board meets almost nothing at the tip and progressively pushes
+the lip aside as it seats. Insertion-corridor volume drops 32.31 → **16.67 mm³** as a
+direct result.
+
+Also completed: the lip is now embedded 0.35 mm into its legs rather than 0.15 mm, giving
+a solid joint and removing the last sub-0.15 mm edges.
+
+**Spring behaviour**, from the finished section (1.45 × 1.50 mm, 26 mm span):
+
+| | |
+|---|---:|
+| Peak strain at full deflection | **1.03%** |
+| Centre-load spring force (PETG, E≈2000 MPa) | **≈6.7 N** |
+
+To release the board, push the lip outward with a small screwdriver — there is 3.10 mm of
+flex gap behind it.
 
 A single leaf spring across the narrow end, retaining the board where a peg cannot:
 
