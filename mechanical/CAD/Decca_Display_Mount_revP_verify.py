@@ -44,7 +44,7 @@ STL_PATH = os.path.join(MECH, "STL", "Rear_Display_Carrier_revP.stl")
 # brief. NOT read from the generator.
 # ---------------------------------------------------------------------------
 R = dict(
-    # measured Decca fascia
+    # measured Decca fascia - locked in Spec v1.1 section 2
     perspex_t=3.00,
     aperture_w=35.20, aperture_h=15.30,
     m2_pitch=49.00,

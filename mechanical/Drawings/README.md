@@ -10,7 +10,7 @@ Dimensioned engineering drawings for fabrication, measurement, and reference.
 
 | File | Role |
 |---|---|
-| `Decca_OLED_Display_Mount_Spec_v1.0.md` | original approved specification. **Its panel dimensions are superseded by measurement** — see the Rev C entry in `docs/Revision History.md`. |
+| `Decca_OLED_Display_Mount_Spec_v1.0.md` | approved specification, **now at v1.1** (the filename keeps `v1.0` for link stability). §2 holds the **measured and locked** Decca interface geometry: opening 35.20 × 15.30, M2 pitch **49.00 mm**. Other design-intent values in it are superseded by later revisions — the build reviews are authoritative there. |
 | `Decca_OLED_Display_Mount_CAD_Review_revN.md` | last front-loaded build (Rev N) |
 | `Decca_OLED_Display_Mount_CAD_Review_revO.md` | redesign specification for the rear-loaded architecture — the governing brief |
 | `Decca_OLED_Display_Mount_Topology_revP.md` | Rev P Stage 1 pre-CAD topology gate: side section, plan, load path, Z-chain, retention, corridors, and the P1 proof |

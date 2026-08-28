@@ -62,9 +62,9 @@ P = {
     # -- Original Decca fascia: MEASURED off the real panel -----------------
     # Measured at Rev C, print-confirmed at Rev D ("fixing pitch 49.00
     # confirmed correct on the print"), used unchanged by the prototyped
-    # Rev N model. These supersede the Spec v1.0 figures (48.00 pitch,
-    # 35.50 x 15.80 aperture) and were re-confirmed by the project owner on
-    # 2026-08-28.
+    # Rev N model. They superseded the Spec v1.0 figures (48.00 pitch,
+    # 35.50 x 15.80 aperture), were re-confirmed by the project owner on
+    # 2026-08-28, and are now locked in Spec v1.1 section 2.
     "perspex_t": 3.00,
     "panel_open_w": 35.20,
     "panel_open_h": 15.30,

@@ -58,8 +58,9 @@ Built on the physically measured fascia dimensions, exactly as Rev N was:
 - Perspex 3.00 mm; aperture **35.20 × 15.30 mm**; M2 pitch **49.00 mm**.
 
 These were corrected from Spec v1.0 by measurement at Rev C, print-confirmed at
-Rev D, and re-confirmed by the project owner on 2026-08-28. No additional
-drilling, cutting or modification of the original fascia.
+Rev D, re-confirmed by the project owner on 2026-08-28, and are now **locked in
+Spec v1.1 §2** so the superseded estimates cannot be re-quoted again. No
+additional drilling, cutting or modification of the original fascia.
 
 ---
 
