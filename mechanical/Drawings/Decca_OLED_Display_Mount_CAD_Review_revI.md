@@ -1,24 +1,29 @@
-# Decca OLED Display Mount — CAD Build Review (Rev H)
+# Decca OLED Display Mount — CAD Build Review (Rev I)
 
-Supersedes Rev G. Retention strengthened at both ends.
+Supersedes Rev H. Header relief opened at both ends; carrier is now orientation-proof.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
 ---
 
-## 1. Solder pin interference
+## 1. Solder pin interference — solved by removing the question
 
-The part in your photo is **Rev F**, where the through cut-out was on the *opposite* edge
-from the header — so the pins sat over a 0.60 mm shallow recess and bottomed out. That is
-exactly the section you cut away by hand.
+Three revisions have now been spent arguing about *which end* the header sits on, and two
+prints lost to getting it wrong. Rev I stops arguing.
 
-**Rev G already moved it**, and Rev H keeps it: full through cut-out, **16.00 mm wide**,
-on the header edge, spanning from the PCB edge **6.30 mm inboard**. The header row is only
-7.62 mm across and sits ~2.20 mm from the edge, so there is ample margin.
+**Both ends now have a full through cut-out**, 16.00 mm wide, full depth through the
+2.30 mm front plate. The shallow 0.60 mm recess is gone entirely — there is no longer a
+"wrong end" to get wrong, and the board fits either way up.
 
-I briefly took the cut-out to 20.00 mm as insurance and reverted it — width was never the
-problem, and the extra 4 mm cost 13 mm² of PCB bearing for nothing.
+**This costs almost nothing.** A 0.60 mm recess already sits clear of the PCB face, so it
+was contributing **zero** bearing. Converting it to a through cut-out is free; the only
+real cost is widening it from 12.00 to 16.00 mm to match the other end, which is
+**6.4 mm² of bearing** (99.4 → 93.0).
 
-Solder tips modelled 2.00 mm proud verify **CLEAR** of the carrier.
+Rearward pin clearance is cut through **both** tray walls to match, so a projecting header
+and its cable have a clear exit whichever end they land at.
+
+Verified by modelling solder tips 2.00 mm proud at **both** PCB edges simultaneously:
+**both CLEAR**.
 
 ---
 
@@ -90,7 +95,7 @@ end, one sprung lip at the far end, plus the two plain posts still locating.
 | Check | Result |
 |---|---:|
 | Glass → Perspex | 0.300 mm |
-| PCB datum bearing | 99.4 mm² |
+| PCB datum bearing | 93.0 mm² |
 | Insertion corridor | sprung features only |
 | Both cable-tie paths | CLEAR |
 | Seats on the Perspex plane | yes |
