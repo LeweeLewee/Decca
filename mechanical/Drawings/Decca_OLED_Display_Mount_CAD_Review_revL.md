@@ -1,7 +1,6 @@
-# Decca OLED Display Mount — CAD Build Review (Rev K)
+# Decca OLED Display Mount — CAD Build Review (Rev L)
 
-Supersedes Rev J. Four sprung pegs; integrated cantilever removed; optional glued
-retainer bar added as a separate part.
+Supersedes Rev K. Retainer bar moved to the centre of the board.
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
 ---
@@ -55,27 +54,38 @@ and nothing else.
 
 ---
 
-## 3. Optional glued retainer bar — separate part
+## 3. Optional retainer bar — now across the centre of the board
 
-A separate flat plate, printed on its own, glued on **after** the board is in.
+Moved from the end to the centre, spanning the board's short axis and dropping into a
+notch in each **side** wall. Three reasons it is better there:
+
+1. **Clear of the header at either end.** An end bar always sits next to one possible
+   header position; a centre bar never does. Same orientation-proofing as §1 of Rev I.
+2. **The end wall stays full height.** The Rev K version needed a shelf machined into it —
+   exactly the cut-out you asked to remove.
+3. **No PCB bearing spent at the ends**, which is the number that has been creeping down.
 
 | | |
 |---|---:|
-| Size | 29.85 × 3.40 × 2.70 mm |
-| Volume | 0.140 cm³ |
-| Overlap onto the PCB rear face | 0.80 mm |
-| Attachment | 2 × Ø2.40 × 1.30 mm locating pins into Ø2.55 holes |
-| Glue area | the 1.80 mm shelf across the end wall |
+| Size | 38.65 × 6.00 × 1.85 mm |
+| Volume | 0.427 cm³ |
+| Ends captured | 1.12 mm into a notch in each side wall |
+| Notches | x ±18.20…19.40, side walls only |
+| Rear face | flush with the tray rear — nothing protrudes |
 
-**Attachment points on the carrier:** the end wall is machined down to a shelf at exactly
-the PCB rear plane, so the bar's face contacts the shelf and the board on the same plane
-and presses the board flat. Two blind holes locate it.
+### It must be a stop, not a clamp
 
-**It prints flat on its PCB-contact face** — no overhang, no bridge, no support, and the
-one surface that matters is the bed face.
+At the ends the bar had front-plate datum directly opposite it, so it could safely clamp.
+**At the centre there is only the open display window behind the board — nothing opposes
+it.** A bar printed even slightly proud would bow the board *forward* and close the
+0.30 mm optical gap onto the Perspex.
 
-Because it goes on after assembly it needs no lead-in ramp, which is what made the
-integrated version awkward in the first place.
+So the bar's front face sits **0.05 mm behind the PCB rear plane**. It stops rearward
+movement and can never preload the glass. Verified: bar-to-PCB minimum distance
+**0.050 mm**, bar-to-carrier 0.000 mm (the notch fit).
+
+It still prints flat with no overhang, and being fitted after assembly it needs no
+lead-in ramp.
 
 ---
 
@@ -91,7 +101,7 @@ integrated version awkward in the first place.
 | All four snap hooks | **ENGAGED** |
 | Insertion corridor | 1.57 mm³ — four noses only |
 | Glass → Perspex | 0.300 mm |
-| PCB datum bearing | **86.7 mm²** (Rev J 93.0 — the two narrow reliefs cost 6.3) |
+| PCB datum bearing | **86.7 mm²** (unchanged) |
 | Both cable-tie paths | CLEAR |
 | Seats on the Perspex plane | yes |
 | Slivers | **0** on both parts |
