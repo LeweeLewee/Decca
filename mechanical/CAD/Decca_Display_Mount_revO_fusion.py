@@ -420,34 +420,45 @@ def write_parameters(design, P, d):
         if not isinstance(v, (int, float)):
             continue
         expr = "{0} mm".format(v)
-        ex = ups.itemByName(k)
-        if ex:
-            ex.expression = expr
-        else:
-            ups.add(k, adsk.core.ValueInput.createByString(expr), "mm",
-                    "Rev O generator")
+        try:
+            ex = ups.itemByName(k)
+            if ex:
+                ex.expression = expr
+            else:
+                ups.add(k, adsk.core.ValueInput.createByString(expr), "mm",
+                        "Rev O generator")
+        except Exception as e:
+            print("parameter %s rejected (%s) - geometry is unaffected" % (k, e))
 
 
-def import_bezel(app, design, root, path):
-    """Bring the unchanged, validated Rev N bezel in as a reference body."""
+def import_bezel(app, root, path):
+    """Bring the unchanged, validated Rev N bezel in as a reference body.
+
+    Strictly non-fatal and strictly non-disruptive. The bezel is cosmetic
+    reference geometry, so it must never be able to take the build down with
+    it -- and it must never switch the active document, because everything
+    after this point holds references into the document we created.
+    """
     if not path or not os.path.exists(path):
         print("bezel: %s not found - skipped" % path)
         return None
-    mgr = app.importManager
-    opts = mgr.createSTEPImportOptions(path)
+    before = set()
+    for i in range(root.occurrences.count):
+        before.add(root.occurrences.item(i).entityToken)
     try:
-        mgr.importToTarget(opts, root)
-    except Exception:
-        # Large/awkward STEP files only import to a new document.
-        doc = mgr.importToNewDocument(opts)
-        src = adsk.fusion.Design.cast(doc.products.itemByProductType("DesignProductType"))
-        print("bezel: imported to a new document (%s) - copy it in manually"
-              % doc.name)
-        return src
+        opts = app.importManager.createSTEPImportOptions(path)
+        app.importManager.importToTarget(opts, root)
+    except Exception as e:
+        # Do NOT fall back to importToNewDocument: it makes the imported file
+        # the active document and every reference held here goes stale.
+        print("bezel: import failed (%s) - continuing without it" % e)
+        return None
     for i in range(root.occurrences.count):
         occ = root.occurrences.item(i)
-        if occ.component.name.startswith("Front_Bezel"):
+        if occ.entityToken not in before:
+            print("bezel: imported as %r" % occ.name)
             return occ
+    print("bezel: import reported success but added no occurrence")
     return None
 
 
@@ -492,12 +503,25 @@ def run(_context):
     try:
         d = derive(P)
 
+        # Check the output path first. A throw at export time rolls the whole
+        # transaction back and you lose the build, so fail here instead.
+        if not os.path.isdir(OUT_DIR):
+            raise RuntimeError(
+                "OUT_DIR does not exist: %s\n"
+                "Edit OUT_DIR at the top of this script to point at your "
+                "clone of the repo (the 'mechanical' folder)." % OUT_DIR)
+
         # A BRAND-NEW document. Rev O is not a Save-As of Rev N.
         doc = app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
         design = adsk.fusion.Design.cast(app.activeProduct)
         design.designType = adsk.fusion.DesignTypes.ParametricDesignType
         root = design.rootComponent
-        root.name = "Decca_Display_Mount_revO"
+        try:
+            root.name = "Decca_Display_Mount_revO"
+        except Exception:
+            # The root component of an unsaved document often cannot be
+            # renamed. Cosmetic only - do not lose the build over it.
+            pass
 
         write_parameters(design, P, d)
 
@@ -506,7 +530,7 @@ def run(_context):
         oled_occ, _ = add_component(root, "REF_SH1106_1P3", build_oled(B, P, d))
         car_occ, car_comp = add_component(root, "Rear_Display_Carrier",
                                           build_carrier(B, P, d))
-        import_bezel(app, design, root, BEZEL_STEP)
+        import_bezel(app, root, BEZEL_STEP)
 
         carrier = car_occ.bRepBodies.item(0)
         ref = [(b.name, b) for b in list(panel_occ.bRepBodies) + list(oled_occ.bRepBodies)]
