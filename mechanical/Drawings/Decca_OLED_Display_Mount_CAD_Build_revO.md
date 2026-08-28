@@ -33,7 +33,7 @@ the carrier alone.
 
 ---
 
-## 2. ⚠ Blocking: the brief quotes superseded panel geometry
+## 2. The brief quotes superseded panel geometry — resolved
 
 The Rev O brief lists the original Decca interface as authoritative:
 
@@ -54,8 +54,10 @@ Building at 48.00 would put each M2 screw 0.50 mm off its hole. An M2 screw in a
 the inserts and the carrier would not bolt on. Shipping that was not a defensible
 option, so the measured geometry won and the deviation is recorded here.
 
-If the 48.00 figure is ever re-confirmed on the real panel, change
-`panel_fix_pitch` in the generator and rebuild — nothing else depends on it.
+**Confirmed by the project owner, 2026-08-28: the measured 49.00 stands and the
+brief's figures were an inadvertent carry-over from Spec v1.0.** If the panel is
+ever re-measured differently, change `panel_fix_pitch` in the generator and
+rebuild — nothing else depends on it.
 
 ---
 
@@ -307,8 +309,8 @@ without checking against the 1.10 mm blind backing.
 
 ## 10. Open items
 
-1. **Panel geometry — blocking.** §2. Rev O is built at 49.00 / 35.20 × 15.30.
-   Confirm against the real fascia before printing.
+1. ~~**Panel geometry.**~~ Closed. §2. Rev O is built at 49.00 / 35.20 × 15.30,
+   confirmed by the project owner as the correct measured geometry.
 2. **Solder-tip length — blocking.** §6. Never measured; still the Rev N
    worst-case 2.00 mm assumption.
 3. **`oled_glass_proud` = 0.80 mm** is from a single measured sample. It sets
@@ -347,5 +349,5 @@ mechanical/CAD/Decca_Display_Mount_revO_verify.py`.
 
 ## 12. Design decision
 
-Rev O is accepted for a geometry-validation prototype print, subject to the two
-blocking measurements in §10. Rev N receives no further work.
+Rev O is accepted for a geometry-validation prototype print, subject to the one
+remaining blocking measurement in §10 — the solder-tip length. Rev N receives no further work.
