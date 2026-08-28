@@ -6,154 +6,192 @@ Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
 ## 1. Reason for redesign
 
-Physical print-and-fit iterations of Rev N have shown that the current front-loaded architecture is over-constrained by the required screen depth.
+Physical print-and-fit iterations of Rev N showed that the front-loaded architecture had become constrained by OLED depth. Rev O changes the topology rather than further tuning the Rev N front plate and retainer arrangement.
 
-To position the OLED glass close to the inside face of the original Perspex, Rev N reduced the carrier front plate to 1.10 mm. This in turn created solder-tip interference with the Perspex, reduced snap-hook effectiveness, and made the separate retainer bar the primary PCB retention feature.
+The governing design objective is to place the OLED glass close to the inside face of the original Perspex while keeping all M2 screw preload out of the OLED glass and PCB.
 
-Rev O changes the architecture rather than further tuning Rev N.
+## 2. Rev O architecture — mandatory topology
 
-## 2. Rev O architecture
+The OLED module shall load into the carrier from the rear.
 
-The OLED module shall be loaded into the carrier from the rear.
+The carrier shall sit behind the OLED PCB. The OLED glass/display projects forwards towards the inside face of the Perspex.
 
-The OLED glass/display face shall project forwards through the carrier window towards the inside face of the Perspex. The carrier shall then be fixed to the original Perspex using the existing two M2 fixing holes at 48.00 mm centres.
+**No carrier front plate, seating land, shoulder, lip or other structural retention feature may occupy the space between the front face of the OLED PCB and the Perspex.** This explicitly rejects the failed Rev O implementation that recreated the Rev N 1.10 mm forward retention plane as short seating lands.
 
-The assembled geometry shall capture the OLED between the rear carrier and Perspex-side seating geometry, removing the need for a separate retainer bar.
+The OLED shall **not** be captured by the carrier alone. Final axial capture occurs only when the carrier is mounted to the Perspex. Snap pins or equivalent features may provide X/Y location and light handling retention before installation, but they are not the primary structural retention system.
 
-The OLED glass must not be used as the structural compression stop. Bolt preload must be reacted by positive carrier-to-Perspex seating features and PCB support geometry.
+The carrier/Perspex assembly therefore performs two independent functions:
 
-## 3. Existing Decca interface — unchanged
+1. **Structural load path:** M2 screw → carrier structural bosses / hard stops → Perspex.
+2. **OLED location and capture:** Perspex-side boundary → OLED module → rear PCB support geometry in the carrier.
+
+The glass must never be the structural compression stop.
+
+## 3. Existing Decca interface — measured values are authoritative
+
+Use the measured and print-confirmed dimensions already recorded in the repository, not the superseded Spec v1.0 values:
 
 - Original Perspex thickness: 3.00 mm.
-- Existing aperture: 35.50 mm W × 15.80 mm H.
-- Existing M2 fixing-hole pitch: 48.00 mm horizontal.
+- Existing aperture: **35.20 mm W × 15.30 mm H**.
+- Existing M2 fixing-hole pitch: **49.00 mm horizontal**.
 - Fixing-hole centreline: vertically centred on the display aperture.
-- Hole centreline therefore lies 7.90 mm from the upper and lower aperture edges.
 - No additional holes, cutting or irreversible modification to the original Perspex.
 - M2 screws enter from the front of the Perspex and fasten into the rear carrier.
 
-## 4. Front bezel — unchanged in principle
+If any later physical measurement contradicts these values, the physical measurement wins and the parameter is updated explicitly.
+
+## 4. Front bezel
 
 The front bezel remains a separate cosmetic trim around the aperture only.
 
-It must not include the M2 fixing holes and must not carry structural load.
+It must not include the M2 fixing holes and must not carry structural load. Retain the validated Rev N bezel unless physical testing identifies a specific reason to change it.
 
-Its purpose is to mask the original aperture edge and provide a clean front finish.
-
-Unless physical testing identifies a problem, the Rev N bezel geometry may be retained.
-
-## 5. OLED loading and retention
+## 5. OLED loading, datum and retention
 
 ### 5.1 Rear loading
 
-The OLED PCB shall insert into the carrier from the rear.
+The OLED PCB shall insert into the carrier from the rear. The carrier shall provide open rear access around the header and solder joints.
 
-The carrier shall include a rear-entry PCB pocket and a central forward clearance/window for the OLED glass.
+### 5.2 Positive OLED Z datum from behind
 
-### 5.2 Positive PCB datum
+OLED fore/aft position shall be established by **rear PCB support lands / shoulders acting on the rear face or rear-safe areas of the PCB**.
 
-The PCB shall seat against defined support lands/shoulders in the carrier.
+These support features may locate the PCB in Z but must not project ahead of the PCB front face.
 
-These lands establish the OLED fore/aft position and prevent M2 screw torque from loading the OLED glass.
+The intended section is therefore:
+
+```text
+Perspex
+  |
+small controlled optical gap
+  |
+OLED glass
+  |
+OLED PCB
+  ^
+rear PCB support lands / datum
+  |
+rear carrier
+```
+
+Separate carrier structural bosses / hard stops shall contact the Perspex directly outside the OLED module envelope and carry the M2 preload.
 
 ### 5.3 Locating snap pins
 
-The existing snap-pin concept may be retained, but its role changes.
-
-The pins are approved as locating and light-retention features because physical prototypes show that they position the screen effectively within the carrier.
-
-They must not be relied upon as the primary structural retention method.
+The existing snap-pin concept may be retained only as a locating and light-retention mechanism.
 
 Design intent:
 
 - locate the PCB consistently in X/Y;
-- provide enough light engagement to keep the OLED in the carrier during handling and assembly;
+- prevent the loose OLED falling away during handling and installation;
 - avoid significant PCB bending or insertion force;
-- avoid fine hook geometry that depends on very thin carrier sections.
+- avoid any path where bonded glass must sweep past a barb or rigid post;
+- do not rely on snap hooks for final axial capture once installed.
 
-If the current Rev N snap geometry can be adapted to the rear-loading architecture without excessive strain or tolerance sensitivity, reuse is preferred over inventing a new mechanism.
+A full swept insertion/removal corridor check is mandatory before print release.
 
 ### 5.4 Retainer bar
 
 Delete the separate retainer bar from Rev O.
 
-The assembled carrier/Perspex geometry provides the primary capture of the OLED, with snap pins used only for location and handling retention.
+The assembled carrier/Perspex geometry provides final axial capture of the OLED.
 
 ## 6. Optical depth and glass protection
 
-The target remains for the OLED display face to sit close to the inside face of the Perspex.
+Target nominal glass-to-Perspex gap: **0.15–0.30 mm**.
 
-Target nominal glass-to-Perspex gap: 0.15–0.30 mm.
+Select the final nominal from measured OLED geometry and realistic FDM tolerance. A nominal around 0.30 mm is acceptable if required for robustness.
 
-The exact final nominal may be selected during CAD validation based on measured module geometry and print tolerance.
+Critical requirements:
 
-Critical requirement: the glass must not become the structural stop when the M2 screws are tightened.
+- the OLED glass must not become the structural stop when the M2 screws are tightened;
+- tightening the M2 screws must not alter OLED depth;
+- there shall be no carrier material between the OLED PCB front face and Perspex used to establish this gap.
 
-The carrier shall include positive hard stops so that full seating of the carrier against the Perspex defines the assembly depth independently of OLED glass thickness.
+## 7. Solder-tip constraint — resolved by module preparation
 
-## 7. Carrier structural design
+The physical OLED solder tips project more than 2 mm from the PCB front face. They can be trimmed to a **maximum of 1.50 mm proud**.
 
-Rev O should take advantage of the reversed architecture to restore sensible FDM section thicknesses.
+This is an accepted assembly preparation step and shall be treated as the design input for Rev O.
+
+Accordingly:
+
+- model `oled_tip_proud = 1.50 mm maximum`;
+- provide sufficient local carrier clearance around the solder joints and header;
+- do not redesign the carrier topology merely to accommodate untrimmed >2 mm tips;
+- verify that the trimmed 1.50 mm tips do not interfere with the Perspex or any carrier feature in the final assembly or insertion path.
+
+If the measured glass proud and selected optical gap still make 1.50 mm incompatible with the Perspex, report that explicitly before changing architecture.
+
+## 8. Carrier structural design
+
+Rev O should restore sensible FDM section thicknesses behind and around the OLED module.
 
 Guidance:
 
-- use approximately 2.0–3.0 mm structural wall thickness where geometry allows;
+- approximately 2.0–3.0 mm structural wall thickness where geometry allows;
 - reinforce M2 boss regions appropriately;
+- use direct carrier-to-Perspex hard stops outside the OLED module envelope;
 - avoid unnecessary thin membranes around the display window;
 - leave rear access around the header and solder joints;
-- no requirement to trim OLED header solder tips solely to achieve panel fit;
-- maintain cable/header clearance and serviceability.
+- maintain cable/header clearance and serviceability;
+- minimise part count and avoid a separate retainer.
 
-The carrier should seat positively and flat against the inside face of the Perspex.
+## 9. Required CAD changes from Rev N / failed Rev O implementation
 
-## 8. Load path
-
-The intended structural load path is:
-
-M2 screw → rear carrier → carrier/Perspex seating stops → Perspex.
-
-OLED PCB support lands locate the module inside the carrier.
-
-The OLED glass must not carry screw preload.
-
-## 9. Required CAD changes from Rev N
-
-1. Redesign the rear carrier around rear insertion of the OLED PCB.
-2. Move the PCB seating datum to the rear-loaded geometry.
-3. Create a forward glass clearance/window through the carrier.
-4. Add positive carrier-to-Perspex hard-stop geometry.
-5. Retain/adapt snap pins only as locating/light-retention features.
-6. Delete the separate retainer bar.
-7. Remove the Rev N dependency on the 1.10 mm thin front plate.
-8. Remove the requirement to trim solder tips for panel clearance.
-9. Retain the original 48.00 mm M2 interface.
+1. Rear-load the OLED PCB.
+2. Keep the carrier and all structural PCB datum geometry behind the PCB front face.
+3. Establish OLED Z position from rear PCB support geometry.
+4. Provide a clear forward path for the OLED glass with no forward PCB seating lands.
+5. Add separate positive carrier-to-Perspex hard-stop geometry to carry M2 preload.
+6. Retain/adapt snap pins only for X/Y location and light handling retention.
+7. Delete the separate retainer bar.
+8. Model solder tips at 1.50 mm maximum after trimming.
+9. Use the measured 49.00 mm M2 pitch and 35.20 × 15.30 mm aperture.
 10. Retain the existing bezel unless new test evidence requires a change.
 11. Preserve active-area centring relative to the original Decca aperture.
 12. Keep the design fully parametric in Fusion 360.
 
-## 10. Validation requirements
+## 10. Mandatory CAD validation gate
 
-Before Rev O is accepted for print, verify in CAD:
+Before Rev O is accepted for print, verify all of the following on the actual generated geometry:
 
-- carrier × Perspex: clear except intended seating faces;
-- carrier × OLED glass: clear except intended non-load-bearing guidance;
-- carrier × OLED PCB: correct support and clearance;
-- carrier × header and solder joints: clear;
-- OLED glass × Perspex: 0.15–0.30 mm target nominal gap;
-- M2 fastener load does not pass through OLED glass;
-- snap pins locate the PCB without excessive strain;
-- no separate retainer is required;
-- OLED can be inserted and removed from the rear without damaging glass or PCB;
+- carrier × Perspex: clear except intended structural seating faces;
+- no carrier geometry ahead of the OLED PCB front face within the OLED module envelope;
+- rear PCB support contacts only intended PCB support areas;
+- carrier × OLED glass: clear throughout insertion, seating and removal;
+- carrier × OLED PCB: correct rear support and X/Y location;
+- carrier × header and trimmed 1.50 mm solder joints: clear;
+- trimmed solder joints × Perspex: clear;
+- OLED glass × Perspex: 0.15–0.30 mm nominal gap;
+- M2 load path terminates through carrier hard stops into Perspex, not OLED glass or PCB;
+- snap features locate the PCB without excessive strain;
+- OLED can be inserted and removed from the rear without bonded glass sweeping through a rigid barb/post envelope;
 - carrier seats flat against Perspex;
 - screen active area remains centred behind the bezel/aperture;
-- no unprintable thin slivers or unsupported features;
-- normal FDM wall thickness restored in structural areas.
+- no unprintable thin slivers or unsupported critical features;
+- normal FDM wall thickness is restored in structural areas.
 
-## 11. Prototype acceptance tests
+**A static final-position interference check is insufficient. A swept insertion/removal corridor check is mandatory.**
 
-First Rev O print should be treated as a geometry-validation prototype.
+## 11. Design-review gate before Fusion build
 
-Check:
+Before generating the next Fusion model, produce and review a simple side-section / topology diagram showing:
+
+- Perspex;
+- optical gap;
+- OLED glass;
+- PCB;
+- rear PCB support datum;
+- structural carrier hard stops to Perspex;
+- M2 load path;
+- snap/location features.
+
+The CAD build must not proceed if that section contains any carrier land, plate or shoulder between the PCB front face and Perspex.
+
+## 12. Prototype acceptance tests
+
+First corrected Rev O print is a geometry-validation prototype. Check:
 
 1. rear insertion/removal of OLED;
 2. snap-pin location and handling retention;
@@ -162,12 +200,14 @@ Check:
 5. active-area centring when powered;
 6. bezel alignment;
 7. M2 tightening does not change OLED depth or stress the module;
-8. header and solder joints clear the Perspex and carrier;
+8. trimmed solder joints and header clear the Perspex and carrier;
 9. no rattle when assembled;
 10. no separate retainer required.
 
-## 12. Design decision
+## 13. Design decision
 
-Rev N should not receive further architecture-level iteration.
+Rev N should receive no further architecture-level iteration.
 
-Rev O is the approved redesign direction: rear-loaded OLED PCB, positive PCB datum, carrier-to-Perspex hard stops, locating snap pins retained where useful, and no separate retainer bar.
+The failed first Rev O implementation is rejected because it recreated the critical Rev N geometry as **1.10 mm forward PCB seating lands** and attempted to capture the OLED within the carrier alone.
+
+The approved Rev O direction is: **rear-loaded OLED, rear PCB Z support, separate carrier-to-Perspex structural hard stops, no carrier geometry ahead of the PCB within the OLED envelope, locating/light-retention snap features only, trimmed solder tips at 1.50 mm maximum, and no separate retainer bar.**
