@@ -21,8 +21,20 @@ No Fusion geometry may be generated until this section is clean.
 > - **§12** the original front bolts have a non-standard thread, so the whole M2
 >   heat-set-insert architecture is deleted and the original bolts and their
 >   matching nuts are reused with a captive hex pocket.
+>
+> **Rev P.4 — BOUNDED CORRECTION 2026-08-29.** Two corrections to Rev P.3,
+> again leaving the validated OLED architecture alone:
+>
+> - **§11.5** the synthetic lighting-unit keepout component is **deleted**. Its
+>   boundary was asserted from the carrier's own pedestals, so it could never
+>   have caught a real collision, and shipping it in the browser, the assembly
+>   STEP and the manufacturing pack misrepresented the assembly. The physical
+>   rail cut it was invented to justify is kept exactly as printed;
+> - **§13** the open rear window is **closed** by an integral opaque rear light
+>   shield, part of the carrier, with a single local four-pin/header opening.
+>   §6 is amended accordingly: release was never rearward, and still is not.
 
-Baseline: `main` @ `53071ff`, whose §8.1, §8.2, §9, §10 and §12 are
+Baseline: `main` @ `e3a9aa1`, whose §8.1, §8.2, §8.3, §9, §10 and §12 are
 authoritative over anything written on this branch before them.
 
 ---
@@ -197,8 +209,9 @@ Rear view (looking forward, −Z). Dimensions in the aperture-centre frame.
        front plane, so it is unconditionally clear of the glass
    Each post stands in a Ø4.80 root relief, on a Ø8.00 pedestal, ringed by a
    Ø6.00/Ø4.80 fixed datum pad at z = −2.70.
-   Open rear window x −11.00 … +11.00, full height: header, cable, and the
-   push-out path used for removal.
+   Rev P.4: the rear of the bay is CLOSED by the 1.20 mm integral light shield
+   (§13), with one local four-pin/header slot, x −5.60 … +5.60, y +17.15 upward.
+   Header and cable exit through that slot; removal is forward, not rearward.
 ```
 
 ### Why the sprung pair is on the header side and the plain pair is not
@@ -400,12 +413,27 @@ Everything else the module touches is rigid.
    pliers — 0.10 mm per half. The barbs stand 0.70 mm proud of the PCB front
    face and are completely exposed, because nothing at all sits in front of the
    PCB.
-3. With a barb pinched, lift that corner clear; or push the PCB forward from the
-   **open rear window** (x −11.00 … +11.00, full board height) with a fingertip
-   or spudger.
-4. The plain posts then slide straight out.
+3. With a barb pinched, lift that corner clear. The module aperture is 0.85 mm
+   larger than the PCB on every side, so a spudger reaches the board edge at
+   z = −1.20 all round and levers it forward.
+4. If more purchase is wanted, the board's top edge (y = +20.75) overhangs the
+   carrier's own termination (y = +20.50) by 0.25 mm and is reachable from the
+   **open lighting-unit side**, which §11 deletes the rail from and §13 does not
+   close. Push forward there.
+5. The plain posts then slide straight out.
 
 No prise holes, no special tool, and no rigid feature anywhere in the corridor.
+
+**Rev P.4: the rear wall does not trap the module.** §13 closes the rear of the
+bay, so the Rev P.3 rear push-out is gone. Nothing else changes, because the
+release was never rearward:
+
+| Requirement | How it is met with the rear wall present |
+|---|---|
+| the sprung posts are deliberately released | pinch both barbs 0.12 mm per half with fine-nose tweezers; 0.70 mm of each nose stands proud of the PCB front face |
+| release is performed from the front or accessible sides | from the front through the module aperture, assisted if wanted from the open lighting-unit side |
+| the OLED withdraws through the front/Perspex side | removal travel is **+Z**, the same straight line as insertion, reversed |
+| neither PCB nor bonded glass contacts the rear wall | the wall's front face is at z = −6.80 and the PCB rear face never leaves z ≥ −2.70: **4.10 mm** of clearance, at every point of the sweep |
 
 **Swept corridor expectations** (verified numerically in Stage 2):
 
@@ -567,7 +595,7 @@ are the only design changes.
 
 ---
 
-## 11. Original Decca lighting-unit keep-out (brief §8.1)
+## 11. Original Decca lighting-unit side (brief §8.1)
 
 ### 11.1 What collided
 
@@ -637,17 +665,49 @@ towers. Between them, over x −10.70 … +10.70, there is nothing at all.
 | Carrier volume | 6.928 cm³ | **4.472 cm³** |
 | Connected solids | 1 | **1** |
 
-### 11.5 The keep-out boundary is asserted, not measured
+### 11.5 There is no keepout component — Rev P.4 correction
 
-The lighting unit's position has **never been measured**. What is known is that
-the rail and the tie projection fouled it. The brief mandates retaining the full
-sprung-post pedestals, so the keep-out solid used in CAD is placed at the
-**pedestal tangent, y = +22.55** — the carrier's own new maximum extent.
+**Rev P.3 was wrong here and the error is corrected, not softened.**
 
-That is an assertion. It is confirmed or refuted by the installed clearance test
-(brief §12.14). If the two pedestal towers still foul, the next correction is to
-reduce `pedestal_d` on the sprung pair, which is a one-parameter change; the
-towers project only 2.05 mm past the upright caps.
+Rev P.3 created a reference solid — `build_light_keepout()` /
+`REF_Lighting_Keepout` / `LIGHTING_UNIT_KEEPOUT` — and checked the carrier
+against it. Its boundary was placed at the **carrier's own sprung-pedestal
+tangent**, y = +22.55, because the brief mandates retaining the full pedestals.
+
+That is circular. A keep-out derived from the part it is meant to check can
+never be violated by that part, so the check could not fail and proved nothing.
+Worse, the body appeared in the Fusion browser, in the assembly STEP and in the
+manufacturing pack, where a reader would reasonably take it for measured
+lighting-unit geometry. **It was never measured. The lighting unit has never
+been measured.**
+
+Rev P.4 deletes all of it:
+
+| Deleted | Where it was |
+|---|---|
+| `build_light_keepout()` | generator |
+| component `REF_Lighting_Keepout` | Fusion browser, assembly STEP |
+| body `LIGHTING_UNIT_KEEPOUT` | that component |
+| derived `light_keepout_y` used only to place it | `derive()` |
+| `carrier × lighting-unit keep-out solid` intersection gate | `validate()` §14 |
+| `ORIGINAL_Nuts / ORIGINAL_Bolt_Envelope × lighting keep-out` gates | `validate()` §15 |
+| `zero carrier material inside the keep-out solid` | independent verifier §M |
+| its rows in the topology, build review, READMEs and exports | documentation |
+
+Nothing replaces it. No proxy, no substitute body, no "conservative envelope".
+
+**What is kept is the physical cut**, exactly as printed and offered up: the end
+rail and cable-tie projection stay deleted, the uprights still terminate at
+`light_cut_y` = +20.50 with their R1.80 caps, and the lighting-unit side stays
+open. Only the *name* of the reported boundary changes: `light_keepout_y`
+becomes **`carrier_max_y`**, and it now means what it always physically was —
+*how far the carrier itself reaches on that side*, +22.55, down from +30.60.
+
+Both tools now say so explicitly:
+
+> CAD cannot and does not prove lighting-unit clearance. Brief §12.14, the
+> installed physical test with the lighting unit left in place, is the sole
+> authority for that interface, and it remains **open and mandatory**.
 
 ### 11.6 Strain relief
 
@@ -740,7 +800,7 @@ diameter, measured 1.388 mm off the exported mesh.
 | rear-accessible regular-hex anti-rotation pocket | 4.00 mm across-flats hex, opening at the rear face | measured 4.000 af / 4.619 ac off the mesh at both centres; the same nut rotated 30° interferes by 1.02 mm³ |
 | positive axial seating shoulder | annulus at z = −2.00 | 8.55 mm², backed by 2.00 mm of solid carrier |
 | defined 1.40 mm head-seat depth | hex head seat ended by a step to the ridge | not dependent on the nut crushing into plastic |
-| clearance for the full 10.00 mm nut and engaged bolt | hex + Ø4.82 bore through to the rear | nut and bolt envelopes CLEAR of glass, PCB, header, Perspex and lighting keep-out |
+| clearance for the full 10.00 mm nut and engaged bolt | hex + Ø4.82 bore through to the rear | nut and bolt envelopes CLEAR of glass, PCB, header and Perspex |
 | sufficient continuous boss wall | Ø7.60 boss | **1.391 mm** minimum, continuous |
 | serviceable captive retention | 0.25 mm retaining ridge, 0.125 mm per flat | pushed past on assembly; **no adhesive**; a 2.2 mm pin through the bolt bore pushes it back out |
 
@@ -771,15 +831,133 @@ onto the shoulder.
 
 ---
 
-## 13. Rev P.3 pre-CAD gate — self-review verdict
+## 13. Integral rear light shield (brief §8.3) — Rev P.4
+
+### 13.1 What was wrong
+
+Rev P.3 left the OLED bay open right through to the rear face: the PCB pocket
+was cut from z = −1.20 to beyond z = −8.00 over the full 35.90 × 34.00 mm
+footprint. Installed, the retained Decca cabinet LEDs sit on the other side of
+that opening. They can light the rear and the edges of the OLED directly, which
+shows as a glow through the Perspex aperture and as washed-out contrast on the
+display. Nothing in the carrier stopped it.
+
+### 13.2 The wall
+
+One continuous wall, **integral to `Rear_Display_Carrier`** — not a cover, not a
+second component, not a separate printed part.
+
+| Property | Value | Why |
+|---|---|---|
+| named parameter | `rear_light_shield_t` = **1.20 mm** | 3 × 0.40 mm nozzle extrusion width. On a different extrusion width, raise it to at least three *actual* widths and regenerate |
+| Z extent | −8.00 → **−6.80** | grown **forward** from the existing rear plane, so the external envelope is unchanged at 56.60 × 39.15 × 8.00 mm |
+| X extent | −17.95 … +17.95 | exactly the PCB-pocket footprint, so it lands on both pocket side walls and bridges the two uprights **across the OLED bay only** |
+| Y extent | −13.00 … **+20.50** | bottom rail up to `light_cut_y`. It stops where the carrier stops |
+| clearance to the PCB | **4.10 mm** behind DATUM B | never touches the board, never preloads it, is never an OLED Z datum |
+| connectivity | one lump, 3442 welded vertices, 1 connected component | joined continuously to the frame |
+| material | **opaque black**, printed fully solid | solid perimeters through the wall — never sparse infill, never a single translucent skin |
+
+It does **not** extend into or recreate the deleted end-rail / cable-tie region.
+That material began at the pocket line y = +21.00 and ran outboard to +30.60;
+the wall stops 0.50 mm short of the pocket line and 10.10 mm short of where the
+flange was.
+
+### 13.3 The only penetration — the four-pin opening
+
+```
+                y = +20.50  ── wall's free top edge = the open §11 side ──
+                  ┌───────────────┐
+   solid wall     │  PIN SLOT     │      solid wall
+   12.35 mm       │ 11.20 × 3.35  │      12.35 mm
+                  └───────────────┘
+                y = +17.15  ── slot floor, solid wall below ──
+                     x −5.60 … +5.60
+```
+
+Sized from the existing header reference parameters plus two **separate, named**
+clearances, so it can be adjusted without touching the general OLED opening:
+
+| Input | Value |
+|---|---|
+| `oled_header_w` | 10.00 mm |
+| `oled_header_h` | 3.00 mm |
+| `oled_header_off_y` | +19.25 mm |
+| `oled_header_depth` | 8.10 mm rearward of the PCB rear face → z = −10.80 |
+| `pin_slot_clear_x` | **0.60 mm** per side — print allowance + conductor room |
+| `pin_slot_clear_y` | **0.60 mm** — print allowance + the wire bend |
+
+Result: **11.20 × 3.35 mm**, 37.52 mm² — **3.1 %** of the 1202.65 mm² wall. It
+is aligned on the header centre, it passes completely through the wall, and the
+full 8.10 mm header/wiring envelope crosses it with **zero** contact. The wire
+bend immediately behind the header lies inside that same envelope, 2.80 mm past
+the rear face, so it is covered by the same check.
+
+There is no general rear window, no solder-access window and no rear release
+opening. A swept membership test over the whole bay slab — 4757 points — finds
+material everywhere except inside this slot.
+
+### 13.4 Reported, not hidden: the slot's top boundary
+
+The header row sits at `oled_header_off_y` = +19.25 and its envelope tops out at
+**+20.75**. The carrier's own termination on that side is **+20.50**. The
+connector is therefore at the *open* lighting-unit end of the board, 0.25 mm
+proud of where the carrier is allowed to reach.
+
+So the slot is bounded by wall on **both X sides** and **below**, and above by
+the wall's free edge. That edge **is** the mandated open lighting-unit side of
+§11 — it is not a second opening, and there is nothing above it to open.
+
+Enclosing the slot would mean printing material back above y = +20.50, across
+the two uprights, in exactly the band the physically-successful rail cut
+emptied. That is not done. The alternative — dropping the wall below the header
+so no slot is needed — would leave a 3.15 × 35.90 mm open band, i.e. a general
+rear window under another name. Also not done.
+
+If the powered test (§12.22) shows leakage **only** at this opening, the fix is
+to tighten it locally or add a short integral hood — never to reopen the wall
+and never to add another printed component.
+
+### 13.5 What the wall does not change
+
+| Preserved | Evidence |
+|---|---|
+| front/Perspex-side insertion | swept corridor CLEAR, unchanged |
+| fixed rear PCB datum pads | 39.76 mm² still facing forward at z = −2.70 |
+| plain and sprung locating posts | built before the wall; the wall cuts none of them |
+| positive loose-carrier retention | 0.10 mm hook overlap, unchanged |
+| deliberate OLED removal | §6, revised — still forward, never rearward |
+| OLED Z position and 0.30 mm Perspex gap | optical chain untouched |
+| active-area centring | untouched |
+| 35.20 × 15.30 aperture, 49.00 mm pitch | untouched |
+| captive-nut interface, hard-stop load path | pockets at x ±24.50, 6.55 mm outboard of the wall |
+| the §11 rail cut | wall stops at +20.50; the old rail band stays empty |
+
+### 13.6 Print orientation
+
+Unchanged: **rear face on the bed, building +Z**. That makes the wall the
+**first 6 layers**, laid flat on the bed over its full 35.90 × 33.50 mm area.
+No bridging, no supports, and the four-pin slot is a through-slot in those same
+layers. Its free top edge is a 1.80 mm strip beyond the upright cap line —
+1.20 mm thick and 35.90 mm wide, a plate edge rather than a sliver or an
+unsupported cantilever. The sliver check reports 0 faces < 0.02 mm² and 0 edges
+< 0.05 mm.
+
+---
+
+## 14. Rev P.4 pre-CAD gate — self-review verdict
 
 | Required demonstration | Result |
 |---|---|
 | Rev P.2 OLED architecture preserved unchanged | PASS — insertion, datum pads, posts, retention, release, Z position, gap, centring, aperture, pitch, hard stops and bezel all re-validated identical |
 | Complete lighting-unit-side end rail deleted | PASS — nothing in its old y +21.60 … +24.60 band |
 | Cable-tie projection and slots deleted | PASS — nothing in its old y +24.60 … +30.60 band |
-| No bridge between the side uprights in the keep-out | PASS — only the two pedestal towers, residual EMPTY |
-| Nothing put back inside the keep-out | PASS — no replacement strain relief added |
+| No bridge between the side uprights above the cut line | PASS — only the two pedestal towers, residual EMPTY |
+| Nothing put back above the cut line | PASS — no replacement strain relief added |
+| No `Lighting_Keepout` component or body exists | PASS — absent from browser, assembly STEP and pack |
+| Rear wall thickness = `rear_light_shield_t` | PASS — 1.20 mm at all 11 probes, both tools |
+| Rear wall confined to the OLED bay | PASS — nothing above y +20.50 in its Z band but the pedestals |
+| Only penetration is the four-pin slot | PASS — 45.024 mm³ measured against 45.024 mm³ required |
+| Rear wall clear of the PCB and components | PASS — 4.10 mm behind DATUM B |
 | Sprung posts, pedestals, pads, reliefs, root fillets retained | PASS — full Ø8.60 / Ø6.00 / Ø4.80 at both |
 | Side uprights, fixing arms/bosses, opposite rail retained | PASS |
 | Uprights terminated with deliberate printable radii | PASS — R1.80 half-round caps |
@@ -790,8 +968,21 @@ onto the shoulder.
 | Hex pocket, seat, head-seat depth, envelope, boss wall, captive retention | PASS — §12.4 |
 | Original load path, no clamp through glass or PCB | PASS — §12.5 |
 | 49.00 mm pitch unchanged | PASS — 49.00000 mm exactly |
-| **Lighting-unit position** | **ASSERTED, NOT MEASURED — §11.5** |
+| Rear wall is integral, one solid with the carrier | PASS — 1 lump, no separate cover component |
+| Rear wall built forward from the existing rear plane | PASS — external envelope unchanged at 8.00 mm deep |
+| Rear wall does not re-enter the deleted rail region | PASS — stops at y +20.50, old band still empty |
+| Four-pin opening = header envelope + named clearances | PASS — 11.20 × 3.35 from 10.00 × 3.00 + 0.60/0.60 |
+| Front insertion and removal sweeps still clear | PASS — glass, tips and header corridors CLEAR |
+| Fixed datum and snap-retention results unchanged | PASS — identical to the Rev P.2 figures |
+| OLED-to-Perspex gap unchanged | PASS — 0.30 mm |
+| Nut pockets, captive retention, service removal unchanged | PASS — §12.4 |
+| Original bolts do not bottom | PASS — 5.00 mm grip, 15.00 mm ceiling, both reported open |
+| No thin slivers or unsupported critical geometry | PASS — 0 faces < 0.02 mm², 0 edges < 0.05 mm |
+| Rear-face-down print orientation still suitable | PASS — the wall is the first 6 layers, bed-supported |
+| **Lighting-unit position** | **NOT MODELLED AND NOT MEASURED — §11.5. CAD makes no clearance claim** |
+| **Light leakage** | **NOT MEASURED — powered test §12.22 gates release** |
 | **Nut across-corners, bolt length, pocket fit** | **NOT MEASURED — §12.6** |
 
-**Amendment approved for CAD**, with four items that gate the print and the
-brief §12 tests that gate release.
+**Amendment approved for CAD**, with the measurement items above gating the
+print and the brief §12 tests — including the installed lighting-unit clearance
+test §12.14 and the powered light-leak test §12.22 — gating release.

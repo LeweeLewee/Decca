@@ -2,16 +2,49 @@
 """
 Decca OLED Display Mount - Rev P parametric generator (Autodesk Fusion 360).
 
+REV P.4 - KEEPOUT REMOVAL AND INTEGRAL REAR LIGHT SHIELD (2026-08-29)
+---------------------------------------------------------------------
+Rev P.4 is a bounded correction on top of Rev P.3. Two changes only:
+
+A. THE SYNTHETIC LIGHTING KEEPOUT IS DELETED (brief 8.1). Rev P.3 carried a
+   reference solid - build_light_keepout() / REF_Lighting_Keepout /
+   LIGHTING_UNIT_KEEPOUT - standing in for the retained original Decca lighting
+   unit. Its boundary was ASSERTED from the carrier's own pedestal tangent, not
+   measured off the radio. A proxy built from the part it is meant to check
+   proves nothing, and shipping it in the browser, the assembly STEP and the
+   manufacturing pack misrepresents the assembly. The function, the component,
+   the body, the derived geometry that existed only to place it, its
+   intersection checks and the fastener-clearance checks against it are all
+   removed, and nothing replaces it.
+
+   The PHYSICAL cut it was invented to justify is KEPT exactly as printed: the
+   lighting-unit-side end rail and its cable-tie projection stay deleted, the
+   uprights still terminate at light_cut_y and the open lighting-unit side is
+   unchanged. ``carrier_max_y`` is what the old ``light_keepout_y`` becomes: a
+   report of the carrier's OWN maximum extent on that side, not a keep-out
+   boundary. The authority for that interface is the installed physical
+   clearance test (brief 12.14), which remains mandatory and open.
+
+B. THE REAR OF THE OLED BAY IS CLOSED (brief 8.3). Rev P.3 left a full-height
+   open rear window behind the module, so the Decca cabinet LEDs could light
+   the back and edges of the OLED and glow through the Perspex aperture. That
+   window is replaced by a continuous integral rear wall, ``rear_light_shield_t``
+   thick, built FORWARD from the existing carrier rear plane so the external
+   envelope does not grow. It is part of Rear_Display_Carrier, not a second
+   component or a cover. Its only penetration is a local slot for the four
+   input/header pins and their conductors, sized from the header envelope plus
+   separately named X and Y print/wiring clearances.
+
 REV P.3 - LIGHTING-UNIT CLEARANCE AND ORIGINAL-FASTENER AMENDMENT (2026-08-29)
 -----------------------------------------------------------------------------
 The Rev P.2 prototype PASSED physically for OLED retention and Perspex fit. That
-architecture is preserved unchanged: flush-side insertion, fixed rear PCB datum
-pads, plain and sprung locating posts, snap retention and release, the OLED Z
-position and 0.30 mm Perspex gap, active-area centring, the 35.20 x 15.30 mm
-aperture, the exact 49.00 mm fixing pitch, the carrier-to-Perspex hard stops and
-the existing Rev N bezel.
+architecture is preserved unchanged through Rev P.3 and Rev P.4: flush-side
+insertion, fixed rear PCB datum pads, plain and sprung locating posts, snap
+retention and release, the OLED Z position and 0.30 mm Perspex gap, active-area
+centring, the 35.20 x 15.30 mm aperture, the exact 49.00 mm fixing pitch, the
+carrier-to-Perspex hard stops and the existing Rev N bezel.
 
-This is a bounded amendment addressing two integration failures only:
+Rev P.3 was a bounded amendment addressing two integration failures only:
 
 1. LIGHTING-UNIT CLEARANCE (brief 8.1). The continuous transverse end rail on
    the lighting-unit side, its central cable-tie / strain-relief projection and
@@ -95,6 +128,13 @@ BEZEL_STEP = os.path.join(OUT_DIR, "CAD", "Front_Bezel_revN.step")
 DOC_NAME = "Decca_Display_Mount_revP"
 CARRIER = "Rear_Display_Carrier"
 
+# Components this generator no longer creates, but must delete when it is run
+# against a document built by an earlier revision. REF_Lighting_Keepout held the
+# synthetic LIGHTING_UNIT_KEEPOUT body that Rev P.4 rejects: it was asserted
+# from the carrier's own geometry rather than measured off the radio, so it
+# must not appear in the browser, the assembly STEP or the manufacturing pack.
+LEGACY_COMPONENTS = ("REF_Lighting_Keepout",)
+
 
 # ---------------------------------------------------------------------------
 # PARAMETERS - the single source of truth.
@@ -163,12 +203,32 @@ P = {
     # transverse rail it stood on are DELETED - they collided with the retained
     # original Decca lighting unit. Nothing replaces them inside the keep-out.
 
-    # -- Original Decca lighting-unit keep-out (brief 8.1) ------------------
+    # -- Lighting-unit-side rail cut (brief 8.1) ----------------------------
+    # This positions the ACTUAL cut in the carrier. It is not, and never was,
+    # a synthetic lighting-unit body: Rev P.4 deletes that proxy entirely.
     # The two side uprights terminate this far short of the PCB pocket's
     # lighting-unit-side wall line, capped with a half-round of the upright
     # width. Above that line the ONLY carrier material is the two sprung-post
     # pedestal towers; there is no bridge of any kind between the uprights.
     "light_cut_back": 0.50,
+
+    # -- Integral rear light shield (brief 8.3) -----------------------------
+    # The rear OLED bay is closed by carrier material, not by a cover. The
+    # wall grows FORWARD from the existing rear plane at z = -carrier_depth,
+    # so the external rear envelope is unchanged.
+    #
+    # 1.20 mm = three 0.40 mm extrusion widths. If the slicer profile uses a
+    # different extrusion width, raise this to at least three ACTUAL widths -
+    # the wall must be solid perimeters end to end, never sparse infill or a
+    # single translucent skin. Print in OPAQUE BLACK material.
+    "rear_light_shield_t": 1.20,
+    # The only penetration. Sized from the header envelope
+    # (oled_header_w x oled_header_h at oled_header_off_y) plus these two
+    # SEPARATE clearances - a print allowance plus room for the conductors and
+    # the wire bend immediately behind the header. They exist so the pin slot
+    # can be opened up without touching the general OLED opening.
+    "pin_slot_clear_x": 0.60,
+    "pin_slot_clear_y": 0.60,
 
     # -- Original Decca bolt / captive-nut interface (brief 8.2) ------------
     # The original bolts have a NON-STANDARD thread. Nothing here is derived
@@ -533,15 +593,58 @@ def derive(P):
     # the glass keep-out the noses require, as a radius about each hole centre
     d["nose_keepout_r"] = P["sprung_barb_d"] / 2.0 + P["nose_glass_margin"]
 
-    # --- lighting-unit keep-out boundary ----------------------------------
-    # The brief mandates retaining the FULL sprung pedestals, so the asserted
-    # keep-out boundary is the pedestal tangent: the carrier's own maximum
-    # extent on the lighting-unit side after the rail is deleted. This is an
-    # ASSERTION, not a measurement - the lighting unit has never been measured.
-    # It is confirmed or refuted by the installed clearance test (brief 12.14).
-    d["light_keepout_y"] = d["y_sprung"] + P["pedestal_d"] / 2.0          # 22.55
+    # --- the carrier's OWN extent on the lighting-unit side ---------------
+    # Rev P.3 called this light_keepout_y and used it to place a synthetic
+    # lighting-unit body. Rev P.4 deletes that body. What remains is simply a
+    # REPORT of how far the carrier itself reaches on that side after the rail
+    # is cut: the sprung-post pedestal tangent, because the brief mandates
+    # retaining the full pedestals. It asserts nothing about where the lighting
+    # unit is - the lighting unit has never been measured. The installed
+    # physical clearance test (brief 12.14) is the only authority.
+    d["carrier_max_y"] = d["y_sprung"] + P["pedestal_d"] / 2.0            # 22.55
     # what the amendment actually buys, for the record
     d["y_before"] = d["ap_y1"] + P["carrier_wall"] + 6.00                 # 30.60
+
+    # --- integral rear light shield (brief 8.3) ---------------------------
+    # A continuous wall across the OLED bay, grown FORWARD from the existing
+    # rear plane so the external envelope is unchanged.
+    d["z_shield_rear"] = d["z_rear"]                                      # -8.00
+    d["z_shield_front"] = d["z_rear"] + P["rear_light_shield_t"]          # -6.80
+    # confined to the OLED bay: exactly the PCB-pocket footprint in X, so the
+    # wall lands on the two pocket side walls and bridges the uprights across
+    # the bay and nowhere else.
+    d["shield_x0"], d["shield_x1"] = d["pk_x0"], d["pk_x1"]
+    d["shield_y0"] = d["pk_y0"]
+    # It stops exactly where the carrier itself stops on the lighting-unit
+    # side. It does NOT reach into the deleted end-rail / cable-tie region,
+    # which began at the pocket line pk_y1 and ran outboard from there.
+    d["shield_y1"] = d["light_cut_y"]                                     # +20.50
+    d["shield_pcb_clear"] = d["z_pcb_rear"] - d["z_shield_front"]         # 4.10
+    d["shield_free_edge"] = d["shield_y1"] - (d["light_cut_y"] - d["cap_r"])
+
+    # the ONLY penetration: the four-pin / header slot
+    d["pin_slot_x1"] = P["oled_header_w"] / 2.0 + P["pin_slot_clear_x"]   # 5.60
+    d["pin_slot_x0"] = -d["pin_slot_x1"]
+    d["pin_slot_y0"] = (P["oled_header_off_y"] - P["oled_header_h"] / 2.0
+                        - P["pin_slot_clear_y"])                          # 17.15
+    # The header row sits at oled_header_off_y = +19.25 and the header envelope
+    # tops out at +20.75 - 0.25 mm ABOVE the carrier's own termination at
+    # light_cut_y = +20.50, because the connector is at the open lighting-unit
+    # end of the board. The slot is therefore bounded by shield material on
+    # both X sides and below; its upper boundary is the shield's own free edge,
+    # i.e. the mandated open lighting-unit side of brief 8.1. Closing it would
+    # mean putting printed material back above light_cut_y, which is exactly
+    # what the physically proven rail cut removed. Reported, not hidden.
+    d["pin_slot_y1"] = (P["oled_header_off_y"] + P["oled_header_h"] / 2.0
+                        + P["pin_slot_clear_y"])                          # 21.15
+    d["pin_slot_w"] = d["pin_slot_x1"] - d["pin_slot_x0"]                 # 11.20
+    d["pin_slot_h"] = d["shield_y1"] - d["pin_slot_y0"]                   # 3.35
+    d["pin_slot_area"] = d["pin_slot_w"] * d["pin_slot_h"]
+    d["shield_area"] = ((d["shield_x1"] - d["shield_x0"])
+                        * (d["shield_y1"] - d["shield_y0"]))
+    # solid shield remaining either side of the slot
+    d["pin_slot_side_w"] = d["shield_x1"] - d["pin_slot_x1"]              # 12.35
+    d["pin_slot_below_h"] = d["pin_slot_y0"] - d["shield_y0"]             # 30.15
     return d
 
 
@@ -626,24 +729,6 @@ def build_fasteners(B, P, d):
     out.append((nuts, "ORIGINAL_Nuts"))
     out.append((bolts, "ORIGINAL_Bolt_Envelope"))
     return out
-
-
-def build_light_keepout(B, P, d):
-    """REF_Lighting_Keepout - a conservative solid standing in for the retained
-    original Decca lighting unit.
-
-    ASSERTED, NOT MEASURED. The lighting unit's position has never been
-    measured; what is known is that the deleted rail and cable-tie projection
-    fouled it. The boundary is therefore placed at the carrier's own retained
-    maximum extent on that side - the sprung-post pedestal tangent - because
-    the brief mandates keeping the full pedestals. It is generous in X and Z so
-    that any carrier feature straying that way is caught, and it is confirmed
-    or refuted by the installed clearance test.
-    """
-    s = B.box(d["car_x0"] - 20.0, d["car_x1"] + 20.0,
-              d["light_keepout_y"], d["light_keepout_y"] + 60.0,
-              d["z_rear"] - 30.0, d["z_perspex_front"] + 10.0)
-    return [(s, "LIGHTING_UNIT_KEEPOUT")]
 
 
 def sweep_bodies(B, P, d, travel, tip_proud=None):
@@ -773,7 +858,11 @@ def plain_post(B, P, d, x, y):
 
 
 def build_carrier(B, P, d, pinch=0.0):
-    """Rear_Display_Carrier - the single structural Rev P.2 part."""
+    """Rear_Display_Carrier - the single structural part.
+
+    Rev P.2 retention geometry unchanged, plus the Rev P.3 lighting-unit-side
+    cut and the Rev P.4 integral rear light shield (steps 3a / 3b).
+    """
     zr, zf = d["z_rear"], d["z_fwd_limit"]
 
     # 1. OPEN-ENDED outer envelope. The lighting-unit-side transverse rail and
@@ -802,9 +891,34 @@ def build_carrier(B, P, d, pinch=0.0):
     #    two sprung noses are added back in step 6 as the declared exception.
     B.sub(s, B.box(d["ap_x0"], d["ap_x1"], d["ap_y0"], d["ap_y1"], zf, 1.0))
 
-    # 3. PCB pocket, open at the rear - the module now drops in from the FRONT,
-    #    and the rear stays open for the header, the cable and the push-out path
+    # 3. PCB pocket, cut right through - the module drops in from the FRONT.
     B.sub(s, B.box(d["pk_x0"], d["pk_x1"], d["pk_y0"], d["pk_y1"], zr - 1.0, zf))
+
+    # 3a. INTEGRAL REAR LIGHT SHIELD (brief 8.3). Rev P.3 stopped at step 3 and
+    #     shipped a full-height open rear window, so the Decca cabinet LEDs lit
+    #     the back and edges of the OLED. The bay is now closed by carrier
+    #     material - a wall grown FORWARD from the existing rear plane, so the
+    #     external envelope is unchanged and the whole wall prints as the first
+    #     layers flat on the bed.
+    #
+    #     Footprint = the PCB-pocket rectangle in X, so the wall lands exactly
+    #     on the two pocket side walls and ties the uprights together across
+    #     the OLED bay. In Y it runs from the bottom rail up to light_cut_y and
+    #     stops: it does not re-enter the deleted end-rail / cable-tie region.
+    #     It is 4.10 mm behind DATUM B, so it never touches the PCB and is
+    #     never an OLED Z datum.
+    B.uni(s, B.box(d["shield_x0"], d["shield_x1"],
+                   d["shield_y0"], d["shield_y1"],
+                   d["z_shield_rear"], d["z_shield_front"]))
+
+    # 3b. the ONLY penetration through the shield: the four-pin / header slot.
+    #     Sized from the header envelope plus the two named clearances. Cut
+    #     right through the wall and on forward into the (already void) bay so
+    #     no coincident faces are created. There is no rear window, no
+    #     solder-access window and no rear release opening anywhere else.
+    B.sub(s, B.box(d["pin_slot_x0"], d["pin_slot_x1"],
+                   d["pin_slot_y0"], d["pin_slot_y1"],
+                   zr - 1.0, zf))
 
     # 4. rigid pedestals + FIXED REAR DATUM PADS at z = z_pcb_rear.
     #    These are solid carrier body. They stop the module moving rearward and
@@ -879,7 +993,11 @@ def write_parameters(design, P, d):
               "z_plain_floor", "z_plain_top", "post_a", "post_t",
               "hook_overlap", "shaft_clear", "plain_clear", "nose_keepout_r",
               "y_sprung", "y_plain", "post_x",
-              "light_cut_y", "cap_r", "cap_x", "light_keepout_y",
+              "light_cut_y", "cap_r", "cap_x", "carrier_max_y",
+              "z_shield_rear", "z_shield_front", "shield_x0", "shield_x1",
+              "shield_y0", "shield_y1", "shield_pcb_clear",
+              "pin_slot_x0", "pin_slot_x1", "pin_slot_y0", "pin_slot_y1",
+              "pin_slot_w", "pin_slot_h", "pin_slot_side_w",
               "z_nut_seat", "z_nut_head_back", "z_nut_retain", "z_nut_lead",
               "z_nut_rear", "nut_hex_af", "nut_hex_ac", "nut_body_d",
               "nut_retain_af", "nut_ac", "boss_wall_min", "bolt_grip"):
@@ -897,7 +1015,7 @@ def write_parameters(design, P, d):
                 ex.expression = expr
             else:
                 ups.add(name, adsk.core.ValueInput.createByString(expr),
-                        "mm", "Rev P.2 generator")
+                        "mm", "Rev P.4 generator")
             n += 1
         except Exception:
             pass
@@ -951,18 +1069,17 @@ def main(_context=None):
     npar = write_parameters(design, P, d)
 
     for name in ("REF_Decca_Panel", "REF_SH1106_1P3", CARRIER,
-                 "REF_Decca_Fasteners", "REF_Lighting_Keepout"):
+                 "REF_Decca_Fasteners") + LEGACY_COMPONENTS:
         clear_component(design, name)
 
     add_component(root, "REF_Decca_Panel", build_panel(B, P, d))
     add_component(root, "REF_SH1106_1P3", build_oled(B, P, d))
     add_component(root, CARRIER, build_carrier(B, P, d))
     add_component(root, "REF_Decca_Fasteners", build_fasteners(B, P, d))
-    add_component(root, "REF_Lighting_Keepout", build_light_keepout(B, P, d))
 
     app.activeViewport.fit()
 
-    print("Rev P.2 built in %s document %r"
+    print("Rev P.4 built in %s document %r"
           % ("the existing Rev P" if reuse else "a NEW", doc.name))
     print("user parameters written: %d" % npar)
     occ = find_component(design, CARRIER)
@@ -983,15 +1100,32 @@ def main(_context=None):
     print("lumps %d  (must be 1 - one connected open-ended solid)"
           % body.lumps.count)
     print("uprights terminate at y %+.2f, capped R%.2f; carrier max y %+.2f "
-          "(was %+.2f)" % (d["light_cut_y"], d["cap_r"], d["light_keepout_y"],
+          "(was %+.2f)" % (d["light_cut_y"], d["cap_r"], d["carrier_max_y"],
                            d["y_before"]))
+    for nm in LEGACY_COMPONENTS:
+        print("legacy component %-24s %s"
+              % (nm, "ABSENT" if find_component(design, nm) is None
+                 else "*** STILL PRESENT ***"))
+    print("rear light shield %.2f mm thick, z %+.2f .. %+.2f, %.1f x %.1f mm, "
+          "%.1f mm clear of the PCB"
+          % (P["rear_light_shield_t"], d["z_shield_rear"], d["z_shield_front"],
+             d["shield_x1"] - d["shield_x0"], d["shield_y1"] - d["shield_y0"],
+             d["shield_pcb_clear"]))
+    print("four-pin slot %.2f x %.2f mm at x %+.2f..%+.2f, y %+.2f..%+.2f "
+          "(header %.2f x %.2f + %.2f/%.2f clearance)"
+          % (d["pin_slot_w"], d["pin_slot_h"], d["pin_slot_x0"],
+             d["pin_slot_x1"], d["pin_slot_y0"], d["shield_y1"],
+             P["oled_header_w"], P["oled_header_h"],
+             P["pin_slot_clear_x"], P["pin_slot_clear_y"]))
+    print("shield open area %.1f%% - the pin slot is the only penetration"
+          % (100.0 * d["pin_slot_w"] * d["pin_slot_h"] / d["shield_area"]))
     print("nut hex pocket %.2f af (%.2f measured + %.2f fit), boss wall %.3f mm"
           % (d["nut_hex_af"], P["original_nut_hex_width"],
              P["nut_pocket_fit_allowance"], d["boss_wall_min"]))
 
 
 # ---------------------------------------------------------------------------
-# validate - the mandatory Rev P.2 validation gate
+# validate - the mandatory Rev P.4 validation gate
 # ---------------------------------------------------------------------------
 SWEEP_TRAVEL = 12.00
 
@@ -1090,11 +1224,13 @@ def validate(_context=None):
     rmid = (P["datum_pad_od"] + P["sprung_relief_d"]) / 4.0
 
     print("=" * 80)
-    print("REV P.3 VALIDATION GATE")
+    print("REV P.4 VALIDATION GATE")
     print("  Rev P.2 flush-side-insertion architecture, PHYSICALLY VALIDATED,")
-    print("  carried through unchanged (sections 1-13), plus the two bounded")
-    print("  amendments: lighting-unit clearance (14) and the original Decca")
-    print("  bolt / captive-nut interface (15).")
+    print("  carried through unchanged (sections 1-13). Rev P.3 amendments:")
+    print("  the lighting-unit-side cut (14) and the original Decca bolt /")
+    print("  captive-nut interface (15). Rev P.4 corrections: the synthetic")
+    print("  keepout proxy is DELETED (14) and the rear OLED bay is CLOSED by")
+    print("  an integral opaque light shield (14b).")
     print("=" * 80)
 
     # ---- 1. static interference, seated ---------------------------------
@@ -1358,15 +1494,38 @@ def validate(_context=None):
         h, v, bb = _hit(B, car_p, swept[nm])
         gate(not h, "pinched carrier x %s" % nm,
              "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb))
-    rear_open = True
-    for xr in (-8.0, 0.0, 8.0):
-        rear_open = rear_open and not _inside(carrier, xr, 0.0, d["z_rear"] + 0.5)
-    gate(rear_open, "open rear push-out window behind the PCB",
-         "clear on the carrier rear face between the pedestals")
+    print("      The rear window is GONE (brief 8.3), so the Rev P.3 rear")
+    print("      push-out is gone with it. Release is now entirely from the")
+    print("      front and the open lighting-unit side:")
     gate(d["z_nose_tip"] - d["z_pcb_front"] > 0.40,
-         "barbs accessible from the front for pinching",
-         "%.2f mm of nose stands proud of the PCB front face"
+         "1. barbs deliberately released from the FRONT",
+         "%.2f mm of each nose stands proud of the PCB front face - pinch both "
+         "halves together with tweezers through the module aperture"
          % (d["z_nose_tip"] - d["z_pcb_front"]))
+    ledge = P["aperture_margin"] + P["pcb_clearance"]
+    gate(ledge > 0.50, "2. PCB edge accessible from the front all round",
+         "the module aperture is %.2f mm larger than the PCB on every side, so "
+         "a spudger reaches the board edge at z %+.2f" % (ledge, d["z_fwd_limit"]))
+    gate(d["pcb_y1"] > d["light_cut_y"],
+         "3. PCB rear top edge accessible from the open side",
+         "the board overhangs the carrier termination by %.2f mm on the "
+         "lighting-unit side, so it can also be pushed forward by hand"
+         % (d["pcb_y1"] - d["light_cut_y"]))
+    gate(d["shield_pcb_clear"] > 1.0,
+         "4. the OLED withdraws FORWARD, away from the rear wall",
+         "removal travel is +Z; the wall sits %.2f mm BEHIND the PCB rear face "
+         "and never enters the removal path" % d["shield_pcb_clear"])
+    back = B.box(d["shield_x0"] - 1.0, d["shield_x1"] + 1.0,
+                 d["shield_y0"] - 1.0, d["shield_y1"] + 1.0,
+                 d["z_rear"] - 1.0, d["z_pcb_rear"] - 1e-4)
+    seated = build_pcb(B, P, d)
+    h, v, bb = _hit(B, B.copy(seated), B.copy(back))
+    gate(not h, "5. neither PCB nor bonded glass reaches the rear wall zone",
+         "the entire module sits forward of z %+.2f throughout insertion, "
+         "seating and removal" % d["z_pcb_rear"] if not h
+         else "HIT %.4f mm3" % v)
+    print("      The module is NOT trapped: nothing about the closed rear")
+    print("      changes the release, because the release was never rearward.")
 
     # ---- 9. glass clearance ---------------------------------------------
     print("")
@@ -1457,6 +1616,19 @@ def validate(_context=None):
           % d["z_pcb_rear"])
     print("      - the nose lead-in is a %.0f deg self-supporting cone"
           % (90 - d["cam_deg"]))
+    print("      - the %.2f mm rear light shield IS the first %d layers, laid"
+          % (P["rear_light_shield_t"],
+             int(round(P["rear_light_shield_t"] / 0.20))))
+    print("        flat on the bed: no bridging, no supports, and the whole")
+    print("        %.1f x %.1f mm plate is bed-supported over its full area."
+          % (d["shield_x1"] - d["shield_x0"], d["shield_y1"] - d["shield_y0"]))
+    print("      - its free top edge is a %.2f mm strip beyond the upright"
+          % d["shield_free_edge"])
+    print("        cap line, %.2f mm thick and %.1f mm wide - a plate edge,"
+          % (P["rear_light_shield_t"], d["shield_x1"] - d["shield_x0"]))
+    print("        not a sliver and not an unsupported cantilever.")
+    print("      - the four-pin slot is a through-slot in those layers, so it")
+    print("        needs no bridge either.")
 
     # ---- 12. point probes -----------------------------------------------
     print("")
@@ -1484,7 +1656,44 @@ def validate(_context=None):
          -0.60, False),
         ("pocket side wall solid", d["pk_x1"] + 0.3, 0.0, -5.0, True),
         ("PCB pocket void", 0.0, 0.0, -2.0, False),
-        ("open rear window void", 0.0, 0.0, d["z_rear"] + 0.5, False),
+        # -- integral rear light shield (brief 8.3). The Rev P.3 probe here
+        #    was "open rear window void"; the window is gone.
+        ("rear shield solid at the bay centre", 0.0, 0.0,
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("rear shield solid at the bottom-left bay corner",
+         d["shield_x0"] + 0.60, d["shield_y0"] + 0.60,
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("rear shield solid at the bottom-right bay corner",
+         d["shield_x1"] - 0.60, d["shield_y0"] + 0.60,
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("rear shield solid at the top-left bay corner",
+         d["shield_x0"] + 0.60, d["shield_y1"] - 0.60,
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("rear shield solid at the top-right bay corner",
+         d["shield_x1"] - 0.60, d["shield_y1"] - 0.60,
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("rear shield solid on the rear face itself", 0.0, 10.0,
+         d["z_rear"] + 0.05, True),
+        ("bay void just AHEAD of the shield", 0.0, 0.0,
+         d["z_shield_front"] + 0.05, False),
+        ("four-pin slot void through the shield", 0.0,
+         P["oled_header_off_y"], d["z_rear"] + 0.05, False),
+        ("four-pin slot still void at the shield front face", 0.0,
+         P["oled_header_off_y"], d["z_shield_front"] - 0.05, False),
+        ("shield solid on the -X side of the pin slot",
+         d["pin_slot_x0"] - 0.30, P["oled_header_off_y"],
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("shield solid on the +X side of the pin slot",
+         d["pin_slot_x1"] + 0.30, P["oled_header_off_y"],
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("shield solid BELOW the pin slot", 0.0, d["pin_slot_y0"] - 0.30,
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("shield solid between the slot and the bay wall (-X)",
+         (d["shield_x0"] + d["pin_slot_x0"]) / 2.0, P["oled_header_off_y"],
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
+        ("shield solid between the slot and the bay wall (+X)",
+         (d["shield_x1"] + d["pin_slot_x1"]) / 2.0, P["oled_header_off_y"],
+         d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
         ("sprung shaft solid inside the hole", sx, sy + half, -2.0, True),
         ("sprung barb solid ahead of the PCB face", sx, sy + half,
          (d["z_hook_face"] + d["z_hook_top"]) / 2.0, True),
@@ -1561,14 +1770,33 @@ def validate(_context=None):
     print("      header  -> Perspex              %8.3f"
           % _mind(app, mod["OLED_Header_Keepout"], perspex))
 
-    # ---- 14. LIGHTING-UNIT KEEP-OUT (brief 8.1) --------------------------
+    # ---- 14. LIGHTING-UNIT SIDE: THE PHYSICAL CUT (brief 8.1) ------------
     print("")
-    print("14. ORIGINAL DECCA LIGHTING-UNIT KEEP-OUT")
-    keep = build_light_keepout(B, P, d)[0][0]
-    h, v, bb = _hit(B, carrier, keep)
-    gate(not h, "carrier x lighting-unit keep-out solid",
-         "ZERO intersection at y >= %+.2f" % d["light_keepout_y"] if not h
-         else "HIT %.4f mm3 %s" % (v, bb))
+    print("14. ORIGINAL DECCA LIGHTING-UNIT SIDE")
+    print("      Rev P.3 checked the carrier against a SYNTHETIC keepout solid")
+    print("      whose boundary was taken from the carrier's own pedestals.")
+    print("      That is circular, and it has been DELETED - component,")
+    print("      body, generator function and every check against it. What")
+    print("      follows tests the carrier's OWN geometry only. CAD cannot and")
+    print("      does not prove lighting-unit clearance; brief 12.14, the")
+    print("      installed physical test, is the sole authority for that.")
+    for nm in LEGACY_COMPONENTS:
+        gate(find_component(design, nm) is None,
+             "no %s component in the design" % nm,
+             "absent from the browser, so absent from the assembly STEP and "
+             "the manufacturing pack")
+    names = set()
+    for i in range(design.rootComponent.occurrences.count):
+        occ = design.rootComponent.occurrences.item(i)
+        names.add(occ.component.name)
+        for b in occ.bRepBodies:
+            names.add(b.name)
+    strays = sorted(n for n in names if "KEEPOUT" in n.upper()
+                    and "HEADER" not in n.upper())
+    gate(not strays, "no keepout proxy body anywhere in the assembly",
+         "browser holds %d components, none of them a lighting proxy"
+         % design.rootComponent.occurrences.count if not strays
+         else "found %s" % ", ".join(strays))
     bridge = B.box(d["pk_x0"], d["pk_x1"], d["light_cut_y"] + 1e-4, 60.0,
                    d["z_rear"] - 1.0, 1.0)
     ped = None
@@ -1590,7 +1818,7 @@ def validate(_context=None):
          "EMPTY over x %+.2f .. %+.2f" % (lo, hi) if not h
          else "HIT %.4f mm3" % v)
     ymax = max(f.boundingBox.maxPoint.y * 10 for f in carrier.faces)
-    gate(abs(ymax - d["light_keepout_y"]) < 1e-3,
+    gate(abs(ymax - d["carrier_max_y"]) < 1e-3,
          "carrier extent on the lighting-unit side",
          "y max %+.3f (was %+.2f with the rail and flange) -> %.2f mm returned"
          % (ymax, d["y_before"], d["y_before"] - ymax))
@@ -1615,6 +1843,198 @@ def validate(_context=None):
     print("      the deleted cable-tie flange is NOT replaced: the brief allows")
     print("      a new strain relief only outside the keep-out and only with")
     print("      demonstrated radio-side clearance, which does not exist yet.")
+
+    # ---- 14b. INTEGRAL REAR LIGHT SHIELD (brief 8.3) ---------------------
+    print("")
+    print("14b. INTEGRAL REAR LIGHT SHIELD")
+    print("      Replaces the Rev P.3 open rear window. It is part of the")
+    print("      carrier body - not a cover and not a second component.")
+
+    # Thickness is MEASURED as a material span along Z at points spread over
+    # the wall, rather than trusting that a box of the right size was drawn.
+    #    The four bay corners are occupied by the pedestal towers, which are
+    #    5.30 mm of solid carrier by design, so the thickness probes sample the
+    #    FREE wall: its centre, its two side edges and the corners of the
+    #    pedestal-free area. The towers are reported separately below.
+    ybot = d["shield_y0"] + 0.60
+    ytop = d["shield_y1"] - 0.60
+    xl = d["shield_x0"] + 0.45
+    xr = d["shield_x1"] - 0.45
+    tprobe = [("bay centre", 0.0, 0.0),
+              ("bottom edge, left of the tower", -11.00, ybot),
+              ("bottom edge, right of the tower", 11.00, ybot),
+              ("left edge, low", xl, -6.00),
+              ("left edge, high", xl, 14.00),
+              ("right edge, low", xr, -6.00),
+              ("right edge, high", xr, 14.00),
+              ("top edge, outboard of the tower", 8.00, ytop),
+              ("top edge, outboard of the tower", -8.00, ytop),
+              ("beside the pin slot", d["pin_slot_x1"] + 1.00,
+               P["oled_header_off_y"]),
+              ("below the pin slot", 0.0, d["pin_slot_y0"] - 1.00)]
+    tbad = []
+    for nm, tx, ty in tprobe:
+        col = B.box(tx - 0.02, tx + 0.02, ty - 0.02, ty + 0.02,
+                    d["z_rear"] - 0.50, d["z_fwd_limit"])
+        h, v, bb = _hit(B, carrier, col)
+        got = v / (0.04 * 0.04) if h else 0.0
+        if abs(got - P["rear_light_shield_t"]) > 1e-3:
+            tbad.append("%s = %.3f" % (nm, got))
+    gate(not tbad, "rear wall thickness equals rear_light_shield_t",
+         "%.2f mm at all %d probes = %d x 0.40 mm extrusion widths"
+         % (P["rear_light_shield_t"], len(tprobe),
+            int(round(P["rear_light_shield_t"] / 0.40))) if not tbad
+         else "wrong at " + "; ".join(tbad))
+    off = P["pedestal_d"] / 2.0 - 0.60
+    for nm, tx, ty in (("sprung tower", d["sprung"][1][0],
+                        d["sprung"][1][1] + off),
+                       ("plain tower", d["plain"][1][0],
+                        d["plain"][1][1] - off)):
+        col = B.box(tx - 0.02, tx + 0.02, ty - 0.02, ty + 0.02,
+                    d["z_rear"] - 0.50, d["z_fwd_limit"])
+        h, v, bb = _hit(B, carrier, col)
+        print("      the four bay corners hold the pedestal towers instead:")
+        print("      %-14s %.2f mm of solid carrier off the bed - the wall"
+              % (nm, (v / (0.04 * 0.04)) if h else 0.0))
+        print("      %-14s merges into it; it is not a separate part." % "")
+    gate(P["rear_light_shield_t"] >= 3 * 0.40 - 1e-9,
+         "thickness is at least three 0.40 mm extrusion widths",
+         "%.2f mm. On a different extrusion width, raise the parameter to "
+         "three ACTUAL widths and regenerate." % P["rear_light_shield_t"])
+
+    # The wall closes the bay: bay slab MINUS carrier must be exactly the slot.
+    bay = B.box(d["shield_x0"], d["shield_x1"], d["shield_y0"], d["shield_y1"],
+                d["z_shield_rear"], d["z_shield_front"])
+    slot = B.box(d["pin_slot_x0"], d["pin_slot_x1"],
+                 d["pin_slot_y0"], d["pin_slot_y1"],
+                 d["z_shield_rear"] - 0.10, d["z_shield_front"] + 0.10)
+    hole = B.copy(bay)
+    B.sub(hole, B.copy(carrier))
+    try:
+        nvoid = hole.faces.count
+    except Exception:
+        nvoid = 0
+    vvoid = volume_of(hole) if nvoid else 0.0
+    nres, vres = 0, 0.0
+    if nvoid:
+        resid = B.copy(hole)
+        B.sub(resid, B.copy(slot))
+        try:
+            nres = resid.faces.count
+        except Exception:
+            nres = 0
+        vres = volume_of(resid) if nres else 0.0
+    want = d["pin_slot_w"] * d["pin_slot_h"] * P["rear_light_shield_t"]
+    gate(nres == 0, "the ONLY penetration is the four-pin slot",
+         "the whole %.1f x %.1f mm bay slab is solid except %.3f mm3, and "
+         "every scrap of that lies inside the declared slot envelope"
+         % (d["shield_x1"] - d["shield_x0"],
+            d["shield_y1"] - d["shield_y0"], vvoid) if nres == 0
+         else "%.4f mm3 of UNINTENDED second rear opening" % vres)
+    gate(abs(vvoid - want) < 0.05, "no unintended second rear opening",
+         "measured void %.3f mm3 against %.3f mm3 required by the header "
+         "envelope plus clearance - no rear window, no solder-access window "
+         "and no rear release opening" % (vvoid, want))
+
+    # The slot matches the header envelope plus the DOCUMENTED clearances.
+    gate(abs(d["pin_slot_x1"] - P["oled_header_w"] / 2.0
+             - P["pin_slot_clear_x"]) < 1e-9,
+         "pin slot X = header %.2f + 2 x %.2f clearance"
+         % (P["oled_header_w"], P["pin_slot_clear_x"]),
+         "%.2f mm wide, x %+.2f .. %+.2f, centred on the header"
+         % (d["pin_slot_w"], d["pin_slot_x0"], d["pin_slot_x1"]))
+    gate(abs((P["oled_header_off_y"] - P["oled_header_h"] / 2.0)
+             - d["pin_slot_y0"] - P["pin_slot_clear_y"]) < 1e-9,
+         "pin slot Y = header %.2f + %.2f clearance below"
+         % (P["oled_header_h"], P["pin_slot_clear_y"]),
+         "slot floor y %+.2f against header floor y %+.2f"
+         % (d["pin_slot_y0"],
+            P["oled_header_off_y"] - P["oled_header_h"] / 2.0))
+    h, v, bb = _hit(B, carrier, mod["OLED_Header_Keepout"])
+    gate(not h, "pins and attached conductors pass without rubbing",
+         "the full %.2f mm deep header / wiring envelope crosses the wall "
+         "with ZERO contact" % P["oled_header_depth"] if not h
+         else "HIT %.4f mm3 %s" % (v, bb))
+    print("      the wire bend immediately behind the header lies inside that")
+    print("      same %.2f mm envelope, which reaches z %+.2f - %.2f mm past"
+          % (P["oled_header_depth"], d["z_header_rear"],
+             abs(d["z_header_rear"] - d["z_rear"])))
+    print("      the rear face - so the bend is covered by the check above.")
+    print("      slot open area %.2f mm2 of %.2f mm2 of wall = %.1f%%: local"
+          % (d["pin_slot_area"], d["shield_area"],
+             100.0 * d["pin_slot_area"] / d["shield_area"]))
+    print("      to the header, not a general window. %.2f mm of solid wall"
+          % d["pin_slot_side_w"])
+    print("      stands either side of it and %.2f mm below it."
+          % d["pin_slot_below_h"])
+    print("")
+    print("      REPORTED, NOT HIDDEN. The header row sits at y %+.2f and its"
+          % P["oled_header_off_y"])
+    print("      envelope tops out at y %+.2f, which is %.2f mm ABOVE the"
+          % (P["oled_header_off_y"] + P["oled_header_h"] / 2.0,
+             P["oled_header_off_y"] + P["oled_header_h"] / 2.0
+             - d["light_cut_y"]))
+    print("      carrier's own termination at y %+.2f, because the connector"
+          % d["light_cut_y"])
+    print("      is at the OPEN lighting-unit end of the board. The slot is")
+    print("      therefore bounded by wall on both X sides and below, and by")
+    print("      the wall's free edge above - and that edge IS the mandated")
+    print("      open lighting-unit side of brief 8.1, not a second opening.")
+    print("      Enclosing it would mean printing material back above")
+    print("      y %+.2f, undoing the rail cut that physically fits."
+          % d["light_cut_y"])
+
+    # Confined to the OLED bay, and out of the deleted rail / tie region.
+    pedcol = None
+    for (px, py) in d["sprung"]:
+        c = B.cylz(P["pedestal_d"] + 0.10, px, py,
+                   d["z_rear"] - 1.0, d["z_fwd_limit"])
+        pedcol = c if pedcol is None else B.uni(pedcol, c)
+    outside = B.box(d["car_x0"] - 1.0, d["car_x1"] + 1.0,
+                    d["shield_y1"] + 1e-4, 60.0,
+                    d["z_shield_rear"] - 1e-4, d["z_shield_front"] + 1e-4)
+    n, rv = _residual(B, carrier, outside, pedcol)
+    gate(n == 0, "the wall is confined to the OLED bay",
+         "nothing above y %+.2f inside the wall's own Z band except the two "
+         "retained pedestal towers" % d["shield_y1"] if n == 0
+         else "%.5f mm3 of wall material has escaped the bay" % rv)
+    railband = B.box(d["pk_x0"], d["pk_x1"], d["pk_y1"] + 1e-4, 60.0,
+                     d["z_rear"] - 1.0, 1.0)
+    n, rv = _residual(B, carrier, railband, pedcol)
+    gate(n == 0, "the deleted rail / cable-tie region is still EMPTY",
+         "the wall has not crept back above y %+.2f" % d["pk_y1"] if n == 0
+         else "%.5f mm3 has reappeared there" % rv)
+    gate(abs(d["z_shield_rear"] - d["z_rear"]) < 1e-9,
+         "built FORWARD from the existing rear plane",
+         "wall z %+.2f .. %+.2f, so the external rear envelope is unchanged "
+         "at z %+.2f" % (d["z_shield_rear"], d["z_shield_front"], d["z_rear"]))
+
+    # Behind and clear of the whole seated module.
+    touch = []
+    for nm in ("OLED_PCB", "OLED_Glass", "OLED_Solder_Tips",
+               "OLED_ActiveArea"):
+        hh, vv, _b = _hit(B, B.copy(bay), mod[nm])
+        if hh:
+            touch.append("%s %.4f mm3" % (nm, vv))
+    gate(not touch, "the wall's whole slab is clear of PCB, glass and tips",
+         "only the header / wiring envelope crosses it, through its own slot"
+         if not touch else "; ".join(touch))
+    gate(d["shield_pcb_clear"] > 1.0, "wall stands clear BEHIND the PCB",
+         "%.2f mm from the wall front face z %+.2f to DATUM B z %+.2f: no "
+         "contact, no preload, and the wall is NOT an OLED Z datum"
+         % (d["shield_pcb_clear"], d["z_shield_front"], d["z_pcb_rear"]))
+    pad_area = _planar_face_area(carrier, 1, d["z_pcb_rear"])
+    gate(pad_area > 0.0,
+         "datum pads, sprung posts, snap overlap and optical gap untouched",
+         "%.2f mm2 of DATUM B pad still faces forward at z %+.2f; the wall is "
+         "built after the retention stack and cuts none of it"
+         % (pad_area, d["z_pcb_rear"]))
+    print("      MATERIAL: print in OPAQUE BLACK, fully solid through the")
+    print("      wall - solid perimeters, never sparse infill and never a")
+    print("      single translucent skin.")
+    print("      ORIENTATION: rear face down, so the wall is the first %d"
+          % int(round(P["rear_light_shield_t"] / 0.20)))
+    print("      layers laid flat on the bed. No bridging and no supports.")
 
     # ---- 15. CAPTIVE ORIGINAL NUTS (brief 8.2) ---------------------------
     print("")
@@ -1688,8 +2108,7 @@ def validate(_context=None):
         for onm, other in (("OLED glass", mod["OLED_Glass"]),
                            ("OLED PCB", mod["OLED_PCB"]),
                            ("header / wiring", mod["OLED_Header_Keepout"]),
-                           ("Perspex aperture", perspex),
-                           ("lighting keep-out", keep)):
+                           ("Perspex aperture", perspex)):
             h, v, bb = _hit(B, fast[nm], other)
             ok = (not h) or (nm == "ORIGINAL_Bolt_Envelope"
                              and onm == "Perspex aperture")
@@ -1781,10 +2200,19 @@ def validate(_context=None):
              "inverted and comes back out, then record the allowance."
              % (P["nut_pocket_fit_allowance"], P["nut_retain_lip"]))
     openitem("installed clearance against the retained lighting unit",
-             "the keep-out boundary at y %+.2f is ASSERTED from the retained "
-             "pedestal tangent, not measured. Offer the carrier up with the "
-             "lighting unit in place - brief 12.14."
-             % d["light_keepout_y"])
+             "there is NO lighting-unit geometry in this model and no CAD "
+             "result here may be read as proving that clearance. All CAD "
+             "reports is the carrier's own extent, y max %+.2f (was %+.2f). "
+             "Offer the carrier up with the lighting unit in place - "
+             "brief 12.14 - which stays MANDATORY."
+             % (d["carrier_max_y"], d["y_before"]))
+    openitem("powered light-leak test with the opaque black print",
+             "the %.2f mm shield and the %.2f x %.2f mm pin slot are chosen, "
+             "not measured against the cabinet LEDs. Run brief 12.22: cabinet "
+             "LEDs through their usable range, OLED black / dim / normal. If "
+             "leakage remains ONLY at the pin slot, tighten that slot or add "
+             "an integral hood - do not reopen the wall or add a component."
+             % (P["rear_light_shield_t"], d["pin_slot_w"], d["pin_slot_h"]))
 
     print("")
     print("=" * 80)
@@ -1801,11 +2229,19 @@ def validate(_context=None):
             print("   * %s" % o)
     print("")
     print("Rev P remains OPEN. The Rev P.2 OLED retention and Perspex fit are")
-    print("PHYSICALLY VALIDATED and are carried through unchanged. What is not")
-    print("yet validated is this amendment: the lighting-unit clearance and the")
-    print("original-fastener interface, plus the pre-existing glass-envelope")
-    print("measurement. Take the measurements above, print the hex coupon, then")
-    print("the carrier, then run the brief section 12 tests.")
+    print("PHYSICALLY VALIDATED and are carried through unchanged. What is NOT")
+    print("validated by anything in this file is:")
+    print("  * clearance to the original lighting unit. There is no measured")
+    print("    lighting-unit geometry anywhere in this model, and the synthetic")
+    print("    proxy that pretended otherwise has been deleted. The installed")
+    print("    physical test, brief 12.14, is the only authority.")
+    print("  * light leakage. The wall thickness, the material and the pin-slot")
+    print("    size are engineering choices, not measurements against the Decca")
+    print("    cabinet LEDs. The powered test, brief 12.22, is the authority.")
+    print("  * the original-fastener interface and the glass envelope, as")
+    print("    before.")
+    print("Take the measurements above, print the hex coupon, then the carrier")
+    print("in OPAQUE BLACK, then run the brief section 12 tests in order.")
     print("=" * 80)
     return fails
 
@@ -2031,10 +2467,12 @@ def snapshots(_context=None):
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_views.png"),
           (-60.0, -45.0, 70.0), (0.0, 4.0, -3.0), (0, 1, 0))
 
-    # 2. rear three-quarter: the carrier alone - pedestals, pads, open rear
+    # 2. rear three-quarter: the carrier alone. This is the view that has to
+    #    show the Rev P.4 change - a CONTINUOUS rear wall closing the OLED bay
+    #    with one small four-pin slot in it, and no keepout proxy anywhere.
     _show(design, {CARRIER})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_rear.png"),
-          (55.0, -50.0, -70.0), (0.0, 4.0, -4.0), (0, 1, 0))
+          (26.0, 40.0, -62.0), (0.0, 4.0, -4.0), (0, 1, 0))
 
     # 3. carrier alone from the front - the retention features themselves
     _show(design, {CARRIER})

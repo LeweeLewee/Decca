@@ -10,14 +10,14 @@ FILE_DESCRIPTION(
 
 FILE_NAME(
 /* name */ 'Hex_Pocket_Fit_Coupon_revP.step',
-/* time_stamp */ '2026-08-29T12:15:55+01:00',
+/* time_stamp */ '2026-08-29T12:57:35+01:00',
 /* author */ (''),
 /* organization */ (''),
 /* preprocessor_version */ 'ST-DEVELOPER v20.1',
 /* originating_system */ 'Autodesk Translation Framework v15.8.0.0',
 /* authorisation */ '');
 
-FILE_SCHEMA (('AUTOMOTIVE_DESIGN { 1 0 10303 214 3 1 1 }'));
+FILE_SCHEMA (('AUTOMOTIVE_DESIGN { 1 0 10303 214 3 1 1 }','FEATURE_BASED_PROCESS_PLANNING'));
 ENDSEC;
 
 DATA;

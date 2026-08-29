@@ -1,12 +1,12 @@
 # Decca OLED Display Mount — CAD Build Review (Rev P)
 
-Supersedes Rev N. Implements the corrected flush-side-insertion architecture
-and the lighting-unit / original-fastener amendments required by
-`Decca_OLED_Display_Mount_CAD_Review_revO.md` §8.1, §8.2, §9, §10 and §12 as
-amended 2026-08-29 (`main` @ `53071ff`).
+Supersedes Rev N. Implements the corrected flush-side-insertion architecture,
+the lighting-unit / original-fastener amendments and the integral rear light
+shield required by `Decca_OLED_Display_Mount_CAD_Review_revO.md` §8.1, §8.2,
+§8.3, §9, §10 and §12 as amended 2026-08-29 (`main` @ `e3a9aa1`).
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
-> ## Status: Rev P.2 OLED architecture PHYSICALLY VALIDATED — Rev P.3 amends the radio-side interface only
+> ## Status: Rev P.2 OLED architecture PHYSICALLY VALIDATED — Rev P.4 corrects the radio-side interface only
 >
 > **What is proven.** The printed **Rev P.2** carrier **passed** its physical
 > tests for **OLED retention and Perspex tolerance**. Flush-side insertion, the
@@ -29,8 +29,25 @@ Platform: Autodesk Fusion 360, script-generated parametric build.
 >    deleted and the two original bolts and their two original matching nuts are
 >    reused, in **captive rear-accessible hex pockets** at the unchanged pitch.
 >
-> **Rev P remains OPEN and is not released.** Four items gate the print and the
-> brief §12 tests gate release:
+> **Rev P.4 corrects two things in Rev P.3**, again without touching the OLED
+> architecture:
+>
+> 3. **The synthetic lighting keepout is deleted (§20.6).** Rev P.3 shipped a
+>    reference body — `REF_Lighting_Keepout` / `LIGHTING_UNIT_KEEPOUT` — whose
+>    boundary was taken from the carrier's own pedestals. A keep-out derived
+>    from the part it checks cannot fail, so it proved nothing, and in the
+>    browser, the assembly STEP and the manufacturing pack it read as measured
+>    lighting-unit geometry. **It was never measured.** It is gone, with every
+>    check against it, and nothing replaces it. The physical rail cut it was
+>    invented to justify is kept exactly as printed.
+> 4. **The rear of the OLED bay is closed (§24).** Rev P.3 left a full-height
+>    open rear window, so the retained Decca cabinet LEDs could light the back
+>    and edges of the OLED and glow through the Perspex. An **integral opaque
+>    rear light shield**, 1.20 mm thick and part of the carrier, now closes it,
+>    with a single local **four-pin/header opening** and nothing else.
+>
+> **Rev P remains OPEN and is not released.** Four measurements gate the print
+> and the brief §12 tests gate release:
 >
 > | # | Gate | Where |
 > |---|---|---|
@@ -39,7 +56,9 @@ Platform: Autodesk Fusion 360, script-generated parametric build.
 > | 3 | Original bolt length under the head — neither engagement nor bottoming is measured | §21.6 |
 > | 4 | Hex-pocket fit coupon on the selected printer/material | §21.6 |
 >
-> Then: installed clearance against the lighting unit (§12.14 of the brief),
+> Then: **installed clearance against the lighting unit (§12.14 of the brief) —
+> which is now the *only* evidence for that interface, since no lighting-unit
+> geometry exists in CAD at all** — the **powered light-leak test (§12.22)**,
 > rack/twist of the open frame (§12.15), and the captive-nut and bolt tests
 > (§12.17–19).
 
@@ -54,9 +73,10 @@ Sources:
 
 ![Rev P.3 carrier, front three-quarter — the open-ended frame, the four locating posts, their datum pads and root reliefs, and the two captive-nut bosses](Decca_OLED_Display_Mount_revP_posts.png)
 
-The open end at the top of that view is the lighting-unit keep-out. The two
-towers either side of it are the retained sprung-post pedestals; there is
-nothing between them.
+The open end at the top of that view is the lighting-unit side. The two towers
+either side of it are the retained sprung-post pedestals; there is nothing
+between them. Note that "the lighting-unit side" here means *the side the
+lighting unit is on* — there is no lighting-unit body anywhere in this model.
 
 ---
 
@@ -96,7 +116,7 @@ increasing spring force, or adding another rear-loaded edge finger.
 | PCB X/Y location | pocket walls | four posts in the four mounting holes, plus the pocket walls |
 | Features in the PCB mounting holes | none | **four locating posts** |
 | Carrier × PCB, seated | 2.40 mm³ (the tongues gripping the edge) | **CLEAR — nothing touches the board but the pads** |
-| Removal | four Ø2.20 mm radial prise holes | pinch the two barbs from the front; push out through the open rear |
+| Removal | four Ø2.20 mm radial prise holes | pinch the two barbs from the front and withdraw forwards (§10, revised at Rev P.4) |
 | Carrier | 56.60 × 47.20 × 9.60, 7.154 cm³ | **56.60 × 47.20 × 8.00, 6.928 cm³** |
 | Parts to print | 2 | 2 (carrier + unchanged Rev N bezel) |
 
@@ -108,8 +128,8 @@ acceptance gate. Neither tool contains a friction criterion any more.
 measured Perspex opening, the 0.30 mm nominal glass-to-Perspex gap, the ≤ 1.00 mm
 front-side solder protrusion, the Rev N bezel, the direct carrier-to-Perspex
 hard-stop rim, the M2 load path through Perspex → carrier rim → boss → insert
-only, active-area centring, open rear header and cable access, and no separate
-retainer bar.
+only, active-area centring, rear header and cable access (local to the header
+from Rev P.4 — §24), and no separate retainer bar.
 
 The carrier lost 1.60 mm of depth because Rev P.1's 9.60 mm existed only to give
 its 8.40 mm cantilever fingers room. With the fingers gone, the depth falls out
@@ -499,9 +519,20 @@ decomposing the corridor into boxes that exclude the hole footprints exactly.
    pliers, 0.10 mm per half. **0.70 mm of nose stands proud of the PCB front
    face and is completely exposed**, because nothing at all sits in front of
    the PCB.
-3. With a barb pinched, lift that corner clear; or push the PCB forward through
-   the **open rear window** with a fingertip or spudger.
-4. The plain posts slide straight out.
+3. With a barb pinched, lift that corner clear. The module aperture is 0.85 mm
+   larger than the PCB on every side, so a spudger reaches the board edge at
+   z = −1.20 all round and levers it forward.
+4. If more purchase is wanted, the board's top edge (y = +20.75) overhangs the
+   carrier's own termination (y = +20.50) by 0.25 mm and is reachable from the
+   **open lighting-unit side**. Push forward there.
+5. The plain posts slide straight out.
+
+**Rev P.4: the rear wall does not change this.** §24 closes the rear of the bay,
+so the Rev P.3 rear push-out is gone — but the release was never rearward. The
+OLED still withdraws **forward, through the Perspex side**, and the wall's front
+face sits at z = −6.80, **4.10 mm behind** the PCB rear face, so neither the
+board nor the bonded glass ever reaches it at any point of the sweep. The module
+is not trapped.
 
 Validated by rebuilding the carrier with both barbs modelled squeezed 0.12 mm
 per half (0.10 required + 0.02 margin) and re-running the full corridor set:
@@ -511,8 +542,11 @@ per half (0.10 required + 0.02 margin) and re-running the full corridor set:
 | Swept PCB | **CLEAR** |
 | Swept glass | **CLEAR** |
 | Swept tips | **CLEAR** |
-| Swept header | **CLEAR** |
-| Open rear push-out window | **clear at the carrier rear face** |
+| Swept header | **CLEAR** — through the four-pin slot |
+| Barbs proud of the PCB front face for pinching | **0.70 mm** |
+| PCB edge reachable from the front | **0.85 mm** ledge all round at z = −1.20 |
+| PCB top edge reachable from the open side | **0.25 mm** overhang past y = +20.50 |
+| PCB / glass vs the rear wall zone | **never enters it — 4.10 mm clear** |
 
 ---
 
@@ -713,7 +747,35 @@ recommendation:
 19. the captive-nut installation and engaged fasteners remain clear of the
     original lighting unit throughout offering-up, seating and removal.
 
+**Rev P.4 adds** (brief §12.20–22):
+
+20. **no synthetic lighting keepout component or proxy body** remains in the
+    Fusion design, the assembly STEP export or the manufacturing pack —
+    confirmed automatically by both tools, and by eye in the Fusion browser;
+21. the **closed rear wall** clears the PCB and the four-pin connection, does
+    not alter insertion, retention, release or the OLED-to-Perspex gap, and has
+    **no unintended rear opening**;
+22. **the powered optical test.** With the carrier printed in **opaque black**,
+    install it with the **original lighting unit in place**. Operate the Decca
+    cabinet LEDs throughout their usable brightness range while the OLED shows
+    **black, dim and normal** content, in representative room lighting. Confirm
+    there is:
+    - **no visible glow from behind the OLED**;
+    - **no edge leakage** around the PCB or the glass;
+    - **no bright patch through the four-pin opening**;
+    - **no visible Perspex illumination** around the aperture; and
+    - **no unacceptable reduction in perceived OLED contrast**.
+
+    If leakage remains **only** at the pin opening, refine that local opening
+    (`pin_slot_clear_x` / `pin_slot_clear_y`) or add a **short integral hood**
+    around it. **Do not reopen the main rear wall and do not add another printed
+    component.**
+
 Note that the cable-tie test is gone: there is no integral tie point any more.
+
+> **Tests 14 and 22 cannot be replaced by CAD.** There is no measured
+> lighting-unit geometry in this project and no measurement of the cabinet LEDs.
+> Nothing in this report claims otherwise.
 
 ---
 
@@ -732,6 +794,9 @@ No supports.**
 | Barb retaining face at z = −1.00 | a **0.20 mm** radial downward-facing ledge, the step from the Ø2.80 shaft to the Ø3.20 barb — the Rev D / Rev K hook class, both of which printed |
 | Barb lead-in cone | 49° from horizontal, self-supporting |
 | Seating face at z = 0 | a top surface — use 4+ top layers or ironing |
+| **Rear light shield, z = −8.00 … −6.80** | **the first 6 layers**, laid flat on the bed over 35.90 × 33.50 mm. No bridging, no supports. Print it **fully solid** — solid perimeters through the wall, never sparse infill and never a single translucent skin |
+| **Four-pin slot** | a through-slot in those same first layers; no bridge needed |
+| **Free top edge of the shield** | a 1.80 mm strip beyond the upright cap line, 1.20 mm thick and 35.90 mm wide — a plate edge, not a sliver |
 
 DATUM A (z = 0) and DATUM B (z = −2.70) are in the same Z stack, so the 2.70 mm
 between them is layer-count accurate.
@@ -745,9 +810,14 @@ between them is layer-count accurate.
 | Sprung post shaft | Ø2.80, 5.50 mm tall, 0.70 mm slot |
 | Plain post shaft | Ø2.70, 2.35 mm tall |
 | Datum pad annulus | 6.00 / 4.80 |
+| Rear light shield | 1.20 (= 3 × 0.40 mm extrusion width) |
 
 Print the posts slowly — the sprung ones are 2.80 mm split columns standing
-5.50 mm tall. Material PETG / PETG-HF.
+5.50 mm tall. Material PETG / PETG-HF, **in opaque black** — the rear light
+shield only works if the material does not transmit the cabinet lighting
+(§24). If a different nozzle or extrusion width is used, raise
+`rear_light_shield_t` to at least three *actual* extrusion widths and
+regenerate.
 
 > **Hardware: the two ORIGINAL Decca bolts and their two ORIGINAL matching
 > nuts, reused.** There are no heat-set inserts, no replacement screws and no
@@ -926,14 +996,14 @@ towers. Between them, over x −10.70 … +10.70, there is nothing.
 | Projection returned | — | **8.05 mm** |
 | Continuous bridge across the uprights | full width | **none** |
 | Carrier envelope | 56.60 × 47.20 × 8.00 | **56.60 × 39.15 × 8.00** |
-| Volume | 6.928 cm³ | **4.472 cm³** (8.8 → 5.7 g in PETG) |
+| Volume | 6.928 cm³ | **5.661 cm³** including the Rev P.4 rear shield (8.8 → 7.2 g in PETG) |
 | Connected solids | 1 | **1** |
 
 ### 20.5 Evidence
 
 | Check | Fusion | Exported STL |
 |---|---|---|
-| carrier × lighting-unit keep-out solid | **ZERO** at y ≥ +22.55 | **empty** |
+| no `REF_Lighting_Keepout` component / keepout proxy body | **absent** | **absent from the assembly STEP** |
 | no bridge across the uprights above y +20.50 | residual **EMPTY** — only the two towers | **empty** |
 | open between the two towers | **EMPTY** over x ±10.70 | **empty** |
 | old rail band y +21.60 … +24.60 | — | **empty** outside the towers |
@@ -941,16 +1011,53 @@ towers. Between them, over x −10.70 … +10.70, there is nothing.
 | carrier extent | y max **+22.550** | y max **+22.545** |
 | sprung pedestals intact at full diameter | 2 of 2 | 2 of 2 |
 | pedestal-to-upright connection | solid both sides | solid both sides |
-| **one connected solid** | **1 lump** | **1 connected component** over 3430 welded vertices |
+| **one connected solid** | **1 lump** | **1 connected component** over 3442 welded vertices |
 
-### 20.6 The keep-out boundary is asserted, not measured
+### 20.6 There is no keepout component — Rev P.4 correction
 
-The lighting unit's position has never been measured. The brief mandates
-retaining the full pedestals, so the keep-out solid is placed at the **pedestal
-tangent, y = +22.55** — the carrier's own new maximum extent. That is an
-assertion, confirmed or refuted by brief §12.14. If the towers still foul, the
-next correction is a smaller `pedestal_d` on the sprung pair: one parameter, and
-the towers project only 2.05 mm past the upright caps.
+**Rev P.3 was wrong here.** It created a reference solid —
+`build_light_keepout()` / `REF_Lighting_Keepout` / `LIGHTING_UNIT_KEEPOUT` — and
+checked the carrier against it. Its boundary was placed at the **carrier's own
+sprung-pedestal tangent**, y = +22.55, because the brief mandates retaining the
+full pedestals.
+
+That is circular. A keep-out derived from the part it is meant to check can
+never be violated by that part, so the check could not fail and demonstrated
+nothing. And the body appeared in the Fusion browser, the assembly STEP and the
+manufacturing pack, where a reader would reasonably take it for measured
+lighting-unit geometry. **It was never measured. The lighting unit has never
+been measured.**
+
+Rev P.4 deletes all of it, and nothing replaces it — no proxy, no substitute
+body, no "conservative envelope":
+
+| Deleted | Where it was |
+|---|---|
+| `build_light_keepout()` | generator |
+| component `REF_Lighting_Keepout` | Fusion browser, assembly STEP |
+| body `LIGHTING_UNIT_KEEPOUT` | that component |
+| derived `light_keepout_y`, used only to place it | `derive()` |
+| `carrier × lighting-unit keep-out solid` gate | `validate()` §14 |
+| `ORIGINAL_Nuts` / `ORIGINAL_Bolt_Envelope` × keep-out gates | `validate()` §15 |
+| `zero carrier material inside the keep-out solid` | independent verifier §M |
+| its rows in this report, the topology, the READMEs and the exports | documentation |
+
+The generator keeps a `LEGACY_COMPONENTS` list so that re-running it against a
+Rev P.3 document **removes** the component rather than leaving it behind, and
+both tools now assert that no keepout proxy exists anywhere in the assembly.
+
+**What is kept is the physical cut**, exactly as printed: the end rail and
+cable-tie projection stay deleted, the uprights still terminate at +20.50 with
+their R1.80 caps, and the lighting-unit side stays open. Only the *name* of the
+reported boundary changes — `light_keepout_y` becomes **`carrier_max_y`**, and
+it now means what it always physically was: *how far the carrier itself reaches
+on that side*, +22.55, down from +30.60.
+
+> **CAD does not prove lighting-unit clearance and this report does not claim
+> it.** Brief §12.14 — offering the carrier up with the lighting unit left in
+> place — is the sole authority, and it is **open and mandatory**. If the towers
+> still foul, the next correction is a smaller `pedestal_d` on the sprung pair:
+> one parameter, and the towers project only 2.05 mm past the upright caps.
 
 ### 20.7 Strain relief and rack
 
@@ -1094,14 +1201,15 @@ the station that gives a firm push-in, holds inverted and still releases, set
 
 ---
 
-## 22. Rev P.3 validation summary
+## 22. Rev P.4 validation summary
 
-Both tools re-run from scratch. **Fusion gate: ALL CHECKS PASS. Independent STL
-verifier: exit 0.** Five blocking open items, all measurements.
+Both tools re-run from scratch. **Fusion gate: ALL CHECKS PASS (52 of 52 point
+probes). Independent STL verifier: exit 0, 64 checks.** Six blocking open items:
+four measurements and two physical tests that CAD cannot substitute for.
 
 ### Rev P.2 architecture — re-proved unchanged
 
-| Property | Rev P.2 | Rev P.3 |
+| Property | Rev P.2 | Rev P.4 |
 |---|---|---|
 | Flush-side insertion corridor | CLEAR | **CLEAR** |
 | Forward escape blocked from | +0.15 mm | **+0.15 mm** |
@@ -1116,6 +1224,9 @@ verifier: exit 0.** Five blocking open items, all measurements.
 | Fixing pitch | 49.00000 | **49.00000** |
 | Bezel | unchanged | **unchanged, re-checked CLEAR** |
 | Slivers | 0 / 0 | **0 / 0** |
+| Front insertion / removal sweeps | CLEAR | **CLEAR — glass, tips and header** |
+| Nut pockets, captive retention, service removal | as §21 | **identical** |
+| Print orientation | rear face down | **rear face down, still suitable** |
 
 ### The amendment
 
@@ -1129,14 +1240,30 @@ verifier: exit 0.** Five blocking open items, all measurements.
 | full 10.00 mm nut and bolt engagement clearance | **CLEAR against every body** |
 | no bolt bottoming or nut pull-through | **8.55 mm² shoulder on a 2.00 mm ring**; bolt window 5.00–15.00 mm, **to be measured** |
 | continuous measurable boss wall | **1.391 nominal / 1.388 measured** |
-| zero carrier intersection with the lighting keep-out | **ZERO** |
+| no `Lighting_Keepout` component or body exists | **absent from the Fusion browser, the assembly STEP and the pack** |
+| the assembly STEP contains no keepout proxy | **`PRODUCT` list: carrier, Perspex, OLED, fasteners, bezel — nothing else** |
 | no bridge or cable-tie feature beneath the sprung pair | **none — residual EMPTY** |
+| the deleted lower rail / cable-tie region remains empty | **y +21.00 … +30.60 empty outside the two towers** |
+| the carrier remains exactly one connected solid | **1 lump / 1 connected component over 3442 welded vertices** |
+| rear wall thickness equals the named parameter | **1.20 mm at 11 probes in Fusion and 11 spans on the mesh** |
+| the wall is confined to the OLED bay | **nothing above y +20.50 in its Z band but the two pedestal towers** |
+| the four-pin opening matches header + documented clearance | **11.20 × 3.35 mm from 10.00 × 3.00 + 0.60 / 0.60** |
+| only one rear penetration, no second opening | **45.024 mm³ measured against 45.024 mm³ required; 4610 of 4610 swept points outside the slot are solid** |
+| rear wall clear of the PCB and component envelopes | **4.10 mm behind DATUM B; header envelope crosses with zero contact** |
+| front insertion and removal sweeps remain clear | **CLEAR, pinched and unpinched** |
+| fixed datum and snap-retention results unchanged | **39.76 mm² pad, 0.10 mm hook overlap — identical** |
+| OLED-to-Perspex gap unchanged | **0.300 mm** |
+| original bolts do not bottom | **5.00 mm grip, 15.00 mm ceiling — window reported, bolt still to be measured** |
+| no thin slivers or unsupported critical geometry | **0 faces < 0.02 mm², 0 edges < 0.05 mm** |
+| rear-face-down print orientation remains suitable | **the wall is the first 6 layers, bed-supported over its full area** |
 | unchanged OLED insertion, retention, release, Z datum, gap | **identical, table above** |
 | unchanged post positions, datum contacts, centring | **identical** |
 | one connected open-ended solid, no slivers | **1 lump / 1 component, 0 slivers** |
 | no unacceptable lateral rack or twist | **sections reported** — physical test §12.15 |
 | printable pocket geometry in the intended orientation | **§23** |
 | hex-pocket fit coupon | **generated and exported — §21.7** |
+| installed lighting-unit clearance | **NOT CLAIMED. No lighting-unit geometry exists in CAD — physical test §12.14** |
+| light leakage | **NOT CLAIMED. No LED measurement exists — powered test §12.22** |
 
 ---
 
@@ -1155,8 +1282,10 @@ Orientation is unchanged: **carrier rear face flat on the bed, building forward
 | Upright end caps | R1.80 half-rounds, vertical — no overhang |
 | Open end | removes all the former flange bridging; nothing new needs support |
 
-The carrier is now 4.472 cm³ (≈ 5.7 g in PETG) against 6.928 cm³, and 39.15 mm
-tall against 47.20 mm, so it also prints faster and packs smaller.
+The carrier is 5.661 cm³ (≈ 7.2 g in PETG) against Rev P.2's 6.928 cm³, and
+39.15 mm tall against 47.20 mm. The Rev P.3 cut removed 2.456 cm³ and the
+Rev P.4 rear shield adds 1.189 cm³ back, at the very rear of the part where it
+costs nothing in print time or in external envelope.
 
 Hardware: **2 × original Decca bolts, 2 × original matching nuts.** No inserts,
 no replacement screws, no adhesive.
@@ -1179,3 +1308,134 @@ no replacement screws, no adhesive.
 
 To service the nuts: remove the bolts, lift the carrier off, and push each nut
 out from the front with a 2 mm pin through the bolt bore.
+
+---
+
+## 24. Integral rear light shield (brief §8.3) — Rev P.4
+
+![Rev P.4 carrier from the rear — the continuous integral light shield closing the OLED bay, with the single four-pin/header opening at the top centre. No lighting keepout component is present.](Decca_OLED_Display_Mount_revP_rear.png)
+
+### 24.1 What was wrong
+
+Rev P.3 cut the PCB pocket straight through to the rear face, leaving an open
+window 35.90 × 34.00 mm behind the module. Installed, the retained Decca cabinet
+LEDs sit on the other side of it. They light the rear and the edges of the OLED
+directly, which shows as a glow through the Perspex aperture and as washed-out
+contrast on the display. Nothing in the carrier stopped it, and the brief's
+§8.3 requires the carrier itself to.
+
+### 24.2 The wall
+
+One continuous wall, **integral to `Rear_Display_Carrier`**. Not a cover, not a
+second component, not a separate printed part — it is unioned into the carrier
+body immediately after the pocket is cut, so it is part of the same solid.
+
+| Property | Value | Why |
+|---|---|---|
+| named parameter | `rear_light_shield_t` = **1.20 mm** | 3 × 0.40 mm nozzle extrusion width. On a different extrusion width, raise it to at least three *actual* widths and regenerate |
+| Z extent | −8.00 → **−6.80** | grown **forward** from the existing rear plane, so the external envelope stays 56.60 × 39.15 × **8.00** mm |
+| X extent | −17.95 … +17.95 | exactly the PCB-pocket footprint, so it lands on both pocket side walls and bridges the two uprights **across the OLED bay only** |
+| Y extent | −13.00 … **+20.50** | bottom rail up to `light_cut_y`. It stops where the carrier stops |
+| clearance to the PCB | **4.10 mm** behind DATUM B | never touches the board, never preloads it, is never an OLED Z datum |
+| wall area | 1202.65 mm² | of which 37.52 mm² (**3.1 %**) is the pin slot |
+| connectivity | **1 lump** in Fusion, **1 connected component** over 3442 welded vertices on the mesh | joined continuously to the frame |
+| material | **opaque black**, printed fully solid | solid perimeters through the wall — never sparse infill, never a single translucent skin |
+
+It does **not** extend into or recreate the deleted end-rail / cable-tie region.
+That material began at the pocket line y = +21.00 and ran outboard to +30.60;
+the wall stops 0.50 mm short of the pocket line and 10.10 mm short of the
+flange, and both old bands verify empty.
+
+### 24.3 The only penetration — the four-pin opening
+
+```
+        y = +20.50 ──── wall's free top edge = the open §20 lighting side ────
+                        ┌──────────────────┐
+   solid wall           │    PIN SLOT      │           solid wall
+   12.35 mm wide        │  11.20 × 3.35    │           12.35 mm wide
+                        └──────────────────┘
+        y = +17.15 ──── slot floor; 30.15 mm of solid wall below ────
+                          x −5.60 … +5.60
+```
+
+Sized from the **existing header reference parameters** plus two **separate,
+named** clearances, so the opening can be tuned without touching the general
+OLED opening:
+
+| Input | Value | Role |
+|---|---|---|
+| `oled_header_w` | 10.00 mm | header envelope, X |
+| `oled_header_h` | 3.00 mm | header envelope, Y |
+| `oled_header_off_y` | +19.25 mm | header centre |
+| `oled_header_depth` | 8.10 mm | rearward of the PCB rear face → z = −10.80 |
+| `pin_slot_clear_x` | **0.60 mm** per side | print allowance + conductor room |
+| `pin_slot_clear_y` | **0.60 mm** | print allowance + the wire bend |
+
+| Requirement | Result |
+|---|---|
+| aligns with the actual four-pin header | centred on `oled_header_off_y`, symmetric about x = 0 |
+| pins and attached conductors pass without rubbing | the full 8.10 mm header/wiring envelope crosses the wall with **ZERO** contact |
+| accommodates the wire bend immediately behind the header | that bend is inside the same envelope, 2.80 mm past the rear face — same check |
+| close-fitting, not a significant light path | **3.1 %** of the wall; 12.35 mm of solid wall each side, 30.15 mm below |
+| passes completely through the shield | measured void **45.024 mm³** against **45.024 mm³** required |
+
+There is **no** general rear window, **no** solder-access window and **no** rear
+release opening. A swept membership test over the whole bay slab finds material
+at **4610 of 4610** points outside the slot, and open at **147 of 147** points
+inside it.
+
+### 24.4 Reported, not hidden: the slot's top boundary
+
+The header row sits at `oled_header_off_y` = **+19.25** and its envelope tops out
+at **+20.75**. The carrier's own termination on that side is **+20.50**. The
+connector is therefore at the *open* lighting-unit end of the board, 0.25 mm
+proud of where the carrier is permitted to reach.
+
+So the slot is bounded by wall on **both X sides** and **below**, and above by
+the wall's free edge. That edge **is** the mandated open lighting-unit side of
+§20 — it is not a second opening, and there is nothing above it that could be
+opened.
+
+The two alternatives were both worse and both rejected:
+
+| Alternative | Why not |
+|---|---|
+| enclose the slot on all four sides | needs printed material back above y = +20.50, across the two uprights, in exactly the band the physically-successful rail cut emptied — undoing §20 on unmeasured grounds |
+| drop the wall below the header so no slot is needed | leaves a 3.15 × 35.90 mm open band, i.e. a general rear window under another name |
+
+If the powered test (§14.22) shows leakage **only** at this opening, the fix is
+to tighten it locally or add a **short integral hood** — never to reopen the
+wall and never to add another printed component.
+
+### 24.5 What the wall does not change
+
+| Preserved | Evidence |
+|---|---|
+| front / Perspex-side insertion | swept corridor CLEAR, identical figures |
+| fixed rear PCB datum pads | **39.76 mm²** still facing forward at z = −2.70 |
+| plain and sprung locating posts | built before the wall; the wall cuts none of them |
+| positive loose-carrier retention | 0.10 mm hook overlap, unchanged |
+| deliberate OLED removal | §10, revised — still forward, never rearward |
+| OLED Z position and Perspex gap | **0.300 mm**, untouched |
+| active-area centring | (0.0000, 0.0000) |
+| 35.20 × 15.30 aperture, 49.00000 mm pitch | untouched |
+| captive-nut interface and hard-stop load path | pockets at x ±24.50, 6.55 mm outboard of the wall |
+| the §20 rail cut | wall stops at +20.50; both old bands still empty |
+
+### 24.6 Print orientation
+
+Unchanged: **rear face on the bed, building +Z**. That makes the wall the
+**first 6 layers**, laid flat on the bed over its full 35.90 × 33.50 mm area —
+no bridging and no supports, and the four-pin slot is a through-slot in those
+same layers. Its free top edge is a 1.80 mm strip beyond the upright cap line,
+1.20 mm thick and 35.90 mm wide: a plate edge, not a sliver and not an
+unsupported cantilever. The sliver check reports **0 faces < 0.02 mm² and 0
+edges < 0.05 mm**.
+
+### 24.7 What CAD does not prove
+
+The wall thickness, the opaque black material and the pin-slot size are
+**engineering choices**, not measurements against the Decca cabinet LEDs.
+Nothing in this section is evidence that the installed display is free of light
+contamination. **Brief §12.22, the powered optical test in §14.22, is the
+authority**, and it is open.
