@@ -13,11 +13,15 @@ architecture brief. It includes the 2026-08-29 Rev P physical-retention
 correction: flush-side insertion onto fixed rear PCB datums, positive sprung-post
 handling retention, and no release until the corrected print passes physical
 retention tests. The 2026-08-29 integration amendment additionally makes the
-original Decca lighting unit a mandatory keep-out and deletes the continuous
-carrier end rail / cable-tie projection below the sprung-post pair as installed.
+original Decca lighting unit a mandatory physical clearance interface and
+deletes the continuous carrier end rail / cable-tie projection below the
+sprung-post pair as installed.
 The same open Rev P correction now also deletes the M2 heat-set inserts and
 replacement M2 screws: the original non-standard-thread Decca front bolts and
 their matching six-sided captive nuts are reused at the unchanged 49.00 mm pitch.
+The Rev P.3 follow-up rejects the unmeasured synthetic lighting-unit keepout
+component and requires an integral opaque rear wall over the OLED bay, with only
+a local four-pin/header opening, to prevent cabinet-light contamination.
 
 ## Display mount
 
