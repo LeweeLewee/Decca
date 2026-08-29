@@ -59,6 +59,7 @@ that source control alone does not express well.
 | 2026-08-29 | Hardware | Selected the existing Phihong PSA15R-050P switching adapter for the 5 V control rail: 5.0 V DC at 3.0 A (15 W). The 5 V PSU procurement item is closed; DC plug size and polarity remain a required multimeter check before connection. |
 | 2026-08-29 | Hardware | Completed the open-component reconciliation for the 5 V input chain: added the matching panel DC socket, post-inlet 2 A fuse and holder, separate +5 V/GND distribution connectors, power wiring/ferrules and explicit external-adapter boundary. Corrected the readable Phase 2 list to the locked Fosi ZA3 decision and added the still-open trigger and audio harness components. |
 | 2026-08-29 | Hardware | Corrected component status against the project decisions and purchase records: recorded the installed ABW1 10K potentiometers, ordered DAOKAI B09YYH2BTF MOSFET modules, delivered ShuoHui B0CFTLZFGT lamps pending fit/5 V testing, purchased Lyeteung B0CBWX98NF JST-XH harness set, selected-but-unbought WiiM Pro and Fosi ZA3, and B&W DM601 S3 as the fit-gated primary speaker target. |
+| 2026-08-29 | Hardware | Purchased the Amazon TopHomer B08HGXYS4J pack of five 5.5 × 2.1 mm, two-terminal, threaded-nut panel DC sockets rated 3 A. Socket procurement is closed; physical fit and centre-positive polarity remain mandatory checks before drilling or wiring. |
 
 ## Hardware Revisions
 
