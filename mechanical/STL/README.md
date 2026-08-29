@@ -10,7 +10,7 @@ Print-ready meshes exported from the CAD sources.
 - STLs are derived artefacts — the editable source lives in `../CAD/`.
 - Name files to match their CAD source and revision.
 
-## Display mount — current revision: **P — OPEN, NOT RELEASED**
+## Display mount — current revision: **P.5 — RELEASED**
 
 | File | Print notes |
 |---|---|
@@ -18,7 +18,19 @@ Print-ready meshes exported from the CAD sources.
 | `Rear_Display_Carrier_revP.stl` | PETG **in OPAQUE BLACK**. **Rear face flat on the bed, building forward.** No supports. 4+ top layers or ironing on the Perspex seating face. Print the **four** Ø2.80 split sprung posts slowly — they stand 4.40 mm tall on a 0.80 mm half-section (exactly two 0.40 mm perimeters). **Print the 1.20 mm rear light shield fully solid** — it is the first 6 layers, flat on the bed; solid perimeters, never sparse infill and never a single translucent skin. The two light blocks grow up off it. 56.60 × 39.15 × **6.00 mm**, 4.411 cm³ ≈ 5.6 g. |
 | `Front_Bezel_revN.stl` | PETG, matt/satin black. **Unchanged for Rev P** — no revP-named file exists. |
 
-> ## Rev P is NOT released — do not print the carrier yet
+> ## Rev P.5 is RELEASED — this mesh has been printed and tested
+>
+> The carrier printed from this mesh has been installed in the radio and passed
+> every physical test: Perspex fit, OLED insertion and removal, four-post
+> retention, lighting-unit clearance, connector-side clearance, the 6.00 mm
+> thickness, the enlarged connector opening, the rear closure and light blocks,
+> the original captive-nut fasteners, 49.00 mm pitch, the 7.00 mm lower
+> mounting points and powered operation.
+>
+> Print it **in opaque black** with the rear light shield solid — that is a
+> functional requirement, not a finish choice.
+>
+> <details><summary>The pre-build gates, retained for the record</summary>
 >
 > The **Rev P.2** print **passed** its OLED retention and Perspex-fit tests. This
 > mesh is **Rev P.5**. Rev P.3 amended
@@ -86,6 +98,18 @@ Print-ready meshes exported from the CAD sources.
 > lighting-unit clearance or freedom from light leakage.** None of the three has
 > ever been measured; the synthetic keepout that implied otherwise was deleted
 > at Rev P.4.
+>
+> </details>
+
+**All six gates above are now closed by the built and tested part.** Both tools
+record them as `[TEST]` and neither check was changed to get there.
+
+> **What is still a modelling caveat, and is not a blocker.** The bonded-glass
+> envelope, the nut across-corners figure and the original bolt length were
+> never measured. The built part works; the **model** still carries
+> placeholders for those three, and `oled_glass_measured` / `GLASS_MEASURED`
+> stay `False`. Measure before regenerating any post, nose, glass keep-out or
+> nut pocket.
 >
 > **One mandatory assembly-preparation step:** nothing on the OLED's display-side
 > face may stand more than **1.00 mm** proud. The budget is

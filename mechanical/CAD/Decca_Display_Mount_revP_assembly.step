@@ -10,7 +10,7 @@ FILE_DESCRIPTION(
 
 FILE_NAME(
 /* name */ 'Decca_Display_Mount_revP_assembly.step',
-/* time_stamp */ '2026-08-29T21:49:53+01:00',
+/* time_stamp */ '2026-08-30T00:02:37+01:00',
 /* author */ (''),
 /* organization */ (''),
 /* preprocessor_version */ 'ST-DEVELOPER v20.1',
@@ -9347,7 +9347,8 @@ SOLID_ANGLE_UNIT()
 #9055=SHAPE_REPRESENTATION('',(#5732),#9027);
 #9056=SHAPE_REPRESENTATION('',(#5759),#9028);
 #9057=PRODUCT_DEFINITION_CONTEXT('part definition',#9077,'design');
-#9058=PRODUCT_DEFINITION('(Unsaved)','(Unsaved)',#9064,#9057);
+#9058=PRODUCT_DEFINITION('Decca screen mount','Decca screen mount v1',#9064,
+#9057);
 #9059=PRODUCT_DEFINITION('REF_Decca_Panel','REF_Decca_Panel',#9065,#9057);
 #9060=PRODUCT_DEFINITION('REF_SH1106_1P3','REF_SH1106_1P3',#9066,#9057);
 #9061=PRODUCT_DEFINITION('Rear_Display_Carrier','Rear_Display_Carrier',
@@ -9362,7 +9363,8 @@ SOLID_ANGLE_UNIT()
 #9067=PRODUCT_DEFINITION_FORMATION('',$,#9082);
 #9068=PRODUCT_DEFINITION_FORMATION('',$,#9083);
 #9069=PRODUCT_DEFINITION_FORMATION('',$,#9084);
-#9070=PRODUCT_RELATED_PRODUCT_CATEGORY('(Unsaved)','(Unsaved)',(#9079));
+#9070=PRODUCT_RELATED_PRODUCT_CATEGORY('Decca screen mount v1',
+'Decca screen mount v1',(#9079));
 #9071=PRODUCT_RELATED_PRODUCT_CATEGORY('REF_Decca_Panel',
 'REF_Decca_Panel',(#9080));
 #9072=PRODUCT_RELATED_PRODUCT_CATEGORY('REF_SH1106_1P3',
@@ -9378,7 +9380,7 @@ SOLID_ANGLE_UNIT()
 #9077=APPLICATION_CONTEXT(
 'Core Data for Automotive Mechanical Design Process');
 #9078=PRODUCT_CONTEXT('part definition',#9077,'mechanical');
-#9079=PRODUCT('(Unsaved)','(Unsaved)',$,(#9078));
+#9079=PRODUCT('Decca screen mount','Decca screen mount v1',$,(#9078));
 #9080=PRODUCT('REF_Decca_Panel','REF_Decca_Panel',$,(#9078));
 #9081=PRODUCT('REF_SH1106_1P3','REF_SH1106_1P3',$,(#9078));
 #9082=PRODUCT('Rear_Display_Carrier','Rear_Display_Carrier',$,(#9078));

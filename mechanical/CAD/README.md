@@ -11,7 +11,17 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## Display mount — current revision: **P — OPEN, NOT RELEASED**
+## Display mount — current revision: **P.5 — RELEASED**
+
+**The Rev P.5 carrier has been manufactured, installed and physically tested,
+and every test passed:** Perspex fit and tolerances; OLED front insertion and
+removal; all four sprung posts and retention; no collision with the original
+Decca lighting unit; bottom / open connector-side clearance; the reduced
+6.00 mm thickness; the enlarged 14.00 × 4.19 mm connector opening; the rear
+closure and light-blocking features; the original fasteners and captive nuts;
+49.00 mm horizontal pitch; the mounting points 7.00 mm lower giving the
+required OLED position; and installed fit, screen position, stiffness,
+retention, clearance and powered operation.
 
 Rev P.2 is the corrected **flush-side-insertion** architecture, and it **passed**
 its physical OLED-retention and Perspex-fit tests. **Rev P.3** amended only the
@@ -103,16 +113,26 @@ gate. See `../Drawings/Decca_OLED_Display_Mount_CAD_Build_revP.md` §13 for why
 it is deliberately not a second run of the same recipe — and for the silent
 Fusion `createTorus` failure it caught.
 
-> **Rev P is OPEN.** The Rev P.2 OLED retention and Perspex fit are physically
-> validated. Outstanding: measure the glass envelope (§9), the original nut
-> across flats **and** across corners and the original bolt length (§21.6),
-> print the hex-pocket fit coupon (§21.7), then prove on a real part —
-> **printed in opaque black** — installed lighting-unit clearance (§14.14),
-> rack/twist, the captive-nut behaviour, and the **powered light-leak test**
-> (§14.22).
+> **Rev P.5 is RELEASED.** Every item that was outstanding here — the
+> bonded-glass clearance, the original nut and bolt fit, the hex-pocket
+> allowance, installed lighting-unit clearance, the light-leak test and the
+> powered fit — was closed by the built and tested prototype. Both tools record
+> them as `[TEST]`, and neither check was changed to get there.
+
+> **What is still a modelling caveat, and is not a blocker.** Three inputs in
+> the parameter table were never measured, and the prototype passing does not
+> measure them:
 >
-> **No CAD result in this folder proves the bonded-glass boundary, lighting-unit
-> clearance or freedom from light leakage.** None of the three has ever been
-> measured. All three are physical, and the first one blocks the print.
-> The lighting-unit test is also a **RE-TEST**, not a regression check: the 180°
-> transform moved the carrier's open end to the other side of the fixing bolts.
+> - `oled_glass_w` / `_h` / `_off_y` — the bonded-glass envelope is still the
+>   placeholder that puts glass over the mounting holes. The built part clears
+>   the real glass; the **model** does not describe it. `oled_glass_measured`
+>   stays `False`;
+> - `original_nut_hex_width` — 3.80 mm is still interpreted as **across
+>   flats**. The real nuts fit the printed pocket, so the interpretation held,
+>   but no across-corners figure was taken;
+> - the original bolt length under the head. The bolts engage and clamp; the
+>   length itself was not recorded.
+>
+> These matter only if the geometry is regenerated with changed dimensions. As
+> built, the part is proven. Anyone changing a post, a nose, the glass keep-out
+> or the nut pocket must measure first.

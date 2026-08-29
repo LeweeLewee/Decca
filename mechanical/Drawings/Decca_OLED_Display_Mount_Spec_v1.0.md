@@ -1,6 +1,7 @@
 # Decca OLED Display Mount Specification v1.1
 
-Status: **Approved design specification**  
+Status: **Approved design specification** · Mechanical implementation
+**Rev P.5 — RELEASED**, prototype built and physically validated 2026-08-30  
 Date: 2026-08-27 (v1.0) · 2026-08-28 (v1.1)  
 Manufacturing method: **FDM 3D print**  
 CAD platform: **Autodesk Fusion 360**
@@ -12,10 +13,13 @@ CAD platform: **Autodesk Fusion 360**
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-08-27 | Initial approved specification. |
+| — | 2026-08-30 | **Mechanical Rev P.5 released.** The carrier has been manufactured, installed and physically tested, and every test passed: Perspex fit and tolerances, OLED front insertion and removal, four sprung retaining posts, no collision with the original Decca lighting unit, bottom/open connector-side clearance, the 6.00 mm carrier thickness, the enlarged 14.00 × 4.19 mm four-pin opening, the rear closure and light-blocking features, the original fasteners and captive nuts, 49.00 mm horizontal pitch, the mounting points 7.00 mm lower giving the required OLED position, and installed fit, screen position, stiffness, retention, clearance and powered operation. **No value in this specification changes.** §2 remains the measured fascia authority; the as-built mechanical design is defined by `Decca_OLED_Display_Mount_CAD_Build_revP.md`. |
 | **1.1** | **2026-08-28** | **Locked the measured Decca interface geometry in §2, §4, §5 and §10.** The v1.0 figures for the display opening and the M2 fixing pitch were pre-measurement estimates and were superseded by physical measurement at Rev C, print-confirmed at Rev D and re-confirmed by the project owner on 2026-08-28. Fixing pitch **48.00 → 49.00 mm**; display opening **35.50 × 15.80 → 35.20 × 15.30 mm**; hole centre from the opening edge **7.90 → 7.65 mm**. No other value is changed. |
 
 **Change control.** Where this document and a physical measurement disagree, the
 measurement wins and this document is updated explicitly — that is what v1.1 is.
+The same rule closed Rev P.5: the checks CAD could not settle were settled by
+the built part, not by editing a check or a number.
 Design-intent values elsewhere in this specification (bezel lip depth, retention
 concept, wall thicknesses) have also been superseded by later mechanical
 revisions; for those, the CAD build reviews in this folder and

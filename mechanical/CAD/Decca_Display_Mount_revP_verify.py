@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Rev P.4 independent verification - reads the EXPORTED STL, not the build recipe.
+Rev P.5 independent verification - reads the EXPORTED STL, not the build recipe.
+
+REV P.5 IS RELEASED. The carrier has been manufactured, installed and tested,
+and every physical test passed - see PROTOTYPE below. Nothing in this file was
+relaxed to get there: every geometric check still runs on the exported mesh and
+still has to pass on its own terms. What changed is that the items this file
+always deferred to physical test are reported as CLOSED BY TEST rather than
+BLOCKED or OPEN, and the unmeasured bonded-glass envelope is still carried,
+unedited, as the placeholder it has always been.
 
 Rev P.2 passed physically for OLED retention and Perspex fit. Sections A-L below
 re-prove that architecture is unchanged. Section M covers the lighting-unit-side
@@ -302,10 +310,34 @@ PED_INNER_X = POST_X - math.sqrt(max(0.0, (R["pedestal_d"] / 2) ** 2
                                      - BLOCK_DY_MAX ** 2))  # 11.34
 BLOCK_X_OUT = PED_INNER_X + R["light_block_tie"]            # 11.94
 
+# ---------------------------------------------------------------------------
+# PROTOTYPE OUTCOME - the physical evidence that closes this revision.
+# Reported by the project owner after building and installing the Rev P.5
+# carrier. Outcomes, not measurements: nothing here is fed back into R.
+# ---------------------------------------------------------------------------
+PROTOTYPE_VALIDATED = True
+PROTOTYPE = (
+    ("Perspex fit and tolerances", "PASS"),
+    ("OLED front insertion and removal", "PASS"),
+    ("all four sprung posts, retention", "PASS"),
+    ("no collision with the original Decca lighting unit", "PASS"),
+    ("bottom / open connector-side clearance", "PASS"),
+    ("reduced 6.00 mm carrier thickness", "PASS"),
+    ("enlarged 14.00 x 4.19 mm four-pin opening", "PASS"),
+    ("rear closure and light-blocking features", "PASS"),
+    ("original fasteners and captive nuts", "PASS"),
+    ("horizontal mounting-hole pitch 49.00 mm", "PASS"),
+    ("mounting points 7.00 mm lower - required OLED position", "PASS"),
+    ("installed fit, screen position, stiffness, retention, clearance",
+     "PASS"),
+    ("powered operation", "PASS"),
+)
+
 FAILS = []
 OPENS = []
 NOTES = []
 BLOCKS = []
+CLOSED = []
 GLASS_MEASURED = False      # set True once the real boundary is entered above
 
 
@@ -321,6 +353,15 @@ def blocked(label, detail=""):
     BLOCKS.append("%s - %s" % (label, detail))
 
 
+def closed_by_test(label, detail=""):
+    """An item this file deferred to physical test, which has now passed.
+
+    Not a mesh pass and not a re-reading of the model: a record that the
+    evidence this file always asked for now exists."""
+    print("  [TEST] %-58s %s" % (label, detail))
+    CLOSED.append("%s - %s" % (label, detail))
+
+
 def glasscheck(ok, label, detail="", blocked_detail=""):
     """A check against the bonded-glass envelope.
 
@@ -330,11 +371,30 @@ def glasscheck(ok, label, detail="", blocked_detail=""):
     the print until the boundary is measured. Set GLASS_MEASURED once it is."""
     if ok or GLASS_MEASURED:
         return check(ok, label, detail)
+    if PROTOTYPE_VALIDATED:
+        # The modelled envelope is still fiction and is still printed as such.
+        # What changed is that the real assembly was built and the OLED
+        # inserted, retained and released with no glass contact.
+        closed_by_test(
+            label,
+            "%s. The modelled envelope is UNMEASURED and unchanged. CLOSED BY "
+            "PHYSICAL TEST: the built carrier inserted, retained and released "
+            "the OLED with no glass contact." % (blocked_detail or detail))
+        return False
     blocked(label, blocked_detail or detail)
     return False
 
 
-def openitem(label, detail=""):
+def openitem(label, detail="", outcome=""):
+    """A pre-print/pre-release item.
+
+    ``detail`` is what had to be done, ``outcome`` what the prototype showed.
+    Clearing PROTOTYPE_VALIDATED restores the original wording exactly."""
+    if PROTOTYPE_VALIDATED:
+        closed_by_test(label, outcome or
+                       "deferred to physical test; the Rev P.5 prototype "
+                       "passed")
+        return
     print("  [OPEN] %-58s %s" % (label, detail))
     OPENS.append("%s - %s" % (label, detail))
 
@@ -531,8 +591,14 @@ def outer_width(tris, x, y, z, axis=1, reach=2.50):
 # ---------------------------------------------------------------------------
 def main():
     print("=" * 80)
-    print("REV P.4 INDEPENDENT VERIFICATION  (exported STL, not the build recipe)")
+    print("REV P.5 INDEPENDENT VERIFICATION  (exported STL, not the build recipe)")
     print("=" * 80)
+    if PROTOTYPE_VALIDATED:
+        print("REV P.5 IS RELEASED - the carrier has been built and tested:")
+        for lbl, res in PROTOTYPE:
+            print("   %-60s %s" % (lbl, res))
+        print("Every geometric check below still runs in full and unmodified.")
+        print("=" * 80)
     if not os.path.isfile(STL_PATH):
         print("STL not found: %s" % STL_PATH)
         return 2
@@ -852,7 +918,7 @@ def main():
         slot = sp[1][0] - sp[0][1]
         half = sp[0][1] - sp[0][0]
         check(abs(slot - R["slot_w"]) < 0.03, "split slot measured off the mesh",
-              "%.3f mm (requirement %.2f) - the post really is split" 
+              "%.3f mm (requirement %.2f) - the post really is split"
               % (slot, R["slot_w"]))
         note("half-post chord 0.50 mm off the axis", "%.3f mm each side" % half)
     # the root relief bore, measured by bisection at mid-relief height. The ray
@@ -996,7 +1062,11 @@ def main():
                  "measure hole centre to the nearest bonded-glass edge at BOTH "
                  "%s holes (x +/-%.2f, y %+.2f). It must be at least %.2f mm. "
                  "Modelled, UNMEASURED: %.2f mm."
-                 % (tag, POST_X, y, q["keepout_r"], gap))
+                 % (tag, POST_X, y, q["keepout_r"], gap),
+                 outcome="CLOSED BY PHYSICAL TEST. The built carrier inserted, "
+                 "retained and released the OLED with no bonded-glass contact "
+                 "at the %s pair. The boundary itself was not measured, so the "
+                 "modelled envelope stays as it is - a placeholder." % tag)
     print("")
     print("   Rev P.5 converted the far pair from plain posts to sprung posts,")
     print("   so BOTH rows now put a nose ahead of the PCB front face. The")
@@ -1652,16 +1722,24 @@ def main():
              "%.2f mm is MODELLED as across flats. If it is across corners the "
              "true across-flats is %.2f mm and this pocket is %.2f mm oversize."
              % (R["nut_af"], R["nut_af"] * math.sqrt(3.0) / 2.0,
-                R["nut_af"] - R["nut_af"] * math.sqrt(3.0) / 2.0))
+                R["nut_af"] - R["nut_af"] * math.sqrt(3.0) / 2.0),
+             outcome="The original nuts seat and stay captive in the printed "
+             "pocket, so the ACROSS-FLATS interpretation held in practice. No "
+             "across-corners figure was taken.")
     openitem("original bolt length under the head",
              "must exceed the %.2f mm grip to engage and stay under %.2f mm to "
              "remain inside the nut" % (R["perspex_t"] + R["nut_seat_depth"],
                                         R["perspex_t"] + R["nut_seat_depth"]
-                                        + R["nut_total_len"]))
+                                        + R["nut_total_len"]),
+             outcome="The original bolts engage freely, do not bottom and clamp "
+             "the carrier to the Perspex. The length itself was not recorded.")
     openitem("hex-pocket fit coupon",
              "fit allowance %.2f mm, retaining lip %.2f mm - print the coupon "
              "and confirm push-in, inverted retention and service removal "
-             "before the carrier" % (R["nut_fit"], R["nut_retain_lip"]))
+             "before the carrier" % (R["nut_fit"], R["nut_retain_lip"]),
+             outcome="SUPERSEDED - the carrier itself has been printed and both "
+             "original nuts fit, so the %.2f mm allowance and %.2f mm lip are "
+             "proven on the real part." % (R["nut_fit"], R["nut_retain_lip"]))
     openitem("installed clearance against the retained lighting unit",
              "there is NO measured lighting-unit geometry in this project and "
              "nothing above may be read as CAD proof of that clearance. All "
@@ -1670,7 +1748,11 @@ def main():
              "which stays MANDATORY. AND the Rev P.5 180-degree transform "
              "moved the open end from +Y to -Y, so the Rev P.3/P.4 installed "
              "fit does not carry over - 12.14 is a RE-TEST, not a regression "
-             "check." % CARRIER_MIN_Y)
+             "check." % CARRIER_MIN_Y,
+             outcome="PASSED. The carrier clears the retained original Decca "
+             "lighting unit, with the required clearance on the bottom / open "
+             "connector side. This was the re-test the 180 deg transform made "
+             "necessary, and it remains the ONLY evidence for that interface.")
     openitem("powered fit and screen-position test, brief 12.8 / 12.26-27",
              "install the carrier on the ORIGINAL Perspex holes with the "
              "ORIGINAL bolts. Confirm the open connector side is at the "
@@ -1682,7 +1764,14 @@ def main():
              "band at the bottom of it. Confirm the intended screen "
              "information is still visible, then repeat the lighting-unit "
              "clearance, light-leak, retention and removal tests."
-             % (OLED_RISE, ACTIVE_ABOVE, OPENING_UNLIT_BELOW))
+             % (OLED_RISE, ACTIVE_ABOVE, OPENING_UNLIT_BELOW),
+             outcome="PASSED. Installed on the original Perspex holes with the "
+             "original bolts, connector side at the bottom, holes aligned "
+             "without forcing or slotting. The %.2f mm rise gives the required "
+             "OLED position and the intended screen information is visible. "
+             "The geometry is unchanged and still reported: %.2f mm of the "
+             "%.2f mm active height falls inside the opening."
+             % (OLED_RISE, VIS_H, R["active_h"]))
     openitem("powered light-leak test, brief 12.22",
              "the %.2f mm wall, the opaque black material and the %.2f x "
              "%.2f mm pin slot are engineering choices, not measurements "
@@ -1691,8 +1780,10 @@ def main():
              "normal content. If leakage remains ONLY at the pin slot, tighten "
              "that opening or add an integral hood - do not reopen the wall "
              "and do not add another component."
-             % (R["rear_light_shield_t"], 2 * PIN_X1,
-                R["pin_open_h"]))
+             % (R["rear_light_shield_t"], 2 * PIN_X1, R["pin_open_h"]),
+             outcome="PASSED. The rear closure and the two light-block walls "
+             "work: powered operation is clean with the cabinet lighting in "
+             "place. No hood was needed and nothing was reopened.")
 
     print("")
     print("=" * 80)
@@ -1709,6 +1800,14 @@ def main():
         for n in OPENS:
             print("   * %s" % n)
         print("")
+    if CLOSED:
+        print("CLOSED BY THE PHYSICAL PROTOTYPE: %d item(s)" % len(CLOSED))
+        print("Each was recorded here as something the mesh could not settle.")
+        print("The built and tested part settled them. None was closed by")
+        print("changing a check or a number.")
+        for n in CLOSED:
+            print("   + %s" % n)
+        print("")
     if NOTES:
         for n in NOTES:
             print("   * %s" % n)
@@ -1717,26 +1816,28 @@ def main():
         print("VERDICT: %d CHECK(S) FAILED" % len(FAILS))
         for f in FAILS:
             print("   - %s" % f)
+    elif BLOCKS:
+        print("VERDICT: every EVALUABLE independent geometric check on the")
+        print("         exported STL passes. %d is/are BLOCKED on the"
+              % len(BLOCKS))
+        print("         bonded-glass measurement, which is the Rev P.5")
+        print("         print gate. NO PRINT until that is resolved.")
     else:
-        if BLOCKS:
-            print("VERDICT: every EVALUABLE independent geometric check on the")
-            print("         exported STL passes. %d is/are BLOCKED on the"
-                  % len(BLOCKS))
-            print("         bonded-glass measurement, which is the Rev P.5")
-            print("         print gate. NO PRINT until that is resolved.")
-        else:
-            print("VERDICT: every independent geometric check on the exported")
-            print("         STL passes.")
-        print("         The Rev P.2 ARCHITECTURE is physically validated, but")
-        print("         Rev P.5 rotates the module, drops the carrier to 6.00")
-        print("         mm and converts two plain posts to sprung posts, so no")
-        print("         Rev P.4 number was carried over unchecked. Rev P stays")
-        print("         OPEN: the bonded glass, lighting-unit clearance, light")
-        print("         leakage and the original-fastener interface are all")
-        print("         unproven physically, and the middle two cannot be")
-        print("         closed by CAD at all.")
+        print("VERDICT: every independent geometric check on the exported STL")
+        print("         passes, and the Rev P.5 carrier has been built,")
+        print("         installed and tested with every physical test passing.")
+        print("         REV P.5 IS RELEASED.")
+        if PROTOTYPE_VALIDATED:
+            print("")
+            print("         MODELLING CAVEAT, not a blocker: the bonded-glass")
+            print("         envelope, the nut across-corners figure and the")
+            print("         original bolt length were never measured. The")
+            print("         built part works; the MODEL still carries")
+            print("         placeholders for those three, and GLASS_MEASURED")
+            print("         stays False. Measure before regenerating any post,")
+            print("         nose, glass keep-out or nut pocket.")
     print("=" * 80)
-    return 1 if (FAILS or BLOCKS) else 0
+    return 1 if (FAILS or BLOCKS or OPENS) else 0
 
 
 if __name__ == "__main__":

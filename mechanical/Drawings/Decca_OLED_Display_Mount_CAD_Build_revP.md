@@ -7,7 +7,7 @@ shield required by `Decca_OLED_Display_Mount_CAD_Review_revO.md` §8.1, §8.2,
 (`main` @ `d7ac584`).
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
-> ## Status: Rev P.5 — the Rev P.2 ARCHITECTURE is proven; none of its NUMBERS survive unchecked
+> ## Status: Rev P.5 — RELEASED. Prototype built, installed and physically validated
 >
 > **What is proven.** The printed **Rev P.2** carrier **passed** its physical
 > tests for **OLED retention and Perspex tolerance**. Flush-side insertion, the
@@ -47,8 +47,33 @@ Platform: Autodesk Fusion 360, script-generated parametric build.
 >    rear light shield**, 1.20 mm thick and part of the carrier, now closes it,
 >    with a single local **four-pin/header opening** and nothing else.
 >
-> **Rev P.5 is a mandatory amendment on top of Rev P.4**, and unlike its
-> predecessors it changes load-bearing numbers:
+> **The Rev P.5 carrier has been manufactured, installed in the radio and
+> tested, and every physical test passed.**
+>
+> | Test | Result |
+> |---|---|
+> | Perspex fit and tolerances | **PASS** |
+> | OLED front insertion and removal | **PASS** |
+> | All four sprung posts, retention | **PASS** |
+> | No collision with the original Decca lighting unit | **PASS** |
+> | Bottom / open connector-side clearance | **PASS** |
+> | Reduced 6.00 mm carrier thickness | **PASS** |
+> | Enlarged 14.00 × 4.19 mm four-pin connector opening | **PASS** |
+> | Rear closure and light-blocking features | **PASS** |
+> | Original fasteners and captive nuts | **PASS** |
+> | Horizontal mounting-hole pitch 49.00 mm | **PASS** |
+> | Mounting points 7.00 mm lower — required OLED position | **PASS** |
+> | Installed fit, screen position, stiffness, retention, clearance | **PASS** |
+> | Powered operation | **PASS** |
+>
+> This closes the revision. The sections below are the design record and the
+> validation trail that got here; where they describe a check as open, blocked
+> or awaiting a test, **that item is now closed by the prototype** — see §29.
+>
+> ---
+>
+> **Rev P.5 was a mandatory amendment on top of Rev P.4**, and unlike its
+> predecessors it changed load-bearing numbers:
 >
 > 5. **Four sprung posts (§25).** Both plain locating posts are **deleted** and
 >    replaced by sprung locating-and-retaining posts. Every one of the four PCB
@@ -83,10 +108,8 @@ Platform: Autodesk Fusion 360, script-generated parametric build.
 > worst-case strain would be 3.17 % against a 3.00 % limit and the relief would
 > cut through the light shield. §25.3 has the full recalculation.
 >
-> **Rev P remains OPEN and is not released.** The bonded-glass boundary is now
-> **THE print gate** (§25.4): the two converted posts put a nose ahead of the
-> PCB at holes the plain posts never reached. Four measurements gate the print
-> and the brief §12 tests gate release:
+> **These were the gates before the build. All are now closed — §29.** They
+> are kept because they record why the design is what it is:
 >
 > | # | Gate | Where |
 > |---|---|---|
@@ -506,7 +529,10 @@ forwards out of the carrier.
 > **WIDENED BY §25.4.** When this was written the glass mattered at two holes,
 > because the plain posts stopped behind the PCB front plane and were safe at
 > any glass size. Rev P.5 put a retaining nose at **all four** holes, so the
-> measurement now covers all four — and it is the gate that blocks the print.
+> measurement now covers all four. **That gate is now closed by the built and
+> tested part (§29.2): the carrier inserted, retained and released the OLED with
+> no bonded-glass contact.** The boundary itself was still never measured, so
+> the modelled envelope remains a placeholder — §29.3.
 
 The brief is explicit: *if the real glass envelope cannot be demonstrated clear,
 stop and report the missing measurement rather than assuming it.*
@@ -1022,7 +1048,9 @@ the STL.
 
 ## 19. Design decision
 
-**Rev P is OPEN. It is not released.**
+**Rev P.5 is RELEASED.** The prototype has been built, installed and tested;
+every physical test passed. The statement below is the Rev P.2 design record
+that got here, and is retained unchanged.
 
 The corrected architecture is delivered in full and validated on the real solid
 and again, independently, on the exported mesh: flush-side insertion, fixed rear
@@ -2006,3 +2034,104 @@ appearances are cosmetic; no dimension depends on them. The carrier itself is
 deliberately left in default shading in the carrier-only views: it is printed in
 **opaque black** (§24), but a matte-black render collapses to a flat silhouette
 and the relief bores, the pin opening and the light blocks disappear.
+
+---
+
+## 29. Release — prototype built, installed and physically validated
+
+**Rev P.5 is RELEASED**, 2026-08-30. The carrier has been manufactured,
+installed in the radio and tested, and the project owner reports every physical
+test passed.
+
+### 29.1 Outcome
+
+| Test | Result |
+|---|---|
+| Perspex fit and tolerances | **PASS** |
+| OLED front insertion and removal | **PASS** |
+| All four sprung posts, retention | **PASS** |
+| No collision with the original Decca lighting unit | **PASS** |
+| Bottom / open connector-side clearance | **PASS** |
+| Reduced 6.00 mm carrier thickness | **PASS** |
+| Enlarged 14.00 × 4.19 mm four-pin connector opening | **PASS** |
+| Rear closure and light-blocking features | **PASS** |
+| Original fasteners and captive nuts | **PASS** |
+| Horizontal mounting-hole pitch 49.00 mm | **PASS** |
+| Mounting points 7.00 mm lower — required OLED position | **PASS** |
+| Installed fit, screen position, stiffness, retention, clearance | **PASS** |
+| Powered operation | **PASS** |
+
+### 29.2 What that closes, and how
+
+Every item this report and both tools recorded as open or blocked was something
+CAD explicitly could not settle. The built part settled them.
+
+| Item | Was | Now |
+|---|---|---|
+| bonded-glass clearance at all four holes (§25.4) | **BLOCKED** — the modelled envelope showed a 0.53 mm³ intrusion at the converted pair, and the same model put glass over the mounting holes | **CLOSED BY TEST** — the carrier inserted, retained and released the OLED with no glass contact |
+| installed lighting-unit clearance (§20.6, §26.1) | **OPEN** — a re-test, because the 180° transform moved the open end from +Y to −Y | **PASS** — no collision; the bottom/open connector side has the required clearance |
+| powered light-leak test (§24.7) | **OPEN** — wall thickness, material and slot size were engineering choices | **PASS** — rear closure and light blocks work; no hood needed, nothing reopened |
+| powered fit and screen position (§28.3) | **OPEN** — CAD could report where the screen would sit, not whether that was acceptable | **PASS** — the 7.00 mm rise gives the required OLED position; the intended screen information is visible |
+| original nut across flats / across corners (§21.6) | **OPEN** — 3.80 mm was an interpretation | **PASS in practice** — the nuts seat and stay captive in the printed pocket |
+| original bolt length (§21.6) | **OPEN** — neither end measured | **PASS in practice** — the bolts engage, do not bottom, and clamp |
+| hex-pocket fit coupon (§21.7) | **OPEN** — de-risking before a carrier print | **SUPERSEDED** — the carrier itself printed and both nuts fit |
+| four-post seat / retain / release (§14.28) | **OPEN** | **PASS** |
+
+**Nothing was closed by changing a check or a number.** Both tools still run
+every geometric gate in full, on the same geometry, and both still pass on their
+own terms. The items above are reported as `[TEST]` — a record that the evidence
+they always asked for now exists — not converted into CAD passes. Setting
+`REV_P5_PROTOTYPE_VALIDATED` / `PROTOTYPE_VALIDATED` back to `False` restores
+the original OPEN/BLOCKED wording exactly.
+
+### 29.3 What is still a modelling caveat, and is not a blocker
+
+Three inputs in the parameter table were never measured, and the prototype
+passing does not measure them:
+
+- `oled_glass_w` / `_h` / `_off_y` — the bonded-glass envelope is still the
+  placeholder that puts glass over the mounting holes. The built part clears the
+  real glass; the **model** does not describe it. `oled_glass_measured` stays
+  `False`, and both tools still print the modelled intrusion;
+- `original_nut_hex_width` — 3.80 mm is still interpreted as **across flats**.
+  The real nuts fit, so the interpretation held, but no across-corners figure
+  was taken;
+- the original bolt length under the head. The bolts engage and clamp; the
+  length itself was not recorded.
+
+These matter only if the geometry is regenerated with changed dimensions. As
+built, the part is proven. **Anyone changing a post, a nose, the glass keep-out
+or the nut pocket must measure first.**
+
+One design outcome is also worth restating plainly, because it is intended
+rather than a defect: **the active area is not fully visible.** 8.30 mm of its
+14.70 mm height falls inside the Perspex opening, about 6.40 mm sits behind the
+fascia above it, and the lowest 7.00 mm of the opening shows unlit board. The
+powered fit test confirmed this is the required position (§28.3).
+
+### 29.4 As-built geometry of record
+
+| | |
+|---|---|
+| carrier | 56.60 × 39.15 × **6.00** mm, 4.411 cm³, **one connected solid**, zero slivers |
+| posts | **four** split sprung locating-and-retaining posts, one per PCB mounting hole |
+| retention | 0.100 mm radial overlap on a square land, all four; 2.42 % worst-case strain against a 3.00 % limit |
+| insertion | 28.6 N combined, 0.057 mm worst-case PCB bow |
+| fixings | original Decca bolts and captive nuts, hex pockets, **49.00000 mm** pitch, **7.00 mm** lower than the superseded position |
+| rear | continuous 1.20 mm integral opaque light shield, **14.00 × 4.19 mm** four-pin opening, two integral light blocks tied into the pedestals |
+| lighting side | end rail and cable-tie projection deleted; **no keepout component anywhere** |
+| optical | 0.300 mm OLED-to-Perspex gap; active area horizontally centred, centre y **+6.70** |
+
+### 29.5 Validation state at release
+
+| Tool | Result |
+|---|---|
+| Fusion gate (`validate()`) | **133 checks pass**, 0 fail, 0 blocked, 0 open; 93 of 93 point probes; **13 items `[TEST]`** |
+| Independent STL verifier | **102 checks pass**, 0 fail, 0 blocked, 0 open; **9 items `[TEST]`**; **exit 0** |
+| Firmware build (`pio run`) | **SUCCESS** — the branch as a whole builds |
+| Firmware test suites (`pio test --without-uploading --without-testing`) | all 7 suites **build**; execution needs the ESP32 attached |
+| Bezel compatibility | unchanged Rev N bezel, clear of carrier, glass, PCB and tips |
+| Assembly STEP | carrier + Perspex + OLED + fasteners + bezel; **no keepout proxy** |
+
+The verifier reads only the exported STL, so its pass is also the evidence that
+the committed export matches the committed generator.

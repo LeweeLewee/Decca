@@ -610,6 +610,11 @@ The brief forbids building CAD until this section demonstrates four things.
 | Print orientation supports the roots, no unsupported critical barb | PASS — §9 |
 | **Glass clearance for the two snap noses** | **NOT DEMONSTRATED — blocks the print, not the CAD, §7** |
 
+> **Historical — this is the Rev P.2 pre-CAD gate.** Both items it left open
+> are now closed: the Rev P.2 prototype passed its retention test, and the
+> Rev P.5 prototype passed the full physical test set including glass
+> clearance. See the build review §29.
+
 **Topology approved for CAD**, with §7 recorded as the one blocking item that
 must be measured before a corrected carrier is printed. The physical retention
 finding from Rev P.1 remains **OPEN** and can only be closed by a real inversion
@@ -1347,6 +1352,12 @@ sequence unchanged.
 ---
 
 ## 18. Rev P.5 pre-CAD gate — self-review verdict
+
+> **CLOSED. The carrier was built, installed and tested, and every physical
+> test passed.** The table below is the pre-CAD gate as it stood before the
+> build. The rows marked BLOCKED or deferred to a physical test are now
+> **closed by the prototype** — see the build review §29. Nothing in the table
+> was changed to reach that state.
 
 | Required demonstration | Result |
 |---|---|
