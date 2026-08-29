@@ -35,6 +35,12 @@ shall be rotated in plane so the four-pin side is at the bottom, and the bottom
 edge of its visible active area shall align with the bottom edge of the measured
 Perspex opening. The original Perspex holes remain fixed physical interfaces.
 
+Amended again 2026-08-29 to replace the remaining two non-sprung locating posts.
+Rev P.5 shall use **four sprung locating-and-retaining posts**, one in every PCB
+mounting hole. No plain post remains. The newly converted pair requires the same
+positive retention proof as the existing pair plus direct bonded-glass clearance,
+combined insertion-force, PCB-bow, root-strength and four-post release evidence.
+
 Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
 ## 1. Reason for redesign
@@ -173,20 +179,26 @@ directly outside the OLED module envelope and carry the original-fastener preloa
 
 ### 5.3 Locating and retaining posts
 
-Use a conservative Rev D / Rev K hybrid as the starting arrangement:
-
-- two plain locating posts at the narrow, glass-sensitive hole pair; and
-- two split sprung locating posts at the wider/header-side hole pair.
+Use four split sprung locating-and-retaining posts, one at each PCB mounting
+hole. Delete both plain-post bodies, plain-post parameters and plain-root-relief
+geometry. Each post shall provide X/Y location and positive forward retention.
 
 Candidate starting geometry from the earlier printed-post development is a
-2.80 mm sprung shaft, 0.70 mm split slot, 3.20 mm initial barb diameter,
-R0.80 root fillet and approximately 1.00 mm root relief where the real glass
-envelope permits. Plain posts may start at 2.70 mm. These values are prototype
-inputs, not automatic acceptance values.
+2.80 mm sprung shaft, 0.70 mm split slot, 3.20 mm initial barb diameter and
+R0.80 root fillet. These are prototype inputs, not automatic acceptance values.
+The two already proven sprung posts may retain their validated local geometry if
+the complete Rev P.5 regeneration confirms it. The newly converted pair may use
+separately named sprung geometry where its measured glass envelope or the new
+6.00 mm carrier depth requires a smaller nose, different split orientation or
+revised root relief. It must remain sprung; do not silently revert it to a plain
+post.
 
-Do not use four sprung posts unless the actual glass-to-hole clearances prove the
-narrow pair safe. Rev K's narrow pair depended on only 0.20 mm assumed glass
-clearance; that dependency shall not be carried forward without measurement.
+Before print release, measure the actual bonded-glass boundary relative to all
+four mounting holes. Every sprung shaft, split, lead-in and retaining nose shall
+remain inside the verified hole keep-out and clear of the bonded glass throughout
+insertion, seating, retention, deliberate release and withdrawal. Rev K's narrow
+pair depended on only 0.20 mm assumed glass clearance; that assumption is not
+evidence for Rev P.5.
 
 Design intent:
 
@@ -197,10 +209,12 @@ Design intent:
 - avoid significant PCB bending or insertion force;
 - keep sprung noses inside verified mounting-hole keep-outs and clear of bonded
   glass throughout insertion, seating and removal;
+- limit the combined force from all four posts so the PCB can seat without bowing
+  and without using the Perspex, glass or rear wall as an insertion reaction;
 - provide axial clearance between each engaged nose and the PCB so the post does
   not clamp the module; and
-- provide an identified, accessible release method after the carrier is removed
-  from the Perspex.
+- provide an identified, accessible release sequence for all four posts after
+  the carrier is removed from the Perspex, with the closed rear wall present.
 
 A full swept insertion/removal corridor check is mandatory before print release.
 
@@ -280,7 +294,8 @@ inside the lighting-unit keep-out.
 
 The removal boundary shall preserve:
 
-- both sprung posts, their full pedestals, datum pads, reliefs and filleted roots;
+- both connector-side sprung posts, their full pedestals, datum pads, reliefs
+  and filleted roots;
 - the local pedestal-to-side-upright connections;
 - both vertical side uprights and both 49.00 mm fixing-boss/load paths;
 - the opposite transverse rail; and
@@ -461,8 +476,8 @@ the holes with the OLED transform.
    PCB datum pads.
 3. Delete the four PCB-edge friction fingers, their tongues, shoulders and
    radial prise holes.
-4. Add plain and sprung locating posts as specified in §5.3, providing positive
-   forward retention after the PCB seats.
+4. Add four sprung locating-and-retaining posts as specified in §5.3, providing
+   positive forward retention at every PCB mounting hole after the PCB seats.
 5. Keep all structural PCB datum geometry behind the PCB front face; permit only
    verified local snap noses to cross that plane inside mounting-hole keep-outs.
 6. Provide a clear path for the OLED glass with no forward PCB seating lands.
@@ -490,6 +505,8 @@ the holes with the OLED transform.
     leaving only the local four-pin/header opening.
 20. Apply all four Rev P.5 packaging corrections in §8.4 as one controlled datum
     update; do not move the original Perspex or its existing fixing holes.
+21. Convert the remaining two plain posts to sprung posts and delete all plain-post
+    geometry and parameters; validate the complete four-post system.
 
 ## 10. Mandatory CAD validation gate
 
@@ -520,8 +537,8 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
   including the former rail and cable-tie region;
 - there is no continuous carrier bridge across the lighting-unit side below or
   outboard of the sprung-post pedestals;
-- both sprung-post pedestals retain their existing datum area, relief depth,
-  root fillets and connection to the side uprights;
+- the two connector-side sprung-post pedestals retain their required datum area,
+  relief depth, root fillets and connection to the side uprights after the rail cut;
 - the remaining U-shaped frame, fixing arms and opposite rail form one closed solid
   with no slivers or tangent-only joins;
 - removal of the end rail does not change the 49.00 mm fixing pitch, OLED Z chain,
@@ -548,6 +565,14 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
 - carrier depth from Perspex seating plane to rear plane is exactly 6.00 mm;
 - shortening the carrier leaves valid sprung-post reliefs, pedestal roots,
   fillets, nut seats and a positive rear-wall-to-PCB/component clearance;
+- all four PCB mounting holes contain sprung locating-and-retaining posts and no
+  plain-post body, parameter, probe or report entry remains;
+- every sprung nose remains inside its measured mounting-hole/glass keep-out and
+  clears bonded glass through insertion, seating, retention, release and removal;
+- individual and combined four-post insertion forces and worst-case strains are
+  reported, remain within the selected material/process limits and do not bow the PCB;
+- all four hooks show positive geometric overlap with deliberate axial clearance,
+  and the documented four-post release sequence is accessible with the rear wall present;
 - the finished four-pin opening measures 14.00 × 4.19 mm and remains centred on
   the transformed connector envelope;
 - two integral light-block walls exist beside the opening, remain inside the
@@ -578,7 +603,7 @@ Before generating the next Fusion model, produce and review a simple side-sectio
 - rear PCB support datum;
 - structural carrier hard stops to Perspex;
 - original-bolt/captive-nut load path;
-- plain and sprung locating posts;
+- all four sprung locating-and-retaining posts;
 - local positive snap overlap on the PCB front face; and
 - the flush-side insertion direction;
 - the integral rear light-shield wall; and
@@ -600,7 +625,7 @@ this order:
 
 1. flush-side rearward insertion of the OLED without glass or component contact;
 2. PCB rear face seats consistently on every fixed datum pad;
-3. sprung posts engage with visible positive overlap and no PCB bow;
+3. all four sprung posts engage with visible positive overlap and no PCB bow;
 4. the loose carrier retains the OLED when inverted in every axis and during a
    gentle handling shake, with no fall-through or fall-away;
 5. the stated release method removes the OLED without damaging posts or PCB;
@@ -645,7 +670,10 @@ this order:
 26. the four-pin side is physically at the bottom and the visible active-area
     bottom edge aligns with the Perspex opening bottom edge; and
 27. both original carrier fixing holes align with the untouched Perspex holes,
-    retaining exactly 49.00 mm horizontal pitch.
+    retaining exactly 49.00 mm horizontal pitch; and
+28. all four sprung posts seat, retain and deliberately release the PCB without
+    bonded-glass contact, excessive insertion force, permanent post set, root
+    cracking or PCB bow; no plain post remains.
 
 CAD and mesh checks may release this prototype print, but they shall not close
 the retention finding. Physical tests 1–5 are mandatory before Rev P can regain
@@ -667,8 +695,8 @@ handling retention to assumed edge friction. Its hard-stop architecture and
 optical chain remain useful; its open rear window is superseded by §8.3.
 
 The approved corrective direction is: **flush-side OLED insertion onto fixed
-rear PCB datum pads; plain and sprung mounting-hole posts providing X/Y location
-and positive loose-carrier retention; a controlled local exception for verified
+rear PCB datum pads; four sprung mounting-hole posts providing X/Y location and
+positive loose-carrier retention; a controlled local exception for verified
 snap noses only; separate carrier-to-Perspex structural hard stops; prepared
 front-side protrusion no more than 1.00 mm; no separate retainer bar; and physical
 retention testing before release. The successful Rev P.2 architecture is now to
@@ -686,4 +714,7 @@ reduce the carrier depth to 6.00 mm, enlarge that finished opening to
 14.00 × 4.19 mm, add two envelope-contained internal side light blocks, rotate
 the complete OLED reference so the connector is at the bottom, and align the
 visible active-area bottom edge with the Perspex opening bottom while leaving
-the original panel holes fixed at exactly 49.00 mm horizontal pitch.**
+the original panel holes fixed at exactly 49.00 mm horizontal pitch. Both
+remaining plain posts are deleted and replaced by sprung locating-and-retaining
+posts, subject to direct four-hole glass-clearance and complete four-post force,
+strain, PCB-bow and release validation.**

@@ -27,3 +27,6 @@ enlarges the finished pin opening by 25% in both axes to 14.00 × 4.19 mm, adds
 two internal side light blocks within the back-plate envelope, places the
 four-pin side at the bottom and aligns the visible active-area bottom edge to
 the Perspex opening bottom without moving the original 49.00 mm-pitch holes.
+The same Rev P.5 amendment converts the two remaining plain locating posts to
+sprung retaining posts, giving four sprung posts subject to measured glass
+clearance, combined-force, PCB-bow and deliberate-release validation.
