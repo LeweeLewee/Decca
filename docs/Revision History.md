@@ -68,6 +68,8 @@ that source control alone does not express well.
 
 | 2026-08-29 | Firmware | Replaced the unreliable four-button electrical model with sole Gram two-state selection: closed = Vinyl, open = Digital Streamer. GPIO16/17/18 released; GPIO23 retained; settings schema v2 no longer persists physical source; nine button tests revised (Specification v0.16, ADR-0011). |
 
+| 2026-08-29 | Firmware | Implemented authenticated local-network ArduinoOTA before enclosure: gitignored credentials, non-blocking reconnect, `decca.local`, PlatformIO `espota`, dual-app partitions, five behavioural tests and safe bootstrap main (Specification v0.17, ADR-0012, FR-ADV-02). Interrupted transfers retain the running image; failed-boot automatic rollback remains Phase 3. |
+
 ## Hardware Revisions
 
 | Rev | Date  | Change                          | Notes |

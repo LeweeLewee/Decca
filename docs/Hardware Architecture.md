@@ -226,9 +226,10 @@ remain **open/proposed** until the driver is selected and bench-tested.
 
 ## Networking (Phase 2)
 
-Wi-Fi is used only in Phase 2 for **WiiM Pro local API** integration (Gram-driven
-Line-In/digital-path switching, volume and metadata/playback state). Digital
-service, station, playlist and track selection remain in the WiiM app. This is the reason ADC1 is mandated
+Wi-Fi is used now for authenticated local-network firmware updates and in Phase
+2 for **WiiM Pro local API** integration. OTA uses the ESP32 standard dual-app
+partition layout and requires no additional hardware. Digital service, station,
+playlist and track selection remain in the WiiM app. This is the reason ADC1 is mandated
 for all analogue inputs. See Firmware Architecture → WiiM interface, ADR-0006,
 ADR-0008 and ADR-0010.
 
