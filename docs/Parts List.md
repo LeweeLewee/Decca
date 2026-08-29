@@ -47,6 +47,6 @@ still-open amplifier model selection.
 
 ## Consumables / Harness
 
-- Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal)
+- Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SDA and Yellow = SCL; H4 Orange must never be connected to 5 V
 - Removable connectors at the controller end (harnesses H1–H5)
 - Heat-shrink, solder, strain-relief materials

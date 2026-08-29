@@ -51,15 +51,20 @@ the low-voltage pot harness by USB during this test.
    - resistance from centre wiper to each outside lug should change smoothly
      and in opposite directions through the full travel.
 2. Viewed from the rear of each installed pot, connect left lug to GND (Brown),
-   centre wiper to its ADC1 pin (White), and right lug to 3.3 V (Red):
+   centre wiper to its ADC1 pin (White), and right lug to 3.3 V (Red). On the
+   30-pin ESP32 DevKit used in this build, the terminal adapter exposes the same
+   printed labels as the board. Use the **printed board label** shown below when
+   locating each ADC terminal:
 
-   | Control | Bench-verified wiper pin |
-   |---------|---------------------------|
-   | Volume  | GPIO32                    |
-   | Bass    | GPIO33                    |
-   | Treble  | GPIO34                    |
-   | Balance | GPIO35                    |
+   | Control | Bench-verified GPIO | Printed board label |
+   |---------|---------------------|---------------------|
+   | Volume  | GPIO32              | **D32**             |
+   | Bass    | GPIO33              | **D33**             |
+   | Treble  | GPIO34              | **D34**             |
+   | Balance | GPIO35              | **D35**             |
 
+   Therefore the four White wiper wires connect to **D32, D33, D34 and D35**
+   respectively. The Red wires go to 3V3 and the Brown wires go to GND.
 3. Set all four controls fully anticlockwise, connect the ESP32 by USB, and run:
 
    ```powershell
@@ -88,12 +93,12 @@ ESP32 in any audio path.
 
 Recorded result (2026-08-24):
 
-| Control | GPIO | Anticlockwise | Approx. centre | Clockwise | Direction |
-|---------|------|---------------|----------------|-----------|-----------|
-| Volume  | 32   | 0             | 2047           | 4095      | Increasing clockwise |
-| Bass    | 33   | 0             | 2047           | 4095      | Increasing clockwise |
-| Treble  | 34   | 0             | 2047           | 4095      | Increasing clockwise |
-| Balance | 35   | 0             | 2047           | 4095      | Increasing clockwise |
+| Control | GPIO | Board label | Anticlockwise | Approx. centre | Clockwise | Direction |
+|---------|------|-------------|---------------|----------------|-----------|-----------|
+| Volume  | 32   | D32         | 0             | 2047           | 4095      | Increasing clockwise |
+| Bass    | 33   | D33         | 0             | 2047           | 4095      | Increasing clockwise |
+| Treble  | 34   | D34         | 0             | 2047           | 4095      | Increasing clockwise |
+| Balance | 35   | D35         | 0             | 2047           | 4095      | Increasing clockwise |
 
 All six `test_pots` cases passed. Midpoint variation is expected because the
 controls have no centre detent. The default 0–4095 calibration is retained with
@@ -160,8 +165,11 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
 2. Connect the purchased Pi Hut SH1106 panel:
    - OLED GND → ESP32 GND (Brown);
    - OLED VCC → ESP32 3V3 (Red), never 5 V for this build;
-   - OLED SDA → GPIO21 (signal conductor labelled SDA);
-   - OLED SCL → GPIO22 (signal conductor labelled SCL).
+   - OLED SDA → GPIO21 / board label D21 (Orange);
+   - OLED SCL → GPIO22 / board label D22 (Yellow).
+
+   H4 is a documented colour-standard exception: its Orange conductor is SDA,
+   not 5 V. Never connect that Orange wire to the 5 V rail.
 3. In the PlatformIO terminal run:
 
    ```powershell
@@ -201,7 +209,7 @@ from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
 for the ESP32.
 
 1. Check the MOSFET stage before applying power:
-   - GPIO25 connects only to the logic-level N-channel MOSFET gate;
+   - GPIO25 / board label D25 connects only to the logic-level N-channel MOSFET gate;
    - the MOSFET source connects to GND;
    - the dial-light negative lead connects to the MOSFET drain;
    - the dial-light positive lead connects to 5 V;
