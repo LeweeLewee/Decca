@@ -11,12 +11,20 @@ retained the OLED and achieved the intended Perspex tolerances. The remaining
 integration failure is a collision between the carrier end rail / cable-tie
 projection below the sprung-post pair as installed and the original Decca
 lighting unit, which cannot be removed. The lighting unit is now a mandatory
-keep-out and Rev P remains open for this bounded clearance correction.
+physical clearance interface and Rev P remains open for this bounded correction.
 
 Amended again 2026-08-29 after confirming that the original Decca front bolts
 use a non-standard thread. The M2 heat-set inserts and replacement M2 screws are
 deleted from the design. The original bolts and their original matching
 six-sided nuts shall be reused at the unchanged 49.00 mm fixing pitch.
+
+Amended again 2026-08-29 after review of Rev P.3. Delete the newly introduced
+synthetic `Lighting_Keepout` / `REF_Lighting_Keepout` CAD component: it is not a
+measured physical part and is not required in the assembly. Preserve the proven
+lighting-unit clearance by keeping the colliding lower end rail deleted. Close
+the rear of the OLED bay with an integral opaque carrier wall to prevent the
+cabinet LEDs washing light around the OLED, leaving only the minimum opening
+required for the four input/header pins and their wiring.
 
 Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
@@ -42,6 +50,14 @@ test also exposed an installation-envelope omission. The transverse carrier
 rail and integral cable-tie projection on the lighting-unit side collide with
 the retained original Decca lighting assembly. The radio-side interface, rather
 than OLED geometry, now governs the next correction.
+
+Rev P.3 then represented the unmeasured lighting-unit clearance as a large new
+reference component. That body is not controlled by physical measurements and
+shall not remain in the Fusion assembly, exports, drawings or verification
+model. The installed fit test remains the authority for lighting-unit clearance.
+The cabinet lighting also creates a credible optical leakage path around the
+rear and edges of the OLED; the carrier itself shall therefore provide the
+light barrier.
 
 ## 2. Corrected Rev P architecture — mandatory topology
 
@@ -114,7 +130,8 @@ specific reason to change it.
 The OLED PCB shall insert from the carrier's flush/Perspex-contact side by a
 controlled rearward translation. The glass enters the central clearance first;
 the PCB rear face then seats on fixed rear datum pads. The carrier shall retain
-open rear access around the header and solder joints after seating.
+clearance around the header and solder joints after seating. Rear access is now
+limited to the local four-pin/header opening specified in §8.3.
 
 ### 5.2 Fixed positive OLED Z datum from behind
 
@@ -227,15 +244,23 @@ Guidance:
 - reinforce the two original-fastener boss regions appropriately;
 - use direct carrier-to-Perspex hard stops outside the OLED module envelope;
 - avoid unnecessary thin membranes around the display window;
-- leave rear access around the header and solder joints;
+- leave the local four-pin/header access and internal component clearance
+  specified in §8.3;
 - maintain cable/header clearance and serviceability;
 - minimise part count and avoid a separate retainer.
 
-### 8.1 Original Decca lighting-unit keep-out
+### 8.1 Original Decca lighting-unit clearance — no keepout component
 
 The original Decca lighting unit is retained and cannot be removed. The carrier
 shall therefore be open on the lighting-unit side below/outboard of the sprung
 locating-post pair as the part is installed in the radio.
+
+Do not create or retain a separate `Lighting_Keepout`,
+`REF_Lighting_Keepout`, `LIGHTING_UNIT_KEEPOUT` or equivalent proxy component,
+body or exported part. Its geometry was asserted rather than measured and would
+misrepresent the physical assembly. Demonstrate this interface through the
+installed physical clearance test, supported by direct measurements if later
+available.
 
 Delete the complete continuous end rail in that region, including the central
 integral cable-tie / strain-relief projection and its slots. Do not merely thin,
@@ -307,6 +332,49 @@ hex envelope. The original load path is: bolt head → Perspex → carrier seati
 face / hard stop → captive original nut → original bolt thread. No part of this
 load path may pass through the OLED glass or PCB.
 
+### 8.3 Integral rear light shield
+
+Close the rear of the OLED module bay with a continuous wall formed integrally
+with the carrier. This wall replaces the current open rear window; it is not a
+separate cover or component. Its purpose is to block direct and reflected light
+from the Decca cabinet LEDs from reaching the rear and edges of the OLED or
+producing a visible glow through the Perspex aperture.
+
+The rear wall shall:
+
+- span the OLED bay and join continuously to the retained carrier frame;
+- use a named `rear_light_shield_t` parameter; for a 0.40 mm nozzle the first
+  prototype shall start at 1.20 mm or three actual extrusion widths, whichever
+  is greater;
+- be printed as solid opaque material, not as exposed sparse infill or a thin
+  translucent membrane;
+- use opaque black material for the prototype and final part unless an
+  alternative is physically shown to block the installed lighting;
+- remain behind and clear of the complete seated PCB/component envelope;
+- not become the OLED Z datum, touch or preload the PCB, or alter the validated
+  rear datum pads and Perspex gap;
+- preserve front-side OLED insertion, positive sprung-post retention and the
+  deliberate service-release path;
+- preserve the open lighting-unit-side rail deletion required by §8.1; and
+- remain one connected printable solid with the carrier.
+
+The rear wall may bridge the side uprights only across the OLED bay itself. It
+shall terminate within that bay and shall not extend into or recreate the
+deleted end-rail/cable-tie region below/outboard of the sprung-post pair.
+
+Provide only one local rear opening: the minimum practical aperture for the
+OLED's four input/header pins and their attached conductors. Size that opening
+from the actual four-pin envelope plus documented print and wiring clearance;
+do not retain a general rear window. Keep the opening close-fitting and local to
+the header so it does not become a direct light path. A short integral hood or
+offset around the pin opening is permitted only if needed after the powered
+light-leak test and only if it clears the connector, wire bend and original
+lighting unit; do not add another printed component.
+
+The closed cavity shall not trap the module permanently. The CAD build review
+must identify how the sprung posts are deliberately released and the OLED is
+withdrawn from the front with the rear wall present.
+
 ## 9. Required corrective CAD changes for open Rev P
 
 1. Replace rear insertion with flush/Perspex-side insertion moving rearwards.
@@ -336,6 +404,10 @@ load path may pass through the OLED glass or PCB.
     original-nut interface specified in §8.2; do not change fixing centres.
 17. Retain the original non-standard-thread bolts and matching nuts as controlled
     physical parts; do not add replacement M2 hardware to the BOM.
+18. Delete the synthetic lighting-unit keepout component/body and remove it from
+    the Fusion assembly, generator, verification model, drawings and exports.
+19. Close the OLED bay with the integral opaque rear wall specified in §8.3,
+    leaving only the local four-pin/header opening.
 
 ## 10. Mandatory CAD validation gate
 
@@ -360,9 +432,10 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
 - OLED can be inserted from the flush side and removed through an identified
   release path without bonded glass sweeping through a rigid barb/post envelope;
 - carrier seats flat against Perspex;
-- a conservative solid keep-out representing the retained Decca lighting unit
-  has zero intersection with the carrier, including the former rail and
-  cable-tie region;
+- no synthetic lighting-unit keepout component or body exists in the Fusion
+  assembly, browser, generator output, STEP assembly or manufacturing pack;
+- installed physical clearance to the retained Decca lighting unit is preserved,
+  including the former rail and cable-tie region;
 - there is no continuous carrier bridge across the lighting-unit side below or
   outboard of the sprung-post pedestals;
 - both sprung-post pedestals retain their existing datum area, relief depth,
@@ -382,6 +455,14 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
   before the carrier hard stops seat against the Perspex;
 - the two nut pockets remain concentric at exactly 49.00 mm pitch and retain a
   continuous structural boss wall;
+- the rear OLED bay is closed by one continuous integral solid wall, with no
+  open rear window or separate rear-cover component;
+- the only rear-wall penetration is the local four-pin/header opening and it is
+  no larger than required by the measured pin, connector and wiring envelope;
+- the rear wall clears every seated PCB component, does not contact the PCB and
+  does not change the fixed datum, snap engagement, release path or optical gap;
+- the selected wall thickness and opaque black print produce no visible light
+  transmission or edge glow under the installed cabinet lighting;
 - screen active area remains centred behind the bezel/aperture;
 - no unprintable thin slivers or unsupported critical features;
 - normal FDM wall thickness is restored in structural areas.
@@ -404,7 +485,9 @@ Before generating the next Fusion model, produce and review a simple side-sectio
 - original-bolt/captive-nut load path;
 - plain and sprung locating posts;
 - local positive snap overlap on the PCB front face; and
-- the flush-side insertion direction.
+- the flush-side insertion direction;
+- the integral rear light-shield wall; and
+- the local four-pin/header opening and wire-exit path.
 
 The CAD build must not proceed unless the section shows positive stops in both
 axial directions: fixed rear datum pads stopping insertion and sprung noses
@@ -443,7 +526,16 @@ this order:
 18. both original non-standard-thread bolts engage freely, do not bottom, and
     clamp the carrier hard stops to the Perspex; and
 19. the captive-nut installation and engaged fasteners remain clear of the
-    original lighting unit throughout offering-up, seating and removal.
+    original lighting unit throughout offering-up, seating and removal;
+20. no synthetic lighting-unit keepout component or proxy body remains in the
+    Fusion design, assembly export or manufacturing pack;
+21. the closed rear wall clears the PCB and four-pin connection, does not alter
+    insertion, retention, release or OLED-to-Perspex gap, and has no unintended
+    rear opening; and
+22. with the OLED powered through black, dim and normal display content and the
+    Decca cabinet LEDs operated through their usable brightness range, no visible
+    rear-light glow, edge leakage or contrast washout appears through the Perspex
+    aperture in representative room lighting.
 
 CAD and mesh checks may release this prototype print, but they shall not close
 the retention finding. Physical tests 1–5 are mandatory before Rev P can regain
@@ -461,8 +553,8 @@ The failed first Rev O implementation is rejected because it recreated the criti
 
 The first Rev P implementation is also rejected for retention because rear
 insertion passed the OLED beyond the only positive shoulder and left forward
-handling retention to assumed edge friction. Its hard-stop architecture,
-optical chain and open rear access remain useful.
+handling retention to assumed edge friction. Its hard-stop architecture and
+optical chain remain useful; its open rear window is superseded by §8.3.
 
 The approved corrective direction is: **flush-side OLED insertion onto fixed
 rear PCB datum pads; plain and sprung mounting-hole posts providing X/Y location
@@ -476,4 +568,7 @@ uprights and the original Decca lighting assembly entirely unobstructed. The M2
 heat-set inserts and replacement screws are also deleted: the carrier shall use
 rear-accessible, anti-rotation pockets for the original 3.80 mm six-sided,
 1.40 mm head-seat-depth, 10.00 mm-long matching nuts and retain the original
-non-standard-thread front bolts at exactly 49.00 mm pitch.**
+non-standard-thread front bolts at exactly 49.00 mm pitch. The synthetic Rev P.3
+lighting keepout component is rejected and shall be removed. The carrier itself
+shall close the rear of the OLED bay as an integral opaque light shield, with
+only the minimum local opening for the four input/header pins and wiring.**
