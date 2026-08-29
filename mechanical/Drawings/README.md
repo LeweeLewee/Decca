@@ -15,3 +15,6 @@ handling retention, and no release until the corrected print passes physical
 retention tests. The 2026-08-29 integration amendment additionally makes the
 original Decca lighting unit a mandatory keep-out and deletes the continuous
 carrier end rail / cable-tie projection below the sprung-post pair as installed.
+The same open Rev P correction now also deletes the M2 heat-set inserts and
+replacement M2 screws: the original non-standard-thread Decca front bolts and
+their matching six-sided captive nuts are reused at the unchanged 49.00 mm pitch.

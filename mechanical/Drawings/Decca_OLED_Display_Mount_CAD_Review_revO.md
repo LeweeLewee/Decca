@@ -13,13 +13,20 @@ projection below the sprung-post pair as installed and the original Decca
 lighting unit, which cannot be removed. The lighting unit is now a mandatory
 keep-out and Rev P remains open for this bounded clearance correction.
 
+Amended again 2026-08-29 after confirming that the original Decca front bolts
+use a non-standard thread. The M2 heat-set inserts and replacement M2 screws are
+deleted from the design. The original bolts and their original matching
+six-sided nuts shall be reused at the unchanged 49.00 mm fixing pitch.
+
 Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
 ## 1. Reason for redesign
 
 Physical print-and-fit iterations of Rev N showed that the front-loaded architecture had become constrained by OLED depth. Rev O changes the topology rather than further tuning the Rev N front plate and retainer arrangement.
 
-The governing design objective is to place the OLED glass close to the inside face of the original Perspex while keeping all M2 screw preload out of the OLED glass and PCB.
+The governing design objective is to place the OLED glass close to the inside
+face of the original Perspex while keeping all front-fastener preload out of the
+OLED glass and PCB.
 
 The subsequent Rev P prototype exposed a second architectural error. Rev P
 inserted the OLED from the rear towards the Perspex, but placed its nominal PCB
@@ -52,7 +59,7 @@ A narrowly controlled exception is permitted only for local sprung-post noses
 inside verified PCB mounting-hole keep-outs. A snap nose may cross the PCB front
 plane only as far as required for positive handling retention and only when its
 clearance to the OLED glass, solder joints, Perspex and full assembly path is
-demonstrated. It shall not establish OLED depth or carry M2 preload.
+demonstrated. It shall not establish OLED depth or carry front-fastener preload.
 
 The loose carrier shall positively constrain the PCB in both axial directions:
 
@@ -68,7 +75,8 @@ away from the loose carrier during handling.
 
 The carrier/Perspex assembly therefore performs two independent functions:
 
-1. **Structural load path:** M2 screw → carrier structural bosses / hard stops → Perspex.
+1. **Structural load path:** original Decca bolt and matching nut → carrier
+   structural bosses / hard stops → Perspex.
 2. **OLED location and capture:** fixed rear PCB datum pads establish depth;
    locating posts establish X/Y; sprung post noses retain the loose module;
    Perspex provides redundant forward containment after assembly.
@@ -81,10 +89,13 @@ Use the measured and print-confirmed dimensions already recorded in the reposito
 
 - Original Perspex thickness: 3.00 mm.
 - Existing aperture: **35.20 mm W × 15.30 mm H**.
-- Existing M2 fixing-hole pitch: **49.00 mm horizontal**.
+- Existing fixing-hole pitch: **49.00 mm horizontal**.
 - Fixing-hole centreline: vertically centred on the display aperture.
 - No additional holes, cutting or irreversible modification to the original Perspex.
-- M2 screws enter from the front of the Perspex and fasten into the rear carrier.
+- The original Decca bolts enter from the front of the Perspex and fasten into
+  their original matching nuts captured by the rear carrier.
+- The original bolt thread is non-standard. Do not substitute M2 screws, M2
+  heat-set inserts or any inferred standard thread.
 
 If any later physical measurement contradicts these values, the physical measurement wins and the parameter is updated explicitly.
 
@@ -92,7 +103,9 @@ If any later physical measurement contradicts these values, the physical measure
 
 The front bezel remains a separate cosmetic trim around the aperture only.
 
-It must not include the M2 fixing holes and must not carry structural load. Retain the validated Rev N bezel unless physical testing identifies a specific reason to change it.
+It must not include the original fixing holes and must not carry structural
+load. Retain the validated Rev N bezel unless physical testing identifies a
+specific reason to change it.
 
 ## 5. OLED loading, datum and retention
 
@@ -127,7 +140,8 @@ rear PCB support lands / datum
 rear carrier
 ```
 
-Separate carrier structural bosses / hard stops shall contact the Perspex directly outside the OLED module envelope and carry the M2 preload.
+Separate carrier structural bosses / hard stops shall contact the Perspex
+directly outside the OLED module envelope and carry the original-fastener preload.
 
 ### 5.3 Locating and retaining posts
 
@@ -179,8 +193,8 @@ Select the final nominal from measured OLED geometry and realistic FDM tolerance
 
 Critical requirements:
 
-- the OLED glass must not become the structural stop when the M2 screws are tightened;
-- tightening the M2 screws must not alter OLED depth;
+- the OLED glass must not become the structural stop when the original bolts are tightened;
+- tightening the original bolts must not alter OLED depth;
 - there shall be no carrier material between the OLED PCB front face and Perspex used to establish this gap.
 
 ## 7. Solder-tip constraint — resolved by module preparation
@@ -210,7 +224,7 @@ Rev O should restore sensible FDM section thicknesses behind and around the OLED
 Guidance:
 
 - approximately 2.0–3.0 mm structural wall thickness where geometry allows;
-- reinforce M2 boss regions appropriately;
+- reinforce the two original-fastener boss regions appropriately;
 - use direct carrier-to-Perspex hard stops outside the OLED module envelope;
 - avoid unnecessary thin membranes around the display window;
 - leave rear access around the header and solder joints;
@@ -232,7 +246,7 @@ The removal boundary shall preserve:
 
 - both sprung posts, their full pedestals, datum pads, reliefs and filleted roots;
 - the local pedestal-to-side-upright connections;
-- both vertical side uprights and both 49.00 mm M2 boss/load paths;
+- both vertical side uprights and both 49.00 mm fixing-boss/load paths;
 - the opposite transverse rail; and
 - the OLED insertion, removal and wiring corridors.
 
@@ -241,6 +255,51 @@ the retained pedestal roots. Do not leave thin remnants, sharp internal corners
 or tangent-only connections. The lighting keep-out takes precedence over an
 integral cable-tie feature; any replacement strain relief must be placed outside
 the keep-out and must have separately demonstrated radio-side clearance.
+
+### 8.2 Original Decca bolt and captive-nut interface
+
+Reuse the two original Decca front bolts and their two original matching nuts.
+Their thread is non-standard and is controlled by the physical original parts,
+not by an M2 or other catalogue-thread assumption. Delete the M2 heat-set insert
+bores, insert chamfers, insert backing dimensions and replacement M2 screws from
+the carrier and manufacturing pack.
+
+The measured nut envelope is:
+
+- six-sided head/profile;
+- **3.80 mm measured width**;
+- **1.40 mm axial head-seat / countersink depth**; and
+- **10.00 mm total nut length**.
+
+For the first corrected CAD model, interpret the reported 3.80 mm width as the
+distance across opposite flat faces. Expose that interpretation explicitly as a
+named parameter and drawing note; do not derive it from an assumed standard nut.
+Before release, verify the physical part across flats and across corners. If the
+3.80 mm measurement proves to be across corners instead, update the single named
+parameter and regenerate the pocket before printing.
+
+Provide a rear-accessible, regular-hex anti-rotation pocket and an axial seating
+shoulder for each original nut. The 1.40 mm head-seat depth shall be positively
+defined; it shall not depend on the nut crushing into printed material. Provide
+a continuous clearance envelope for the full 10.00 mm nut length and the engaged
+bolt, including insertion and removal. The nut may not bottom before the carrier
+seats against the Perspex, be pulled through the boss under tightening, rotate
+in its pocket, contact the OLED/PCB/wiring, or enter the original lighting-unit
+keep-out.
+
+Use separate named parameters for the measured nut width, pocket fit allowance,
+head-seat depth and total nut length. Pocket clearance is a print-process fit
+allowance, not permission to alter the 3.80 mm physical-part measurement. Where
+that fit has not already been demonstrated on the selected printer/material,
+release a small hex-pocket fit coupon before the full carrier and record the
+selected allowance.
+
+The carrier-to-Perspex hard-stop face remains the structural datum. The nut
+pocket shall be concentric with each existing fixing centre, preserve the exact
+49.00 mm centre pitch and leave a continuous, measurable boss wall around the
+hex envelope. The original load path is: bolt head → Perspex → carrier seating
+face / hard stop → captive original nut → original bolt thread. No part of this
+load path may pass through the OLED glass or PCB.
 
 ## 9. Required corrective CAD changes for open Rev P
 
@@ -254,10 +313,11 @@ the keep-out and must have separately demonstrated radio-side clearance.
 5. Keep all structural PCB datum geometry behind the PCB front face; permit only
    verified local snap noses to cross that plane inside mounting-hole keep-outs.
 6. Provide a clear path for the OLED glass with no forward PCB seating lands.
-7. Retain separate positive carrier-to-Perspex hard-stop geometry to carry M2 preload.
+7. Retain separate positive carrier-to-Perspex hard-stop geometry to carry the
+   original-fastener preload.
 8. Delete the separate retainer bar.
 9. Model display-side protrusions at 1.00 mm maximum after preparation.
-10. Use the measured 49.00 mm M2 pitch and 35.20 × 15.30 mm aperture.
+10. Use the measured 49.00 mm fixing pitch and 35.20 × 15.30 mm aperture.
 11. Retain the existing bezel unless new test evidence requires a change.
 12. Preserve active-area centring relative to the original Decca aperture.
 13. Keep the design fully parametric in Fusion 360.
@@ -266,6 +326,10 @@ the keep-out and must have separately demonstrated radio-side clearance.
     uprights as one connected solid.
 15. Keep Rev P open until the modified carrier has passed both the retained OLED
     checks and an installed clearance test against the non-removable lighting unit.
+16. Delete both M2 heat-set insert interfaces and replace them with the captive
+    original-nut interface specified in §8.2; do not change fixing centres.
+17. Retain the original non-standard-thread bolts and matching nuts as controlled
+    physical parts; do not add replacement M2 hardware to the BOM.
 
 ## 10. Mandatory CAD validation gate
 
@@ -281,7 +345,8 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
 - carrier × header and prepared 1.00 mm solder joints: clear;
 - prepared solder joints × Perspex: at least 0.10 mm clear;
 - OLED glass × Perspex: 0.15–0.30 mm nominal gap;
-- M2 load path terminates through carrier hard stops into Perspex, not OLED glass or PCB;
+- original-fastener load path terminates through carrier hard stops into
+  Perspex, not OLED glass or PCB;
 - snap features locate and positively retain the PCB without excessive strain,
   bending or axial preload;
 - rearward PCB translation stops on fixed datums and forward PCB translation is
@@ -296,11 +361,19 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
   outboard of the sprung-post pedestals;
 - both sprung-post pedestals retain their existing datum area, relief depth,
   root fillets and connection to the side uprights;
-- the remaining U-shaped frame, M2 arms and opposite rail form one closed solid
+- the remaining U-shaped frame, fixing arms and opposite rail form one closed solid
   with no slivers or tangent-only joins;
-- removal of the end rail does not change the 49.00 mm M2 pitch, OLED Z chain,
+- removal of the end rail does not change the 49.00 mm fixing pitch, OLED Z chain,
   post positions, snap overlap, PCB datum contact or Perspex seating plane;
-- the remaining seating faces resist rocking when the two M2 screws are snug;
+- the remaining seating faces resist rocking when the two original bolts are snug;
+- each original nut fits its six-sided pocket with positive anti-rotation and a
+  defined axial seat, and can be installed and removed from the rear;
+- the full 10.00 mm nut and engaged original bolt clear the OLED, PCB, wiring,
+  Perspex optical aperture and retained lighting-unit keep-out;
+- neither original bolt bottoms in its nut nor pulls the nut through the carrier
+  before the carrier hard stops seat against the Perspex;
+- the two nut pockets remain concentric at exactly 49.00 mm pitch and retain a
+  continuous structural boss wall;
 - screen active area remains centred behind the bezel/aperture;
 - no unprintable thin slivers or unsupported critical features;
 - normal FDM wall thickness is restored in structural areas.
@@ -320,7 +393,7 @@ Before generating the next Fusion model, produce and review a simple side-sectio
 - PCB;
 - rear PCB support datum;
 - structural carrier hard stops to Perspex;
-- M2 load path;
+- original-bolt/captive-nut load path;
 - plain and sprung locating posts;
 - local positive snap overlap on the PCB front face; and
 - the flush-side insertion direction.
@@ -346,16 +419,22 @@ this order:
 7. actual OLED-to-Perspex gap;
 8. active-area centring when powered;
 9. bezel alignment;
-10. M2 tightening does not change OLED depth or stress the module;
+10. tightening the original Decca bolts does not change OLED depth or stress the module;
 11. prepared solder joints and header clear the Perspex and carrier;
 12. no rattle when assembled; and
 13. no separate retainer is required;
 14. the carrier clears the original lighting unit throughout offering-up,
     seating and removal, with the lighting unit left in place;
 15. the open-ended carrier shows no perceptible lateral rack or twist when
-    handled and when the two M2 screws are snug; and
+    handled and when the two original bolts are snug; and
 16. the OLED retention, removal, gap and centring results remain unchanged after
-    removal of the end rail.
+    removal of the end rail;
+17. both original nuts seat fully in their hex pockets without rotation, cracking
+    or excessive insertion force;
+18. both original non-standard-thread bolts engage freely, do not bottom, and
+    clamp the carrier hard stops to the Perspex; and
+19. the captive-nut installation and engaged fasteners remain clear of the
+    original lighting unit throughout offering-up, seating and removal.
 
 CAD and mesh checks may release this prototype print, but they shall not close
 the retention finding. Physical tests 1–5 are mandatory before Rev P can regain
@@ -373,7 +452,7 @@ The failed first Rev O implementation is rejected because it recreated the criti
 
 The first Rev P implementation is also rejected for retention because rear
 insertion passed the OLED beyond the only positive shoulder and left forward
-handling retention to assumed edge friction. Its M2 hard-stop architecture,
+handling retention to assumed edge friction. Its hard-stop architecture,
 optical chain and open rear access remain useful.
 
 The approved corrective direction is: **flush-side OLED insertion onto fixed
@@ -384,4 +463,8 @@ front-side protrusion no more than 1.00 mm; no separate retainer bar; and physic
 retention testing before release. The successful Rev P.2 architecture is now to
 be retained while the complete lighting-unit-side end rail and integral cable-tie
 projection are removed, leaving the post pedestals connected locally to the side
-uprights and the original Decca lighting assembly entirely unobstructed.**
+uprights and the original Decca lighting assembly entirely unobstructed. The M2
+heat-set inserts and replacement screws are also deleted: the carrier shall use
+rear-accessible, anti-rotation pockets for the original 3.80 mm six-sided,
+1.40 mm head-seat-depth, 10.00 mm-long matching nuts and retain the original
+non-standard-thread front bolts at exactly 49.00 mm pitch.**
