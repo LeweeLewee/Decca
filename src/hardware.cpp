@@ -1,8 +1,7 @@
 /**
  * @file    hardware.cpp
- * @brief   Implementation of the board-level abstraction (see hardware.h).
+ * @brief   Board-level initialisation.
  */
-
 #include "hardware.h"
 
 #include <Arduino.h>
@@ -23,14 +22,10 @@ void init() {
     analogSetPinAttenuation(kPotBalance, ADC_11db);
 
     pinMode(kSwitchOnOff, INPUT_PULLUP);
-    pinMode(kButtonVhf, INPUT_PULLUP);
-    pinMode(kButtonMw, INPUT_PULLUP);
-    pinMode(kButtonLw, INPUT_PULLUP);
     pinMode(kButtonGram, INPUT_PULLUP);
 
     Wire.begin(kDisplaySda, kDisplayScl);
 
-    // Establish the required safe boot state before lighting::init() owns fades.
     ledcSetup(kDialLightingPwmChannel,
               kDialLightingPwmFrequencyHz,
               kDialLightingPwmResolutionBits);

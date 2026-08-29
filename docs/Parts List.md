@@ -17,7 +17,7 @@ validation remains.
 | ABW1 10K linear potentiometers | 4 | **INSTALLED / VERIFIED** | AB Elektronik / TT Electronics ABW1 10K, CPC order code RE04644. Position sensors for Balance, Treble, Bass and Volume; not in the audio path. | CPC |
 | OLED display | 1 | **INSTALLED / VERIFIED** | Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V. | The Pi Hut |
 | DAOKAI MOSFET driver modules | Pack of 10; 1 required | **ORDERED — DELIVERY / BENCH CHECK** | ASIN B09YYH2BTF. Seller describes a 3.3 V / 5 V PWM MOSFET driver module with cable. Use one as the selected H5 candidate only after confirming clean GPIO25 PWM switching and acceptable temperature at the measured lamp current. | Amazon / DAOKAI |
-| ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **DELIVERED — FIT / 5 V CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Use three identical lamps in parallel only after confirming the approximately 24 mm holder fit and acceptable brightness/current from 5 V. | Amazon / ShuoHui |
+| ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **DELIVERED — 5 V FUNCTION VERIFIED / FIT CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Bench-confirmed functional from the locked 5 V rail on 2026-08-29. Use three identical lamps in parallel; physical holder fit, final brightness and total bank current still require commissioning confirmation. | Amazon / ShuoHui |
 | 5 V regulated control supply | 1 | **ACQUIRED — PLUG / POLARITY CHECK** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Confirm the actual DC plug dimensions and centre polarity with a multimeter before connection. | Existing stock |
 | TopHomer panel-mount DC input sockets | Pack of 5; 1 required | **PURCHASED — DELIVERY / FIT / POLARITY CHECK** | ASIN B08HGXYS4J; female two-terminal threaded-nut sockets, 5.5 mm OD × 2.1 mm ID, rated 3 A. Use one only after confirming the actual Phihong plug fit and centre-positive polarity before drilling or wiring. | Amazon / TopHomer |
 | Low-voltage inline fuse holder | 1 | **OPEN — BUY** | Installed in the +5 V conductor immediately after the panel socket and before distribution. | _TBD_ |
@@ -32,7 +32,7 @@ validation remains.
 |-------------------------|-------------------------------------------------------------|
 | Original on/off switch  | Retained with original solder joints and cable. Low-voltage logic input only (Red/Green). Not switching mains. |
 | Original selector PCB   | **Retained** as mechanical carrier for the interlocked selector (ADR-0001). Not disposable. |
-| Original source buttons | VHF, MW, LW, Gram wired as inputs; **SW deferred / no function** (ADR-0004). |
+| Original source buttons | Original mechanism retained. Only Gram is wired: closed = Vinyl, open = Digital Streamer. VHF/SW/MW/LW are mechanically retained but electrically unused; replacement panel deferred (ADR-0011). |
 | Original Stereo/Mono control | Retained mechanically, **unwired**, decorative in Phase 1 (ADR-0005). |
 | Original Decca knobs    | Retained via mechanical adaptor strategy (see `mechanical/Knob Adaptors/`). |
 
@@ -40,7 +40,7 @@ validation remains.
 
 | Item | Qty | Decision / procurement status | Notes | Source |
 |------|-----|-------------------------------|-------|--------|
-| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 local-API integration for source selection, volume and metadata. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
+| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 switches Line-In for Gram/Vinyl and restores the digital path when Gram is released; phone controls digital content. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
 | Fosi Audio ZA3 | 1 | **LOCKED — NOT ACQUIRED** | Selected stereo power amplifier. WiiM Pro line output feeds the ZA3; its gain/volume becomes a commissioning ceiling and its operating state is controlled by the 12 V trigger. New-unit price watch threshold: £129 or below. | _Price watch active_ |
 | B&W DM601 S3 speakers | 2 | **PRIMARY TARGET — NOT ACQUIRED / FIT VERIFY** | Primary used-speaker target, not yet a locked purchase. Approx. 365 H × 204 W × 228 D mm; verify the actual pair including terminals against the hard per-bay limit of 400 H × 270 W × 245 D mm. Front-ported. Target ≤£150, exceptional ≤£130; reject damaged/dented tweeters. | _Used-speaker watch active_ |
 | ZA3 12 V trigger driver and source | 1 | **OPEN — DESIGN / SELECT** | ESP32-controlled transistor/MOSFET or isolated interface plus suitable 12 V source. Exact circuit and GPIO require selection and bench verification. | _TBD_ |

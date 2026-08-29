@@ -104,55 +104,41 @@ All six `test_pots` cases passed. Midpoint variation is expected because the
 controls have no centre detent. The default 0–4095 calibration is retained with
 no inversion.
 
-### 7.2 Source-button bench verification
+### 7.2 Gram two-state source verification
 
-The proposed H3 inputs are active-low and use the ESP32's internal pull-ups.
-Keep the Decca disconnected from mains and power only the ESP32 by USB.
+Only the verified right-hand Gram Green/Yellow pair is used. Keep the Decca
+disconnected from mains and power only the ESP32 by USB.
 
-| Physical order | Button | Contact pair | Test termination | Status |
-|----------------|--------|--------------|------------------|--------|
-| Leftmost / top | VHF    | Yellow + Green (left-hand pair) | Yellow → GPIO16 / RX2; Green → GND | Passed |
-| —              | SW     | No unique isolated pair | Leave disconnected | Deferred |
-| Second working pair | MW | Purple + Blue | Purple → GPIO17 / TX2; Blue → GND | Passed |
-| Third working pair | LW | Yellow + Orange | Yellow → GPIO18 / D18; Orange → GND | Repair and retest |
-| Rightmost / bottom | Gram | Green + Yellow (right-hand pair) | Green → GPIO23 / D23; Yellow → GND | Passed |
-
-1. Identify the four pairs by their physical left-to-right order. Distinguish
-   the left-hand and right-hand Green/Yellow pairs before connecting either.
-2. Test only one pair at a time. Connect one conductor to its proposed GPIO and
-   the other conductor from the same pair to GND as shown. Each pair has its own
-   return; H3 has no common-return wire. Do not connect any contact to 3.3 V or
-   5 V. Because these are dry contacts, swapping the two conductors within one
-   pair does not affect the result.
-3. Connect the ESP32 by USB and run:
+1. Connect one conductor of the right-hand Gram pair to GPIO23 / board label
+   D23 and the other to GND. Current termination is Green → GPIO23 and
+   Yellow → GND; the dry-contact pair may be swapped.
+2. Leave VHF, SW, MW and LW conductors disconnected and individually insulated.
+   Do not connect them to GPIO16, GPIO17 or GPIO18.
+3. Run:
 
    ```powershell
    pio test -e esp32dev -f test_buttons
    ```
 
-4. Record the line beginning `BUTTON_SNAPSHOT`. A selected source is shown as
-   `1`; an open contact is shown as `0`.
-5. Repeat with the proposed VHF, MW, LW and Gram pairs in turn, disconnecting
-   the previous pair before connecting the next. Ignore `onoff` unless the H2
-   harness is also connected.
+4. With Gram latched, expect:
+
+   ```text
+   BUTTON_SNAPSHOT pressed onoff=<0-or-1> gram=1 source=vinyl
+   ```
+
+5. Press any other fascia source button to release Gram and rerun. Expect
+   `gram=0 source=digital`.
 
 Pass criteria:
 
-- each selection sets only its matching named value to `1`;
-- changing selection returns the previous contact to `0`;
+- Gram closed reports Vinyl;
+- Gram open reports Digital Streamer;
 - all nine behavioural tests pass;
-- SW remains unwired and has no reported input.
+- VHF, SW, MW and LW have no individual reported input.
 
-If a pair responds to a different physical button, stop and amend the pair
-assignment from the observed result rather than moving GPIO definitions.
-
-Recorded result (2026-08-24): VHF, MW and Gram passed their individual pair
-tests. The LW pair was identified as Yellow + Orange but failed because its wire
-joint requires resoldering. Repair that joint and repeat the LW test only.
-
-On the pictured ESP32 board, GPIO16 and GPIO17 are printed as RX2 and TX2;
-GPIO18 and GPIO23 are printed as D18 and D23. GPIO16, GPIO17 and GPIO23 are
-bench-verified. Keep GPIO18 proposed until the repaired LW pair passes.
+The former LW solder repair is no longer required. If the Gram contact itself
+later becomes unreliable, the deferred fallback is a purpose-built replacement
+button panel.
 
 ### 7.3 OLED bench verification
 

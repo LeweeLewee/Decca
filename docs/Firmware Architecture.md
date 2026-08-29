@@ -24,7 +24,7 @@ AI-assisted editing.
 |------------|--------------------------------------------------|-----------------------|
 | `hardware` | Pin map and board-level init                     | —                     |
 | `settings` | Persisted config + shared runtime state (NVS)    | —                     |
-| `buttons`  | Debounced on/off switch + source buttons (VHF, MW, LW, Gram) | `hardware`  |
+| `buttons`  | Debounced on/off switch + sole Gram two-state selector | `hardware`  |
 | `pots`     | Filtered ADC1 reads of the four position pots (Balance, Treble, Bass, Volume) | `hardware` |
 | `display`  | OLED rendering behind the dial glass              | `hardware`, `settings`|
 | `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|
@@ -36,11 +36,10 @@ AI-assisted editing.
 
 ### Module notes (confirmed Phase 1 build)
 
-- **`buttons`** reads the retained on/off switch (low-voltage input, internal
-  pull-up) and the four working active-low source buttons with a 25 ms software
-  debounce. It exposes stable state for latching controls and queues one event
-  per confirmed press without hold repeats. **SW has no function in Phase 1**
-  (no unique contact; ADR-0004). No transport controls exist in Phase 1.
+- **`buttons`** reads the retained on/off switch and sole active-low Gram contact
+  with 25 ms software debounce. It exposes the stable Gram-derived source mode:
+  closed = Vinyl; open = Digital Streamer. Press events do not repeat while held.
+  VHF, SW, MW and LW are not GPIO inputs (ADR-0011).
 - **`pots`** treats the four pots as **position sensors only** (not in the audio
   path). It applies calibration, smoothing, deadband, and optional inversion, and
   emits values suitable for stable display updates (FR-POT-01..05). Sampling is
@@ -100,8 +99,9 @@ Modules add a small number of typed accessors (e.g. `buttons::nextEvent()`,
 
 - **Phase 1 (Local control):** `hardware`, `settings`, `buttons`, `pots`,
   `display`, `lighting`.
-- **Phase 2 (WiiM):** add the WiiM interface module (network layer) and route
-  source/volume/metadata through `settings`.
+- **Phase 2 (WiiM):** add the WiiM interface module; Gram selects Line-In,
+  released Gram restores digital playback, and the phone controls digital
+  content. Volume and metadata route through `settings`.
 - **Phase 3 (Advanced):** configuration menus (`display` + `settings`), OTA
   update channel, richer UI, additional legacy controls.
 

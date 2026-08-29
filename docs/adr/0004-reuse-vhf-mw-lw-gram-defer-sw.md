@@ -1,7 +1,7 @@
 # ADR-0004: Reuse VHF, MW, LW and Gram; defer SW
 
 ## Status
-Accepted
+Superseded by ADR-0011 on 2026-08-29
 
 ## Context
 The fascia selector order is VHF, SW, MW, LW, Gram. Bench investigation of the
@@ -26,3 +26,6 @@ Current intended mapping direction (Phase 2, not binding):
 - Documentation must not claim all five buttons work, nor that SW has a Phase 1
   function.
 - Revisiting SW later would require a hardware change and a new ADR.
+
+> Historical record only. The four-input decision was superseded after the old
+> PCB proved unreliable for repeated soldering and connection.

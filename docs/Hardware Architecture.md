@@ -26,9 +26,9 @@ audio signal path is separate from the controller.
        ADC1 (H1) │       │ H2    │ H3     │ H4    │ H5 (PWM)
         4× 10k   │       │ on/off│ source │ I²C   │ MOSFET gate
      ┌───────────┴──┐ ┌──┴───┐ ┌─┴─────┐ ┌┴─────┐ ┌┴──────────┐
-     │ Balance/Treble│ │orig. │ │VHF MW │ │ OLED │ │ 3× 5V     │
-     │ Bass/Volume   │ │switch│ │LW Gram│ │128x64│ │ E10 LEDs  │
-     │ (position)    │ │Red/Grn│ │(SW n/f)│ │ SH1106│ │ (N-ch FET)│
+     │ Balance/Treble│ │orig. │ │ Gram  │ │ OLED │ │ 3× 5V     │
+     │ Bass/Volume   │ │switch│ │contact│ │128x64│ │ E10 LEDs  │
+     │ (position)    │ │Red/Grn│ │2-state│ │ SH1106│ │ (N-ch FET)│
      └───────────────┘ └──────┘ └───────┘ └──────┘ └───────────┘
 
                   local network control / metadata
@@ -178,15 +178,16 @@ firmware inversion after bench testing. Its logical state drives the locked
 system-power sequence documented above.
 
 ### Source button bank (H3)
-Original interlocked selector on its **original PCB**, which is retained as the
-**mechanical carrier** for the mechanism (ADR-0001). Four working contact pairs
-(VHF, MW, LW, Gram) are read as low-voltage digital inputs with internal pull-ups
-and software debounce. **SW has no unique contact and is deferred (no function in
-Phase 1).** Inputs are VHF GPIO16 / board label RX2, MW GPIO17 / board label TX2,
-LW GPIO18 / board label D18 and Gram GPIO23 / board label D23; all avoid strapping
-pins. GPIO16, GPIO17 and GPIO23 are bench-verified. GPIO18 remains proposed
-pending repair and retest of the LW Yellow/Orange contact pair. The Stereo/Mono
-control is retained but **unwired** (ADR-0005).
+The original selector PCB and interlocked mechanism are retained as the
+mechanical carrier (ADR-0001), but unreliable soldering/contact behaviour makes
+multi-button electrical reuse unsuitable.
+
+Only the verified right-hand Gram Green/Yellow dry-contact pair is connected to
+GPIO23 / D23 with the internal pull-up and software debounce. Closed Gram selects
+Vinyl; open Gram selects Digital Streamer. VHF, SW, MW and LW are mechanically
+retained but unwired at the ESP32; pressing them may release Gram through the
+interlock. GPIO16, GPIO17 and GPIO18 are released. A new button panel is a
+deferred fallback (ADR-0011). Stereo/Mono remains unwired (ADR-0005).
 
 ## Outputs
 
@@ -198,9 +199,10 @@ suite and a visual layout inspection.
 
 ### Dial lighting (H5)
 The purchased lamp set is **ShuoHui ASIN B0CFTLZFGT**: ten E10 miniature
-screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. Physical fit,
-brightness and current at the locked 5 V rail remain bench checks, so the lamps
-are acquired candidates rather than approved installed parts.
+screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. The lamps were
+bench-confirmed functional at **5 V** on 2026-08-29, validating compatibility with
+the locked 5 V lighting rail. Physical holder fit, final brightness and total
+three-lamp current remain commissioning checks.
 
 The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
 module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
@@ -224,8 +226,9 @@ remain **open/proposed** until the driver is selected and bench-tested.
 
 ## Networking (Phase 2)
 
-Wi-Fi is used only in Phase 2 for **WiiM Pro local API** integration (source
-selection, volume, metadata/playback state). This is the reason ADC1 is mandated
+Wi-Fi is used only in Phase 2 for **WiiM Pro local API** integration (Gram-driven
+Line-In/digital-path switching, volume and metadata/playback state). Digital
+service, station, playlist and track selection remain in the WiiM app. This is the reason ADC1 is mandated
 for all analogue inputs. See Firmware Architecture → WiiM interface, ADR-0006,
 ADR-0008 and ADR-0010.
 

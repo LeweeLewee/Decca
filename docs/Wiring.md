@@ -6,9 +6,9 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` matches the status recorded below:
-the four pot inputs, the VHF, MW and Gram source inputs, and OLED I²C GPIO21/22
-are bench-verified; LW and all other assigned pins remain proposed.
+(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole Gram
+source input and OLED I²C GPIO21/22 are bench-verified; all other assigned pins
+remain proposed.
 
 ## Wiring Colour Standard
 
@@ -31,9 +31,9 @@ uses **Orange for SDA** and **Yellow for SCL**. These are signal conductors in H
 the Orange SDA wire must **never** be connected to the 5 V rail. H4 retains Red
 for 3.3 V and Brown for GND. See the OLED section.
 
-H3 uses separate two-wire contact pairs; it has no common-return conductor.
-The pairs are recorded in physical left-to-right order under H3. VHF, MW and
-Gram are bench-verified; LW awaits repair and retest.
+H3 now uses only the verified right-hand Gram dry-contact pair. It has its own
+return and no common-return conductor. All other selector conductors are left
+disconnected and individually insulated at the controller end.
 
 ## Harnesses
 
@@ -62,19 +62,16 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
 | On/off switch (Red)   | GPIO19 (proposed) | D19 | Digital in  | H2      | Internal pull-up; low-voltage logic only |
-| Source: VHF           | GPIO16 (bench-verified) | RX2 | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: MW            | GPIO17 (bench-verified) | TX2 | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: LW            | GPIO18 (proposed) | D18 | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: Gram          | GPIO23 (bench-verified) | D23 | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: SW            | —               | — | —           | H3      | **NO FUNCTION in Phase 1** (see below)   |
+| Source selector: Gram | GPIO23 (bench-verified) | D23 | Digital in | H3 | Closed = Vinyl; open = Digital Streamer |
+| VHF / SW / MW / LW    | — | — | Unwired | H3 | Mechanical only; may release Gram |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (proposed) | D25 | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
-> The four source-button GPIOs avoid strapping pins and support internal
-> pull-ups. GPIO16, GPIO17 and GPIO23 are bench-verified. GPIO18 remains
-> proposed until the repaired LW pair passes the H3 verification procedure.
+> GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
+> is bench-verified. GPIO16, GPIO17 and GPIO18 are released for future use and
+> must not be connected to the unreliable selector contacts.
 
 ## H1 — Potentiometers
 
@@ -142,57 +139,37 @@ joints and original cable**. It is a simple open/close switch.
 
 ## H3 — Radio/Source Button Bank
 
-The **original PCB is retained** because it is the mechanical carrier for the
-interlocked selector mechanism. It is **not** disposable and must not be removed.
-See ADR-0001.
+The original PCB and interlocked selector mechanism are retained mechanically
+(ADR-0001). Repeated soldering and contact tests showed that multi-button
+electrical reuse is not reliable. ADR-0011 therefore supersedes ADR-0004.
 
-Fascia order (top to bottom): **VHF, SW, MW, LW, Gram.**
+Only the already verified **right-hand Gram Green/Yellow dry-contact pair** is
+connected:
 
-Confirmed wiring findings:
+| Gram pair | ESP32 termination | Status |
+|-----------|-------------------|--------|
+| Green | GPIO23 / board label D23 | Bench-verified input |
+| Yellow | GND | Bench-verified return |
 
-- Usable contact pairs were found and wired for **VHF, MW, LW, Gram**.
-- A **unique SW-only** contact pair could **not** be found; the pair that closed
-  for SW also switched with Gram.
-- Therefore **SW is intentionally NO FUNCTION in the first pass**. No microswitch
-  workaround is added in the current design.
+The two conductors may be swapped because this is an isolated dry contact.
+GPIO23 uses the ESP32 internal pull-up and 25 ms software debounce. Do not connect
+either conductor to 3.3 V or 5 V.
 
-Phase 1 behaviour:
+Authoritative source logic:
 
-| Button | Phase 1 state              |
-|--------|----------------------------|
-| VHF    | Selectable input state     |
-| MW     | Selectable input state     |
-| LW     | Selectable input state     |
-| Gram   | Selectable input state     |
-| SW     | No function / deferred     |
+| Debounced Gram state | Logical source | Phase 2 WiiM action |
+|----------------------|----------------|----------------------|
+| Closed / latched | Vinyl | Select Line-In |
+| Open / released | Digital Streamer | Restore phone-controlled digital playback |
 
-The four working inputs are treated as simple low-voltage GPIO signals with
-software debounce. Final Phase 2 WiiM source mappings remain configurable in
-software (see Specification and ADR-0004).
+Pressing VHF, SW, MW or LW may mechanically release Gram through the retained
+interlock, but those four positions have no individual ESP32 input or software
+mapping. Their former conductors are disconnected and individually insulated at
+the controller end. GPIO16, GPIO17 and GPIO18 are no longer assigned.
 
-Controller termination, derived from physical pair order and tested one pair at
-a time on 2026-08-24:
-
-| Physical order | Button | Contact pair | ESP32 input | Board label | Individual return | Status |
-|----------------|--------|--------------|-------------|-------------|-------------------|--------|
-| Leftmost / top | VHF    | Yellow + Green (left-hand pair) | GPIO16 | RX2 | Green → GND | Bench-verified |
-| —              | SW     | No unique isolated pair | — | — | No Phase 1 connection | Deferred |
-| Second working pair | MW | Purple + Blue | GPIO17 | TX2 | Blue → GND | Bench-verified |
-| Third working pair | LW | Yellow + Orange | GPIO18 | D18 | Orange → GND | Solder repair and retest required |
-| Rightmost / bottom | Gram | Green + Yellow (right-hand pair) | GPIO23 | D23 | Yellow → GND | Bench-verified |
-
-The first colour in each working pair is the GPIO conductor and the second is
-its individual GND return. These are dry
-contacts, so the two conductors within a pair may be swapped without changing
-operation. There is no shared return in H3. The ESP32 provides the pull-up; do
-not connect any contact to 3.3 V or 5 V. RX2 and TX2 are the board's silkscreen
-labels for GPIO16 and GPIO17 and are available because UART2 is unused.
-Firmware accepts a changed state after 25 ms of stability and emits one event
-on each confirmed selection without repeating while held.
-
-The VHF, MW and Gram pair tests passed. The LW pair was identified as Yellow +
-Orange but failed electrically at the existing joint; repair and repeat the
-GPIO18 test before marking LW bench-verified.
+A purpose-built replacement button panel is a deferred fallback if the two-state
+scheme later proves insufficient. No LW solder repair is required for the
+current design.
 
 ## Stereo/Mono Control
 
