@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress. Pot inputs GPIO32–35, sole source selector Gram GPIO23 and OLED GPIO21/22 are bench-verified. The original selector PCB is retained mechanically, but VHF/SW/MW/LW are not electrical inputs. Digital content selection is delegated to the WiiM app; remaining assigned GPIOs are proposed. |
-| Version  | 0.16                                              |
+| Status   | Draft. Safe bootstrap runtime now initialises hardware and provides authenticated, non-blocking local-network OTA. Dual OTA partitions protect against interrupted transfer; automatic rollback after a fully received but boot-invalid image remains Phase 3. Control orchestration and WiiM integration remain in progress. |
+| Version  | 0.17                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -145,8 +145,9 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
 | FR-ADV-01 | The system shall provide on-device configuration menus.                      | 3     |
-| FR-ADV-02 | The system shall support OTA firmware updates with rollback safety.          | 3     |
+| FR-ADV-02 | The system shall support authenticated local-network OTA firmware updates. Interrupted or rejected transfers shall leave the running firmware bootable. | 1 |
 | FR-ADV-03 | The system shall support reuse of additional original controls.             | 3     |
+| FR-ADV-04 | The system shall automatically roll back after a fully received firmware image fails post-update boot validation. | 3 |
 
 ---
 
@@ -220,6 +221,8 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06, FR-LGT, FR-SET satisfied.
 - Local controls and vinyl selection remain available without a network; digital content selection requires the WiiM app/network.
 - All Phase 1 module test suites pass (`pio test`).
+- One USB bootstrap flash and one authenticated OTA upload both succeed before enclosure.
+- Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
 - Build is clean per NFR-04.
 
 ### Phase 2 — WiiM Integration
@@ -228,7 +231,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - Loss of the streamer does not impair local control (FR-SYS-05, NFR-09).
 
 ### Phase 3 — Advanced Features
-- FR-ADV-01..03 and FR-DSP-04 satisfied.
+- FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.
 - OTA update demonstrated with a successful rollback.
 
 ---

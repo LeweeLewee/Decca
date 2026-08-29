@@ -62,3 +62,7 @@ per module reinforces the low-coupling design in
 Logic with no hardware dependency can move to a faster `native` environment
 (no board required) once modules are decoupled from `Arduino.h` — for example
 by testing extracted libraries under `lib/`. Not required for Phase 1.
+
+## OTA suite
+
+`pio test -e esp32dev -f test_ota` covers disabled operation, non-blocking connection, timed retry, service start/handling and Wi-Fi-loss recovery. Physical acceptance is one USB bootstrap flash followed by one authenticated wireless upload.

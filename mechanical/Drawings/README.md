@@ -25,8 +25,10 @@ a local four-pin/header opening, to prevent cabinet-light contamination.
 The Rev P.5 packaging correction reduces carrier depth from 8.00 to 6.00 mm,
 enlarges the finished pin opening by 25% in both axes to 14.00 × 4.19 mm, adds
 two internal side light blocks within the back-plate envelope, places the
-four-pin side at the bottom and aligns the visible active-area bottom edge to
-the Perspex opening bottom without moving the original 49.00 mm-pitch holes.
+four-pin side at the bottom and moves both carrier fixing points 7.00 mm toward
+that bottom relative to the OLED group. The original Perspex holes remain fixed
+at 49.00 mm pitch, so this raises the screen 7.00 mm relative to the earlier
+bottom-edge-aligned datum.
 The same Rev P.5 amendment converts the two remaining plain locating posts to
 sprung retaining posts, giving four sprung posts subject to measured glass
 clearance, combined-force, PCB-bow and deliberate-release validation.

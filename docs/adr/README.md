@@ -19,3 +19,4 @@ Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
 | 0008 | Lock WiiM Pro with separate power amplification             | Accepted |
 | 0009 | Omit legacy button labels from user-facing display views    | Accepted |
 | 0011 | Use Gram as the sole two-state source selector               | Accepted |
+| 0012 | Use authenticated local-network ArduinoOTA                   | Accepted |

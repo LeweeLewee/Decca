@@ -27,10 +27,37 @@ from parts.
 - Knob adaptors (see `mechanical/Knob Adaptors/`)
 - Lighting placement
 
-## 5. Firmware Flashing
-- Installing PlatformIO
-- First build and upload
-- Cross-reference: `README.md` → Development Workflow
+## 5. Firmware Flashing and OTA Bootstrap
+
+Complete both tests before mounting the ESP32 where USB access is difficult.
+
+1. Create the private configuration:
+   ```powershell
+   Copy-Item src\secrets.example.h src\secrets.h
+   ```
+2. Replace the placeholders with the Wi-Fi details and a long unique OTA
+   password. Never commit `src/secrets.h`; it is gitignored.
+3. Flash once by USB:
+   ```powershell
+   pio run -e esp32dev -t upload --upload-port COM_PORT
+   ```
+4. Run `pio device monitor -b 115200` and wait for `[OTA] ready`.
+5. Set the same password for PlatformIO:
+   ```powershell
+   $env:DECCA_OTA_PASSWORD = "YOUR_SAME_OTA_PASSWORD"
+   ```
+6. Prove a wireless upload:
+   ```powershell
+   pio run -e esp32dev-ota -t upload
+   ```
+   If mDNS fails, add `--upload-port 192.168.x.x` using the displayed IP.
+
+The computer and Decca must be on the same local network. Guest-network
+isolation or a VPN may block OTA. Do not expose the OTA service to the internet.
+
+The dual application slots protect against interrupted or rejected transfers.
+Automatic rollback after a fully received image fails to boot remains a Phase 3
+hardening item, so retain recovery access until it is implemented.
 
 ## 6. First Power-On
 - Bring-up checklist

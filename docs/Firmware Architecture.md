@@ -30,9 +30,11 @@ AI-assisted editing.
 | `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|
 | `power`    | On/off state handling *(planned)*                | `hardware`, `settings`|
 | WiiM iface | WiiM Pro local-API control *(Phase 2)*           | `settings`, Wi-Fi     |
+| `ota`      | Authenticated Wi-Fi firmware update service      | Wi-Fi                 |
 
 > `power` and the WiiM interface are documented here as intended modules; they
-> are added in later phases and are not yet present in `src/`.
+> are added in later phases and are not yet present in `src/`. The `ota` module
+> is active in the safe bootstrap runtime.
 
 ### Module notes (confirmed Phase 1 build)
 
@@ -98,12 +100,12 @@ Modules add a small number of typed accessors (e.g. `buttons::nextEvent()`,
 ## Phase Mapping
 
 - **Phase 1 (Local control):** `hardware`, `settings`, `buttons`, `pots`,
-  `display`, `lighting`.
+  `display`, `lighting`; authenticated `ota` is brought forward before enclosure.
 - **Phase 2 (WiiM):** add the WiiM interface module; Gram selects Line-In,
   released Gram restores digital playback, and the phone controls digital
   content. Volume and metadata route through `settings`.
-- **Phase 3 (Advanced):** configuration menus (`display` + `settings`), OTA
-  update channel, richer UI, additional legacy controls.
+- **Phase 3 (Advanced):** configuration menus, automatic post-boot OTA rollback
+  validation, richer UI and additional legacy controls.
 
 ## Evolving Toward `lib/`
 
