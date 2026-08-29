@@ -50,24 +50,27 @@ Each harness is removable at the controller end where practical.
 
 ## Pin Map
 
-All ESP32 pin numbers below are **(proposed)** unless stated otherwise.
+All ESP32 pin numbers below are **(proposed)** unless stated otherwise. The
+**Board label** column records the silkscreen text printed beside the pin on the
+30-pin ESP32 DevKit used in this build. For the four ADC inputs the printed
+labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 
-| Signal                | ESP32 Pin       | Type        | Harness | Notes                                    |
-|-----------------------|-----------------|-------------|---------|------------------------------------------|
-| Volume pot wiper      | GPIO32 (bench-verified) | ADC1        | H1      | ADC1 required (Wi-Fi in Phase 2)         |
-| Bass pot wiper        | GPIO33 (bench-verified) | ADC1        | H1      | ADC1 required                            |
-| Treble pot wiper      | GPIO34 (bench-verified) | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
-| Balance pot wiper     | GPIO35 (bench-verified) | ADC1, in-only | H1    | ADC1; input-only pin                     |
-| On/off switch (Red)   | GPIO19 (proposed) | Digital in  | H2      | Internal pull-up; low-voltage logic only |
-| Source: VHF           | GPIO16 (bench-verified) | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: MW            | GPIO17 (bench-verified) | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: LW            | GPIO18 (proposed) | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: Gram          | GPIO23 (bench-verified) | Digital in  | H3      | Internal pull-up + software debounce     |
-| Source: SW            | —               | —           | H3      | **NO FUNCTION in Phase 1** (see below)   |
-| OLED SDA              | GPIO21 (bench-verified) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| OLED SCL              | GPIO22 (bench-verified) | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO25 (proposed) | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
-| ZA3 trigger control   | TBD             | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
+| Signal                | ESP32 Pin       | Board label | Type        | Harness | Notes                                    |
+|-----------------------|-----------------|-------------|-------------|---------|------------------------------------------|
+| Volume pot wiper      | GPIO32 (bench-verified) | **D32** | ADC1        | H1      | ADC1 required (Wi-Fi in Phase 2)         |
+| Bass pot wiper        | GPIO33 (bench-verified) | **D33** | ADC1        | H1      | ADC1 required                            |
+| Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
+| Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
+| On/off switch (Red)   | GPIO19 (proposed) | D19 | Digital in  | H2      | Internal pull-up; low-voltage logic only |
+| Source: VHF           | GPIO16 (bench-verified) | RX2 | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: MW            | GPIO17 (bench-verified) | TX2 | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: LW            | GPIO18 (proposed) | D18 | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: Gram          | GPIO23 (bench-verified) | D23 | Digital in  | H3      | Internal pull-up + software debounce     |
+| Source: SW            | —               | — | —           | H3      | **NO FUNCTION in Phase 1** (see below)   |
+| OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
+| OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
+| Dial lighting PWM     | GPIO25 (proposed) | D25 | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
+| ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > The four source-button GPIOs avoid strapping pins and support internal
 > pull-ups. GPIO16, GPIO17 and GPIO23 are bench-verified. GPIO18 remains
@@ -90,6 +93,16 @@ installed potentiometer:
 | Centre  | White     | Wiper / analogue signal |
 | Right   | Red       | 3.3 V                 |
 
+At the ESP32 terminal adapter, connect each **White centre/wiper conductor** to
+the terminal carrying both the GPIO number and matching DevKit silkscreen label:
+
+| Control | ESP32 GPIO | Printed board label |
+|---------|------------|---------------------|
+| Volume  | GPIO32     | **D32**             |
+| Bass    | GPIO33     | **D33**             |
+| Treble  | GPIO34     | **D34**             |
+| Balance | GPIO35     | **D35**             |
+
 Termination (confirmed): ends soldered directly to the lugs, insulated with
 heat-shrink, mechanically strain-relieved, and terminated through a removable
 connector at the controller end.
@@ -98,12 +111,12 @@ Bench verification completed 2026-08-24 with each control connected to its
 named ADC1 channel. All readings increased clockwise and the on-target
 `test_pots` suite passed all six test cases.
 
-| Control | GPIO | Anticlockwise | Approx. centre | Clockwise |
-|---------|------|---------------|----------------|-----------|
-| Volume  | 32   | 0             | 2047           | 4095      |
-| Bass    | 33   | 0             | 2047           | 4095      |
-| Treble  | 34   | 0             | 2047           | 4095      |
-| Balance | 35   | 0             | 2047           | 4095      |
+| Control | GPIO | Board label | Anticlockwise | Approx. centre | Clockwise |
+|---------|------|-------------|---------------|----------------|-----------|
+| Volume  | 32   | D32         | 0             | 2047           | 4095      |
+| Bass    | 33   | D33         | 0             | 2047           | 4095      |
+| Treble  | 34   | D34         | 0             | 2047           | 4095      |
+| Balance | 35   | D35         | 0             | 2047           | 4095      |
 
 The controls have no centre detent, so the centre readings vary slightly with
 manual positioning. The observed endpoints match the firmware's default
@@ -119,7 +132,7 @@ The original Decca on/off switch is retained, including its **original solder
 joints and original cable**. It is a simple open/close switch.
 
 - Active conductors (confirmed): **Red** and **Green**.
-- Interface (proposed): **Red → ESP32 GPIO19** input with **internal pull-up
+- Interface (proposed): **Red → ESP32 GPIO19 / board label D19** input with **internal pull-up
   enabled**; **Green → GND**.
 - This is a **low-voltage logic input only**. It does **not** switch 230 V mains.
 - Logical inversion may be applied in firmware after bench testing.
@@ -193,8 +206,8 @@ with a pre-soldered four-pin header. Expected address: **0x3C**.
 
 - VCC → 3.3 V (Red)
 - GND → GND (Brown)
-- SDA → GPIO21 (Orange, bench-verified)
-- SCL → GPIO22 (Yellow, bench-verified)
+- SDA → GPIO21 / board label **D21** (Orange, bench-verified)
+- SCL → GPIO22 / board label **D22** (Yellow, bench-verified)
 
 The H4 Orange and Yellow signal colours are a documented exception to the
 general loom colour standard. In particular, do not treat the Orange SDA
@@ -220,7 +233,7 @@ unclipped and free of persistent display artefacts.
 - The three lamps are wired **in parallel**.
 - One **logic-level N-channel MOSFET** low-side switches the complete lamp bank;
   ESP32 drives the gate.
-- **PWM** controlled by the ESP32 (proposed **GPIO25**, LEDC).
+- **PWM** controlled by the ESP32 (proposed **GPIO25 / board label D25**, LEDC).
 - ESP32 and lighting grounds are **common**.
 - Brightness is set during commissioning, stored in non-volatile settings and
   then treated as a setup value rather than a normal user control. The unused
