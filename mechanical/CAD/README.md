@@ -13,9 +13,11 @@ Source (editable, parametric) mechanical design files.
 
 ## Display mount — current revision: **P — OPEN, NOT RELEASED**
 
-Rev P.2 is the corrected **flush-side-insertion** architecture, rebuilt after the
-printed Rev P.1 failed its physical retention test. The `.f3d` is the source of
-truth; the STEPs and the STL are derived exports.
+Rev P.2 is the corrected **flush-side-insertion** architecture, and it **passed**
+its physical OLED-retention and Perspex-fit tests. **Rev P.3** amends only the
+radio-side interface: the lighting-unit clearance cut and the original Decca
+bolt / captive-nut interface that replaces the deleted M2 heat-set inserts. The
+`.f3d` is the source of truth; the STEPs and the STL are derived exports.
 
 | File | Role |
 |---|---|
@@ -23,7 +25,8 @@ truth; the STEPs and the STL are derived exports.
 | `Decca_Display_Mount_revP_fusion.py` | the generator that builds the `.f3d`; single source of truth for every dimension |
 | `Decca_Display_Mount_revP_verify.py` | independent offline verification of the exported STL (numpy only) |
 | `Rear_Display_Carrier_revP.step` | the one structural part |
-| `Decca_Display_Mount_revP_assembly.step` | carrier + Perspex + OLED + bezel references |
+| `Decca_Display_Mount_revP_assembly.step` | carrier + Perspex + OLED + bezel + **original nuts / bolt envelope + lighting-unit keep-out** references |
+| `Hex_Pocket_Fit_Coupon_revP.step` | five-station captive-nut pocket fit coupon — print this **before** the carrier |
 | `Front_Bezel_revN.step` | cosmetic bezel — **unchanged, still the file of record for Rev P** |
 
 Rev N files are retained as the last front-loaded design:
@@ -36,9 +39,10 @@ equivalent.
 
 Inside Fusion (Utilities → Add-Ins → Scripts), point `OUT_DIR` at this clone's
 `mechanical` folder and run `main()`, `validate()`, `import_bezel()`,
-`snapshots()`, `export()`. `main()` creates its own new document and never
-modifies the Rev N or Rev O files; `snapshots()` regenerates the four Drawings
-PNGs from the live model. Then, offline:
+`snapshots()`, `export()`, and `coupon()`. `main()` creates its own new document
+and never modifies the Rev N or Rev O files; `snapshots()` regenerates the five
+Drawings PNGs from the live model; `coupon()` builds and exports the hex-pocket
+fit coupon in its own document. Then, offline:
 
 ```bash
 python mechanical/CAD/Decca_Display_Mount_revP_verify.py
@@ -49,8 +53,9 @@ gate. See `../Drawings/Decca_OLED_Display_Mount_CAD_Build_revP.md` §13 for why
 it is deliberately not a second run of the same recipe — and for the silent
 Fusion `createTorus` failure it caught.
 
-> **Rev P is OPEN.** Two items are outstanding: the glass envelope at the two
-> header-side mounting holes must be measured before any print, and a printed
-> carrier must pass a physical inversion and gentle-shake retention test before
-> the finding raised by the Rev P.1 print can be closed. See the build review
-> §9 and §14.
+> **Rev P is OPEN.** The Rev P.2 OLED retention and Perspex fit are physically
+> validated. Outstanding for the Rev P.3 amendment: measure the glass envelope
+> (§9), the original nut across flats **and** across corners and the original
+> bolt length (§21.6), print the hex-pocket fit coupon (§21.7), then prove
+> installed lighting-unit clearance, rack/twist and the captive-nut behaviour on
+> a real part.

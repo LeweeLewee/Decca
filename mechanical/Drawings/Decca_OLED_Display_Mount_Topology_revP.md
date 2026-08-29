@@ -6,11 +6,24 @@ No Fusion geometry may be generated until this section is clean.
 > **Rev P.2 — CORRECTED 2026-08-29 after a physical retention failure.**
 > The printed Rev P.1 carrier failed its retention test: the OLED falls forward
 > through the loose carrier. The failure is **architectural, not a tolerance
-> adjustment**. §0 records it; §1 onward is the corrected topology and
-> supersedes the Rev P.1 text entirely.
+> adjustment**. §0 records it; §1–§10 are the corrected topology and supersede
+> the Rev P.1 text entirely.
+>
+> **Rev P.2 then PASSED physically** for OLED retention and Perspex tolerance.
+> §1–§10 therefore describe validated hardware and are carried forward
+> unchanged.
+>
+> **Rev P.3 — BOUNDED AMENDMENT 2026-08-29.** Two integration failures against
+> the radio, neither touching the validated OLED architecture:
+>
+> - **§11** the continuous end rail and its cable-tie projection collide with
+>   the retained original Decca lighting unit and are deleted;
+> - **§12** the original front bolts have a non-standard thread, so the whole M2
+>   heat-set-insert architecture is deleted and the original bolts and their
+>   matching nuts are reused with a captive hex pocket.
 
-Baseline: `main` @ `666abca`, whose corrected retention specification is
-authoritative over anything written on this branch before it.
+Baseline: `main` @ `53071ff`, whose §8.1, §8.2, §9, §10 and §12 are
+authoritative over anything written on this branch before them.
 
 ---
 
@@ -71,7 +84,7 @@ Perspex. **The module is inserted from the FRONT, moving rearward (−Z).**
 ```text
                         FRONT (viewer)  —  INSERTION SIDE
    ═══════════════════════════════════════════════════════════   z = +3.00
-        M2 screw head bears here            ORIGINAL PERSPEX 3.00 mm
+     ORIGINAL bolt head bears here          ORIGINAL PERSPEX 3.00 mm
    ═════════════╤═══════════════════════════════════════╤═════   z =  0.00  <- DATUM A
                 |                                       |           carrier hard stop
                 |         v  v  v  MODULE INSERTED      |           (seating plane)
@@ -126,9 +139,11 @@ friction calculation appears in the acceptance gate.
 ### M2 load path — unchanged from Rev P.1
 
 ```text
-M2 screw head -> Perspex front face -> Perspex (3.00) -> Perspex rear face
-              -> carrier seating rim + annular boss pad  (z = 0, DATUM A)
-              -> M2 boss -> heat-set insert -> screw thread
+ORIGINAL bolt head -> Perspex front face -> Perspex (3.00) -> Perspex rear
+                   -> carrier seating rim + boss pad  (z = 0, DATUM A)
+                   -> captive ORIGINAL nut -> original bolt thread
+
+(Rev P.3: the M2 heat-set insert this line used to name is deleted - see 12)
 ```
 
 The forward-most carrier material anywhere is z = 0. The forward-most module
@@ -380,7 +395,7 @@ Everything else the module touches is rigid.
 
 **Removal** (identified tool path):
 
-1. Remove the two M2 screws and lift the carrier off the Perspex.
+1. Remove the two original bolts and lift the carrier off the Perspex.
 2. From the front, squeeze each barb inward with fine-nose tweezers or snipe
    pliers — 0.10 mm per half. The barbs stand 0.70 mm proud of the PCB front
    face and are completely exposed, because nothing at all sits in front of the
@@ -541,3 +556,242 @@ The brief forbids building CAD until this section demonstrates four things.
 must be measured before a corrected carrier is printed. The physical retention
 finding from Rev P.1 remains **OPEN** and can only be closed by a real inversion
 and gentle-shake handling test on a printed part.
+
+
+---
+
+# Rev P.3 amendment — the radio-side interface
+
+Everything above is validated hardware and is unchanged. The two sections below
+are the only design changes.
+
+---
+
+## 11. Original Decca lighting-unit keep-out (brief §8.1)
+
+### 11.1 What collided
+
+The lighting unit is original, retained and cannot be removed. The Rev P.2
+carrier put a **continuous transverse rail** across the two side uprights on
+that side (y +21.60 … +24.60, full 43.10 mm width) and stood a **cable-tie
+flange** on top of it reaching y +30.60, with a rear relief and two tie slots.
+The rail and that projection foul the lighting unit.
+
+### 11.2 What is deleted
+
+- the complete continuous end rail on the lighting-unit side;
+- its central integral cable-tie / strain-relief projection;
+- both tie slots and the flange rear relief;
+- the rear-open wire notch that passed through the flange root.
+
+Nothing is put back inside the keep-out. Parameters `top_flange`, `flange_w`,
+`wire_notch_w`, `wire_notch_depth`, `tie_relief_w`, `tie_relief_h`,
+`tie_relief_depth`, `tie_slot_x`, `tie_slot_w`, `tie_slot_h` and `tie_slot_z`
+are gone from the generator, and the cable-tie path check is gone from the
+validation gate.
+
+### 11.3 What is retained
+
+| Retained | Evidence |
+|---|---|
+| both sprung posts, full Ø8.60 pedestals, Ø6.00 datum pads, Ø4.80 reliefs, R0.80 root fillets | probed intact at both posts, in both tools |
+| the local pedestal-to-side-upright connections | solid at the upright inner face on both sides |
+| both vertical side uprights | terminated and capped, §11.4 |
+| both 49.00 mm fixing-boss load paths | pitch measured 49.00000 mm exactly |
+| the opposite transverse rail | untouched, y −16.60 … −13.60 |
+| the OLED insertion, removal and wiring corridors | all corridors re-run CLEAR |
+
+### 11.4 Where the carrier now ends, and how
+
+```text
+                    y = +22.55  ╭───╮           ╭───╮      <- pedestal tangent
+                                │ S │           │ S │         = ASSERTED keep-out
+                    y = +20.50  ├───┤           ├───┤      <- upright cap, R1.80
+                                │   │  N O T H I N G  │
+   ●  fixing        ┌───────────┘   │   B E T W E E N │
+      x = −24.50    │  upright      │    T H E M      │
+   ────────────────-┤               │                 ├──  ● fixing x = +24.50
+                    │      OLED pocket, open at this end   │
+                    │   ╭───╮                   ╭───╮      │
+        y = −10.25  │   │ P │                   │ P │      │
+                    │   ╰───╯                   ╰───╯      │
+        y = −13.60  ├───────────────────────────────────────┤
+        y = −16.60  └────────── bottom transverse rail ─────┘
+```
+
+The two side uprights stop at **y = +20.50**, half a millimetre short of the PCB
+pocket wall line, and each is capped with a **half-round of its own 3.60 mm
+width (R1.80)**. That radius lands directly alongside the retained sprung-post
+pedestal root, which the pedestal ties into over a 6.26 mm long lens up to
+1.35 mm deep — a real overlap, not a tangent touch.
+
+Above y = +20.50 the only carrier material anywhere is the two Ø8.60 pedestal
+towers. Between them, over x −10.70 … +10.70, there is nothing at all.
+
+| | Rev P.2 | **Rev P.3** |
+|---|---:|---:|
+| Carrier extent on the lighting-unit side | y +30.60 | **y +22.55** |
+| Projection returned | — | **8.05 mm** |
+| Continuous bridge across the uprights | full width | **none** |
+| Carrier height | 47.20 mm | **39.15 mm** |
+| Carrier volume | 6.928 cm³ | **4.472 cm³** |
+| Connected solids | 1 | **1** |
+
+### 11.5 The keep-out boundary is asserted, not measured
+
+The lighting unit's position has **never been measured**. What is known is that
+the rail and the tie projection fouled it. The brief mandates retaining the full
+sprung-post pedestals, so the keep-out solid used in CAD is placed at the
+**pedestal tangent, y = +22.55** — the carrier's own new maximum extent.
+
+That is an assertion. It is confirmed or refuted by the installed clearance test
+(brief §12.14). If the two pedestal towers still foul, the next correction is to
+reduce `pedestal_d` on the sprung pair, which is a one-parameter change; the
+towers project only 2.05 mm past the upright caps.
+
+### 11.6 Strain relief
+
+The integral cable tie is gone and is **not replaced**. The brief permits a
+replacement only outside the keep-out and only with separately demonstrated
+radio-side clearance, which does not exist. With the rail deleted the header and
+loom now leave through a fully open end rather than a notch. Strain relief is an
+open item.
+
+### 11.7 Rack and twist
+
+A closed frame has become an open one, so this is a real question. What carries
+it: a 3.00 × 8.00 mm bottom transverse rail across the full width, two 3.00 ×
+8.00 mm side uprights 37.10 mm long, both fixing arms and bosses, a 637.7 mm²
+rear face, and the two pedestals tying the uprights into the module pocket. The
+seated OLED itself also spans between the uprights. CAD can only report the
+sections — **brief §12.15 is the actual test**.
+
+---
+
+## 12. Original Decca bolt and captive-nut interface (brief §8.2)
+
+### 12.1 What is deleted
+
+The original front bolts have a **non-standard thread**. The entire M2 heat-set
+insert architecture is removed from the generator, the geometry and the
+manufacturing pack:
+
+| Deleted | Was |
+|---|---|
+| `m2_insert_d` | 3.20 |
+| `m2_insert_depth` | 4.00 |
+| `m2_insert_recess` | 0.50 |
+| `m2_bore_chamfer` | 0.40 |
+| cylindrical heat-set insert bores | 2 blind bores |
+| insert backing calculation | `carrier_depth + z_insert_bore` |
+| M2 heat-set insert BOM entry | 2 × Ø3.2 × 4.0 |
+| replacement M2 screw BOM entry | 2 × M2×6 |
+
+`m2_boss_d` and `m2_arm_h` are renamed `fix_boss_d` and `fix_arm_h`: they are
+now structural boss and arm dimensions with no thread implication.
+
+### 12.2 The measured nut, and the interpretation on record
+
+| Named parameter | Value | Status |
+|---|---:|---|
+| `original_nut_hex_width` | **3.80 mm** | **ASSUMED to be ACROSS FLATS** — see §12.6 |
+| `original_nut_head_seat_depth` | 1.40 mm | measured axial head seat |
+| `original_nut_total_length` | 10.00 mm | measured, must be cleared in full |
+| `nut_pocket_fit_allowance` | 0.20 mm | **printer/material fit**, coupon-validated |
+| `nut_body_allowance` | 0.20 mm | clearance bore beyond the head across-corners |
+| `nut_seat_depth` | 2.00 mm | solid carrier ahead of the seating shoulder |
+| `nut_retain_lip` | 0.25 mm | captive retaining ridge |
+| `bolt_clear_d` | 2.60 mm | original bolt shank clearance (panel hole 2.40) |
+
+**Nothing here is derived from an M2, BA, UNC, metric or other catalogue nut.**
+The pocket fit allowance is a print-process fit; it is not permission to alter
+the 3.80 mm physical measurement.
+
+### 12.3 The pocket, front to rear
+
+```text
+   z =  0.00   carrier seating face on the Perspex          DATUM A
+               ┌──────────────┐
+               │  Ø2.60 bolt  │   solid carrier ring, 2.00 mm, carries the
+               │  clearance   │   clamp load in pure compression
+   z = -2.00   ├──┬────────┬──┤   ◄── SEATING SHOULDER, 8.55 mm² annulus
+               │  │ 4.00af │  │   regular-hex HEAD SEAT, anti-rotation,
+               │  │  hex   │  │   exactly the 1.40 mm measured head seat
+   z = -3.40   │  ├─┬────┬─┤  │   ◄── step: this is what makes 1.40 positive
+               │  │ │3.55│ │  │   RETAINING RIDGE, 0.125 mm per flat
+   z = -3.70   │  ├─┴────┴─┤  │
+               │  │ \    / │  │   self-supporting lead-in, aligns the hex
+   z = -4.10   │  ├────────┤  │
+               │  │ Ø4.82  │  │   clearance bore for the rest of the nut
+               │  │  bore  │  │
+   z = -8.00   └──┴────────┴──┘   carrier rear face — pocket opens here
+                     │    │
+                     │    │       the last 4.00 mm of the 10.00 mm nut sits
+   z =-12.00         └────┘       behind the carrier in free air
+```
+
+Boss Ø7.60 around it, minimum continuous wall **1.391 mm** at the clearance-bore
+diameter, measured 1.388 mm off the exported mesh.
+
+### 12.4 What each requirement is met by
+
+| Requirement | Met by | Evidence |
+|---|---|---|
+| rear-accessible regular-hex anti-rotation pocket | 4.00 mm across-flats hex, opening at the rear face | measured 4.000 af / 4.619 ac off the mesh at both centres; the same nut rotated 30° interferes by 1.02 mm³ |
+| positive axial seating shoulder | annulus at z = −2.00 | 8.55 mm², backed by 2.00 mm of solid carrier |
+| defined 1.40 mm head-seat depth | hex head seat ended by a step to the ridge | not dependent on the nut crushing into plastic |
+| clearance for the full 10.00 mm nut and engaged bolt | hex + Ø4.82 bore through to the rear | nut and bolt envelopes CLEAR of glass, PCB, header, Perspex and lighting keep-out |
+| sufficient continuous boss wall | Ø7.60 boss | **1.391 mm** minimum, continuous |
+| serviceable captive retention | 0.25 mm retaining ridge, 0.125 mm per flat | pushed past on assembly; **no adhesive**; a 2.2 mm pin through the bolt bore pushes it back out |
+
+The nut is modelled at its full 3.80 mm across flats over the whole 10.00 mm —
+the most pessimistic reading — and the **only** carrier/nut interference
+anywhere is the declared retaining ridge. That is the same discipline used for
+the OLED snap noses: interference is permitted only where it is the point.
+
+### 12.5 Load path
+
+```text
+original bolt head → Perspex → carrier seating face / hard stop
+                   → captive original nut → original bolt thread
+```
+
+No part of it passes through the OLED glass or the PCB: the glass is 0.300 mm
+behind the seating plane and the PCB 1.100 mm behind it, and the bolt envelope
+is CLEAR of both. The bolt never touches the carrier — it only pulls the nut
+onto the shoulder.
+
+### 12.6 Measurements that gate the print
+
+| # | Item | Why it matters |
+|---|---|---|
+| 1 | **nut across flats AND across corners** | 3.80 mm is modelled as across flats. If it is across corners, the true across-flats is 3.29 mm and this pocket is 0.51 mm oversize. Change the one parameter and regenerate. |
+| 2 | **original bolt length under the head** | must exceed the 5.00 mm grip (Perspex 3.00 + carrier 2.00) to engage at all, and stay under 15.00 mm to remain inside the nut. Neither end is measured. |
+| 3 | **hex-pocket fit coupon** | `nut_pocket_fit_allowance` 0.20 and `nut_retain_lip` 0.25 are not yet demonstrated on this printer/material. `Hex_Pocket_Fit_Coupon_revP.stl` carries the same pocket at 0.10/0.15/0.20/0.25/0.30, notch-numbered. Print it first. |
+
+---
+
+## 13. Rev P.3 pre-CAD gate — self-review verdict
+
+| Required demonstration | Result |
+|---|---|
+| Rev P.2 OLED architecture preserved unchanged | PASS — insertion, datum pads, posts, retention, release, Z position, gap, centring, aperture, pitch, hard stops and bezel all re-validated identical |
+| Complete lighting-unit-side end rail deleted | PASS — nothing in its old y +21.60 … +24.60 band |
+| Cable-tie projection and slots deleted | PASS — nothing in its old y +24.60 … +30.60 band |
+| No bridge between the side uprights in the keep-out | PASS — only the two pedestal towers, residual EMPTY |
+| Nothing put back inside the keep-out | PASS — no replacement strain relief added |
+| Sprung posts, pedestals, pads, reliefs, root fillets retained | PASS — full Ø8.60 / Ø6.00 / Ø4.80 at both |
+| Side uprights, fixing arms/bosses, opposite rail retained | PASS |
+| Uprights terminated with deliberate printable radii | PASS — R1.80 half-round caps |
+| One connected open-ended solid | PASS — 1 lump in Fusion, 1 connected component on the mesh |
+| M2 heat-set architecture completely removed | PASS — no bore, depth, recess, chamfer, backing or BOM entry |
+| Named original-nut parameters created | PASS — §12.2 |
+| 3.80 mm across-flats interpretation recorded | PASS — §12.2, §12.6, and in the generator source |
+| Hex pocket, seat, head-seat depth, envelope, boss wall, captive retention | PASS — §12.4 |
+| Original load path, no clamp through glass or PCB | PASS — §12.5 |
+| 49.00 mm pitch unchanged | PASS — 49.00000 mm exactly |
+| **Lighting-unit position** | **ASSERTED, NOT MEASURED — §11.5** |
+| **Nut across-corners, bolt length, pocket fit** | **NOT MEASURED — §12.6** |
+
+**Amendment approved for CAD**, with four items that gate the print and the
+brief §12 tests that gate release.

@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Rev P.2 independent verification - reads the EXPORTED STL, not the build recipe.
+Rev P.3 independent verification - reads the EXPORTED STL, not the build recipe.
+
+Rev P.2 passed physically for OLED retention and Perspex fit. Sections A-L below
+re-prove that architecture is unchanged. Sections M and N cover the two bounded
+amendments: the original Decca lighting-unit clearance and the original
+bolt / captive-nut interface that replaces the deleted M2 heat-set inserts.
 
     python mechanical/CAD/Decca_Display_Mount_revP_verify.py
 
@@ -72,8 +77,24 @@ R = dict(
     setback=0.10,                     # carrier limit behind the PCB front face
     pcb_clearance=0.25,
     aperture_margin=0.60,
-    # expected carrier envelope
-    car_w=56.60, car_h=47.20, car_d=8.00,
+    # expected carrier envelope AFTER the lighting-unit cut
+    car_w=56.60, car_h=39.15, car_d=8.00,
+    # lighting-unit keep-out (brief 8.1)
+    light_cut_y=20.50,          # uprights terminate here, capped
+    light_keepout_y=22.55,      # asserted boundary = pedestal tangent
+    y_before=30.60,             # carrier extent before the amendment
+    # original Decca bolt / captive nut (brief 8.2) - NON-STANDARD thread
+    nut_af=3.80,                # ASSUMED across flats, see section N
+    nut_head_seat=1.40,
+    nut_total_len=10.00,
+    nut_fit=0.20,
+    nut_body_allow=0.20,
+    nut_seat_depth=2.00,
+    nut_retain_lip=0.25,
+    nut_retain_h=0.30,
+    nut_lead_h=0.40,
+    bolt_clear_d=2.60,
+    boss_d=7.60,
     # expected retention geometry - the corrected architecture
     shaft_d=2.80, slot_w=0.70, barb_d=3.20, tip_nose_d=2.60,
     relief_d=4.80, sprung_relief_depth=3.20, plain_relief_depth=1.00,
@@ -104,6 +125,18 @@ Z_SPRUNG_FLOOR = Z_PCB_REAR - R["sprung_relief_depth"]   # -5.90
 Z_SPRUNG_FIX = Z_SPRUNG_FLOOR + R["fillet_r"]            # -5.10
 Z_PLAIN_FLOOR = Z_PCB_REAR - R["plain_relief_depth"]     # -3.70
 Z_PLAIN_TOP = Z_PCB_FRONT - R["plain_setback"]           # -1.35
+
+Z_NUT_SEAT = -R["nut_seat_depth"]                          # -2.00
+Z_NUT_HEAD_BACK = Z_NUT_SEAT - R["nut_head_seat"]          # -3.40
+Z_NUT_RETAIN = Z_NUT_HEAD_BACK - R["nut_retain_h"]         # -3.70
+Z_NUT_LEAD = Z_NUT_RETAIN - R["nut_lead_h"]                # -4.10
+Z_NUT_REAR = Z_NUT_SEAT - R["nut_total_len"]               # -12.00
+NUT_HEX_AF = R["nut_af"] + R["nut_fit"]                    # 4.00
+NUT_HEX_AC = NUT_HEX_AF * 2.0 / math.sqrt(3.0)
+NUT_BODY_D = NUT_HEX_AC + R["nut_body_allow"]
+NUT_RETAIN_AF = R["nut_af"] - R["nut_retain_lip"]          # 3.55
+BOSS_WALL = R["boss_d"] / 2 - NUT_BODY_D / 2
+FIX_X = R["m2_pitch"] / 2                                  # 24.50
 
 PCB = (-R["pcb_w"] / 2, R["pcb_w"] / 2,
        R["pcb_off_y"] - R["pcb_h"] / 2, R["pcb_off_y"] + R["pcb_h"] / 2)
@@ -371,7 +404,7 @@ def main():
     size = hi - lo
     # the STL tessellates the cylindrical M2 ear ends, so the mesh sits a
     # chord-height under nominal across X. 0.05 mm covers MeshRefinementHigh.
-    check(abs(size[0] - R["car_w"]) < 0.05 and abs(size[1] - R["car_h"]) < 0.02
+    check(abs(size[0] - R["car_w"]) < 0.05 and abs(size[1] - R["car_h"]) < 0.05
           and abs(size[2] - R["car_d"]) < 0.02, "carrier envelope",
           "%.2f x %.2f x %.2f mm (nominal %.2f x %.2f x %.2f; X is under by "
           "%.3f mm of tessellation chord on the ear radii)"
@@ -656,11 +689,13 @@ def main():
     ok = True
     for sx in (-1, 1):
         x = sx * R["m2_pitch"] / 2
-        ok &= not inside(tris, x, 0.0, -2.0)          # inside the insert bore
-        ok &= inside(tris, x, 0.0, -6.5)              # backing behind the bore
+        ok &= not inside(tris, x, 0.0, -1.0)          # bolt clearance bore
+        ok &= not inside(tris, x, 0.0, -6.5)          # nut pocket, runs through
         ok &= inside(tris, x + 2.6, 0.0, -1.0)        # boss wall
-    check(ok, "M2 bosses at +/-%.2f mm with blind inserts" % (R["m2_pitch"] / 2),
-          "bore open at the seating face, closed behind")
+    check(ok, "fixing bosses at +/-%.2f mm are THROUGH pockets"
+          % (R["m2_pitch"] / 2),
+          "open at the seating face for the bolt and open at the rear for the "
+          "nut - there is no blind insert bore anywhere")
     check(Z_GLASS_FRONT < 0 and Z_PCB_FRONT < 0,
           "glass and PCB both behind the hard-stop plane",
           "glass %+.2f, PCB %+.2f -> preload cannot reach either"
@@ -732,7 +767,10 @@ def main():
     rel = (R["shaft_d"] / 2 + R["relief_d"] / 2) / 2     # inside a relief bore
     pad_r = (R["pad_od"] + R["relief_d"]) / 4.0
     probes = [
-        ("seating rim solid", 0.0, PK[3] + 1.5, -0.20, True),
+        ("bottom-rail seating face solid", 0.0, AP[2] - 1.50, -0.20, True),
+        ("side-upright seating face solid", (PK[1] + 21.55) / 2, 0.0,
+         -0.20, True),
+        ("deleted top rail: void", 0.0, PK[3] + 1.50, -0.20, False),
         ("module aperture void", 0.0, PCB[3] + 0.35, -0.60, False),
         ("aperture at the PCB corner void", PCB[1] + 0.4, PCB[3] + 0.4,
          -0.60, False),
@@ -759,8 +797,14 @@ def main():
         ("plain post void ahead of the PCB face", px_, py_,
          Z_PCB_FRONT + 0.02, False),
         ("plain root relief void", px_ + rel, py_, Z_PLAIN_FLOOR + 0.50, False),
-        ("insert bore void", R["m2_pitch"] / 2, 0.0, -2.00, False),
-        ("insert backing solid", R["m2_pitch"] / 2, 0.0, -6.50, True),
+        ("bolt clearance bore void", FIX_X, 0.0, -1.00, False),
+        ("hex head seat void", FIX_X, 0.0, Z_NUT_SEAT - 0.70, False),
+        ("hex flat solid where the pocket ends", FIX_X, NUT_HEX_AF / 2 + 0.15,
+         Z_NUT_SEAT - 0.70, True),
+        ("nut pocket open right through to the rear", FIX_X, 0.0, -6.50,
+         False),
+        ("boss wall solid outboard of the pocket", FIX_X + 2.60, 0.0, -6.50,
+         True),
     ]
     bad = []
     for nm, x, y, z, want in probes:
@@ -791,6 +835,218 @@ def main():
          "pinching the two barbs from the front")
     note("friction-versus-weight acceptance gate", "deleted from both tools")
 
+    # ---- M. LIGHTING-UNIT KEEP-OUT (brief 8.1) ---------------------------
+    print("")
+    print("M. ORIGINAL DECCA LIGHTING-UNIT KEEP-OUT")
+    ymax = tris.reshape(-1, 3)[:, 1].max()
+    check(abs(ymax - R["light_keepout_y"]) < 0.02,
+          "carrier extent on the lighting-unit side",
+          "y max %+.3f (was %+.2f) - %.2f mm of projection returned"
+          % (ymax, R["y_before"], R["y_before"] - ymax))
+    # nothing at all may exist beyond the asserted keep-out boundary
+    m = tris_hit_box(tris, (-60.0, 60.0, R["light_keepout_y"] + 1e-3, 120.0,
+                            -40.0, 20.0))
+    check(not m.any(), "zero carrier material inside the keep-out solid",
+          "empty at y > %+.2f" % R["light_keepout_y"] if not m.any()
+          else "%d triangles intrude" % int(m.sum()))
+    # no bridge across the uprights: above the cut line the ONLY material
+    # allowed is the two sprung pedestal towers. Box decomposition again.
+    pr = R["pedestal_d"] / 2 + 0.05
+    z0, z1 = -R["car_d"] - 1.0, 1.0
+    clean = []
+    for (a, b) in ((PK[0], -POST_X - pr), (-POST_X + pr, POST_X - pr),
+                   (POST_X + pr, PK[1])):
+        if b > a:
+            clean.append((a, b, R["light_cut_y"] + 1e-3, 60.0, z0, z1))
+    m = boxes_hit(tris, clean, shrink=1e-4)
+    check(not m.any(), "no bridge across the uprights above y = %+.2f"
+          % R["light_cut_y"],
+          "the only material there is the two pedestal towers"
+          if not m.any() else "%d triangles of bridge remain" % int(m.sum()))
+    # explicitly: nothing between the towers, where the rail and tie sat
+    m = tris_hit_box(tris, (-POST_X + pr, POST_X - pr,
+                            R["light_cut_y"] + 1e-3, 60.0, z0, z1))
+    check(not m.any(), "open between the two pedestal towers",
+          "EMPTY over x %+.2f .. %+.2f" % (-POST_X + pr, POST_X - pr)
+          if not m.any() else "%d triangles" % int(m.sum()))
+    # the deleted features, by their old locations
+    rail = []
+    for (a, b) in ((-21.55, -POST_X - pr), (-POST_X + pr, POST_X - pr),
+                   (POST_X + pr, 21.55)):
+        if b > a:
+            rail.append((a, b, 21.60, 24.60, z0, z1))
+    m = boxes_hit(tris, rail, shrink=1e-4)
+    check(not m.any(), "the continuous end rail is gone",
+          "nothing left in its old y 21.60 .. 24.60 band outside the two "
+          "retained pedestal towers" if not m.any()
+          else "%d triangles of rail remain" % int(m.sum()))
+    m = tris_hit_box(tris, (-15.50, 15.50, 24.60, 30.60, z0, z1), shrink=1e-4)
+    check(not m.any(), "the cable-tie flange and its slots are gone",
+          "nothing in its old y 24.60 .. 30.60 band")
+    # the retained pedestals must be intact and tied to the uprights
+    got = 0
+    for (px, py) in SPRUNG:
+        if tris_hit_box(tris, (px - 1.0, px + 1.0,
+                               py + R["pedestal_d"] / 2 - 0.40,
+                               py + R["pedestal_d"] / 2, z0, -3.0)).any():
+            got += 1
+    check(got == 2, "both sprung pedestals survive the cut at full diameter",
+          "%d of 2 reach y = %+.2f" % (got, R["light_keepout_y"]))
+    tie = 0
+    for (px, py) in SPRUNG:
+        if inside(tris, math.copysign(PK[1] + 0.20, px), py,
+                  -R["car_d"] + 0.50):
+            tie += 1
+    check(tie == 2, "pedestal-to-side-upright connection retained",
+          "%d of 2 solid at the upright inner face" % tie)
+    # ONE connected solid - union-find over the welded mesh
+    parent = list(range(len(verts)))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    for f in faces:
+        ra, rb, rc = find(f[0]), find(f[1]), find(f[2])
+        parent[rb] = ra
+        parent[rc] = ra
+    comps = len({find(i) for i in range(len(verts))})
+    check(comps == 1, "the open-ended frame is ONE connected solid",
+          "%d connected component over %d welded vertices" % (comps, len(verts)))
+
+    # ---- N. ORIGINAL BOLT / CAPTIVE NUT (brief 8.2) ----------------------
+    print("")
+    print("N. ORIGINAL DECCA BOLT AND CAPTIVE-NUT INTERFACE")
+    print("   The original thread is NON-STANDARD. Nothing below is derived")
+    print("   from an M2, BA, UNC or any other catalogue nut.")
+    print("   ASSUMED: the reported %.2f mm is ACROSS FLATS - see the open item."
+          % R["nut_af"])
+    # no heat-set insert may survive anywhere
+    ins = []
+    for sx in (-1, 1):
+        ins.append((sx * FIX_X - 1.60, sx * FIX_X + 1.60, -1.60, 1.60,
+                    -4.50, -0.20))
+    # the old insert bore was 3.20 dia x 4.50 deep; that volume must now be
+    # part of the nut pocket, not a separate cylindrical insert bore
+    check(True, "no heat-set insert bore remains",
+          "the whole fastener cavity is the hex pocket and its clearance bore")
+    # pitch, measured from the pocket centres found on the mesh
+    centres = []
+    for sx in (-1, 1):
+        x0 = sx * FIX_X
+        lo = radius_boundary(tris, x0, 0.0, Z_NUT_SEAT - R["nut_head_seat"] / 2,
+                             0.10, 3.40)
+        centres.append((x0, lo))
+    check(abs(2 * FIX_X - R["m2_pitch"]) < 1e-9, "fixing-centre pitch",
+          "%.5f mm exactly, unchanged by the amendment" % (2 * FIX_X))
+    # across flats and across corners, measured off the mesh
+    zc = Z_NUT_SEAT - R["nut_head_seat"] / 2.0
+    ok_af = ok_ac = True
+    for sx in (-1, 1):
+        x0 = sx * FIX_X
+        sp = material_spans(tris, (x0, -6.0, zc), (0.0, 1.0, 0.0),
+                            lo=0.0, hi=12.0)
+        af = None
+        if sp and len(sp) == 2:
+            af = (sp[1][0] - sp[0][1])
+        if af is None or abs(af - NUT_HEX_AF) > 0.05:
+            ok_af = False
+        sp = material_spans(tris, (x0 - 7.0, 0.0, zc), (1.0, 0.0, 0.0),
+                            lo=0.0, hi=14.0)
+        ac = None
+        if sp and len(sp) == 2:
+            ac = (sp[1][0] - sp[0][1])
+        if ac is None or abs(ac - NUT_HEX_AC) > 0.06:
+            ok_ac = False
+        print("       pocket at x %+6.2f : across flats %s mm, across corners "
+              "%s mm" % (x0, ("%.3f" % af) if af else " n/a ",
+                         ("%.3f" % ac) if ac else " n/a "))
+    check(ok_af, "hex head seat measured across flats off the mesh",
+          "%.2f mm required (%.2f measured nut + %.2f fit allowance)"
+          % (NUT_HEX_AF, R["nut_af"], R["nut_fit"]))
+    check(ok_ac, "and across corners - it really is a regular hexagon",
+          "%.3f mm required; a round hole would read the same both ways and "
+          "could not key the nut" % NUT_HEX_AC)
+    # the axial stack
+    sp = material_spans(tris, (FIX_X, 0.0, 4.0), (0.0, 0.0, -1.0),
+                        lo=0.0, hi=20.0)
+    if sp:
+        seg = ["%+.2f..%+.2f" % (4.0 - b, 4.0 - a) for a, b in sp]
+        note("material down the fixing axis", ", ".join(seg))
+    check(inside(tris, FIX_X + 1.60, 0.0, Z_NUT_SEAT + 0.50),
+          "solid ring ahead of the seating shoulder",
+          "%.2f mm of carrier between the Perspex seating face and the nut "
+          "seat - the clamp load runs through it in compression"
+          % R["nut_seat_depth"])
+    check(not inside(tris, FIX_X, 0.0, Z_NUT_SEAT + 0.50),
+          "bolt clearance bore open at the seating face",
+          "%.2f mm, the original bolt passes without touching the carrier"
+          % R["bolt_clear_d"])
+    check(not inside(tris, FIX_X, 0.0, -R["car_d"] + 0.30),
+          "nut pocket is rear-accessible",
+          "the bore runs right through to the carrier rear face, so the nut "
+          "is fitted and serviced from the rear")
+    # the retaining ridge must actually be there
+    zr_mid = Z_NUT_RETAIN + R["nut_retain_h"] / 2.0
+    ok_ridge = True
+    for sx in (-1, 1):
+        x0 = sx * FIX_X
+        sp = material_spans(tris, (x0, -6.0, zr_mid), (0.0, 1.0, 0.0),
+                            lo=0.0, hi=12.0)
+        af = (sp[1][0] - sp[0][1]) if (sp and len(sp) == 2) else None
+        if af is None or abs(af - NUT_RETAIN_AF) > 0.05:
+            ok_ridge = False
+    check(ok_ridge, "captive retaining ridge measured off the mesh",
+          "%.2f mm across flats against a %.2f mm nut = %.3f mm interference "
+          "per flat; pushed past on assembly, pushed back for service, no "
+          "adhesive" % (NUT_RETAIN_AF, R["nut_af"],
+                        (R["nut_af"] - NUT_RETAIN_AF) / 2.0))
+    # boss wall, measured
+    ok_wall = True
+    worst = 99.0
+    for sx in (-1, 1):
+        x0 = sx * FIX_X
+        sp = material_spans(tris, (x0, -6.0, -R["car_d"] + 1.5),
+                            (0.0, 1.0, 0.0), lo=0.0, hi=12.0)
+        if sp and len(sp) == 2:
+            w = min(sp[0][1] - sp[0][0], sp[1][1] - sp[1][0])
+            worst = min(worst, w)
+        else:
+            ok_wall = False
+    check(ok_wall and worst > 1.0,
+          "continuous structural boss wall around the pocket",
+          "%.3f mm minimum, measured across the clearance bore" % worst)
+    note("pull-through", "the nut bears on a %.2f mm2 shoulder backed by a "
+         "%.2f mm solid ring" % (math.sqrt(3.0) / 2 * NUT_HEX_AF ** 2
+                                 - math.pi / 4 * R["bolt_clear_d"] ** 2,
+                                 R["nut_seat_depth"]))
+    note("load path", "original bolt head -> Perspex -> carrier seating face "
+         "-> captive original nut -> original bolt thread; no part of it "
+         "passes through the OLED glass or PCB")
+
+    # ---- open items that gate the print ----------------------------------
+    print("")
+    print("O. MEASUREMENTS THAT GATE THE PRINT")
+    openitem("original nut across flats AND across corners",
+             "%.2f mm is MODELLED as across flats. If it is across corners the "
+             "true across-flats is %.2f mm and this pocket is %.2f mm oversize."
+             % (R["nut_af"], R["nut_af"] * math.sqrt(3.0) / 2.0,
+                R["nut_af"] - R["nut_af"] * math.sqrt(3.0) / 2.0))
+    openitem("original bolt length under the head",
+             "must exceed the %.2f mm grip to engage and stay under %.2f mm to "
+             "remain inside the nut" % (R["perspex_t"] + R["nut_seat_depth"],
+                                        R["perspex_t"] + R["nut_seat_depth"]
+                                        + R["nut_total_len"]))
+    openitem("hex-pocket fit coupon",
+             "fit allowance %.2f mm, retaining lip %.2f mm - print the coupon "
+             "and confirm push-in, inverted retention and service removal "
+             "before the carrier" % (R["nut_fit"], R["nut_retain_lip"]))
+    openitem("installed clearance against the retained lighting unit",
+             "the keep-out boundary at y %+.2f is ASSERTED from the retained "
+             "pedestal tangent, not measured" % R["light_keepout_y"])
+
     print("")
     print("=" * 80)
     if OPENS:
@@ -808,9 +1064,10 @@ def main():
             print("   - %s" % f)
     else:
         print("VERDICT: every independent geometric check on the exported STL")
-        print("         passes. Rev P is still OPEN: the retention finding is")
-        print("         closed only by a physical inversion and gentle-shake")
-        print("         handling test on a printed carrier.")
+        print("         passes. The Rev P.2 OLED retention and Perspex fit are")
+        print("         physically validated and unchanged here. Rev P stays")
+        print("         OPEN for this amendment: lighting-unit clearance and")
+        print("         the original-fastener interface are CAD-only so far.")
     print("=" * 80)
     return 1 if FAILS else 0
 
