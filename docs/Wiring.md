@@ -264,8 +264,11 @@ remain proposed until the dial-lighting bench procedure passes.
   derived by the ESP32 board regulator for logic/ADC and the OLED as documented.
 - The 5 V rail supplies the ESP32 board input and the three E10 dial lamps.
 - **No dedicated 6 V/6.3 V lighting rail** is required or planned.
-- Exact 5 V PSU/regulator model and current rating remain **open procurement** and
-  must be selected with adequate current margin before final assembly.
+- Selected/acquired 5 V supply: **Phihong PSA15R-050P** switching adapter,
+  **5.0 V DC at 3.0 A (15 W)**. The 5 V PSU procurement item is closed.
+- Before connecting it to the loom, confirm the DC plug size and polarity with a
+  multimeter. Keep the enclosed mains adapter intact; only its low-voltage output
+  connects to the 5 V control rail.
 - The WiiM Pro remains continuously powered and uses its own automatic standby.
 - The Fosi ZA3 PSU may remain energised; the amplifier state is controlled by H6
   via its 12 V trigger input.
