@@ -41,6 +41,13 @@ mounting hole. No plain post remains. The newly converted pair requires the same
 positive retention proof as the existing pair plus direct bonded-glass clearance,
 combined insertion-force, PCB-bow, root-strength and four-post release evidence.
 
+Amended again 2026-08-29 to correct the mounting-point vertical offset. With the
+open connector-cut-out side defined as the carrier bottom, move both carrier
+fixing centres **7.00 mm downward** relative to the OLED bay. The original
+Perspex holes remain untouched; aligning the revised carrier to them raises the
+screen by 7.00 mm relative to the Perspex opening. This supersedes the earlier
+active-area-bottom-to-opening-bottom alignment rule.
+
 Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
 ## 1. Reason for redesign
@@ -445,29 +452,37 @@ not external fins and not separate components.
 
 #### Screen and fixing-hole vertical datum
 
-Use the measured Perspex opening as the panel datum. With the opening centre at
-`y = 0`, its bottom edge is:
+Define the open side containing the four-pin connector cut-out as the carrier
+**bottom** (`-Y`). Retain the complete 180-degree in-plane OLED transform so the
+four-pin/header side is also at the bottom. PCB, glass, active area, four mounting
+holes, header, solder tips, datum pads, posts, pocket, rear-wall opening and light
+blocks shall remain one internally consistent OLED-dependent group.
 
-`panel_open_bottom_y = -panel_open_h / 2 = -7.65 mm`.
+Move both carrier fixing centres, their bosses, bores, captive-nut pockets and
+structural arms exactly **7.00 mm toward the carrier bottom** relative to that
+OLED-dependent group. Provide one named parameter:
 
-Rotate the complete OLED module reference **180 degrees in its plane** so the
-four-pin/header side is the bottom side. Do not mirror only selected features;
-transform the PCB, glass, active area, four mounting holes, header, solder tips,
-datum pads, posts, pocket, rear-wall opening and light blocks consistently.
+`carrier_fix_y_from_previous = -7.00 mm`.
 
-Align the bottom edge of the visible OLED active area with the bottom edge of
-the Perspex opening. With `oled_active_h = 14.70 mm`, this gives:
+Both fixing centres shall remain on one common horizontal centreline and retain
+the exact 49.00 mm X pitch. The shift is vertical only; no relative X movement,
+skew or pitch change is permitted.
 
-`oled_active_center_y = panel_open_bottom_y + oled_active_h / 2 = -0.30 mm`.
+The original Perspex and its holes are not moved, redrilled or redefined. In the
+assembled reference, the carrier fixing holes shall coincide with the physical
+Perspex holes. Therefore the equivalent panel-coordinate implementation is to
+raise the OLED bay and all OLED-dependent carrier geometry by **+7.00 mm** while
+leaving the panel holes fixed. Do not create a Fusion assembly in which the
+carrier holes and Perspex holes are shown 7.00 mm apart.
 
-The OLED active area remains horizontally centred. It is intentionally no longer
-vertically centred: the top margin becomes 0.60 mm and the bottom margin 0.00 mm.
-
-The existing Perspex fixing holes are not moved. Their exact 49.00 mm horizontal
-pitch and physical vertical centreline remain the mounting authority. Correct
-the carrier by moving the OLED bay and all OLED-dependent geometry relative to
-the panel-fixed bosses/holes. Do not merely change `panel_fix_y`, and do not move
-the holes with the OLED transform.
+This instruction supersedes the earlier rule that aligned the visible active-area
+bottom edge with the Perspex opening bottom. Using the immediately preceding
+Rev P.5 datum as the numerical baseline, the expected modelled active-area centre
+moves from `y = -0.30 mm` to **`y = +6.70 mm`**, with predicted edges at
+`y = -0.65 mm` and `y = +14.05 mm`. These figures are a transform cross-check,
+not proof that the visible position is acceptable. Record the actual powered
+screen position through the Perspex and obtain physical fit evidence before
+release.
 
 ## 9. Required corrective CAD changes for open Rev P
 
@@ -487,8 +502,8 @@ the holes with the OLED transform.
 9. Model display-side protrusions at 1.00 mm maximum after preparation.
 10. Use the measured 49.00 mm fixing pitch and 35.20 × 15.30 mm aperture.
 11. Retain the existing bezel unless new test evidence requires a change.
-12. Preserve horizontal active-area centring; supersede vertical centring with
-    the connector-side bottom-edge alignment specified in §8.4.
+12. Preserve horizontal active-area centring; set the vertical screen position
+    from the 7.00 mm downward carrier-fixing-centre offset specified in §8.4.
 13. Keep the design fully parametric in Fusion 360.
 14. Remove the complete lighting-unit-side end rail and integral cable-tie
     projection as specified in §8.1, while retaining the post pedestals and side
@@ -507,6 +522,9 @@ the holes with the OLED transform.
     update; do not move the original Perspex or its existing fixing holes.
 21. Convert the remaining two plain posts to sprung posts and delete all plain-post
     geometry and parameters; validate the complete four-post system.
+22. Define the connector-cut-out side as bottom and move both carrier fixing
+    points 7.00 mm toward that bottom relative to the complete OLED-dependent
+    geometry, without moving the original Perspex holes or changing 49.00 mm pitch.
 
 ## 10. Mandatory CAD validation gate
 
@@ -580,10 +598,18 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
   insertion/removal sweep;
 - the complete OLED reference and OLED-dependent carrier geometry have undergone
   one consistent 180-degree in-plane transform, placing the connector at the bottom;
-- the visible active area remains horizontally centred and its bottom edge is
-  coincident with the Perspex opening bottom edge to the CAD model tolerance;
+- the connector-cut-out side is unambiguously the carrier bottom and both fixing
+  centres are exactly 7.00 mm farther toward that bottom than in the preceding
+  Rev P.5 geometry, measured relative to the OLED-dependent group;
+- the visible active area remains horizontally centred and is exactly 7.00 mm
+  higher relative to the Perspex opening than in the preceding Rev P.5 datum;
+- the model reports the resulting visible active-area extent through the Perspex
+  and does not retain the superseded bottom-edge-alignment PASS check;
 - the panel-fixed boss/hole centres remain coincident with the existing Perspex
   holes at exactly 49.00 mm horizontal pitch and are not moved with the OLED;
+- both shifted fixing arms remain continuously joined to the 6.00 mm carrier,
+  clear the OLED bay, rear shield, light blocks and lighting-unit installation
+  path, and carry clamp load through the existing hard stops;
 - no unprintable thin slivers or unsupported critical features;
 - normal FDM wall thickness is restored in structural areas.
 
@@ -610,7 +636,9 @@ Before generating the next Fusion model, produce and review a simple side-sectio
 - the 6.00 mm carrier rear plane;
 - the 14.00 × 4.19 mm four-pin/header opening and wire-exit path;
 - the two internal light-block walls; and
-- the connector-side active-area bottom edge aligned to the Perspex opening bottom.
+- the connector-cut-out side identified as bottom, with the two fixing points
+  dimensioned 7.00 mm downward relative to the OLED group and coincident with
+  the unchanged Perspex holes in the assembled view.
 
 The CAD build must not proceed unless the section shows positive stops in both
 axial directions: fixed rear datum pads stopping insertion and sprung noses
@@ -631,9 +659,9 @@ this order:
 5. the stated release method removes the OLED without damaging posts or PCB;
 6. carrier seats flat against Perspex;
 7. actual OLED-to-Perspex gap;
-8. powered active-area alignment: horizontally centred, connector-side bottom
-   edge aligned to the Perspex opening bottom edge, with 0.00 mm nominal bottom
-   margin and 0.60 mm nominal top margin;
+8. powered active-area position after the 7.00 mm mounting-offset correction:
+   horizontally centred and visibly raised by 7.00 mm relative to the preceding
+   Rev P.5 position; record the visible active-area edges through the opening;
 9. bezel alignment;
 10. tightening the original Decca bolts does not change OLED depth or stress the module;
 11. prepared solder joints and header clear the Perspex and carrier;
@@ -667,10 +695,11 @@ this order:
     wire bend pass freely;
 25. both internal light-block walls remain within the back-plate footprint and
     carrier-depth envelope and show no pin/wire contact;
-26. the four-pin side is physically at the bottom and the visible active-area
-    bottom edge aligns with the Perspex opening bottom edge; and
-27. both original carrier fixing holes align with the untouched Perspex holes,
-    retaining exactly 49.00 mm horizontal pitch; and
+26. the open four-pin side is physically at the bottom and both carrier fixing
+    centres are 7.00 mm down relative to the OLED-dependent geometry;
+27. both shifted carrier fixing holes align with the untouched Perspex holes,
+    retaining exactly 49.00 mm horizontal pitch, and the resulting screen is
+    7.00 mm higher relative to the opening than the preceding Rev P.5 datum; and
 28. all four sprung posts seat, retain and deliberately release the PCB without
     bonded-glass contact, excessive insertion force, permanent post set, root
     cracking or PCB bow; no plain post remains.
@@ -712,9 +741,11 @@ shall close the rear of the OLED bay as an integral opaque light shield, with
 only the local opening for the four input/header pins and wiring. Rev P.5 shall
 reduce the carrier depth to 6.00 mm, enlarge that finished opening to
 14.00 × 4.19 mm, add two envelope-contained internal side light blocks, rotate
-the complete OLED reference so the connector is at the bottom, and align the
-visible active-area bottom edge with the Perspex opening bottom while leaving
-the original panel holes fixed at exactly 49.00 mm horizontal pitch. Both
+the complete OLED reference so the connector is at the bottom, then place both
+carrier fixing centres 7.00 mm farther toward that bottom relative to the OLED
+group while leaving the original Perspex holes fixed at exactly 49.00 mm
+horizontal pitch. The earlier active-area-bottom alignment rule is superseded;
+the screen is intentionally raised 7.00 mm relative to that datum. Both
 remaining plain posts are deleted and replaced by sprung locating-and-retaining
 posts, subject to direct four-hole glass-clearance and complete four-post force,
 strain, PCB-bow and release validation.**
