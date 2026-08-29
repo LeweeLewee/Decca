@@ -140,6 +140,9 @@ thermal-design restriction.
 ## Controller
 
 - **ESP32 DevKit** (dual-core, Wi-Fi, LEDC PWM, ADC).
+- The physical board used is the **30-pin DevKit V1 / DOIT-style layout** on a
+  matching 30-pin screw-terminal adapter. Documentation therefore records both
+  the logical GPIO number and the **silkscreen label printed on the board**.
 - **ADC1 is used for all analogue inputs** because Wi-Fi is enabled in Phase 2
   and **ADC2 is unavailable while Wi-Fi is active** (Specification `HW-02`).
 - Strapping pins (0, 2, 5, 12, 15) are avoided for driven/reset-sensitive lines
@@ -151,14 +154,22 @@ thermal-design restriction.
 Four **10 kΩ linear** pots (Balance, Treble, Bass, Volume) wired GND / wiper /
 3.3 V (Brown / White / Red). Wipers read on ADC1. Firmware applies calibration,
 smoothing, deadband, and optional inversion (see Firmware Architecture).
-Bench-verified pins: Volume GPIO32, Bass GPIO33, Treble GPIO34, Balance GPIO35.
+Bench-verified assignments and board labels are:
+
+| Control | GPIO | Printed board label |
+|---------|------|---------------------|
+| Volume  | GPIO32 | **D32** |
+| Bass    | GPIO33 | **D33** |
+| Treble  | GPIO34 | **D34** |
+| Balance | GPIO35 | **D35** |
+
 Each channel measured 0 anticlockwise, approximately 2047 at centre, and 4095
 clockwise on 2026-08-24, so the default 0–4095 calibration remains applicable.
 
 ### On/off switch (H2)
 Retained original switch and cable, active conductors **Red** and **Green**. A
 simple open/close contact read as a **low-voltage digital input** with the ESP32
-**internal pull-up** enabled (proposed GPIO19). **Not a mains switch.** Optional
+**internal pull-up** enabled (proposed GPIO19, board label **D19**). **Not a mains switch.** Optional
 firmware inversion after bench testing. Its logical state drives the locked
 system-power sequence documented above.
 
@@ -167,17 +178,19 @@ Original interlocked selector on its **original PCB**, which is retained as the
 **mechanical carrier** for the mechanism (ADR-0001). Four working contact pairs
 (VHF, MW, LW, Gram) are read as low-voltage digital inputs with internal pull-ups
 and software debounce. **SW has no unique contact and is deferred (no function in
-Phase 1).** Inputs are VHF GPIO16, MW GPIO17, LW GPIO18 and Gram GPIO23; all
-avoid strapping pins. GPIO16, GPIO17 and GPIO23 are bench-verified. GPIO18
-remains proposed pending repair and retest of the LW Yellow/Orange contact pair.
-The Stereo/Mono control is retained but **unwired** (ADR-0005).
+Phase 1).** Inputs are VHF GPIO16 / board label RX2, MW GPIO17 / board label TX2,
+LW GPIO18 / board label D18 and Gram GPIO23 / board label D23; all avoid strapping
+pins. GPIO16, GPIO17 and GPIO23 are bench-verified. GPIO18 remains proposed
+pending repair and retest of the LW Yellow/Orange contact pair. The Stereo/Mono
+control is retained but **unwired** (ADR-0005).
 
 ## Outputs
 
 ### OLED display (H4)
 Purchased Pi Hut 1.3-inch white 128×64 SH1106 I²C panel (SKU 105630), powered
-from 3.3 V at address 0x3C. SDA GPIO21 / SCL GPIO22 were bench-verified on
-2026-08-25 with the on-target display suite and a visual layout inspection.
+from 3.3 V at address 0x3C. SDA GPIO21 / board label **D21** and SCL GPIO22 /
+board label **D22** were bench-verified on 2026-08-25 with the on-target display
+suite and a visual layout inspection.
 
 ### Dial lighting (H5)
 Three identical **E10/MES warm-white LED lamps**, target approximately **24 mm
@@ -186,7 +199,7 @@ overall length** to match the originals. Preferred colour temperature is
 5 V devices or explicitly specified as compatible across a range including 5 V
 (e.g. 1–5 V or 3–6 V). They are wired **in parallel** and driven together through
 a **logic-level N-channel MOSFET**, gate driven by ESP32 **PWM (LEDC)**, proposed
-GPIO25. Common ground with the ESP32.
+GPIO25 / board label **D25**. Common ground with the ESP32.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. Firmware stores the selected PWM level in non-volatile
