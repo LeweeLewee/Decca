@@ -273,10 +273,12 @@ The approved low-voltage controller path is:
 - The adapter remains enclosed and external by default. Only its isolated
   low-voltage output enters the cabinet; this controller path adds no internal
   230 V connection.
-- The panel-mount female DC socket must match the actual adapter plug and be rated
-  for at least 5 V / 3 A. A 5.5 mm OD × 2.1 mm ID centre-positive connection is
-  the provisional expectation only; verify the physical plug and polarity before
-  ordering or wiring the socket.
+- Purchased input-socket set: **TopHomer ASIN B08HGXYS4J**, pack of five
+  female two-terminal threaded-nut panel sockets, **5.5 mm OD × 2.1 mm ID** and
+  rated **3 A**; one is required.
+- The purchase closes socket procurement, not validation. Confirm the actual
+  Phihong plug fit and centre-positive polarity before drilling or wiring the
+  selected socket.
 - Fit a **2 A low-voltage fuse** in the +5 V conductor immediately after the
   socket and before distribution. Recheck the rating against measured total lamp
   current during commissioning.
