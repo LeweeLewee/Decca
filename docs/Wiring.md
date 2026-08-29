@@ -223,17 +223,18 @@ unclipped and free of persistent display artefacts.
 
 ## H5 — Dial Illumination
 
-- **Three identical E10/MES warm-white LED lamps** in the three original holders.
-- Target lamp geometry: approximately **24 mm overall length**, matching the
-  original bulb form factor closely enough to retain the original optics/position.
-- Preferred colour temperature: **2200–3000 K**.
-- Lamps must be compatible with the locked **5 V lighting rail**. Accept nominal
-  5 V devices or a specified operating range that includes 5 V (for example
-  1–5 V or 3–6 V).
-- The three lamps are wired **in parallel**.
-- One **logic-level N-channel MOSFET** low-side switches the complete lamp bank;
-  ESP32 drives the gate.
-- **PWM** controlled by the ESP32 (proposed **GPIO25 / board label D25**, LEDC).
+- Purchased lamp set: **ShuoHui E10 miniature screw LEDs**, ASIN
+  **B0CFTLZFGT**, pack of 10; **6 V AC/DC, 0.2 W, 3000 K**. Three are required.
+- The selected lamps are **not yet electrically or mechanically approved**:
+  confirm their approximately 24 mm holder fit, acceptable brightness and total
+  current from the locked 5 V rail before installation.
+- Wire the three validated lamps **in parallel**.
+- Selected switch candidate: one **DAOKAI 3.3 V / 5 V PWM MOSFET driver module**,
+  ASIN **B09YYH2BTF**, from the ordered pack of 10.
+- The seller's compatibility claim is not the bench result. Verify clean PWM
+  switching from ESP32 **GPIO25 / board label D25**, safe-off behaviour and
+  acceptable module temperature at the measured lamp-bank current. Reopen the
+  switch selection if it cannot pass.
 - ESP32 and lighting grounds are **common**.
 - Brightness is set during commissioning, stored in non-volatile settings and
   then treated as a setup value rather than a normal user control. The unused
@@ -241,8 +242,9 @@ unclipped and free of persistent display artefacts.
   not reserved permanently for lighting.
 
 Expected behaviours: fade up, fade down, stored/configurable brightness, safe
-boot state. Firmware support is implemented; GPIO25 and the MOSFET/load wiring
-remain proposed until the dial-lighting bench procedure passes.
+boot state. Firmware support is implemented. The purchased lamps, ordered
+MOSFET module, GPIO25 and the complete load wiring remain unapproved until the
+dial-lighting bench procedure passes.
 
 ## H6 — Fosi ZA3 12 V Trigger
 
