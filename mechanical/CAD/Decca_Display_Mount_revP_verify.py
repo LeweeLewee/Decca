@@ -94,9 +94,15 @@ R = dict(
     # expected carrier envelope. Rev P.5 brief 8.4 fixes the depth at 6.00.
     car_w=56.60, car_h=39.15, car_d=6.00,
     # Rev P.5 in-plane module transform (brief 8.4). 180 degrees, so the
-    # four-pin connector ends up at the BOTTOM, and the visible active area is
-    # dropped until its bottom edge meets the Perspex opening bottom edge.
+    # four-pin connector ends up at the BOTTOM - the open, cut-away side.
     module_rot_deg=180.0,
+    # Rev P.5 mounting-point correction (brief 8.4, amended). BOTTOM is -Y.
+    # Both carrier fixing centres move this far toward it, relative to the
+    # OLED-dependent group. The Perspex holes do not move, so in the assembled
+    # frame the OLED group rises by the same amount instead. This SUPERSEDES
+    # the active-area-bottom-to-opening-bottom rule; there is no requirement
+    # left in this file for a 0.00 mm bottom margin or a 0.60 mm top margin.
+    carrier_fix_y_from_previous=-7.00,
     # lighting-unit-side rail cut (brief 8.1). These describe the CARRIER, not
     # a lighting unit: there is no measured lighting-unit geometry anywhere in
     # this project and Rev P.4 deleted the proxy that pretended otherwise.
@@ -183,7 +189,10 @@ FIX_X = R["m2_pitch"] / 2                                  # 24.50
 # origin, so its bottom edge fixes where the visible active area must sit.
 PANEL_BOTTOM_Y = -R["aperture_h"] / 2                      # -7.65
 PANEL_TOP_Y = R["aperture_h"] / 2                          # +7.65
-OLED_CY = PANEL_BOTTOM_Y + R["active_h"] / 2               # -0.30
+# the SUPERSEDED datum, kept only as the numerical baseline for the correction
+OLED_CY_PREV = PANEL_BOTTOM_Y + R["active_h"] / 2          # -0.30
+OLED_RISE = -R["carrier_fix_y_from_previous"]              # +7.00
+OLED_CY = OLED_CY_PREV + OLED_RISE                         # +6.70
 FY = math.cos(math.radians(R["module_rot_deg"]))           # -1 at 180 deg
 
 
@@ -221,7 +230,19 @@ Y_FAR = MY(R["pcb_off_y"] - R["hole_pitch_y"] / 2)         # +9.95
 CONN = [(-POST_X, Y_CONN), (POST_X, Y_CONN)]
 FAR = [(-POST_X, Y_FAR), (POST_X, Y_FAR)]
 HOLES = CONN + FAR
-CARRIER_MIN_Y = Y_CONN - R["pedestal_d"] / 2               # -22.85
+CARRIER_MIN_Y = Y_CONN - R["pedestal_d"] / 2               # -15.85
+
+# what the correction does to the picture, re-derived independently
+VIS_Y0 = max(ACTIVE[2], PANEL_BOTTOM_Y)                    # -0.65
+VIS_Y1 = min(ACTIVE[3], PANEL_TOP_Y)                       # +7.65
+VIS_H = max(0.0, VIS_Y1 - VIS_Y0)                          #  8.30
+ACTIVE_ABOVE = max(0.0, ACTIVE[3] - PANEL_TOP_Y)           #  6.40
+ACTIVE_BELOW = max(0.0, PANEL_BOTTOM_Y - ACTIVE[2])        #  0.00
+OPENING_UNLIT_BELOW = max(0.0, ACTIVE[2] - PANEL_BOTTOM_Y)  #  7.00
+# the same move in the two frames
+FIX_REL_OLED = 0.0 - OLED_CY                               # -6.70
+FIX_REL_OLED_PREV = 0.0 - OLED_CY_PREV                     # +0.30
+FIX_SHIFT_LOCAL = FIX_REL_OLED - FIX_REL_OLED_PREV         # -7.00
 
 
 def post_req(tag):
@@ -1516,9 +1537,117 @@ def main():
          "flat on the bed and the light blocks grow up off it - no bridging "
          "and no supports." % int(round(R["rear_light_shield_t"] / 0.20)))
 
+    # ---- P. THE MOUNTING-POINT CORRECTION, MEASURED ----------------------
+    print("")
+    print("P. MOUNTING-POINT CORRECTION AND WHAT IS ACTUALLY VISIBLE")
+    print("   Both figures below come off the mesh: the bolt-bore centre and")
+    print("   the carrier's own connector-side extremity. Nothing is read")
+    print("   back from the generator.")
+
+    # 1. the bolt bore centre, from the void it leaves in the boss
+    bore_c = None
+    ok_bore = True
+    for sx in (-1, 1):
+        x0 = sx * FIX_X
+        sp = material_spans(tris, (x0, -12.0, -1.00), (0.0, 1.0, 0.0),
+                            lo=0.0, hi=24.0)
+        if not sp or len(sp) != 2:
+            ok_bore = False
+            continue
+        lo = sp[0][1] - 12.0
+        hi = sp[1][0] - 12.0
+        c = (lo + hi) / 2.0
+        if abs((hi - lo) - R["bolt_clear_d"]) > 0.06:
+            ok_bore = False
+        if bore_c is None:
+            bore_c = c
+        elif abs(c - bore_c) > 1e-3:
+            ok_bore = False       # the two are not on one centreline
+        print("       bore at x %+7.2f : void y %+7.3f .. %+7.3f, centre "
+              "%+7.3f, width %.3f" % (x0, lo, hi, c, hi - lo))
+    check(ok_bore and bore_c is not None and abs(bore_c) < 0.005,
+          "both bolt bores on one horizontal centreline at y = 0",
+          "centre %+.4f mm, width %.2f mm, no relative skew - the Perspex "
+          "holes were not moved" % (bore_c if bore_c is not None else
+                                    float("nan"), R["bolt_clear_d"]))
+
+    # 2. the same bores, in X: exact pitch, no shift
+    xs = []
+    for sy in (0.0,):
+        sp = material_spans(tris, (-40.0, sy, -1.00), (1.0, 0.0, 0.0),
+                            lo=0.0, hi=80.0)
+        if sp:
+            for a, b in zip(sp, sp[1:]):
+                g0, g1 = a[1] - 40.0, b[0] - 40.0
+                if abs((g1 - g0) - R["bolt_clear_d"]) < 0.06:
+                    xs.append((g0 + g1) / 2.0)
+    ok_x = len(xs) == 2 and abs(abs(xs[1] - xs[0]) - R["m2_pitch"]) < 1e-3 \
+        and abs(xs[0] + xs[1]) < 1e-3
+    check(ok_x, "fixing pitch exactly %.2f mm, symmetric about x = 0"
+          % R["m2_pitch"],
+          "centres %s, pitch %.5f mm - no X shift"
+          % (", ".join("%+.4f" % v for v in xs),
+             abs(xs[1] - xs[0]) if len(xs) == 2 else float("nan")))
+
+    # 3. the fixings relative to the OLED-dependent group, measured
+    ymin = tris.reshape(-1, 3)[:, 1].min()
+    meas = (bore_c if bore_c is not None else 0.0) - ymin
+    want = 0.0 - CARRIER_MIN_Y
+    prev = want + OLED_RISE
+    check(abs(meas - want) < 0.03,
+          "fixings sit %.2f mm above the connector-side extremity" % want,
+          "%.3f mm measured. Before the correction it was %.2f mm, so the "
+          "fixings moved %+.2f mm toward the connector/open bottom relative "
+          "to the OLED group." % (meas, prev, want - prev))
+    print("")
+    print("   THE SAME MOVE, STATED IN BOTH FRAMES")
+    print("   1. CARRIER-LOCAL. Fixing centres %+.2f mm from the OLED group,"
+          % FIX_REL_OLED)
+    print("      against %+.2f mm before: %+.2f mm toward the connector."
+          % (FIX_REL_OLED_PREV, FIX_SHIFT_LOCAL))
+    print("   2. ASSEMBLED PANEL. Perspex and its holes unmoved; the OLED bay")
+    print("      and every OLED-dependent feature rose %+.2f mm, so the"
+          % OLED_RISE)
+    print("      carrier holes land ON the Perspex holes, not %.2f mm away."
+          % abs(FIX_SHIFT_LOCAL))
+    check(abs(FIX_SHIFT_LOCAL - R["carrier_fix_y_from_previous"]) < 1e-9,
+          "the two frames describe ONE move, not two",
+          "carrier-local %+.2f mm and assembled %+.2f mm are the same "
+          "geometry" % (FIX_SHIFT_LOCAL, OLED_RISE))
+
+    # 4. what is visible - reported, never passed
+    print("")
+    print("   WHAT IS ACTUALLY VISIBLE - REPORTED, NOT PASSED")
+    print("   The superseded rule aligned the active-area bottom edge with the")
+    print("   opening bottom edge. It is gone from this file, and so is any")
+    print("   check that would PASS on it.")
+    print("")
+    print("     active area        y %+7.2f .. %+7.2f   (%.2f mm tall)"
+          % (ACTIVE[2], ACTIVE[3], R["active_h"]))
+    print("     Perspex opening    y %+7.2f .. %+7.2f   (%.2f mm tall)"
+          % (PANEL_BOTTOM_Y, PANEL_TOP_Y, R["aperture_h"]))
+    print("     VISIBLE overlap    y %+7.2f .. %+7.2f   = %.2f mm, %.0f%% of "
+          "the active height"
+          % (VIS_Y0, VIS_Y1, VIS_H, 100.0 * VIS_H / R["active_h"]))
+    print("     hidden ABOVE the opening              %.2f mm" % ACTIVE_ABOVE)
+    print("     hidden BELOW the opening              %.2f mm" % ACTIVE_BELOW)
+    print("     unlit band at the opening bottom      %.2f mm"
+          % OPENING_UNLIT_BELOW)
+    print("")
+    print("   The active area is NOT fully visible and is NOT vertically")
+    print("   centred. About %.2f mm - %.0f%% - sits behind the fascia above"
+          % (ACTIVE_ABOVE, 100.0 * ACTIVE_ABOVE / R["active_h"]))
+    print("   the opening, and the lowest %.2f mm of the opening shows unlit"
+          % OPENING_UNLIT_BELOW)
+    print("   board rather than screen. Reported so the powered fit test is")
+    print("   judged against the real picture, not against a CAD claim.")
+    note("visible screen position", "a CAD report, not an acceptance. Only "
+         "brief 12.8 / 12.27, powered and photographed, can say whether the "
+         "intended screen information is still visible.")
+
     # ---- open items that gate the print ----------------------------------
     print("")
-    print("P. MEASUREMENTS AND TESTS THAT GATE THE PRINT AND THE RELEASE")
+    print("Q. MEASUREMENTS AND TESTS THAT GATE THE PRINT AND THE RELEASE")
     openitem("original nut across flats AND across corners",
              "%.2f mm is MODELLED as across flats. If it is across corners the "
              "true across-flats is %.2f mm and this pocket is %.2f mm oversize."
@@ -1542,6 +1671,18 @@ def main():
              "moved the open end from +Y to -Y, so the Rev P.3/P.4 installed "
              "fit does not carry over - 12.14 is a RE-TEST, not a regression "
              "check." % CARRIER_MIN_Y)
+    openitem("powered fit and screen-position test, brief 12.8 / 12.26-27",
+             "install the carrier on the ORIGINAL Perspex holes with the "
+             "ORIGINAL bolts. Confirm the open connector side is at the "
+             "BOTTOM and both fixing holes align without forcing or slotting. "
+             "Power the OLED and PHOTOGRAPH the visible active-area top and "
+             "bottom edges through the opening. Expected: the screen sits "
+             "%.2f mm higher than the preceding Rev P.5 position, with about "
+             "%.2f mm of active area above the opening and a %.2f mm unlit "
+             "band at the bottom of it. Confirm the intended screen "
+             "information is still visible, then repeat the lighting-unit "
+             "clearance, light-leak, retention and removal tests."
+             % (OLED_RISE, ACTIVE_ABOVE, OPENING_UNLIT_BELOW))
     openitem("powered light-leak test, brief 12.22",
              "the %.2f mm wall, the opaque black material and the %.2f x "
              "%.2f mm pin slot are engineering choices, not measurements "

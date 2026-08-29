@@ -36,9 +36,14 @@ bolt / captive-nut interface that replaces the deleted M2 heat-set inserts.
   locating-and-retaining posts — all four PCB mounting holes now hold a split
   sprung post, and no plain-post parameter, body, branch or probe survives;
 - the complete OLED reference is rotated **180° in plane**, so the four-pin
-  connector is at the **bottom** and the active area's bottom edge sits on the
-  Perspex opening bottom edge. The panel-fixed holes do not move. **The open
+  connector is at the **bottom**. The panel-fixed holes do not move. **The open
   lighting-unit end of the carrier travelled with the module, +Y → −Y**;
+- both carrier fixing centres then move **7.00 mm toward that bottom** relative
+  to the OLED group (`carrier_fix_y_from_previous = -7.00 mm`). The Perspex
+  holes are untouched, so the equivalent — and the only implementation that
+  lands the carrier holes *on* them — is to raise the OLED bay **+7.00 mm**.
+  This **supersedes** the earlier active-area-bottom-to-opening-bottom rule and
+  every PASS based on it;
 - the carrier drops to **6.00 mm** deep, the finished rear opening grows 25 % to
   **14.00 × 4.19 mm**, and two integral **light-block** baffles are added
   beside it, running out into the sprung pedestals.
@@ -46,6 +51,13 @@ bolt / captive-nut interface that replaces the deleted M2 heat-set inserts.
 Nothing numeric is inherited: the depth reduction shortens every cantilever, so
 the split slot goes 0.70 → 1.20 mm and the root relief 3.20 → 2.00 mm. Build
 review §25.3 has the recalculation.
+
+> **The screen is no longer fully visible.** Only **8.30 mm** of the 14.70 mm
+> active height falls inside the Perspex opening; about **6.40 mm — 44 % —**
+> sits behind the fascia above it, and the lowest 7.00 mm of the opening shows
+> unlit board. Both tools **report** this and neither passes a check on it.
+> Whether the intended screen information is still readable is a question only
+> the powered fit test can answer. Build review §28.3.
 
 > **The bonded-glass boundary is now THE print gate.** The two converted posts
 > put a nose ahead of the PCB at holes the plain posts never reached, and the

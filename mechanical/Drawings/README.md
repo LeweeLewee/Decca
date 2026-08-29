@@ -43,8 +43,8 @@ clearance, combined-force, PCB-bow and deliberate-release validation.
 | `Decca_OLED_Display_Mount_Topology_revP.md` | Rev P pre-CAD topology gate. **Rev P.2 corrected topology** — flush-side insertion, fixed rear datum pads, positive stops in both axial directions; §13 the Rev P.4 rear light shield; §14–§16 the Rev P.5 four-post conversion, 180° datum and 6.00 mm depth |
 | `Decca_OLED_Display_Mount_CAD_Build_revP.md` | **Rev P.5 build review and validation record** — start here |
 | `Decca_OLED_Display_Mount_revP_posts.png` | **Rev P.5 carrier from the front — FOUR split sprung posts, one in every PCB mounting hole. Connector at the bottom; the two light blocks flank the four-pin opening and run out into the bottom pedestals** |
-| `Decca_OLED_Display_Mount_revP_views.png` | Rev P.5 front three-quarter, carrier + module seated |
-| `Decca_OLED_Display_Mount_revP_rear.png` | **Rev P.5 rear three-quarter — the continuous integral light shield, the four post relief bores, and the enlarged 14.00 × 4.19 mm four-pin opening at the bottom. No lighting keepout component is present** |
+| `Decca_OLED_Display_Mount_revP_views.png` | **Rev P.5 assembly, straight on through the Perspex — where the active area actually sits in the opening after the 7.00 mm mounting correction. Rendered with appearances so it can be read: green active area, translucent fascia** |
+| `Decca_OLED_Display_Mount_revP_rear.png` | **Rev P.5 rear three-quarter — the continuous integral light shield, the four post relief bores, the enlarged 14.00 × 4.19 mm four-pin opening at the bottom, and the two fixing bosses sitting LOW relative to the connector-side carrier after the 7.00 mm correction. No lighting keepout component is present** |
 | `Decca_OLED_Display_Mount_revP_sections.png` | Rev P.5 section at x = +15, through a sprung locating post, with the Perspex, glass and PCB |
 | `Decca_OLED_Display_Mount_revP_nut.png` | Rev P.5 half-section through a fixing centre — the bolt bore, hex head seat, retaining ridge and the original nut |
 
@@ -89,10 +89,9 @@ load-bearing numbers:
 5. both **plain locating posts are deleted** and replaced by sprung
    locating-and-retaining posts — **four sprung posts**, one per PCB mounting
    hole (build review §25);
-6. the module is rotated **180° in plane**: connector at the **bottom**, active
-   area's bottom edge on the Perspex opening bottom edge, panel-fixed holes
-   unmoved. The carrier's open lighting-unit end travelled with it, +Y → −Y
-   (§26);
+6. the module is rotated **180° in plane**: connector at the **bottom**,
+   panel-fixed holes unmoved. The carrier's open lighting-unit end travelled
+   with it, +Y → −Y (§26);
 7. the carrier drops to **6.00 mm**, the finished rear opening grows 25 % to
    **14.00 × 4.19 mm**, and two integral **light-block** baffles are added
    beside it (§27).
@@ -101,7 +100,22 @@ The depth reduction shortens every cantilever, so the split slot goes
 0.70 → 1.20 mm and the root relief 3.20 → 2.00 mm; worst-case post strain rises
 to 2.42 % against a 3.00 % limit and combined insertion force is 28.6 N.
 
-Gating the print: **the bonded-glass boundary at all four holes (§25.4)**, the
+8. both carrier fixing centres then move **7.00 mm toward that bottom**
+   relative to the OLED group (`carrier_fix_y_from_previous = -7.00 mm`). The
+   Perspex holes are untouched, so the equivalent — and the only implementation
+   that lands the carrier holes *on* them — is to raise the OLED bay
+   **+7.00 mm**. This **supersedes** the active-area-bottom-to-opening-bottom
+   rule and every PASS based on it (§28).
+
+**The screen is no longer fully visible.** Only **8.30 mm** of the 14.70 mm
+active height falls inside the Perspex opening; about **6.40 mm — 44 %** — sits
+behind the fascia above it, and the lowest 7.00 mm of the opening shows unlit
+board. Both tools report this and neither passes a check on it; only the powered
+fit test can say whether the intended screen information is still readable
+(§28.3).
+
+Gating the print: **the powered fit and screen-position test (§28.3)**, **the
+bonded-glass boundary at all four holes (§25.4)**, the
 nut across flats **and** across corners (§21.6), the original bolt length
 (§21.6), and the hex-pocket fit coupon (§21.7). Gating release: installed
 lighting-unit clearance (a **re-test**, not a regression check), rack/twist of

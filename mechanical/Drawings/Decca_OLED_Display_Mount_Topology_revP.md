@@ -53,7 +53,18 @@ No Fusion geometry may be generated until this section is clean.
 > sprung cantilever, so both pairs are re-solved from the finished solid.
 > §1–§10 remain the architecture; their *numbers* are superseded by §14–§16.
 
-Baseline: `main` @ `7e115e3`, whose §5.3, §8.1, §8.2, §8.3, §8.4, §9, §10 and
+> **Rev P.5 MOUNTING-POINT CORRECTION, 2026-08-29.** Both carrier fixing
+> centres move **7.00 mm toward the connector/open bottom** relative to the
+> OLED-dependent group (`carrier_fix_y_from_previous = -7.00 mm`). The original
+> Perspex holes do not move, so in the assembled frame the equivalent — and the
+> only implementation that lands the carrier holes *on* the Perspex holes — is
+> to raise the OLED bay and everything that depends on it by **+7.00 mm**.
+>
+> **This supersedes §15's active-area-bottom-to-opening-bottom rule**, and
+> every PASS that depended on it. §17 records the correction and, plainly, what
+> it does to the visible screen.
+
+Baseline: `main` @ `d7ac584`, whose §5.3, §8.1, §8.2, §8.3, §8.4, §9, §10 and
 §12 are authoritative over anything written on this branch before them.
 
 ---
@@ -1106,7 +1117,14 @@ the far pair is easier to reach.
 
 ---
 
-## 15. The 180° module transform and the vertical datum (brief §8.4) — Rev P.5
+## 15. The 180° module transform (brief §8.4) — Rev P.5
+
+> **§15.2's vertical datum is SUPERSEDED by §17.** The 180° transform itself
+> stands: the connector is at the bottom and the group is internally
+> consistent. What changed is *where that group sits* — the fixing centres moved
+> 7.00 mm toward the bottom, which raises the screen 7.00 mm in the assembled
+> frame. The active-area figures below are the superseded baseline, kept only so
+> the correction can be checked against a stated starting point.
 
 The panel is the datum. The Perspex opening is centred on the origin, so its
 bottom edge is at `−panel_open_h/2 = −7.65`. Aligning the visible active area's
@@ -1129,10 +1147,10 @@ transforms anything again, so no feature can be moved twice or missed.
 | tip x offset | +0.50 | −0.50 |
 | **fixing holes** | — | **y 0.00, pitch 49.00000 — NOT MOVED** |
 
-Result: active area **horizontally centred**, bottom margin **0.00 mm**, top
-margin **0.60 mm**, connector at the **bottom**. The vertical off-centring is
-intentional and both tools assert it as such, so it cannot later be mistaken for
-drift.
+Result at this stage: active area **horizontally centred**, connector at the
+**bottom**, active centre at y −0.30. **That vertical position is superseded by
+§17** — it survives here only as `oled_cy_prev`, the numerical baseline the
+7.00 mm correction is measured from.
 
 ### 15.1 The open end travelled with the module — this matters
 
@@ -1220,7 +1238,115 @@ rail to the cap. Nothing else moved, and the sliver check still reports 0 / 0.
 
 ---
 
-## 17. Rev P.5 pre-CAD gate — self-review verdict
+## 17. Mounting-point correction — 7.00 mm (brief §8.4, amended)
+
+### 17.1 The instruction, and the one place it is applied
+
+**BOTTOM is −Y**: the open, cut-away side of the carrier that carries the
+four-pin connector opening. Both carrier fixing centres move **7.00 mm toward
+that bottom** relative to the complete OLED-dependent group:
+
+```
+carrier_fix_y_from_previous = -7.00 mm
+```
+
+The original Perspex and its holes are not moved, redrilled or redefined. So the
+only implementation that puts the carrier holes **on** the Perspex holes rather
+than 7.00 mm away from them is to hold `panel_fix_y` on the physical hole line
+and **raise the OLED bay and everything that depends on it by +7.00 mm**.
+
+`derive()` does exactly that, in one place: `oled_cy = oled_cy_prev + 7.00`.
+Every OLED-dependent value is computed from `oled_cy`, so the whole group moves
+together and cannot be half-moved:
+
+| Moved with the OLED group | Not moved — panel-fixed |
+|---|---|
+| PCB reference, bonded glass, active area | both fixing bores |
+| header / electrical connector, solder tips | both structural bosses |
+| all four PCB holes and all four sprung posts | both captive-nut hex pockets |
+| datum pads and pedestals | both nut-retention ridges |
+| OLED pocket and the surrounding carrier frame | both fixing arms |
+| rear light shield | the local hard-stop / load-path faces |
+| the 14.00 × 4.19 mm connector opening | `panel_fix_y`, and the 49.00 mm pitch |
+| both connector light-block walls | the Perspex patch and its opening |
+| the open lower rail cut | |
+| insertion and removal sweep geometry | |
+
+### 17.2 The same move, stated in both frames
+
+Both tools print both, and gate that they are one geometry:
+
+| | before | after | change |
+|---|---:|---:|---:|
+| **carrier-local** — fixing centres relative to the OLED group | +0.30 | **−6.70** | **−7.00** |
+| **assembled panel** — OLED group relative to the fixed Perspex holes | −0.30 | **+6.70** | **+7.00** |
+
+Measured independently off the mesh: both bolt bores on one centreline at
+y = 0.0000, Ø2.600, pitch **49.00000 mm**, symmetric about x = 0 — no X shift,
+no skew. The fixings sit **15.847 mm** above the carrier's connector-side
+extremity, against 22.85 mm before: **−7.00 mm**.
+
+### 17.3 What it does to the visible screen — reported, not passed
+
+The superseded rule is gone, and so is every PASS based on it. This is the
+consequence, stated plainly:
+
+| | y range | height |
+|---|---|---:|
+| active area | −0.65 … **+14.05** | 14.70 mm |
+| Perspex opening | −7.65 … +7.65 | 15.30 mm |
+| **visible overlap** | −0.65 … +7.65 | **8.30 mm** |
+
+- **6.40 mm** of active area — about **44 %** — sits behind the fascia **above**
+  the opening;
+- **0.00 mm** sits below it;
+- the lowest **7.00 mm** of the opening shows **unlit board**, not screen.
+
+> **The active area is not fully visible and is not vertically centred.**
+> Neither tool claims otherwise, and neither passes a check on it. Whether the
+> intended screen information is still readable is a question only the powered
+> fit test can answer — brief §12.8 / §12.26–27, photographed.
+
+### 17.4 Structural re-check of the moved fixings
+
+Sliding the fixings 7.00 mm relative to the OLED group lands them on a different
+part of the side uprights, so the connection is **re-measured**, not assumed:
+
+| Check | Result |
+|---|---|
+| both arms continuously joined to the uprights | solid across the full 7.50 mm arm height at the arm root (x ±19.55) and the upright outer face (x ±21.55) — a **2.00 mm** overlap, not a tangent |
+| the arms land on full-width upright, clear of both corner radii | arm y −3.75 … +3.75; full-width upright y −9.00 … +20.30 — 5.25 mm below, 16.55 mm above |
+| bosses clear the OLED bay | boss inner edge x ±20.70 against an aperture edge at ±18.55 — **2.15 mm** |
+| nut pockets clear the rear shield and light blocks | nut bore inner edge x ±22.09 against a shield edge at ±17.95 |
+| no thin neck, tangent-only join or sliver | **0 faces < 0.02 mm², 0 edges < 0.05 mm** |
+| carrier-to-Perspex hard stops intact | **53.96 mm²** of the 406.4 mm² seating face is under the two arms; the bolt → Perspex → carrier seat → captive nut path is unbroken |
+| nut-pocket boss wall | **1.391 mm**, unchanged — the pockets moved with their bosses |
+| both bolts retain a valid clamp-load path | grip 5.00 mm, window 5.00–15.00 mm, unchanged |
+| one connected solid | **1 lump**, 3446 welded vertices |
+| carrier depth | exactly **6.00 mm** — the correction is in-plane only |
+| all four sprung-post roots | unchanged: 1.30 mm floor, R0.80 fillet intact, 2.42 % worst strain |
+| rear shield and light blocks relative to the OLED | unchanged — they moved with the group |
+| connector opening | **14.00 × 4.19 mm**, unchanged |
+| open connector side is still the bottom | rail cut at y −13.80, opening starts there, header entirely below the active centre |
+| the deleted lighting-unit rail has not returned | nothing below y −13.80 but the two connector pedestal towers |
+
+**One consequence to carry into the physical test.** The carrier now reaches
+**y +23.30** above the bolt line, against +16.30 before, because the OLED bay
+rose while the bolts stayed put. Nothing in CAD says whether that fits the
+radio. Brief §12.14 covers it, and it is a physical test.
+
+### 17.5 Assembly
+
+The assembled Fusion model and the assembly STEP show the carrier fixing holes
+**coincident** with the Perspex holes — never 7.00 mm apart. Re-checked after
+the move: carrier × Perspex clear except the intended seating faces; bezel clear
+of carrier, glass, PCB and tips; header and wiring corridors clear; the
+OLED-to-Perspex gap still 0.300 mm; front insertion and the four-post release
+sequence unchanged.
+
+---
+
+## 18. Rev P.5 pre-CAD gate — self-review verdict
 
 | Required demonstration | Result |
 |---|---|
@@ -1268,7 +1394,15 @@ rail to the cap. Nothing else moved, and the sliver check still reports 0 / 0.
 | Carrier depth exactly 6.00 mm | PASS — measured on the solid and the mesh |
 | Finished pin opening 14.00 × 4.19 mm | PASS — measured both ways |
 | One consistent 180° transform; connector at the bottom | PASS — header envelope entirely below the active centre |
-| Active area horizontally centred, bottom edge on the opening bottom | PASS — margins 0.00 / 0.60 mm |
+| Active area horizontally centred | PASS — centre x 0.0000 mm |
+| ~~Active-area bottom edge on the opening bottom~~ | **SUPERSEDED by §17 — check deleted, not softened** |
+| Fixing centres moved exactly `carrier_fix_y_from_previous` | PASS — −7.00 mm relative to the OLED group, both tools |
+| Active area exactly 7.00 mm higher than the superseded datum | PASS — centre y +6.7000, measured on the built body |
+| Both bolt bores on one centreline, 49.00000 mm pitch, no skew | PASS — measured off the mesh at y 0.0000 |
+| Connector cut-out side is unambiguously the bottom | PASS — rail cut and pin opening both at y −13.80 |
+| Moved arms continuously joined, no neck or sliver | PASS — 2.00 mm overlap, 0 / 0 slivers |
+| Hard stops, nut pockets and clamp path intact after the move | PASS — §17.4 |
+| **Visible active-area extent through the opening** | **REPORTED, not passed — 8.30 mm of 14.70 mm visible, 6.40 mm above the opening. §17.3** |
 | Panel-fixed holes not moved with the OLED | PASS — y 0.00, 49.00000 mm pitch |
 | **Bonded-glass boundary at all four holes** | **BLOCKED — §14.4. THE Rev P.5 print gate** |
 | **Lighting-unit position** | **NOT MODELLED AND NOT MEASURED — §11.5. CAD makes no clearance claim** |

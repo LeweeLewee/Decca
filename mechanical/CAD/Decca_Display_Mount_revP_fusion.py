@@ -29,12 +29,22 @@ B. 6.00 mm CARRIER DEPTH (brief 8.4). carrier_depth 8.00 -> 6.00. This is NOT a
 
 C. 180-DEGREE MODULE TRANSFORM AND THE VERTICAL DATUM (brief 8.4). The complete
    OLED reference is rotated 180 degrees in its plane, so the four-pin connector
-   is now at the BOTTOM. The active area is no longer vertically centred: its
-   bottom edge is aligned with the bottom edge of the measured Perspex opening,
-   which puts the active-area centre at y = -0.30 mm and gives a 0.00 mm bottom
-   margin and a 0.60 mm top margin. The panel-fixed fixing bosses do NOT move -
-   they stay on the physical Perspex holes at y = 0 and exactly 49.00 mm pitch.
-   Everything OLED-dependent moves relative to them.
+   is now at the BOTTOM - the open, cut-away side of the carrier.
+
+   MOUNTING-POINT CORRECTION (brief 8.4, amended). Both carrier fixing centres
+   move 7.00 mm TOWARD that bottom relative to the OLED-dependent group -
+   carrier_fix_y_from_previous = -7.00 mm. The original Perspex holes are not
+   moved, redrilled or redefined, so in the assembled model the equivalent and
+   only correct implementation is to RAISE the OLED bay and everything that
+   depends on it by +7.00 mm while the panel holes stay put. The carrier holes
+   and the Perspex holes are therefore coincident in the assembly, never 7.00 mm
+   apart.
+
+   This SUPERSEDES the earlier rule that aligned the visible active-area bottom
+   edge with the Perspex opening bottom edge. That rule, and every PASS based on
+   it, is deleted. The active-area centre moves from y = -0.30 to y = +6.70, and
+   the consequence is reported rather than dressed up: only part of the modelled
+   active area lies inside the Perspex opening. See validate() section 10.
 
    Because the whole module rotated, the open lighting-unit end of the carrier
    travels with the connector-side sprung pair from +Y to -Y. The Rev P.3/P.4
@@ -219,6 +229,20 @@ P = {
     # datum pads, posts, pocket, rear-wall opening and light blocks. The
     # panel-fixed bosses and holes are NOT part of the module and do not move.
     "module_rot_deg": 180.0,
+
+    # -- Rev P.5 mounting-point correction (brief 8.4, amended) -------------
+    # BOTTOM is -Y: the open, cut-away side of the carrier that carries the
+    # four-pin connector opening. Both carrier fixing centres move this far
+    # toward that bottom, relative to the complete OLED-dependent group.
+    # Negative = downward = toward the connector.
+    #
+    # The original Perspex holes do NOT move. So in the assembled model the
+    # equivalent - and the only implementation that puts the carrier holes on
+    # the Perspex holes rather than 7.00 mm away from them - is to raise the
+    # OLED bay and everything that depends on it by the same amount while
+    # panel_fix_y stays on the physical hole line. derive() does exactly that,
+    # in one place, so the two descriptions cannot drift apart.
+    "carrier_fix_y_from_previous": -7.00,
     # NOT MEASURED. Rev P.5 depends on the glass X/Y envelope at ALL FOUR
     # mounting holes now, because all four hold sprung noses. It is REPORTED
     # as a blocking pre-print measurement, never assumed away.
@@ -696,16 +720,26 @@ def derive(P):
     # Applied ONCE, here, to every module-local value. Nothing downstream may
     # transform anything again, and nothing may be left untransformed.
     #
-    # The panel is the datum. The measured Perspex opening is centred on the
-    # origin, so its bottom edge is at -panel_open_h / 2. The visible active
-    # area's bottom edge is aligned to it, which fixes the active centre.
+    # The panel is the datum: the measured Perspex opening, centred on the
+    # origin, with the fixing holes on y = panel_fix_y. Neither moves, ever.
     d["panel_open_bottom_y"] = -P["panel_open_h"] / 2.0                # -7.65
     d["panel_open_top_y"] = P["panel_open_h"] / 2.0                    # +7.65
-    d["oled_cy"] = d["panel_open_bottom_y"] + P["oled_active_h"] / 2.0  # -0.30
-    d["active_bottom_margin"] = (d["oled_cy"] - P["oled_active_h"] / 2.0
-                                 - d["panel_open_bottom_y"])           #  0.00
-    d["active_top_margin"] = (d["panel_open_top_y"]
-                              - (d["oled_cy"] + P["oled_active_h"] / 2.0))
+
+    # --- the SUPERSEDED datum, kept only as the numerical baseline --------
+    # Rev P.5 originally aligned the visible active-area bottom edge with the
+    # Perspex opening bottom edge, which put the active centre here. Brief 8.4
+    # as amended supersedes that rule; this value survives ONLY so the 7.00 mm
+    # correction can be cross-checked against a stated starting point.
+    d["oled_cy_prev"] = (d["panel_open_bottom_y"]
+                         + P["oled_active_h"] / 2.0)                   # -0.30
+
+    # --- the mounting-point correction (brief 8.4, amended) ---------------
+    # Both fixing centres move carrier_fix_y_from_previous toward the bottom
+    # relative to the OLED group. The Perspex holes do not move, so the
+    # equivalent - and the only implementation that keeps the carrier holes ON
+    # the Perspex holes - is to raise the OLED group by the same amount.
+    d["oled_rise"] = -P["carrier_fix_y_from_previous"]                  # +7.00
+    d["oled_cy"] = d["oled_cy_prev"] + d["oled_rise"]                   # +6.70
     # the flip itself: 180 degrees in plane negates both in-plane axes
     r = math.radians(P["module_rot_deg"])
     d["fx"] = round(math.cos(r), 12)                                   # -1
@@ -734,8 +768,8 @@ def derive(P):
     d["glass_x1"] = P["oled_glass_w"] / 2.0
     d["glass_y0"] = d["glass_cy"] - P["oled_glass_h"] / 2.0            # -14.25
     d["glass_y1"] = d["glass_cy"] + P["oled_glass_h"] / 2.0            # +8.75
-    d["active_y0"] = d["oled_cy"] - P["oled_active_h"] / 2.0           # -7.65
-    d["active_y1"] = d["oled_cy"] + P["oled_active_h"] / 2.0           # +7.05
+    d["active_y0"] = d["oled_cy"] - P["oled_active_h"] / 2.0           # -0.65
+    d["active_y1"] = d["oled_cy"] + P["oled_active_h"] / 2.0           # +14.05
     d["header_y0"] = d["header_cy"] - P["oled_header_h"] / 2.0         # -21.05
     d["header_y1"] = d["header_cy"] + P["oled_header_h"] / 2.0         # -18.05
     d["z_tip_front"] = d["z_pcb_front"] + P["oled_tip_proud"]
@@ -897,6 +931,29 @@ def derive(P):
     d["carrier_max_y"] = d["car_y1"]                                      # +16.30
     d["carrier_h"] = d["carrier_max_y"] - d["carrier_min_y"]              #  39.15
     d["y_before"] = d["ap_y0"] - P["carrier_wall"] - 6.00
+
+    # --- what the mounting-point correction actually does to the picture --
+    # Reported, not asserted. The active area is NOT fully visible and is NOT
+    # vertically centred; both statements would be false.
+    d["vis_y0"] = max(d["active_y0"], d["panel_open_bottom_y"])         # -0.65
+    d["vis_y1"] = min(d["active_y1"], d["panel_open_top_y"])            # +7.65
+    d["vis_h"] = max(0.0, d["vis_y1"] - d["vis_y0"])                    #  8.30
+    d["vis_frac"] = d["vis_h"] / P["oled_active_h"]
+    d["active_above_opening"] = max(0.0, d["active_y1"]
+                                    - d["panel_open_top_y"])            #  6.40
+    d["active_below_opening"] = max(0.0, d["panel_open_bottom_y"]
+                                    - d["active_y0"])                   #  0.00
+    # unlit band of the Perspex opening under the active area
+    d["opening_unlit_below"] = max(0.0, d["active_y0"]
+                                   - d["panel_open_bottom_y"])          #  7.00
+
+    # --- the SAME move, stated in both frames -----------------------------
+    # 1. CARRIER-LOCAL: where the fixing centres sit relative to the OLED group
+    d["fix_rel_oled"] = P["panel_fix_y"] - d["oled_cy"]                 # -6.70
+    d["fix_rel_oled_prev"] = P["panel_fix_y"] - d["oled_cy_prev"]       # +0.30
+    d["fix_shift_local"] = d["fix_rel_oled"] - d["fix_rel_oled_prev"]   # -7.00
+    # 2. ASSEMBLED PANEL: the panel holes are fixed, the OLED group rose
+    d["oled_shift_global"] = d["oled_cy"] - d["oled_cy_prev"]           # +7.00
     return d
 # ---------------------------------------------------------------------------
 # Reference bodies
@@ -1272,8 +1329,11 @@ def write_parameters(design, P, d):
               "z_pcb_rear", "z_rear", "z_tip_front", "z_hook_face", "z_hook_top",
               "z_nose_tip", "z_ped_top",
               "oled_cy", "pcb_cy", "glass_cy", "header_cy",
-              "active_y0", "active_y1", "active_bottom_margin",
-              "active_top_margin", "panel_open_bottom_y",
+              "active_y0", "active_y1", "panel_open_bottom_y",
+              "panel_open_top_y", "oled_cy_prev", "oled_rise",
+              "vis_y0", "vis_y1", "vis_h", "active_above_opening",
+              "opening_unlit_below", "fix_rel_oled", "fix_rel_oled_prev",
+              "fix_shift_local", "oled_shift_global",
               "y_conn", "y_far", "post_x",
               "light_cut_y", "cap_r", "cap_x",
               "carrier_min_y", "carrier_max_y", "carrier_h",
@@ -1393,12 +1453,22 @@ def main(_context=None):
           % (d["y_conn"], d["y_far"]))
     print("  connector at the bottom: %s   header side: %s   no plain post: yes"
           % (d["connector_at_bottom"], d["conn_is_header_side"]))
-    print("module rotated %.0f deg in plane; active-area centre y %+.2f, "
-          "bottom margin %.2f, top margin %.2f"
-          % (P["module_rot_deg"], d["oled_cy"], d["active_bottom_margin"],
-             d["active_top_margin"]))
-    print("panel-fixed bosses UNMOVED at y %+.2f, pitch %.5f mm"
-          % (P["panel_fix_y"], 2.0 * d["m2_x"]))
+    print("module rotated %.0f deg in plane" % P["module_rot_deg"])
+    print("MOUNTING-POINT CORRECTION, stated both ways:")
+    print("  carrier-local : fixing centres %+.2f mm relative to the OLED "
+          "group (was %+.2f) = %+.2f mm toward the connector bottom"
+          % (d["fix_rel_oled"], d["fix_rel_oled_prev"], d["fix_shift_local"]))
+    print("  assembled     : Perspex holes UNMOVED at y %+.2f, pitch %.5f mm; "
+          "OLED group raised %+.2f mm (centre %+.2f -> %+.2f)"
+          % (P["panel_fix_y"], 2.0 * d["m2_x"], d["oled_shift_global"],
+             d["oled_cy_prev"], d["oled_cy"]))
+    print("active area y %+.2f .. %+.2f against a Perspex opening of "
+          "%+.2f .. %+.2f" % (d["active_y0"], d["active_y1"],
+                              d["panel_open_bottom_y"], d["panel_open_top_y"]))
+    print("  VISIBLE through the opening: %.2f mm of %.2f mm (%.0f%%); "
+          "%.2f mm of active area sits ABOVE the opening"
+          % (d["vis_h"], P["oled_active_h"], 100.0 * d["vis_frac"],
+             d["active_above_opening"]))
     print("lumps %d  (must be 1 - one connected open-ended solid)"
           % body.lumps.count)
     print("uprights terminate at y %+.2f, capped R%.2f; carrier reaches y %+.2f "
@@ -2137,40 +2207,127 @@ def validate(_context=None):
     print("         So the measurement above is the complete question - there")
     print("         is nothing else for the glass to foul.")
 
-    # ---- 10. optical alignment ------------------------------------------
+    # ---- 10. optical alignment and the mounting-point correction ---------
     print("")
-    print("10. OPTICAL ALIGNMENT AND THE ASSEMBLED GAP")
+    print("10. VERTICAL DATUM, THE 7.00 mm MOUNTING-POINT CORRECTION,")
+    print("    AND WHAT IS ACTUALLY VISIBLE")
     aa = mod["OLED_ActiveArea"].boundingBox
     cx = (aa.minPoint.x + aa.maxPoint.x) * 5.0
     cy = (aa.minPoint.y + aa.maxPoint.y) * 5.0
     ay0 = aa.minPoint.y * 10.0
     ay1 = aa.maxPoint.y * 10.0
+
+    print("")
+    print("    THE SAME MOVE, STATED IN BOTH FRAMES")
+    print("    1. CARRIER-LOCAL. Both fixing centres are %+.2f mm from the"
+          % d["fix_rel_oled"])
+    print("       OLED-dependent group, against %+.2f mm before: they moved"
+          % d["fix_rel_oled_prev"])
+    print("       %+.2f mm TOWARD the connector/open bottom." % d["fix_shift_local"])
+    print("    2. ASSEMBLED PANEL. The Perspex and its holes did not move at")
+    print("       all. The OLED bay and every OLED-dependent feature rose")
+    print("       %+.2f mm instead, so the carrier holes land ON the Perspex"
+          % d["oled_shift_global"])
+    print("       holes rather than %.2f mm away from them."
+          % abs(d["fix_shift_local"]))
+    print("    These are one geometry described twice, not two moves.")
+    print("")
+
     gate(abs(cx) < 1e-6, "active area still HORIZONTALLY centred",
-         "centre x %.4f mm" % cx)
-    gate(abs(ay0 - d["panel_open_bottom_y"]) < 1e-6,
-         "active-area BOTTOM edge on the Perspex opening bottom edge",
-         "both at y %+.4f - brief 8.4 supersedes vertical centring: bottom "
-         "margin %.2f mm, top margin %.2f mm"
-         % (ay0, ay0 - d["panel_open_bottom_y"], d["panel_open_top_y"] - ay1))
-    gate(abs(cy - d["oled_cy"]) < 1e-6,
-         "active-area centre is deliberately OFF the aperture centre",
-         "y %+.4f, which is -panel_open_h/2 + oled_active_h/2. This is "
-         "intended, not drift." % cy)
+         "centre x %.4f mm - the correction is vertical only" % cx)
+    gate(abs(d["fix_shift_local"] - P["carrier_fix_y_from_previous"]) < 1e-9,
+         "fixing centres moved exactly carrier_fix_y_from_previous",
+         "%+.2f mm toward the bottom, relative to the OLED-dependent group"
+         % d["fix_shift_local"])
+    gate(abs((cy - d["oled_cy_prev"]) - d["oled_rise"]) < 1e-6,
+         "active area is exactly %.2f mm higher than the superseded datum"
+         % d["oled_rise"],
+         "centre y %+.4f against the previous %+.2f - measured on the built "
+         "body, not asserted" % (cy, d["oled_cy_prev"]))
     hdr = mod["OLED_Header_Keepout"].boundingBox
     gate(hdr.maxPoint.y * 10.0 < cy,
          "the four-pin connector is at the BOTTOM",
          "header envelope y %+.2f .. %+.2f, entirely below the active-area "
          "centre - the complete module was rotated %.0f deg in plane"
          % (hdr.minPoint.y * 10.0, hdr.maxPoint.y * 10.0, P["module_rot_deg"]))
+    gate(abs(d["light_cut_y"] - d["pin_open_y0"]) < 1e-9
+         and d["pin_open_y0"] < cy,
+         "the connector CUT-OUT side is the same bottom",
+         "the open rail cut terminates at y %+.2f and the four-pin opening "
+         "starts there - BOTTOM is unambiguously -Y"
+         % d["light_cut_y"])
     gate(abs(P["panel_fix_y"]) < 1e-9
          and abs(2.0 * d["m2_x"] - P["panel_fix_pitch"]) < 1e-9,
-         "the panel-fixed holes did NOT move with the module",
-         "still on y %+.2f at exactly %.5f mm pitch; the OLED bay moved "
-         "relative to them, not the other way round"
-         % (P["panel_fix_y"], 2.0 * d["m2_x"]))
+         "the panel-fixed holes did NOT move",
+         "still on y %+.2f at exactly %.5f mm pitch, on one common horizontal "
+         "centreline, no X shift and no skew - the carrier was corrected "
+         "around them" % (P["panel_fix_y"], 2.0 * d["m2_x"]))
+    ok = True
+    for sx in (-1, 1):
+        b = B.cylz(P["bolt_clear_d"] - 0.20, sx * d["m2_x"], P["panel_fix_y"],
+                   d["z_nut_seat"] + 0.10, -0.001)
+        h, v, bb = _hit(B, carrier, b)
+        ok = ok and not h
+    gate(ok, "both bolt bores concentric with their fixing centres",
+         "clear through at x %+.2f and %+.2f, y %+.2f - bores, bosses, hex "
+         "pockets, retention ridges and arms all moved together"
+         % (-d["m2_x"], d["m2_x"], P["panel_fix_y"]))
+
+    # ---- what this actually looks like through the Perspex ---------------
+    print("")
+    print("    WHAT IS ACTUALLY VISIBLE - REPORTED, NOT PASSED")
+    print("    The superseded rule put the active-area bottom edge on the")
+    print("    opening bottom edge. It is gone, and so is every PASS that")
+    print("    depended on it. Raising the screen 7.00 mm has a consequence,")
+    print("    and this is it:")
+    print("")
+    print("      active area          y %+.2f .. %+.2f  (%.2f mm tall)"
+          % (ay0, ay1, ay1 - ay0))
+    print("      Perspex opening      y %+.2f .. %+.2f  (%.2f mm tall)"
+          % (d["panel_open_bottom_y"], d["panel_open_top_y"],
+             P["panel_open_h"]))
+    print("      VISIBLE overlap      y %+.2f .. %+.2f  = %.2f mm, %.0f%% of "
+          "the active height" % (d["vis_y0"], d["vis_y1"], d["vis_h"],
+                                 100.0 * d["vis_frac"]))
+    print("      hidden ABOVE the opening            %.2f mm of active area"
+          % d["active_above_opening"])
+    print("      hidden BELOW the opening            %.2f mm of active area"
+          % d["active_below_opening"])
+    print("      unlit band at the bottom of the opening  %.2f mm"
+          % d["opening_unlit_below"])
+    print("")
+    print("    The active area is NOT fully visible and is NOT vertically")
+    print("    centred. Roughly %.2f mm of it - about %.0f%% - sits behind the"
+          % (d["active_above_opening"],
+             100.0 * d["active_above_opening"] / P["oled_active_h"]))
+    print("    fascia above the opening, and the lowest %.2f mm of the opening"
+          % d["opening_unlit_below"])
+    print("    shows unlit board rather than screen. This is the direct,")
+    print("    intended consequence of the mounting correction, reported so")
+    print("    that the powered fit test (brief 12.8 / 12.27) is judged")
+    print("    against the real picture and not against a CAD claim.")
+    gate(d["vis_h"] > 0.0, "some active area does fall inside the opening",
+         "%.2f mm of %.2f mm. This is a REPORT of the geometry, not a "
+         "judgement that it is acceptable - only the powered test can make "
+         "that call" % (d["vis_h"], P["oled_active_h"]))
+    openitem("powered active-area position through the Perspex",
+             "brief 12.8 / 12.27. Install on the ORIGINAL Perspex holes with "
+             "the ORIGINAL bolts, confirm the open connector side is at the "
+             "bottom and both holes align without forcing or slotting, power "
+             "the OLED and PHOTOGRAPH the visible top and bottom edges. "
+             "Expected: the screen sits %.2f mm higher than the preceding "
+             "Rev P.5 position, with about %.2f mm of active area above the "
+             "opening and a %.2f mm unlit band at the bottom of it. Confirm "
+             "the intended screen information is still visible."
+             % (d["oled_rise"], d["active_above_opening"],
+                d["opening_unlit_below"]))
+
+    print("")
     gate(abs(-d["z_glass_front"] - P["oled_perspex_gap"]) < 1e-9,
          "assembled glass-to-Perspex gap",
-         "%.3f mm nominal, seated on the fixed pads" % P["oled_perspex_gap"])
+         "%.3f mm nominal, seated on the fixed pads - the correction is "
+         "in-plane only and does not touch the Z chain"
+         % P["oled_perspex_gap"])
     print("      float within the carrier is the %.2f mm hook clearance, so the"
           % P["hook_clear"])
     print("      worst-case gap is %.2f mm and the glass can never touch the"
@@ -2179,10 +2336,107 @@ def validate(_context=None):
     print("      active %.2f x %.2f in aperture %.2f x %.2f"
           % (P["oled_active_w"], P["oled_active_h"], P["panel_open_w"],
              P["panel_open_h"]))
-    print("      margins: x %.2f each side, y %.2f bottom / %.2f top"
-          % ((P["panel_open_w"] - P["oled_active_w"]) / 2,
-             d["active_bottom_margin"], d["active_top_margin"]))
+    print("      margins: x %.2f each side; vertically the active area now"
+          % ((P["panel_open_w"] - P["oled_active_w"]) / 2))
+    print("      OVERRUNS the opening at the top by %.2f mm."
+          % d["active_above_opening"])
     print("      firmware must still mask 2 pixel rows top and bottom")
+
+    # ---- 10b. THE MOVED FIXINGS - STRUCTURE ------------------------------
+    print("")
+    print("10b. MOVED FIXING ARMS AND BOSSES - STRUCTURAL RE-CHECK")
+    print("     Sliding the fixings %+.2f mm relative to the OLED group lands"
+          % d["fix_shift_local"])
+    print("     them on a different part of the side uprights, so their")
+    print("     connection is re-measured on the finished solid rather than")
+    print("     assumed to be as good as it was.")
+
+    # 1. the arm is joined to the upright over its full height, not necked
+    ok = True
+    worst = None
+    for sy in (-1, 1):
+        y = sy * P["fix_arm_h"] / 2.0 * 0.90
+        for sx in (-1, 1):
+            if not _inside(carrier, sx * (d["arm_x0"] + 0.30), y, -0.20):
+                ok = False
+            if not _inside(carrier, sx * (d["car_x1"] - 0.30), y, -0.20):
+                ok = False
+    gate(ok, "both arms continuously joined to the side uprights",
+         "solid across the whole %.2f mm arm height at both x %+.2f (the arm "
+         "root) and x %+.2f (the upright outer face) - the arm overlaps the "
+         "upright by %.2f mm, it does not meet it on a tangent"
+         % (P["fix_arm_h"], d["arm_x0"], d["car_x1"],
+            d["car_x1"] - d["arm_x0"]))
+
+    # 2. the junction is inside the upright's full-width band, not on a radius
+    upright_lo = d["light_cut_y"] + d["cap_r"] + P["carrier_corner_r"]
+    upright_hi = d["car_y1"] - P["carrier_corner_r"]
+    lo_m = P["panel_fix_y"] - P["fix_arm_h"] / 2.0 - upright_lo
+    hi_m = upright_hi - (P["panel_fix_y"] + P["fix_arm_h"] / 2.0)
+    gate(min(lo_m, hi_m) > 1.0,
+         "the arms land on FULL-WIDTH upright, clear of both corner radii",
+         "arm spans y %+.2f .. %+.2f; the upright is full width from y %+.2f "
+         "to %+.2f, so there is %.2f mm below the arm and %.2f mm above it"
+         % (P["panel_fix_y"] - P["fix_arm_h"] / 2.0,
+            P["panel_fix_y"] + P["fix_arm_h"] / 2.0,
+            upright_lo, upright_hi, lo_m, hi_m))
+
+    # 3. the boss is not cut into by anything OLED-side
+    gate(d["m2_x"] - d["m2_r"] > d["ap_x1"] + 0.50,
+         "the bosses clear the OLED bay entirely",
+         "boss inner edge x %+.2f against an aperture edge at %+.2f - %.2f mm "
+         "clear, so raising the bay cannot reach them"
+         % (d["m2_x"] - d["m2_r"], d["ap_x1"],
+            (d["m2_x"] - d["m2_r"]) - d["ap_x1"]))
+    gate(d["m2_x"] - d["nut_body_d"] / 2.0 > d["shield_x1"] + 0.50,
+         "the nut pockets clear the rear shield and the light blocks",
+         "nut bore inner edge x %+.2f against a shield edge at %+.2f"
+         % (d["m2_x"] - d["nut_body_d"] / 2.0, d["shield_x1"]))
+    h, v, bb = _hit(B, carrier, mod["OLED_PCB"])
+    gate(not h, "the moved fixings do not touch the seated module",
+         "carrier x OLED_PCB still CLEAR after the shift")
+
+    # 4. the clamp-load path still terminates in Perspex seating faces
+    seat_all = _planar_face_area(carrier, 1, 0.0)
+    arm_seat = None
+    for sx in (-1, 1):
+        a, b = sx * d["arm_x0"], sx * d["ear_x1"]
+        blk = B.box(min(a, b), max(a, b),
+                    -P["fix_arm_h"] / 2.0, P["fix_arm_h"] / 2.0, -0.05, 0.05)
+        arm_seat = blk if arm_seat is None else B.uni(arm_seat, blk)
+    h, v, bb = _hit(B, carrier, arm_seat)
+    gate(h and v > 0.0, "both fixing arms still seat on the Perspex",
+         "%.2f mm2 of the %.1f mm2 total seating face is under the two arms - "
+         "the bolt head -> Perspex -> carrier seat -> captive nut path is "
+         "unbroken" % (v / 0.10, seat_all))
+
+    # 5. nut pocket walls unchanged by the move
+    gate(d["boss_wall_min"] > 1.0,
+         "nut-pocket boss wall unchanged by the shift",
+         "%.3f mm minimum - the pockets moved with their bosses, so nothing "
+         "about the wall changed" % d["boss_wall_min"])
+    gate(abs((d["z_perspex_rear"] - d["z_rear"]) - P["carrier_depth"]) < 1e-9,
+         "carrier depth still exactly %.2f mm" % P["carrier_depth"],
+         "the correction is in-plane only")
+
+    # 6. the deleted rail has not come back with the move
+    pedcol = None
+    for (px, py) in d["conn"]:
+        c = B.cylz(P["pedestal_d"] + 0.10, px, py, d["z_rear"] - 1.0, 1.0)
+        pedcol = c if pedcol is None else B.uni(pedcol, c)
+    below = B.box(d["car_x0"] - 1.0, d["car_x1"] + 1.0, -60.0,
+                  d["light_cut_y"] - 1e-4, d["z_rear"] - 1.0, 1.0)
+    n, rv = _residual(B, carrier, below, pedcol)
+    gate(n == 0, "the lighting-unit-side rail has NOT returned",
+         "nothing below y %+.2f but the two connector pedestal towers - the "
+         "fixings moved toward that side without putting material back into it"
+         % d["light_cut_y"])
+    print("     NOTE. The carrier now reaches y %+.2f above the bolt line "
+          % d["car_y1"])
+    print("     against %+.2f before, because the OLED bay rose while the"
+          % (d["car_y1"] - d["oled_rise"]))
+    print("     bolts stayed put. Nothing in CAD says whether that fits the")
+    print("     radio - brief 12.14 covers it, and it is a physical test.")
 
     # ---- 11. printability -----------------------------------------------
     print("")
@@ -3149,6 +3403,61 @@ def _shot(app, path, eye, target, up, w=1600, h=1200):
     return ok
 
 
+# Snapshot appearances. The Rev P.5 mounting-point correction is a question
+# about WHERE THE SCREEN SITS IN THE OPENING, and a uniform grey render cannot
+# answer it: the module and the Perspex come out the same colour and the
+# aperture reads as an empty hole. These make the assembly image legible - a
+# translucent fascia, a lit-looking active area, a black carrier as it will
+# actually be printed. Cosmetic only; no dimension depends on them.
+PAINT = {
+    "PANEL_Perspex": "Glass - Light Color",
+    "OLED_ActiveArea": "LED (Green)",
+    "OLED_Glass": "Glass (Grey)",
+    "OLED_PCB": "Plastic - Matte (Blue)",
+    "OLED_Header_Keepout": "Plastic - Matte (White)",
+    "OLED_Solder_Tips": "Paint - Metallic (Yellow)",
+    # The carrier is deliberately NOT painted. It is printed in opaque black
+    # (brief 8.3), but a matte-black render collapses to a flat silhouette and
+    # the four relief bores, the pin opening and the light blocks disappear.
+    # The carrier-only views are documentation of geometry, so they keep the
+    # default shading. The print colour is a material requirement, not a
+    # rendering one.
+    "ORIGINAL_Nuts": "Paint - Metallic (Blue)",
+    "ORIGINAL_Bolt_Envelope": "Paint - Metallic (Blue)",
+}
+
+
+def _paint(app, design):
+    """Apply PAINT to every matching body. Silent no-op if a name is missing."""
+    lib = app.materialLibraries.itemByName("Fusion Appearance Library")
+    if lib is None:
+        return 0
+    cache = {}
+    n = 0
+    root = design.rootComponent
+    for i in range(root.occurrences.count):
+        occ = root.occurrences.item(i)
+        for b in occ.bRepBodies:
+            want = PAINT.get(b.name)
+            if want is None:
+                continue
+            if want not in cache:
+                src = lib.appearances.itemByName(want)
+                if src is None:
+                    cache[want] = None
+                else:
+                    ex = design.appearances.itemByName(want)
+                    cache[want] = ex or design.appearances.addByCopy(src, want)
+            ap = cache[want]
+            if ap is not None:
+                try:
+                    b.appearance = ap
+                    n += 1
+                except Exception:
+                    pass
+    return n
+
+
 def _show(design, names):
     root = design.rootComponent
     for i in range(root.occurrences.count):
@@ -3169,29 +3478,38 @@ def snapshots(_context=None):
     d = derive(P)
     if not os.path.isdir(IMG_DIR):
         os.makedirs(IMG_DIR)
+    print("appearances applied to %d bodies" % _paint(app, design))
 
     clear_component(design, SECTION)
 
-    # 1. front three-quarter: carrier + module, the flush side towards us
-    _show(design, {CARRIER, "REF_SH1106_1P3"})
+    # 1. THE ASSEMBLY, STRAIGHT ON FROM THE FRONT. This is the image that has
+    #    to answer the Rev P.5 mounting-point question, so it shows the
+    #    Perspex as well: where the active area actually sits inside the
+    #    opening after the 7.00 mm correction. A three-quarter view cannot be
+    #    read for alignment, so this one is deliberately square-on.
+    _show(design, {CARRIER, "REF_SH1106_1P3", "REF_Decca_Panel"})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_views.png"),
-          (-60.0, -45.0, 70.0), (0.0, -4.0, -2.5), (0, 1, 0))
+          (0.0, 4.0, 320.0), (0.0, 4.0, 0.0), (0, 1, 0))
 
-    # 2. rear three-quarter: the carrier alone. This view has to show the
+    # 2. rear three-quarter: the carrier alone. It also has to show the
+    #    Rev P.5 mounting-point correction from behind - the two fixing bosses
+    #    now sit LOW relative to the connector-side carrier, because the OLED
+    #    bay rose 7.00 mm while the bolts stayed on the Perspex holes.
+    #    This view has to show the
     #    Rev P.4 change - a CONTINUOUS rear wall closing the OLED bay with one
     #    small four-pin slot and no keepout proxy - AND the Rev P.5 changes:
     #    the connector opening now at the BOTTOM with its two light blocks,
     #    and FOUR post relief bores, one per PCB mounting hole.
     _show(design, {CARRIER})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_rear.png"),
-          (-28.0, -34.0, -64.0), (0.0, -5.0, -3.0), (0, 1, 0))
+          (-28.0, -27.0, -64.0), (0.0, 3.0, -3.0), (0, 1, 0))
 
     # 3. carrier alone from the front - the retention features themselves.
     #    Rev P.5: FOUR split sprung posts, one in every mounting hole. There is
     #    no plain post left to show.
     _show(design, {CARRIER})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_posts.png"),
-          (-42.0, -34.0, 46.0), (0.0, -4.0, -2.0), (0, 1, 0))
+          (-42.0, -27.0, 46.0), (0.0, 3.0, -2.0), (0, 1, 0))
 
     # 4. section on x = +15.00, through a sprung locating post.
     #    Everything is clipped to a window around the module as well as to the
@@ -3218,7 +3536,7 @@ def snapshots(_context=None):
     _show(design, {SECTION})
     _shot(app,
           os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_sections.png"),
-          (-120.0, 26.0, 34.0), (d["post_x"], -3.0, -3.0), (0, 1, 0))
+          (-120.0, 33.0, 34.0), (d["post_x"], 4.0, -3.0), (0, 1, 0))
 
     # 5. section on y = 0 through a captive-nut pocket, looking along -Y
     clear_component(design, SECTION)

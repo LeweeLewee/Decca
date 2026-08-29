@@ -32,8 +32,10 @@ Print-ready meshes exported from the CAD sources.
 > **Rev P.5 then changed load-bearing numbers.** Both plain locating posts are
 > deleted and replaced by sprung retaining posts — **four sprung posts now, one
 > per mounting hole**. The module is rotated **180°**, putting the connector at
-> the **bottom** and the active area's bottom edge on the Perspex opening bottom
-> edge. The carrier drops to **6.00 mm**, the finished opening grows to
+> the **bottom**, and both carrier fixing centres then move **7.00 mm toward
+> that bottom** relative to the OLED group — which, with the Perspex holes
+> untouched, raises the screen 7.00 mm in the assembly.
+> The carrier drops to **6.00 mm**, the finished opening grows to
 > **14.00 × 4.19 mm**, and two light blocks flank it. The shorter carrier forces
 > the split slot to 1.20 mm and the root relief to 2.00 mm; worst-case post
 > strain rises from 1.66 % to **2.42 %** against a 3.00 % limit, and combined
@@ -48,7 +50,15 @@ Print-ready meshes exported from the CAD sources.
 >    as across flats (§21.6);
 > 3. the original bolt length under the head — between 5.00 and 15.00 mm (§21.6);
 > 4. the **hex-pocket fit coupon**, printed first (§21.7);
-> 5. **the bonded-glass boundary at ALL FOUR holes (§25.4) — this one blocks the
+> 5. **the powered fit and screen-position test (§28.3).** Install on the
+>    original Perspex holes with the original bolts, confirm the open connector
+>    side is at the bottom and both holes align without forcing or slotting,
+>    power the OLED and **photograph** the visible active-area edges. Only
+>    **8.30 mm** of the 14.70 mm active height falls inside the opening — about
+>    **6.40 mm sits above it** and the lowest 7.00 mm of the opening shows
+>    unlit board. CAD reports that; only the powered part can say whether it is
+>    acceptable;
+> 6. **the bonded-glass boundary at ALL FOUR holes (§25.4) — this one blocks the
 >    print.** The two converted posts put a retaining nose ahead of the PCB at
 >    holes the plain posts never reached. The modelled glass envelope says the
 >    far pair fouls by 0.40 mm — and the same model puts the glass over the
