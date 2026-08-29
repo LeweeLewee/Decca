@@ -6,6 +6,13 @@ Amended 2026-08-29 after the physical Rev P prototype failed loose-carrier
 retention. Rev P remains an open prototype revision; this correction supersedes
 the rear-insertion and friction-retention clauses below as originally issued.
 
+Amended again 2026-08-29 after the corrected Rev P.2 prototype successfully
+retained the OLED and achieved the intended Perspex tolerances. The remaining
+integration failure is a collision between the carrier end rail / cable-tie
+projection below the sprung-post pair as installed and the original Decca
+lighting unit, which cannot be removed. The lighting unit is now a mandatory
+keep-out and Rev P remains open for this bounded clearance correction.
+
 Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
 ## 1. Reason for redesign
@@ -21,6 +28,13 @@ in the opposite direction; forward handling retention relied only on four
 0.10 mm edge-friction contacts. The physical screen passed through the loose
 carrier. This physical result invalidates the analytical friction-hold release
 claim and is the governing evidence for the correction in this document.
+
+The corrected Rev P.2 post-and-datum architecture subsequently passed physical
+fit testing: screen retention and the Perspex tolerance are satisfactory. That
+test also exposed an installation-envelope omission. The transverse carrier
+rail and integral cable-tie projection on the lighting-unit side collide with
+the retained original Decca lighting assembly. The radio-side interface, rather
+than OLED geometry, now governs the next correction.
 
 ## 2. Corrected Rev P architecture — mandatory topology
 
@@ -203,6 +217,31 @@ Guidance:
 - maintain cable/header clearance and serviceability;
 - minimise part count and avoid a separate retainer.
 
+### 8.1 Original Decca lighting-unit keep-out
+
+The original Decca lighting unit is retained and cannot be removed. The carrier
+shall therefore be open on the lighting-unit side below/outboard of the sprung
+locating-post pair as the part is installed in the radio.
+
+Delete the complete continuous end rail in that region, including the central
+integral cable-tie / strain-relief projection and its slots. Do not merely thin,
+notch or shorten the rail: no bridge may remain across the two side uprights
+inside the lighting-unit keep-out.
+
+The removal boundary shall preserve:
+
+- both sprung posts, their full pedestals, datum pads, reliefs and filleted roots;
+- the local pedestal-to-side-upright connections;
+- both vertical side uprights and both 49.00 mm M2 boss/load paths;
+- the opposite transverse rail; and
+- the OLED insertion, removal and wiring corridors.
+
+Terminate the two side uprights with intentional radii or fillets adjacent to
+the retained pedestal roots. Do not leave thin remnants, sharp internal corners
+or tangent-only connections. The lighting keep-out takes precedence over an
+integral cable-tie feature; any replacement strain relief must be placed outside
+the keep-out and must have separately demonstrated radio-side clearance.
+
 ## 9. Required corrective CAD changes for open Rev P
 
 1. Replace rear insertion with flush/Perspex-side insertion moving rearwards.
@@ -222,8 +261,11 @@ Guidance:
 11. Retain the existing bezel unless new test evidence requires a change.
 12. Preserve active-area centring relative to the original Decca aperture.
 13. Keep the design fully parametric in Fusion 360.
-14. Keep Rev P open and remove all release claims until corrected physical
-    retention has passed prototype testing.
+14. Remove the complete lighting-unit-side end rail and integral cable-tie
+    projection as specified in §8.1, while retaining the post pedestals and side
+    uprights as one connected solid.
+15. Keep Rev P open until the modified carrier has passed both the retained OLED
+    checks and an installed clearance test against the non-removable lighting unit.
 
 ## 10. Mandatory CAD validation gate
 
@@ -247,6 +289,18 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
 - OLED can be inserted from the flush side and removed through an identified
   release path without bonded glass sweeping through a rigid barb/post envelope;
 - carrier seats flat against Perspex;
+- a conservative solid keep-out representing the retained Decca lighting unit
+  has zero intersection with the carrier, including the former rail and
+  cable-tie region;
+- there is no continuous carrier bridge across the lighting-unit side below or
+  outboard of the sprung-post pedestals;
+- both sprung-post pedestals retain their existing datum area, relief depth,
+  root fillets and connection to the side uprights;
+- the remaining U-shaped frame, M2 arms and opposite rail form one closed solid
+  with no slivers or tangent-only joins;
+- removal of the end rail does not change the 49.00 mm M2 pitch, OLED Z chain,
+  post positions, snap overlap, PCB datum contact or Perspex seating plane;
+- the remaining seating faces resist rocking when the two M2 screws are snug;
 - screen active area remains centred behind the bezel/aperture;
 - no unprintable thin slivers or unsupported critical features;
 - normal FDM wall thickness is restored in structural areas.
@@ -295,11 +349,21 @@ this order:
 10. M2 tightening does not change OLED depth or stress the module;
 11. prepared solder joints and header clear the Perspex and carrier;
 12. no rattle when assembled; and
-13. no separate retainer is required.
+13. no separate retainer is required;
+14. the carrier clears the original lighting unit throughout offering-up,
+    seating and removal, with the lighting unit left in place;
+15. the open-ended carrier shows no perceptible lateral rack or twist when
+    handled and when the two M2 screws are snug; and
+16. the OLED retention, removal, gap and centring results remain unchanged after
+    removal of the end rail.
 
 CAD and mesh checks may release this prototype print, but they shall not close
 the retention finding. Physical tests 1–5 are mandatory before Rev P can regain
 a release recommendation.
+
+The project owner reports that the corrected Rev P.2 prototype has satisfied the
+retention and Perspex-tolerance intent. Treat that as submitted physical evidence,
+not as permission to skip regression testing after the lighting-clearance cut.
 
 ## 13. Design decision
 
@@ -317,4 +381,7 @@ rear PCB datum pads; plain and sprung mounting-hole posts providing X/Y location
 and positive loose-carrier retention; a controlled local exception for verified
 snap noses only; separate carrier-to-Perspex structural hard stops; prepared
 front-side protrusion no more than 1.00 mm; no separate retainer bar; and physical
-retention testing before release.**
+retention testing before release. The successful Rev P.2 architecture is now to
+be retained while the complete lighting-unit-side end rail and integral cable-tie
+projection are removed, leaving the post pedestals connected locally to the side
+uprights and the original Decca lighting assembly entirely unobstructed.**
