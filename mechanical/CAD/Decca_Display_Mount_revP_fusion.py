@@ -1253,9 +1253,11 @@ def validate(_context=None):
             tiny_e += 1
     gate(tiny_f == 0 and tiny_e == 0, "boolean slivers",
          "%d faces < 0.02 mm2, %d edges < 0.05 mm" % (tiny_f, tiny_e))
-    gate(d["hook_overlap"] <= 0.25, "unsupported barb ledge, printed rear-down",
-         "%.2f mm radial - the Rev D 0.10 / Rev K 0.175 class, both printed"
-         % d["hook_overlap"])
+    ledge = (P["sprung_barb_d"] - P["sprung_shaft_d"]) / 2.0
+    gate(ledge <= 0.30, "unsupported barb ledge, printed rear-down",
+         "%.2f mm radial step from the shaft (the retention overlap against "
+         "the hole is a different %.2f mm) - the Rev D / Rev K hook class, "
+         "both printed" % (ledge, d["hook_overlap"]))
     print("      structural wall %.2f ; boss wall %.2f ; insert backing %.2f mm"
           % (P["carrier_wall"], (P["m2_boss_d"] - P["m2_insert_d"]) / 2.0,
              P["carrier_depth"] + d["z_insert_bore"]))

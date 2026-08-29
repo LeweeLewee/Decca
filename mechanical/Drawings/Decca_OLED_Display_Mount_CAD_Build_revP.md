@@ -304,7 +304,7 @@ clearance to the modelled glass: **0.292 mm**.
 
 ### 6.5 Recalculated mechanics
 
-Split cantilever fixed at the top of the root fillet (z = −4.90 effective),
+Split cantilever fixed at the top of the root fillet (z = −5.10),
 loaded at the full-diameter land: **a = 4.35 mm**, half-section
 t = (2.80 − 0.70)/2 = **1.05 mm**, PETG E = 2000 MPa.
 
@@ -690,7 +690,7 @@ No supports.**
 | Post roots | start on the solid relief floor |
 | Datum pads at z = −2.70 | upward-facing, on a layer boundary — layer-count accurate |
 | Aperture step at z = −1.20 | upward-facing ledge |
-| Barb retaining face at z = −1.00 | a **0.10 mm** radial downward-facing ledge — the Rev D 0.10 / Rev K 0.175 class, both of which printed |
+| Barb retaining face at z = −1.00 | a **0.20 mm** radial downward-facing ledge, the step from the Ø2.80 shaft to the Ø3.20 barb — the Rev D / Rev K hook class, both of which printed |
 | Barb lead-in cone | 49° from horizontal, self-supporting |
 | Seating face at z = 0 | a top surface — use 4+ top layers or ironing |
 

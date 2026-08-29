@@ -81,7 +81,7 @@ Perspex. **The module is inserted from the FRONT, moving rearward (−Z).**
                 |   ┌────────────────────────┐    /^\   |       z = −0.40  nose tip
    ┌────────────┤   |       OLED GLASS       |   /   \  |       (Ø2.60, 0.40 clear
    |            |   |   (0.80 proud of PCB)  |  | Ø3.2| |        of the Perspex)
-   |  CARRIER   |   |                        |  ├─────┤ |       z = −0.85  land
+   |  CARRIER   |   |                        |  ├─────┤ |       z = −0.75  land
    |    RIM     |   ├────────────────────────┤  ├█████┤ |       z = −1.00  <- SNAP HOOK
    |  (3.00)    |   |        OLED PCB        |  |     | |        retaining face, square,
    |            |   |        1.60 mm         |  |     | |        0.10 mm axial clearance
@@ -94,10 +94,10 @@ Perspex. **The module is inserted from the FRONT, moving rearward (−Z).**
    |            |█  ███████████ └───────────────┤     | |       z = −3.00  pedestal top
    |            |█  ██████████  Ø4.80 root  ████|     | |
    |            |█  ██████████     relief   ████|     | |        (the relief is now
-   |  M2 boss   |█  ██████████  (3.00 deep) ████|  \_/| |         BEHIND the PCB — the
+   |  M2 boss   |█  ██████████  (3.20 deep) ████|  \_/| |         BEHIND the PCB — the
    |  + insert  |█  ████████████████████████████ \___/  |         glass cannot constrain
    |            |█  ██████████████ R0.80 fillet ────────┘         its depth any more)
-   |            |█  ████████████████████████████████████  z = −5.70  post root
+   |            |█  ████████████████████████████████████  z = −5.90  post root
    |            |█  ████████████████████████████████████
    └────────────┴──█████████████████████████████████████         z = −8.00  carrier rear
                         REAR (cabinet)  —  OPEN                  z = −10.80 header extent
@@ -158,7 +158,7 @@ Rear view (looking forward, −Z). Dimensions in the aperture-centre frame.
                                 |   |  ╭─╮   ┌───────┐  ╭─╮ |   |
                     y = +18.25  |   |  |S|   | header|  |S| |   |  <- SPRUNG POSTS
                                 |   |  ╰─╯   └───────┘  ╰─╯ |   |     x ±15.00
-                                |   |   ^ Ø8.0 pedestal ^   |   |
+                                |   |   ^ Ø8.6 pedestal ^   |   |
                                 |   |                       |   |
    ●  M2 x = −24.50             |   |      OLED  PCB        |   |         M2 x = +24.50 ●
    y = 0 ──────────────────────-|   |     35.40 x 33.50     |   |-────────────────── y = 0
@@ -217,12 +217,12 @@ Starting values taken from the printed Rev D / Rev K post development, then
 
 | z range | feature | Ø | note |
 |---|---|---:|---|
-| −5.70 … −4.90 | R0.80 root fillet | 2.80 → 4.40 | inside the Ø4.80 relief, top 1.80 mm behind DATUM B |
-| −5.70 … −1.00 | split shaft | **2.80** | 0.10 mm radial clearance in the Ø3.00 hole |
+| −5.90 … −5.10 | R0.80 root fillet | 2.80 → 4.40 | inside the Ø4.80 relief, top 2.40 mm behind DATUM B |
+| −5.90 … −1.00 | split shaft | **2.80** | 0.10 mm radial clearance in the Ø3.00 hole |
 | −1.10 … −1.00 | axial clearance zone | 2.80 | **0.10 mm** — the hook does not clamp the PCB |
 | **z = −1.00** | **retaining face — square, rearward-facing** | 2.80 → **3.20** | **0.10 mm radial overlap = the forward stop** |
-| −1.00 … −0.85 | full-diameter land | 3.20 | |
-| −0.85 … −0.40 | insertion lead-in cone | 3.20 → 2.60 | 33.7° from the axis |
+| −1.00 … −0.75 | full-diameter land | 3.20 | 0.25 mm, thicker than a print layer |
+| −0.75 … −0.40 | insertion lead-in cone | 3.20 → 2.60 | 40.6° from the axis |
 | slot | full height, 0.70 mm wide, normal to Y | | halves deflect **inward**, never outward |
 
 ### 3.2 Plain locating posts — x = ±15.00, y = −10.25
@@ -230,12 +230,14 @@ Starting values taken from the printed Rev D / Rev K post development, then
 | z range | feature | Ø |
 |---|---|---:|
 | −3.70 … −2.90 | R0.80 root fillet | 2.70 → 4.30 |
-| −3.70 … −1.50 | shaft | **2.70** (0.15 mm radial clearance) |
-| −1.50 … −1.20 | entry chamfer | 2.70 → 2.10 |
+| −3.70 … −1.65 | shaft | **2.70** (0.15 mm radial clearance) |
+| −1.65 … −1.35 | entry chamfer | 2.70 → 2.10 |
 
-Top face at z = −1.20 — **0.10 mm behind the PCB front plane**, so the plain
+Top face at z = −1.35 — **0.25 mm behind the PCB front plane**, so the plain
 posts satisfy the original prohibition without needing the controlled exception
-at all.
+at all. 0.10 mm (the generic `forward_setback`) is too thin to trust on an FDM
+post top when the modelled glass overhangs these holes; 0.25 mm costs nothing
+and still engages 1.35 mm of the 1.60 mm board.
 
 ### 3.3 Reused, changed, and why
 
@@ -246,25 +248,26 @@ at all.
 | barb Ø3.20, 0.10 mm radial hook | **Ø3.20, 0.10 mm** | reused unchanged — the brief's starting value |
 | R0.80 root fillet | **R0.80** | reused unchanged |
 | plain post Ø2.70 | **Ø2.70** | reused unchanged |
-| root relief ≈ 1.00 mm | **3.00 mm (sprung) / 1.00 mm (plain)** | **changed.** In Rev D/K the relief sat *in front of* the PCB, so its depth was capped by the glass — that is exactly what forced Rev K's narrow pair down to a 0.40 mm relief on 0.20 mm of assumed clearance. In Rev P.2 the relief is **behind** the PCB, where the glass cannot constrain it at all, so its depth is set by strain instead. |
-| Rev D peak strain 1.64 % (a = 3.10) | **0.96 %** (a = 4.05) | consequence of the deeper relief |
+| root relief ≈ 1.00 mm | **3.20 mm (sprung) / 1.00 mm (plain)** | **changed.** In Rev D/K the relief sat *in front of* the PCB, so its depth was capped by the glass — that is exactly what forced Rev K's narrow pair down to a 0.40 mm relief on 0.20 mm of assumed clearance. In Rev P.2 the relief is **behind** the PCB, where the glass cannot constrain it at all, so its depth is set by strain instead. |
+| hook land (Rev D: under one print layer) | **0.25 mm** | **changed.** A retaining face thinner than a layer is not a retaining face. |
+| Rev D peak strain 1.64 % (a = 3.10) | **0.83 %** (a = 4.35) | consequence of the deeper relief |
 | Rev K narrow pair on 0.20 mm assumed glass clearance | **deleted** | replaced by plain posts — the dependency is removed, not re-estimated |
 
 ### 3.4 Recalculated mechanics
 
-Cantilever half-post, fixed at the top of the root fillet (z = −4.90), loaded at
-the full-diameter land (z = −0.85): free length **a = 4.05 mm**, half-section
+Cantilever half-post, fixed at the top of the root fillet (z = −5.10), loaded at
+the full-diameter land (z = −0.75): free length **a = 4.35 mm**, half-section
 thickness t = (2.80 − 0.70)/2 = **1.05 mm**, PETG E = 2000 MPa.
 
 | Quantity | Value |
 |---|---:|
 | Deflection to pass the barb, per half | 0.10 mm |
-| **Peak strain, hole centred** | **0.96 %** |
+| **Peak strain, hole centred** | **0.83 %** |
 | Deflection worst case, board hard to one side | 0.20 mm on one half |
-| **Peak strain, worst case** | **1.92 %** |
+| **Peak strain, worst case** | **1.66 %** |
 | Strain limit | 3.00 % |
-| Radial spring force per post at 0.10 mm | ≈ 4.9 N |
-| Insertion force (33.7° cam, µ 0.30) | ≈ 5.9 N per post → **≈ 12 N total** |
+| Radial spring force per post at 0.10 mm | ≈ 3.9 N |
+| Insertion force (40.6° cam, µ 0.30) | ≈ 6.1 N per post → **≈ 12.3 N total** |
 | Seated deflection | **0.00 mm — the barb clears the PCB entirely** |
 | Seated radial preload on the PCB | **zero** (0.10 mm shaft clearance in the hole) |
 | Seated axial preload on the PCB | **zero** (0.10 mm clearance under the hook) |
@@ -370,6 +373,7 @@ whose swept envelope is exactly the module cross-section extruded along Z.
    stops there — on rigid carrier body, not on a spring.
 6. As the PCB front face passes z = −1.00 the two barbs snap fully clear and
    relax to zero deflection, standing 0.10 mm ahead of the PCB front face.
+   Their tips reach z = −0.40, so 0.70 mm of nose stands proud of the board.
 
 Only the two intended sprung noses deflect at any point in that sequence.
 Everything else the module touches is rigid.
@@ -456,16 +460,17 @@ neither is designed until the number exists.
 | **0.000** | Perspex rear face = **carrier structural hard stop (DATUM A)** |
 | −0.300 | OLED glass front face — `oled_perspex_gap` |
 | −0.400 | sprung post nose tip — 0.400 mm clear of the Perspex |
-| −0.850 | barb full-diameter land begins |
+| −0.750 | barb full-diameter land begins |
 | **−1.000** | **snap-hook retaining face — the forward stop** |
 | −1.100 | OLED PCB front face — `+ oled_glass_proud 0.80`; **0.100 mm under the hook** |
 | −1.200 | forward limit of all carrier material inside the aperture, `N` excepted |
+| −1.350 | plain post tops |
 | **−2.700** | OLED PCB rear face = **fixed datum pads (DATUM B)** — `+ oled_pcb_t 1.60` |
 | −2.900 | plain-post root fillet top |
 | −3.000 | post pedestal top |
 | −3.700 | plain-post root relief floor |
-| −4.900 | sprung-post root fillet top |
-| −5.700 | sprung-post root relief floor |
+| −5.100 | sprung-post root fillet top |
+| −5.900 | sprung-post root relief floor |
 | −8.000 | carrier rear face |
 | −10.800 | header rear extent — clear of the carrier |
 
@@ -494,8 +499,8 @@ Rev C.
 | Post roots | start on the solid relief floor, supported |
 | Datum pads at z = −2.70 | upward-facing faces on a layer boundary — layer-count accurate |
 | Aperture step at z = −1.20 | upward-facing ledge |
-| Barb retaining face at z = −1.00 | a **0.20 mm** downward-facing annular ledge on a Ø2.80 post — the same feature class as the Rev D 0.10 mm and Rev K 0.175 mm hooks, both of which printed |
-| Barb lead-in cone | 33.7° from the axis, self-supporting |
+| Barb retaining face at z = −1.00 | a **0.20 mm** downward-facing annular ledge, the step from the Ø2.80 shaft to the Ø3.20 barb (the retention overlap against the Ø3.00 hole is a different 0.10 mm) — the Rev D / Rev K hook class, both of which printed |
+| Barb lead-in cone | 40.6° from the axis, 49° from horizontal — self-supporting |
 | Seating face at z = 0 | becomes a top surface — use 4+ top layers or ironing, as Rev P.1 |
 
 No unsupported critical barb: the only overhang in the retention system is the
