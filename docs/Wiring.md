@@ -223,17 +223,18 @@ unclipped and free of persistent display artefacts.
 
 ## H5 — Dial Illumination
 
-- **Three identical E10/MES warm-white LED lamps** in the three original holders.
-- Target lamp geometry: approximately **24 mm overall length**, matching the
-  original bulb form factor closely enough to retain the original optics/position.
-- Preferred colour temperature: **2200–3000 K**.
-- Lamps must be compatible with the locked **5 V lighting rail**. Accept nominal
-  5 V devices or a specified operating range that includes 5 V (for example
-  1–5 V or 3–6 V).
-- The three lamps are wired **in parallel**.
-- One **logic-level N-channel MOSFET** low-side switches the complete lamp bank;
-  ESP32 drives the gate.
-- **PWM** controlled by the ESP32 (proposed **GPIO25 / board label D25**, LEDC).
+- Purchased lamp set: **ShuoHui E10 miniature screw LEDs**, ASIN
+  **B0CFTLZFGT**, pack of 10; **6 V AC/DC, 0.2 W, 3000 K**. Three are required.
+- The selected lamps are **not yet electrically or mechanically approved**:
+  confirm their approximately 24 mm holder fit, acceptable brightness and total
+  current from the locked 5 V rail before installation.
+- Wire the three validated lamps **in parallel**.
+- Selected switch candidate: one **DAOKAI 3.3 V / 5 V PWM MOSFET driver module**,
+  ASIN **B09YYH2BTF**, from the ordered pack of 10.
+- The seller's compatibility claim is not the bench result. Verify clean PWM
+  switching from ESP32 **GPIO25 / board label D25**, safe-off behaviour and
+  acceptable module temperature at the measured lamp-bank current. Reopen the
+  switch selection if it cannot pass.
 - ESP32 and lighting grounds are **common**.
 - Brightness is set during commissioning, stored in non-volatile settings and
   then treated as a setup value rather than a normal user control. The unused
@@ -241,8 +242,9 @@ unclipped and free of persistent display artefacts.
   not reserved permanently for lighting.
 
 Expected behaviours: fade up, fade down, stored/configurable brightness, safe
-boot state. Firmware support is implemented; GPIO25 and the MOSFET/load wiring
-remain proposed until the dial-lighting bench procedure passes.
+boot state. Firmware support is implemented. The purchased lamps, ordered
+MOSFET module, GPIO25 and the complete load wiring remain unapproved until the
+dial-lighting bench procedure passes.
 
 ## H6 — Fosi ZA3 12 V Trigger
 
@@ -260,18 +262,42 @@ remain proposed until the dial-lighting bench procedure passes.
 
 ## Power Distribution
 
+The approved low-voltage controller path is:
+
+`external Phihong adapter -> panel DC socket -> 2 A fuse on +5 V -> +5 V / GND distribution -> ESP32 and H5 lighting`
+
 - Locked controller architecture: **one regulated 5 V control rail**, with 3.3 V
   derived by the ESP32 board regulator for logic/ADC and the OLED as documented.
-- The 5 V rail supplies the ESP32 board input and the three E10 dial lamps.
+- Selected/acquired supply: **Phihong PSA15R-050P**, **5.0 V DC at 3.0 A
+  (15 W)**.
+- The adapter remains enclosed and external by default. Only its isolated
+  low-voltage output enters the cabinet; this controller path adds no internal
+  230 V connection.
+- Purchased input-socket set: **TopHomer ASIN B08HGXYS4J**, pack of five
+  female two-terminal threaded-nut panel sockets, **5.5 mm OD × 2.1 mm ID** and
+  rated **3 A**; one is required.
+- The purchase closes socket procurement, not validation. Confirm the actual
+  Phihong plug fit and centre-positive polarity before drilling or wiring the
+  selected socket.
+- Fit a **2 A low-voltage fuse** in the +5 V conductor immediately after the
+  socket and before distribution. Recheck the rating against measured total lamp
+  current during commissioning.
+- Use two three-way distribution connectors, preferred **Wago 221-413** or
+  equivalent: one +5 V connector and one GND connector.
+- The +5 V distribution branches to the ESP32 **5V/VIN** terminal and the positive
+  side of all three E10 lamps. Never connect this rail to the ESP32 **3V3**
+  terminal.
+- The GND distribution branches to ESP32 GND and the lighting MOSFET source/GND.
+  The lamp negatives return through the MOSFET switched output; they must never
+  be driven directly from GPIO25.
+- Use 22–24 AWG stranded Orange wire for +5 V and Brown wire for GND, with
+  correctly sized ferrules at screw and lever terminals.
 - **No dedicated 6 V/6.3 V lighting rail** is required or planned.
-- Selected/acquired 5 V supply: **Phihong PSA15R-050P** switching adapter,
-  **5.0 V DC at 3.0 A (15 W)**. The 5 V PSU procurement item is closed.
-- Before connecting it to the loom, confirm the DC plug size and polarity with a
-  multimeter. Keep the enclosed mains adapter intact; only its low-voltage output
-  connects to the 5 V control rail.
 - The WiiM Pro remains continuously powered and uses its own automatic standby.
 - The Fosi ZA3 PSU may remain energised; the amplifier state is controlled by H6
   via its 12 V trigger input.
+- A future single-mains-lead cabinet arrangement remains a separate open design
+  decision and must not be improvised from the low-voltage parts above.
 - The ESP32 remains powered when the Decca front-panel switch is OFF so it can
   detect the next state change.
 - The ESP32 carries **control and UI only**. It does **not** process or carry

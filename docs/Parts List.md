@@ -1,19 +1,30 @@
 # Parts List
 
 > **Status:** active. Human-readable summary; the formal BOM lives in
-> `hardware/BOM/`. Reflects the confirmed build decisions. Where a component
-> model is not yet selected, that is stated explicitly rather than inferred.
+> `hardware/BOM/`. Reflects the confirmed build decisions. A selected model that
+> has not yet been bought is kept separate from a genuinely open selection.
 
 ## Electronics (Phase 1)
 
-| Item                  | Qty | Spec / Notes                                              | Source |
-|-----------------------|-----|-----------------------------------------------------------|--------|
-| ESP32 DevKit          | 1   | Dual-core, Wi-Fi, ADC1, LEDC PWM. Control/UI only, no audio. | _TBD_ |
-| Potentiometer, 10 kΩ linear | 4 | Position sensors (Balance, Treble, Bass, Volume). Not in audio path. | _TBD_ |
-| OLED display          | 1   | **Installed and bench-verified:** Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V | The Pi Hut |
-| N-channel MOSFET      | 1   | Logic-level; switches 5 V dial lighting under ESP32 PWM   | _TBD_  |
-| E10 warm-white LED lamps | 1 set | **5 V, E10 screw-base LED lamps** for the original dial-lighting positions; warm-white output; switched/dimmed together from the 5 V lighting rail via the MOSFET PWM stage. Exact lamp count to follow physical socket count. | _TBD_  |
-| Power supply / rails  | 1   | **Selected / acquired:** Phihong PSA15R-050P switching adapter; regulated 5.0 V DC at 3.0 A (15 W) for the ESP32 and 5 V dial-lighting rail. 3.3 V remains derived by the ESP32 board regulator. Confirm the DC plug size and polarity with a multimeter before connection. | Existing stock |
+Status meanings: **OPEN** = selection or purchase is still required; **CHECK** =
+the named item is already selected or purchased but a physical or electrical
+validation remains.
+
+| Item | Qty | Status | Spec / Notes | Source |
+|------|-----|--------|--------------|--------|
+| ESP32 DevKit | 1 | **ACQUIRED** | 30-pin DevKit V1 / DOIT-style board; dual-core, Wi-Fi, ADC1 and LEDC PWM. Control/UI only, no audio. | Existing stock |
+| ESP32 screw-terminal adapter | 1 | **ACQUIRED** | Matching 30-pin terminal adapter used for the installed controller. | Existing stock |
+| ABW1 10K linear potentiometers | 4 | **INSTALLED / VERIFIED** | AB Elektronik / TT Electronics ABW1 10K, CPC order code RE04644. Position sensors for Balance, Treble, Bass and Volume; not in the audio path. | CPC |
+| OLED display | 1 | **INSTALLED / VERIFIED** | Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V. | The Pi Hut |
+| DAOKAI MOSFET driver modules | Pack of 10; 1 required | **ORDERED — DELIVERY / BENCH CHECK** | ASIN B09YYH2BTF. Seller describes a 3.3 V / 5 V PWM MOSFET driver module with cable. Use one as the selected H5 candidate only after confirming clean GPIO25 PWM switching and acceptable temperature at the measured lamp current. | Amazon / DAOKAI |
+| ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **DELIVERED — FIT / 5 V CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Use three identical lamps in parallel only after confirming the approximately 24 mm holder fit and acceptable brightness/current from 5 V. | Amazon / ShuoHui |
+| 5 V regulated control supply | 1 | **ACQUIRED — PLUG / POLARITY CHECK** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Confirm the actual DC plug dimensions and centre polarity with a multimeter before connection. | Existing stock |
+| TopHomer panel-mount DC input sockets | Pack of 5; 1 required | **PURCHASED — DELIVERY / FIT / POLARITY CHECK** | ASIN B08HGXYS4J; female two-terminal threaded-nut sockets, 5.5 mm OD × 2.1 mm ID, rated 3 A. Use one only after confirming the actual Phihong plug fit and centre-positive polarity before drilling or wiring. | Amazon / TopHomer |
+| Low-voltage inline fuse holder | 1 | **OPEN — BUY** | Installed in the +5 V conductor immediately after the panel socket and before distribution. | _TBD_ |
+| 2 A fuse | 2 | **OPEN — BUY** | One fitted and one spare; type must match the selected holder. Final rating to be rechecked against measured lamp current during bench commissioning. | _TBD_ |
+| 5 V / GND distribution connectors | 2 | **OPEN — SELECT / BUY** | Two three-way lever connectors: one for +5 V and one for GND. Wago 221-413 or equivalent is preferred but has not been selected or purchased. | _TBD_ |
+| Lyeteung JST-XH 4-pin harness set | 15 pairs | **PURCHASED — CHECK PHYSICAL STOCK** | ASIN B0CBWX98NF; 2.54 mm male/female connectors with 150 mm 22 AWG leads. Use where a four-way removable low-voltage harness is suitable. | Amazon / Lyeteung |
+| 22–24 AWG stranded power wire and ferrules | 1 lot | **CHECK STOCK** | Orange for +5 V and Brown for GND; ferrules sized for the ESP32 terminal adapter and distribution connectors. | Existing stock / _TBD_ |
 
 ## Reused Original Components (Phase 1)
 
@@ -27,17 +38,31 @@
 
 ## Audio Path / Phase 2
 
-| Item | Qty | Decision status | Notes | Source |
-|------|-----|-----------------|-------|--------|
-| WiiM Pro | 1 | **LOCKED** | Networked streamer/source. ESP32 integration via local API for source selection, volume and metadata. **Do not substitute WiiM Amp / Amp Pro without a new ADR.** | _TBD / price watch active_ |
-| Separate stereo power amplifier | 1 | **ARCHITECTURE LOCKED; MODEL OPEN** | WiiM Pro line output feeds a separate analogue power amplifier, then passive speakers. Exact amp model is intentionally not yet locked. Fosi V3 was the initial recommendation; used conventional hi-fi amplification was subsequently reopened for comparison. | _TBD_ |
-| Monoblock power amplifiers | 2 | **REJECTED for current build** | Considered, but added cost/complexity was not justified for the expected audible benefit in this installation. Revisit only if speaker/amp requirements materially change. | n/a |
-| Passive speakers | 2 | **Separate selection** | Driven only by the power amplifier. Speaker selection is outside ESP32 firmware control. | _TBD_ |
+| Item | Qty | Decision / procurement status | Notes | Source |
+|------|-----|-------------------------------|-------|--------|
+| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 local-API integration for source selection, volume and metadata. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
+| Fosi Audio ZA3 | 1 | **LOCKED — NOT ACQUIRED** | Selected stereo power amplifier. WiiM Pro line output feeds the ZA3; its gain/volume becomes a commissioning ceiling and its operating state is controlled by the 12 V trigger. New-unit price watch threshold: £129 or below. | _Price watch active_ |
+| B&W DM601 S3 speakers | 2 | **PRIMARY TARGET — NOT ACQUIRED / FIT VERIFY** | Primary used-speaker target, not yet a locked purchase. Approx. 365 H × 204 W × 228 D mm; verify the actual pair including terminals against the hard per-bay limit of 400 H × 270 W × 245 D mm. Front-ported. Target ≤£150, exceptional ≤£130; reject damaged/dented tweeters. | _Used-speaker watch active_ |
+| ZA3 12 V trigger driver and source | 1 | **OPEN — DESIGN / SELECT** | ESP32-controlled transistor/MOSFET or isolated interface plus suitable 12 V source. Exact circuit and GPIO require selection and bench verification. | _TBD_ |
+| ZA3 trigger plug / lead | 1 | **OPEN — SELECT WITH DRIVER** | Match the ZA3 trigger connector and confirmed polarity; length follows final equipment placement. | _TBD_ |
+| Stereo RCA interconnect | 1 | **OPEN — BUY LATER** | WiiM Pro line output to ZA3 input; choose length after internal placement is fixed. | _TBD_ |
+| 2 × 2.5 mm² OFC speaker cable / internal harness | 1 set | **SPEC SELECTED — LENGTH / TERMINATIONS OPEN** | ZA3 to passive speakers; exact brand, length and terminations follow final placement and speaker selection. | _TBD_ |
+| Monoblock power amplifiers | 2 | **REJECTED** | Added cost and complexity are not justified for the current build. | n/a |
 
-**Locked signal architecture:** `WiiM Pro -> separate power amplifier -> passive speakers`.
+**Locked signal architecture:** `WiiM Pro -> Fosi Audio ZA3 -> passive speakers`.
 
-See ADR-0008 for the decision boundary between the locked architecture and the
-still-open amplifier model selection.
+See ADR-0008 and ADR-0010 for the locked streamer, amplifier and system-power
+decisions.
+
+## Whole-system mains boundary
+
+The Phihong 5 V adapter is treated as an **external enclosed adapter** by default;
+only its isolated 5 V output enters the cabinet. The current design therefore
+does not add a 230 V socket merely for the controller rail.
+
+A future one-mains-lead arrangement for the WiiM, ZA3 and controller would require
+a separate fused mains-inlet/distribution design. That remains an **open system
+design decision**, not an approved component purchase.
 
 ## Mechanical / Fasteners
 
@@ -48,5 +73,5 @@ still-open amplifier model selection.
 ## Consumables / Harness
 
 - Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SDA and Yellow = SCL; H4 Orange must never be connected to 5 V
-- Removable connectors at the controller end (harnesses H1–H5)
-- Heat-shrink, solder, strain-relief materials
+- Removable connectors at the controller end (harnesses H1–H6), including the purchased Lyeteung JST-XH 4-pin set where appropriate
+- Heat-shrink, solder, ferrules and strain-relief materials

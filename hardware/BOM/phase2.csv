@@ -1,5 +1,8 @@
 designator,item,quantity,manufacturer,model,status,notes
-A1,Network streamer,1,WiiM,WiiM Pro,LOCKED,"Local API integration; line-level source only. Continuously powered; uses WiiM automatic standby. Do not substitute WiiM Amp/Amp Pro without new ADR."
-A2,Stereo power amplifier,1,Fosi Audio,ZA3,LOCKED,"Separate analogue power amp. Power state controlled by ZA3 12 V trigger from an ESP32-controlled driver; amp gain/volume fixed during commissioning while user volume is controlled through WiiM."
-A3L/A3R,Passive speakers,2,TBD,TBD,OPEN,"Driven by A2; final speaker selection tracked separately."
-A4,ZA3 trigger driver,1,TBD,TBD,OPEN,"ESP32-controlled interface that generates/switches the ZA3 12 V trigger signal. Exact transistor/MOSFET, 12 V source and GPIO remain to be selected and bench-verified."
+A1,Network streamer,1,WiiM,WiiM Pro,LOCKED-NOT-ACQUIRED,"Local API integration; line-level source only. Continuously powered; uses WiiM automatic standby. Do not substitute WiiM Amp/Amp Pro without new ADR. New-unit price watch threshold GBP149 or below."
+A2,Stereo power amplifier,1,Fosi Audio,ZA3,LOCKED-NOT-ACQUIRED,"Separate analogue power amp. Power state controlled by ZA3 12 V trigger from an ESP32-controlled driver; amp gain/volume fixed during commissioning while user volume is controlled through WiiM. New-unit price watch threshold GBP129 or below."
+A3L/A3R,Passive speakers,2,Bowers & Wilkins,DM601 S3,PRIMARY-TARGET-NOT-ACQUIRED-FIT-VERIFY,"Primary used-speaker target, not a locked purchase. Approximate published size 365 H x 204 W x 228 D mm; verify the actual pair including terminals against the hard per-bay limit 400 H x 270 W x 245 D mm. Front port required for this placement. Target price no more than GBP150, exceptional at GBP130 or below; reject damaged or dented tweeters."
+A4,ZA3 trigger driver and 12 V source,1,TBD,TBD,OPEN-DESIGN,"ESP32-controlled interface that generates or switches the ZA3 12 V trigger signal. Exact transistor/MOSFET or isolated interface, 12 V source and GPIO remain to be selected and bench-verified."
+A5,ZA3 trigger plug or lead,1,TBD,TBD,OPEN,"Match ZA3 trigger connector and confirmed polarity; length follows final equipment placement."
+A6,Stereo RCA interconnect,1,TBD,TBD,OPEN-LATER,"WiiM Pro line output to ZA3 input; select length after internal placement is fixed."
+A7,Speaker cable and internal harness,1 set,TBD,TBD,OPEN-LATER,"Selected cable specification is 2 x 2.5 mm2 OFC; exact length, brand and terminations follow final placement and speaker selection."
