@@ -60,7 +60,7 @@ enum class Control : uint8_t {
  */
 struct ViewState {
     PowerState power = PowerState::Standby;
-    settings::Source source = settings::Source::Vhf;
+    settings::Source source = settings::Source::DigitalStreamer;
     uint16_t volume = 0;
     uint16_t bass = 0;
     uint16_t treble = 0;

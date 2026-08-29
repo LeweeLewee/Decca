@@ -64,6 +64,8 @@ that source control alone does not express well.
 | 2026-08-29 | Hardware | Corrected component status against the project decisions and purchase records: recorded the installed ABW1 10K potentiometers, ordered DAOKAI B09YYH2BTF MOSFET modules, delivered ShuoHui B0CFTLZFGT lamps pending fit/5 V testing, purchased Lyeteung B0CBWX98NF JST-XH harness set, selected-but-unbought WiiM Pro and Fosi ZA3, and B&W DM601 S3 as the fit-gated primary speaker target. |
 | 2026-08-29 | Hardware | Purchased the Amazon TopHomer B08HGXYS4J pack of five 5.5 × 2.1 mm, two-terminal, threaded-nut panel DC sockets rated 3 A. Socket procurement is closed; physical fit and centre-positive polarity remain mandatory checks before drilling or wiring. |
 
+| 2026-08-29 | Firmware | Replaced the unreliable four-button electrical model with sole Gram two-state selection: closed = Vinyl, open = Digital Streamer. GPIO16/17/18 released; GPIO23 retained; settings schema v2 no longer persists physical source; nine button tests revised (Specification v0.16, ADR-0011). |
+
 ## Hardware Revisions
 
 | Rev | Date  | Change                          | Notes |

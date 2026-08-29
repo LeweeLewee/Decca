@@ -1,8 +1,7 @@
 /**
  * @file    buttons.cpp
- * @brief   Implementation of front-panel button input (see buttons.h).
+ * @brief   Debounced on/off and two-state Gram source-selection input.
  */
-
 #include "buttons.h"
 
 #include <Arduino.h>
@@ -12,22 +11,16 @@
 namespace decca::buttons {
 namespace {
 
-constexpr uint8_t kButtonCount = 5;
-constexpr uint8_t kEventQueueCapacity = 8;
+constexpr uint8_t kButtonCount = 2;
+constexpr uint8_t kEventQueueCapacity = 4;
 
 constexpr Button kButtons[kButtonCount] = {
     Button::OnOff,
-    Button::Vhf,
-    Button::Mw,
-    Button::Lw,
     Button::Gram,
 };
 
 constexpr uint8_t kPins[kButtonCount] = {
     hardware::kSwitchOnOff,
-    hardware::kButtonVhf,
-    hardware::kButtonMw,
-    hardware::kButtonLw,
     hardware::kButtonGram,
 };
 
@@ -131,17 +124,19 @@ bool isPressed(Button button) {
     return indexFor(button, index) && g_states[index].stablePressed;
 }
 
+SourceMode sourceMode() {
+    return isPressed(Button::Gram) ? SourceMode::Vinyl
+                                   : SourceMode::DigitalStreamer;
+}
+
 #ifdef PIO_UNIT_TESTING
 namespace testing {
-
 void setRawReader(RawReader reader) {
     g_rawReader = reader;
 }
-
 void resetRawReader() {
     g_rawReader = nullptr;
 }
-
 }  // namespace testing
 #endif
 

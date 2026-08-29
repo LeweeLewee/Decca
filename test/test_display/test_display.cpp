@@ -98,7 +98,7 @@ void test_display_physical_sh1106_snapshot() {
 
     ViewState state;
     state.power = PowerState::On;
-    state.source = decca::settings::Source::Gram;
+    state.source = decca::settings::Source::Vinyl;
     state.volume = 750;
     state.bass = 500;
     state.treble = 500;
@@ -145,7 +145,7 @@ void test_display_dashboard_carries_function_and_controls() {
     startInjected();
     ViewState state;
     state.power = PowerState::On;
-    state.source = decca::settings::Source::Gram;
+    state.source = decca::settings::Source::Vinyl;
     state.volume = 1000;
     state.bass = 600;
     state.treble = 400;
@@ -158,7 +158,7 @@ void test_display_dashboard_carries_function_and_controls() {
                       static_cast<int>(g_lastKind));
     TEST_ASSERT_EQUAL(static_cast<int>(PowerState::On),
                       static_cast<int>(g_lastState.power));
-    TEST_ASSERT_EQUAL(static_cast<int>(decca::settings::Source::Gram),
+    TEST_ASSERT_EQUAL(static_cast<int>(decca::settings::Source::Vinyl),
                       static_cast<int>(g_lastState.source));
     TEST_ASSERT_EQUAL_STRING("VINYL", g_lastFunction);
     TEST_ASSERT_EQUAL_UINT16(1000, g_lastState.volume);
@@ -174,7 +174,7 @@ void test_display_copies_and_clears_now_playing_metadata() {
     char artist[] = "The Rolling Stones";
     ViewState state;
     state.power = PowerState::On;
-    state.source = decca::settings::Source::Vhf;
+    state.source = decca::settings::Source::DigitalStreamer;
     state.functionName = function;
     state.title = title;
     state.artist = artist;
@@ -228,8 +228,8 @@ void test_display_confirms_mapped_function_then_returns() {
     startInjected();
     ViewState state;
     state.power = PowerState::On;
-    state.source = decca::settings::Source::Mw;
-    state.functionName = "JAZZ PRESET";
+    state.source = decca::settings::Source::DigitalStreamer;
+    state.functionName = "DIGITAL STREAMER";
     decca::display::setState(state);
     finishStartup();
     decca::display::showFunction();
@@ -237,8 +237,8 @@ void test_display_confirms_mapped_function_then_returns() {
 
     TEST_ASSERT_EQUAL(static_cast<int>(FrameKind::Function),
                       static_cast<int>(g_lastKind));
-    TEST_ASSERT_EQUAL_STRING("JAZZ PRESET", g_lastFunction);
-    TEST_ASSERT_EQUAL(static_cast<int>(decca::settings::Source::Mw),
+    TEST_ASSERT_EQUAL_STRING("DIGITAL STREAMER", g_lastFunction);
+    TEST_ASSERT_EQUAL(static_cast<int>(decca::settings::Source::DigitalStreamer),
                       static_cast<int>(g_lastState.source));
 
     g_nowMs += decca::display::kStatusDurationMs;

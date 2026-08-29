@@ -1,14 +1,12 @@
 /**
  * @file    settings.cpp
- * @brief   Implementation of persisted configuration/state (see settings.h).
+ * @brief   Persisted configuration and shared runtime state.
  */
-
 #include "settings.h"
 
 #include <Preferences.h>
 
 namespace decca::settings {
-
 namespace {
 
 #ifdef PIO_UNIT_TESTING
@@ -18,41 +16,26 @@ constexpr char kNamespace[] = "decca";
 #endif
 
 constexpr char kStateKey[] = "state";
-constexpr uint8_t kCurrentVersion = 1;
+constexpr uint8_t kCurrentVersion = 2;
 
 struct PersistedState {
     uint8_t version;
-    uint8_t source;
     uint8_t volume;
     uint8_t dial;
 };
 
-static_assert(sizeof(PersistedState) == 4,
+static_assert(sizeof(PersistedState) == 3,
               "Persisted settings layout must remain fixed-width");
 
 State g_state;
 bool g_dirty = false;
 
 bool isValid(const PersistedState& persisted) {
-    return persisted.version == kCurrentVersion &&
-           persisted.source <= static_cast<uint8_t>(Source::Gram);
-}
-
-State fromPersisted(const PersistedState& persisted) {
-    State state;
-    state.source = static_cast<Source>(persisted.source);
-    state.volume = persisted.volume;
-    state.dial = persisted.dial;
-    return state;
+    return persisted.version == kCurrentVersion;
 }
 
 PersistedState toPersisted(const State& state) {
-    return {
-        kCurrentVersion,
-        static_cast<uint8_t>(state.source),
-        state.volume,
-        state.dial,
-    };
+    return {kCurrentVersion, state.volume, state.dial};
 }
 
 bool statesEqual(const State& lhs, const State& rhs) {
@@ -76,7 +59,8 @@ void init() {
         preferences.getBytes(kStateKey, &persisted, sizeof(persisted)) ==
             sizeof(persisted) &&
         isValid(persisted)) {
-        g_state = fromPersisted(persisted);
+        g_state.volume = persisted.volume;
+        g_state.dial = persisted.dial;
     }
 
     preferences.end();
@@ -90,7 +74,6 @@ void set(const State& state) {
     if (statesEqual(g_state, state)) {
         return;
     }
-
     g_state = state;
     g_dirty = true;
 }

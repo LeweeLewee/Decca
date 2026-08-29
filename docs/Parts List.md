@@ -32,7 +32,7 @@ validation remains.
 |-------------------------|-------------------------------------------------------------|
 | Original on/off switch  | Retained with original solder joints and cable. Low-voltage logic input only (Red/Green). Not switching mains. |
 | Original selector PCB   | **Retained** as mechanical carrier for the interlocked selector (ADR-0001). Not disposable. |
-| Original source buttons | VHF, MW, LW, Gram wired as inputs; **SW deferred / no function** (ADR-0004). |
+| Original source buttons | Original mechanism retained. Only Gram is wired: closed = Vinyl, open = Digital Streamer. VHF/SW/MW/LW are mechanically retained but electrically unused; replacement panel deferred (ADR-0011). |
 | Original Stereo/Mono control | Retained mechanically, **unwired**, decorative in Phase 1 (ADR-0005). |
 | Original Decca knobs    | Retained via mechanical adaptor strategy (see `mechanical/Knob Adaptors/`). |
 
@@ -40,7 +40,7 @@ validation remains.
 
 | Item | Qty | Decision / procurement status | Notes | Source |
 |------|-----|-------------------------------|-------|--------|
-| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 local-API integration for source selection, volume and metadata. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
+| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 switches Line-In for Gram/Vinyl and restores the digital path when Gram is released; phone controls digital content. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
 | Fosi Audio ZA3 | 1 | **LOCKED — NOT ACQUIRED** | Selected stereo power amplifier. WiiM Pro line output feeds the ZA3; its gain/volume becomes a commissioning ceiling and its operating state is controlled by the 12 V trigger. New-unit price watch threshold: £129 or below. | _Price watch active_ |
 | B&W DM601 S3 speakers | 2 | **PRIMARY TARGET — NOT ACQUIRED / FIT VERIFY** | Primary used-speaker target, not yet a locked purchase. Approx. 365 H × 204 W × 228 D mm; verify the actual pair including terminals against the hard per-bay limit of 400 H × 270 W × 245 D mm. Front-ported. Target ≤£150, exceptional ≤£130; reject damaged/dented tweeters. | _Used-speaker watch active_ |
 | ZA3 12 V trigger driver and source | 1 | **OPEN — DESIGN / SELECT** | ESP32-controlled transistor/MOSFET or isolated interface plus suitable 12 V source. Exact circuit and GPIO require selection and bench verification. | _TBD_ |

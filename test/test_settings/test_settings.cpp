@@ -1,11 +1,7 @@
 /**
  * @file    test_settings.cpp
- * @brief   Tests for the settings module (shared state + persistence).
- *
- * Tests use the real ESP32 NVS backend under a test-only namespace so they do
- * not alter production settings.
+ * @brief   Settings tests for runtime source and persisted user values.
  */
-
 #include "unity_runner.h"
 
 #include "settings.h"
@@ -20,46 +16,41 @@ void assertStateEquals(const State& expected, const State& actual) {
     TEST_ASSERT_EQUAL_UINT8(expected.dial, actual.dial);
 }
 
-// A default-constructed snapshot must hold safe first-boot values.
 void test_settings_defaults() {
     const State defaults;
-    TEST_ASSERT_EQUAL(static_cast<int>(Source::Vhf),
+    TEST_ASSERT_EQUAL(static_cast<int>(Source::DigitalStreamer),
                       static_cast<int>(defaults.source));
     TEST_ASSERT_EQUAL_UINT8(0, defaults.volume);
     TEST_ASSERT_EQUAL_UINT8(0, defaults.dial);
 }
 
-// set() then get() must round-trip the values.
 void test_settings_set_get_roundtrip() {
-    State next;
-    next.source = Source::Gram;
-    next.volume = 42;
-    next.dial = 128;
+    const State next{Source::Vinyl, 42, 128};
     decca::settings::set(next);
-
     assertStateEquals(next, decca::settings::get());
 }
 
-// Saved settings must survive module reinitialisation through the NVS backend.
-void test_settings_nvs_roundtrip() {
-    const State first{Source::Mw, 73, 141};
-    const State second{Source::Lw, 184, 62};
+void test_settings_nvs_roundtrip_does_not_persist_physical_source() {
+    const State first{Source::Vinyl, 73, 141};
+    const State expectedFirst{Source::DigitalStreamer, 73, 141};
+    const State second{Source::Vinyl, 184, 62};
+    const State expectedSecond{Source::DigitalStreamer, 184, 62};
 
     decca::settings::init();
     decca::settings::set(first);
     decca::settings::save();
     decca::settings::init();
-    assertStateEquals(first, decca::settings::get());
+    assertStateEquals(expectedFirst, decca::settings::get());
 
     decca::settings::set(second);
     decca::settings::save();
-    decca::settings::set(first);  // Deliberately leave RAM different from NVS.
+    decca::settings::set(first);
     decca::settings::init();
-    assertStateEquals(second, decca::settings::get());
+    assertStateEquals(expectedSecond, decca::settings::get());
 }
 
 void runAll() {
     RUN_TEST(test_settings_defaults);
     RUN_TEST(test_settings_set_get_roundtrip);
-    RUN_TEST(test_settings_nvs_roundtrip);
+    RUN_TEST(test_settings_nvs_roundtrip_does_not_persist_physical_source);
 }

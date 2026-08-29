@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Phase 1 hardware layer in progress; settings, pots, debounced button input, dial-light fades and the ADR-0007/0009 SH1106 display presentation contract are implemented. Phase 2 metadata inputs are display-ready but have no WiiM producer yet. Pot inputs GPIO32–35, source-button GPIO16/17/23 and OLED GPIO21/22 are bench-verified; GPIO18 awaits an LW harness repair and remaining ESP32 assignments are proposed. |
-| Version  | 0.15                                              |
+| Status   | Draft. Phase 1 hardware layer in progress. Pot inputs GPIO32–35, sole source selector Gram GPIO23 and OLED GPIO21/22 are bench-verified. The original selector PCB is retained mechanically, but VHF/SW/MW/LW are not electrical inputs. Digital content selection is delegated to the WiiM app; remaining assigned GPIOs are proposed. |
+| Version  | 0.16                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -44,8 +44,7 @@ Confirmed Phase 1 front-panel controls:
 
 - Four rotary controls as 10 kΩ position sensors: **Balance, Treble, Bass, Volume**.
 - Retained original **on/off switch** (low-voltage logic input).
-- Original **source button bank**: **VHF, MW, LW, Gram** working; **SW deferred
-  (no function in Phase 1)**. Stereo/Mono retained but unwired.
+- Original **source button bank** retained mechanically. Only **Gram** is an electrical input: latched = **Vinyl**; released = **Digital Streamer**. VHF, SW, MW and LW have no individual electronic function. Stereo/Mono remains unwired.
 - **OLED** display and **warm dial illumination**.
 
 See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
@@ -70,7 +69,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 |-----------|------------------------------------------------------------------------------|-------|
 | FR-SYS-01 | The system shall initialise all modules in dependency order at power-on.     | 1     |
 | FR-SYS-02 | The system shall run a non-blocking main loop; no operation may stall it.    | 1     |
-| FR-SYS-03 | The system shall be fully operable from the front panel with no network.     | 1     |
+| FR-SYS-03 | Local hardware controls shall remain usable without a network; digital content and track selection are delegated to the WiiM app. | 1 |
 | FR-SYS-04 | The system shall restore its last persisted state on boot.                   | 1     |
 | FR-SYS-05 | The system shall degrade gracefully if the streamer is unavailable.          | 2     |
 
@@ -78,14 +77,14 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-BTN-01 | The system shall read the working source buttons and the on/off switch and debounce them in software. | 1 |
-| FR-BTN-02 | The system shall emit a discrete event per confirmed press.                  | 1     |
-| FR-BTN-03 | The system shall support power/standby (retained on/off switch, low-voltage input) and source selection across the four working inputs (VHF, MW, LW, Gram). | 1 |
-| FR-BTN-04 | SW shall have **no function** in Phase 1 (no unique contact; deferred). The design shall not claim all five source buttons are available. | 1 |
+| FR-BTN-01 | The system shall debounce the retained on/off switch and the sole Gram source contact. | 1 |
+| FR-BTN-02 | The system shall expose the stable Gram state continuously and emit one event per confirmed press without hold repeats. | 1 |
+| FR-BTN-03 | Closed/latched Gram shall select Vinyl; open/released Gram shall select Digital Streamer. Gram release is therefore an authoritative source change. | 1 |
+| FR-BTN-04 | VHF, SW, MW and LW shall have no individual ESP32 input. They may mechanically release Gram through the original interlock. A replacement button panel is a deferred fallback only. | 1 |
 
-> Transport/playback control is not a Phase 1 hardware capability; playback
-> control arrives with the WiiM integration (see 5.7). Source-button-to-WiiM
-> mappings are configurable in software (ADR-0004).
+> Digital service, station, playlist and track selection remain in the WiiM app.
+> In Phase 2 the ESP32 maps Vinyl to WiiM Line-In and Digital Streamer to the
+> phone-controlled network playback path (ADR-0011).
 
 ### 5.3 Potentiometers
 
@@ -128,7 +127,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
-| FR-SET-01 | The system shall persist user state (source, volume, brightness) to NVS.     | 1     |
+| FR-SET-01 | The system shall persist volume and brightness to NVS. Source shall be derived from the physical Gram state and shall not be persisted. | 1 |
 | FR-SET-02 | Settings shall be the single point through which modules exchange state.     | 1     |
 | FR-SET-03 | Persistence shall be write-limited to protect flash endurance.               | 1     |
 
@@ -137,7 +136,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | ID        | Requirement                                                                 | Phase |
 |-----------|------------------------------------------------------------------------------|-------|
 | FR-WIM-01 | The system shall connect to the WiiM Pro over the local network.             | 2     |
-| FR-WIM-02 | The system shall select the streamer source from the front panel.            | 2     |
+| FR-WIM-02 | Gram shall select WiiM Line-In for Vinyl; releasing Gram shall restore the phone-controlled digital playback path. | 2 |
 | FR-WIM-03 | Front-panel volume and streamer volume shall be synchronised.                | 2     |
 | FR-WIM-04 | The system shall retrieve and display now-playing metadata.                  | 2     |
 
@@ -191,10 +190,10 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 | ID     | Interface                                                                       |
 |--------|---------------------------------------------------------------------------------|
-| IF-01  | **Front panel:** four 10 kΩ pots on ADC1 (position sensors); on/off switch and four working source buttons (VHF, MW, LW, Gram) as debounced low-voltage digital inputs. SW deferred; Stereo/Mono unwired. |
+| IF-01  | **Front panel:** four 10 kΩ pots on ADC1; retained on/off switch; sole debounced Gram source contact on GPIO23. Gram closed = Vinyl, Gram open = Digital Streamer. VHF/SW/MW/LW and Stereo/Mono are unwired. |
 | IF-02  | **Display:** purchased Pi Hut 1.3-inch white 128×64 **SH1106** OLED over **I²C** at address 0x3C, powered from 3.3 V and mounted behind the dial glass. |
 | IF-03  | **Lighting:** PWM-driven warm dial illumination via logic-level N-channel MOSFET (dial only in Phase 1). |
-| IF-04  | **WiiM Pro local API (Phase 2):** source selection, volume control, and metadata/playback-state feedback. Endpoint and command set to be documented in a dedicated interface note when implemented. |
+| IF-04  | **WiiM Pro local API (Phase 2):** two-state Line-In/digital-path switching, volume control, and metadata/playback-state feedback. Digital content selection remains in the WiiM app. |
 | IF-05  | **Serial console:** 115200 baud for diagnostics and bring-up.                   |
 
 ---
@@ -219,13 +218,13 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 ### Phase 1 — Local Control
 - FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06, FR-LGT, FR-SET satisfied.
-- Device is fully usable with no network connected.
+- Local controls and vinyl selection remain available without a network; digital content selection requires the WiiM app/network.
 - All Phase 1 module test suites pass (`pio test`).
 - Build is clean per NFR-04.
 
 ### Phase 2 — WiiM Integration
 - FR-WIM-01..04 and FR-DSP-03/07 satisfied.
-- Source selection, volume sync, and metadata verified against a live WiiM Pro.
+- Gram-to-Line-In and released-Gram-to-digital switching, volume sync and metadata are verified against a live WiiM Pro.
 - Loss of the streamer does not impair local control (FR-SYS-05, NFR-09).
 
 ### Phase 3 — Advanced Features
