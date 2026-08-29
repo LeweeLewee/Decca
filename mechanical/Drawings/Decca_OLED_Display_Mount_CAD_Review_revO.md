@@ -287,6 +287,12 @@ seats against the Perspex, be pulled through the boss under tightening, rotate
 in its pocket, contact the OLED/PCB/wiring, or enter the original lighting-unit
 keep-out.
 
+The nut shall also remain captive when the loose carrier is inverted and offered
+into the radio before either bolt is engaged. Use a documented, serviceable
+retention lip, small snap or validated controlled fit; do not use permanent
+adhesive. Handling retention is separate from the axial seating shoulder and
+shall not be credited as part of the structural clamp-load path.
+
 Use separate named parameters for the measured nut width, pocket fit allowance,
 head-seat depth and total nut length. Pocket clearance is a print-process fit
 allowance, not permission to alter the 3.80 mm physical-part measurement. Where
@@ -368,6 +374,8 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
 - the remaining seating faces resist rocking when the two original bolts are snug;
 - each original nut fits its six-sided pocket with positive anti-rotation and a
   defined axial seat, and can be installed and removed from the rear;
+- each original nut remains captive when the loose carrier is inverted and
+  offered into the radio before either bolt is installed;
 - the full 10.00 mm nut and engaged original bolt clear the OLED, PCB, wiring,
   Perspex optical aperture and retained lighting-unit keep-out;
 - neither original bolt bottoms in its nut nor pulls the nut through the carrier
@@ -430,7 +438,8 @@ this order:
 16. the OLED retention, removal, gap and centring results remain unchanged after
     removal of the end rail;
 17. both original nuts seat fully in their hex pockets without rotation, cracking
-    or excessive insertion force;
+    or excessive insertion force, remain captive with the loose carrier inverted,
+    and can still be deliberately removed for service;
 18. both original non-standard-thread bolts engage freely, do not bottom, and
     clamp the carrier hard stops to the Perspex; and
 19. the captive-nut installation and engaged fasteners remain clear of the
