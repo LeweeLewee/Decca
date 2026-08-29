@@ -13,7 +13,7 @@
 | OLED display          | 1   | **Installed and bench-verified:** Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V | The Pi Hut |
 | N-channel MOSFET      | 1   | Logic-level; switches 5 V dial lighting under ESP32 PWM   | _TBD_  |
 | E10 warm-white LED lamps | 1 set | **5 V, E10 screw-base LED lamps** for the original dial-lighting positions; warm-white output; switched/dimmed together from the 5 V lighting rail via the MOSFET PWM stage. Exact lamp count to follow physical socket count. | _TBD_  |
-| Power supply / rails  | 1   | 5 V rail; 3.3 V from board regulator                      | _TBD_  |
+| Power supply / rails  | 1   | **Selected / acquired:** Phihong PSA15R-050P switching adapter; regulated 5.0 V DC at 3.0 A (15 W) for the ESP32 and 5 V dial-lighting rail. 3.3 V remains derived by the ESP32 board regulator. Confirm the DC plug size and polarity with a multimeter before connection. | Existing stock |
 
 ## Reused Original Components (Phase 1)
 

@@ -75,9 +75,12 @@ The audio-path architecture is locked by ADR-0008 and ADR-0010 as:
 - The dial lighting does **not** receive a separate 6 V or 6.3 V rail. A dedicated
   lamp-only supply is explicitly rejected unless a later hardware constraint
   requires an ADR change.
-- Exact 5 V PSU/regulator model and current rating remain **open procurement
-  items** and must be selected with adequate margin for the controller, OLED and
-  all three lamps.
+- The 5 V supply is **selected and acquired**: **Phihong PSA15R-050P** switching
+  adapter, rated **5.0 V DC at 3.0 A (15 W)**. This closes the 5 V PSU procurement
+  item and provides adequate margin for the controller, OLED and all three lamps.
+  Before connection, confirm the DC plug size and polarity with a multimeter; keep
+  the adapter's enclosed mains side intact and route only its low-voltage output
+  into the control-rail wiring.
 - ESP32 and dial-lighting **grounds are common**.
 - The original Decca on/off switch remains a **low-voltage ESP32 input only**; it
   does not carry 230 V mains.
