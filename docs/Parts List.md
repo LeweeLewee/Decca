@@ -1,27 +1,29 @@
 # Parts List
 
 > **Status:** active. Human-readable summary; the formal BOM lives in
-> `hardware/BOM/`. Reflects the confirmed build decisions. Where a component
-> model is not yet selected, that is stated explicitly rather than inferred.
+> `hardware/BOM/`. Reflects the confirmed build decisions. A selected model that
+> has not yet been bought is kept separate from a genuinely open selection.
 
 ## Electronics (Phase 1)
 
-Status meanings: **OPEN** = purchase or selection still required; **CHECK STOCK** =
-may already be available but has not been confirmed.
+Status meanings: **OPEN** = selection or purchase is still required; **CHECK** =
+the named item is already selected or purchased but a physical or electrical
+validation remains.
 
 | Item | Qty | Status | Spec / Notes | Source |
 |------|-----|--------|--------------|--------|
 | ESP32 DevKit | 1 | **ACQUIRED** | 30-pin DevKit V1 / DOIT-style board; dual-core, Wi-Fi, ADC1 and LEDC PWM. Control/UI only, no audio. | Existing stock |
 | ESP32 screw-terminal adapter | 1 | **ACQUIRED** | Matching 30-pin terminal adapter used for the installed controller. | Existing stock |
-| Potentiometer, 10 kΩ linear | 4 | **INSTALLED / VERIFIED** | Position sensors for Balance, Treble, Bass and Volume. Not in the audio path. | Existing stock |
+| ABW1 10K linear potentiometers | 4 | **INSTALLED / VERIFIED** | AB Elektronik / TT Electronics ABW1 10K, CPC order code RE04644. Position sensors for Balance, Treble, Bass and Volume; not in the audio path. | CPC |
 | OLED display | 1 | **INSTALLED / VERIFIED** | Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V. | The Pi Hut |
-| Logic-level N-channel MOSFET stage | 1 | **OPEN — SELECT** | 3.3 V gate-compatible, PWM-capable low-side stage for the complete 5 V lamp bank. Minimum 3 A rating; include a gate pulldown, either on the module or externally. | _TBD_ |
-| E10 warm-white LED lamps | 3 | **OPEN — BUY** | E10/MES, approximately 24 mm overall length, preferably 2200–3000 K; nominal 5 V or an operating range explicitly including 5 V; identical and wired in parallel. | _TBD_ |
-| 5 V regulated control supply | 1 | **ACQUIRED — OUTPUT CHECK REQUIRED** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Confirm the actual DC plug dimensions and centre polarity with a multimeter before connection. | Existing stock |
+| DAOKAI MOSFET driver modules | Pack of 10; 1 required | **ORDERED — DELIVERY / BENCH CHECK** | ASIN B09YYH2BTF. Seller describes a 3.3 V / 5 V PWM MOSFET driver module with cable. Use one as the selected H5 candidate only after confirming clean GPIO25 PWM switching and acceptable temperature at the measured lamp current. | Amazon / DAOKAI |
+| ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **DELIVERED — FIT / 5 V CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Use three identical lamps in parallel only after confirming the approximately 24 mm holder fit and acceptable brightness/current from 5 V. | Amazon / ShuoHui |
+| 5 V regulated control supply | 1 | **ACQUIRED — PLUG / POLARITY CHECK** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Confirm the actual DC plug dimensions and centre polarity with a multimeter before connection. | Existing stock |
 | Panel-mount DC input socket | 1 | **OPEN — VERIFY THEN BUY** | Female socket matching the Phihong plug, rated at least 5 V / 3 A. Provisional expectation is 5.5 mm OD × 2.1 mm ID, centre positive; do not order until the actual plug is checked. | _TBD_ |
 | Low-voltage inline fuse holder | 1 | **OPEN — BUY** | Installed in the +5 V conductor immediately after the panel socket and before distribution. | _TBD_ |
 | 2 A fuse | 2 | **OPEN — BUY** | One fitted and one spare; type must match the selected holder. Final rating to be rechecked against measured lamp current during bench commissioning. | _TBD_ |
-| 5 V / GND distribution connectors | 2 | **OPEN — BUY** | Two three-way lever connectors, preferred Wago 221-413 or equivalent: one for +5 V and one for GND. | _TBD_ |
+| 5 V / GND distribution connectors | 2 | **OPEN — SELECT / BUY** | Two three-way lever connectors: one for +5 V and one for GND. Wago 221-413 or equivalent is preferred but has not been selected or purchased. | _TBD_ |
+| Lyeteung JST-XH 4-pin harness set | 15 pairs | **PURCHASED — CHECK PHYSICAL STOCK** | ASIN B0CBWX98NF; 2.54 mm male/female connectors with 150 mm 22 AWG leads. Use where a four-way removable low-voltage harness is suitable. | Amazon / Lyeteung |
 | 22–24 AWG stranded power wire and ferrules | 1 lot | **CHECK STOCK** | Orange for +5 V and Brown for GND; ferrules sized for the ESP32 terminal adapter and distribution connectors. | Existing stock / _TBD_ |
 
 ## Reused Original Components (Phase 1)
@@ -38,13 +40,13 @@ may already be available but has not been confirmed.
 
 | Item | Qty | Decision / procurement status | Notes | Source |
 |------|-----|-------------------------------|-------|--------|
-| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Networked streamer/source. ESP32 local-API integration for source selection, volume and metadata. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. | _TBD / price watch active_ |
-| Fosi Audio ZA3 | 1 | **LOCKED — NOT ACQUIRED** | Stereo power amplifier. WiiM Pro line output feeds the ZA3; its gain/volume becomes a commissioning ceiling and its operating state is controlled by the 12 V trigger. | _TBD / price watch active_ |
-| Passive speakers | 2 | **OPEN — SELECTION TRACKED SEPARATELY** | Driven by the ZA3. Final choice must meet the cabinet fit and condition limits. | _TBD_ |
+| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 local-API integration for source selection, volume and metadata. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
+| Fosi Audio ZA3 | 1 | **LOCKED — NOT ACQUIRED** | Selected stereo power amplifier. WiiM Pro line output feeds the ZA3; its gain/volume becomes a commissioning ceiling and its operating state is controlled by the 12 V trigger. New-unit price watch threshold: £129 or below. | _Price watch active_ |
+| B&W DM601 S3 speakers | 2 | **PRIMARY TARGET — NOT ACQUIRED / FIT VERIFY** | Primary used-speaker target, not yet a locked purchase. Approx. 365 H × 204 W × 228 D mm; verify the actual pair including terminals against the hard per-bay limit of 400 H × 270 W × 245 D mm. Front-ported. Target ≤£150, exceptional ≤£130; reject damaged/dented tweeters. | _Used-speaker watch active_ |
 | ZA3 12 V trigger driver and source | 1 | **OPEN — DESIGN / SELECT** | ESP32-controlled transistor/MOSFET or isolated interface plus suitable 12 V source. Exact circuit and GPIO require selection and bench verification. | _TBD_ |
 | ZA3 trigger plug / lead | 1 | **OPEN — SELECT WITH DRIVER** | Match the ZA3 trigger connector and confirmed polarity; length follows final equipment placement. | _TBD_ |
 | Stereo RCA interconnect | 1 | **OPEN — BUY LATER** | WiiM Pro line output to ZA3 input; choose length after internal placement is fixed. | _TBD_ |
-| Speaker cable / internal harness | 1 set | **OPEN — BUY LATER** | ZA3 to passive speakers; conductor size, length and terminations follow final placement and speaker selection. | _TBD_ |
+| 2 × 2.5 mm² OFC speaker cable / internal harness | 1 set | **SPEC SELECTED — LENGTH / TERMINATIONS OPEN** | ZA3 to passive speakers; exact brand, length and terminations follow final placement and speaker selection. | _TBD_ |
 | Monoblock power amplifiers | 2 | **REJECTED** | Added cost and complexity are not justified for the current build. | n/a |
 
 **Locked signal architecture:** `WiiM Pro -> Fosi Audio ZA3 -> passive speakers`.
@@ -71,5 +73,5 @@ design decision**, not an approved component purchase.
 ## Consumables / Harness
 
 - Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SDA and Yellow = SCL; H4 Orange must never be connected to 5 V
-- Removable connectors at the controller end (harnesses H1–H6)
+- Removable connectors at the controller end (harnesses H1–H6), including the purchased Lyeteung JST-XH 4-pin set where appropriate
 - Heat-shrink, solder, ferrules and strain-relief materials

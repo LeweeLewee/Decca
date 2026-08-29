@@ -1,13 +1,14 @@
 item,quantity,specification,supplier,part_number,status
 ESP32 DevKit,1,"30-pin DevKit V1 / DOIT-style; Wi-Fi; at least 4 MB flash; control/UI only",Existing stock,TBD,acquired
 ESP32 screw-terminal adapter,1,"matching 30-pin terminal adapter for installed controller",Existing stock,TBD,acquired
-10 kOhm linear potentiometer,4,"position sensor; not in audio path",TBD,TBD,installed-and-verified
+10 kOhm linear potentiometer,4,"ABW1 10K linear position sensor; Balance, Treble, Bass and Volume; not in audio path",CPC / AB Elektronik / TT Electronics,ABW1 10K / CPC RE04644,installed-and-verified
 OLED display,1,"1.3-inch; white; 128x64; SH1106; four-pin I2C; 3.3 V",The Pi Hut,SKU 105630,installed-and-verified
-N-channel MOSFET stage,1,"logic-level at 3.3 V; PWM-capable low-side switch for complete 5 V dial-light bank; minimum 3 A rating; gate pulldown required on module or externally",TBD,TBD,open-selection
-E10 warm-white LED lamps,3,"E10/MES; target ~24 mm overall length; preferably 2200-3000 K; nominal 5 V or explicit range including 5 V; all identical; wired in parallel",TBD,TBD,open
+N-channel MOSFET driver module,10 (1 required),"DAOKAI 3.3 V / 5 V PWM MOSFET driver module with cable; one module is the selected candidate low-side switch for the full lamp bank; verify clean switching and acceptable temperature from GPIO25 at the measured lamp load before final installation",Amazon / DAOKAI,ASIN B09YYH2BTF,ordered-pending-delivery-and-bench-verification
+E10 warm-white LED lamps,10 (3 required),"ShuoHui AC/DC E10 miniature screw LED bulbs; 6 V; 0.2 W; 3000 K; use three identical lamps in parallel only after confirming physical fit and acceptable brightness/current at the locked 5 V rail",Amazon / ShuoHui,ASIN B0CFTLZFGT,delivered-pending-fit-and-5v-bench-verification
 5 V regulated control supply,1,"Phihong switching adapter; input 100-240 V AC 50-60 Hz 0.5 A; output 5.0 V DC 3.0 A (15 W); confirm actual DC plug dimensions and centre polarity before connection",Phihong,PSA15R-050P,acquired-pending-output-verification
 Panel-mount DC input socket,1,"female socket matching Phihong plug; rated at least 5 V 3 A; provisional 5.5 mm OD x 2.1 mm ID centre positive; do not order until actual plug is checked",TBD,TBD,open-pending-plug-verification
 Low-voltage inline fuse holder,1,"in +5 V conductor immediately after panel socket and before distribution; type to suit selected 2 A fuse",TBD,TBD,open
 2 A fuse,2,"one fitted and one spare; recheck final rating against measured lamp current during bench commissioning",TBD,TBD,open
-5 V and GND distribution connectors,2,"three-way lever connectors; preferred Wago 221-413 or equivalent; one +5 V and one GND",TBD,221-413 or equivalent,open
+5 V and GND distribution connectors,2,"three-way lever connectors; Wago 221-413 or equivalent is preferred but not yet selected; one +5 V and one GND",TBD,TBD,open-selection
+JST-XH removable connector harnesses,15 pairs,"Lyeteung 4-pin male/female JST-XH 2.54 mm connectors with 150 mm 22 AWG leads; use where a four-way removable low-voltage harness is suitable; check physical stock before relying on quantity",Amazon / Lyeteung,ASIN B0CBWX98NF,purchased-stock-check
 22-24 AWG stranded power wire and ferrules,1 lot,"Orange +5 V and Brown GND; ferrules sized for ESP32 terminal adapter and distribution connectors",Existing stock / TBD,TBD,stock-check

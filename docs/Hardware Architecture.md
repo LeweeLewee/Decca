@@ -154,7 +154,8 @@ thermal-design restriction.
 ## Inputs
 
 ### Potentiometers (H1)
-Four **10 kΩ linear** pots (Balance, Treble, Bass, Volume) wired GND / wiper /
+Four installed **AB Elektronik / TT Electronics ABW1 10K linear** pots (CPC
+order code **RE04644**) for Balance, Treble, Bass and Volume, wired GND / wiper /
 3.3 V (Brown / White / Red). Wipers read on ADC1. Firmware applies calibration,
 smoothing, deadband, and optional inversion (see Firmware Architecture).
 Bench-verified assignments and board labels are:
@@ -196,13 +197,17 @@ board label **D22** were bench-verified on 2026-08-25 with the on-target display
 suite and a visual layout inspection.
 
 ### Dial lighting (H5)
-Three identical **E10/MES warm-white LED lamps**, target approximately **24 mm
-overall length** to match the originals. Preferred colour temperature is
-**2200–3000 K**. Lamps must be suitable for the locked 5 V rail, either nominal
-5 V devices or explicitly specified as compatible across a range including 5 V
-(e.g. 1–5 V or 3–6 V). They are wired **in parallel** and driven together through
-a **logic-level N-channel MOSFET**, gate driven by ESP32 **PWM (LEDC)**, proposed
-GPIO25 / board label **D25**. Common ground with the ESP32.
+The purchased lamp set is **ShuoHui ASIN B0CFTLZFGT**: ten E10 miniature
+screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. Physical fit,
+brightness and current at the locked 5 V rail remain bench checks, so the lamps
+are acquired candidates rather than approved installed parts.
+
+The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
+module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
+claims do not replace verification: GPIO25 / board label **D25**, safe-off
+behaviour, clean PWM switching and module temperature must pass at the measured
+three-lamp load. The three validated lamps will be wired **in parallel** with
+common ground to the ESP32.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. Firmware stores the selected PWM level in non-volatile
