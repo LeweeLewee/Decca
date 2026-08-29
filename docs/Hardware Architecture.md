@@ -198,9 +198,10 @@ suite and a visual layout inspection.
 
 ### Dial lighting (H5)
 The purchased lamp set is **ShuoHui ASIN B0CFTLZFGT**: ten E10 miniature
-screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. Physical fit,
-brightness and current at the locked 5 V rail remain bench checks, so the lamps
-are acquired candidates rather than approved installed parts.
+screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. The lamps were
+bench-confirmed functional at **5 V** on 2026-08-29, validating compatibility with
+the locked 5 V lighting rail. Physical holder fit, final brightness and total
+three-lamp current remain commissioning checks.
 
 The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
 module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
