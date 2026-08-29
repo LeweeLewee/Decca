@@ -260,18 +260,40 @@ remain proposed until the dial-lighting bench procedure passes.
 
 ## Power Distribution
 
+The approved low-voltage controller path is:
+
+`external Phihong adapter -> panel DC socket -> 2 A fuse on +5 V -> +5 V / GND distribution -> ESP32 and H5 lighting`
+
 - Locked controller architecture: **one regulated 5 V control rail**, with 3.3 V
   derived by the ESP32 board regulator for logic/ADC and the OLED as documented.
-- The 5 V rail supplies the ESP32 board input and the three E10 dial lamps.
+- Selected/acquired supply: **Phihong PSA15R-050P**, **5.0 V DC at 3.0 A
+  (15 W)**.
+- The adapter remains enclosed and external by default. Only its isolated
+  low-voltage output enters the cabinet; this controller path adds no internal
+  230 V connection.
+- The panel-mount female DC socket must match the actual adapter plug and be rated
+  for at least 5 V / 3 A. A 5.5 mm OD × 2.1 mm ID centre-positive connection is
+  the provisional expectation only; verify the physical plug and polarity before
+  ordering or wiring the socket.
+- Fit a **2 A low-voltage fuse** in the +5 V conductor immediately after the
+  socket and before distribution. Recheck the rating against measured total lamp
+  current during commissioning.
+- Use two three-way distribution connectors, preferred **Wago 221-413** or
+  equivalent: one +5 V connector and one GND connector.
+- The +5 V distribution branches to the ESP32 **5V/VIN** terminal and the positive
+  side of all three E10 lamps. Never connect this rail to the ESP32 **3V3**
+  terminal.
+- The GND distribution branches to ESP32 GND and the lighting MOSFET source/GND.
+  The lamp negatives return through the MOSFET switched output; they must never
+  be driven directly from GPIO25.
+- Use 22–24 AWG stranded Orange wire for +5 V and Brown wire for GND, with
+  correctly sized ferrules at screw and lever terminals.
 - **No dedicated 6 V/6.3 V lighting rail** is required or planned.
-- Selected/acquired 5 V supply: **Phihong PSA15R-050P** switching adapter,
-  **5.0 V DC at 3.0 A (15 W)**. The 5 V PSU procurement item is closed.
-- Before connecting it to the loom, confirm the DC plug size and polarity with a
-  multimeter. Keep the enclosed mains adapter intact; only its low-voltage output
-  connects to the 5 V control rail.
 - The WiiM Pro remains continuously powered and uses its own automatic standby.
 - The Fosi ZA3 PSU may remain energised; the amplifier state is controlled by H6
   via its 12 V trigger input.
+- A future single-mains-lead cabinet arrangement remains a separate open design
+  decision and must not be improvised from the low-voltage parts above.
 - The ESP32 remains powered when the Decca front-panel switch is OFF so it can
   detect the next state change.
 - The ESP32 carries **control and UI only**. It does **not** process or carry
