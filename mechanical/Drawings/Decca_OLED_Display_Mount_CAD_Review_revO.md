@@ -26,6 +26,15 @@ the rear of the OLED bay with an integral opaque carrier wall to prevent the
 cabinet LEDs washing light around the OLED, leaving only the minimum opening
 required for the four input/header pins and their wiring.
 
+Amended again 2026-08-29 after physical packaging review of Rev P.4. Reduce the
+plastic carrier depth from 8.00 to **6.00 mm**; enlarge the finished four-pin
+opening by 25% in both axes from 11.20 × 3.35 mm to **14.00 × 4.19 mm**; add two
+integral internal light-block walls beside that opening without exceeding the
+revised carrier/back-plate envelope; and correct the vertical datum. The OLED
+shall be rotated in plane so the four-pin side is at the bottom, and the bottom
+edge of its visible active area shall align with the bottom edge of the measured
+Perspex opening. The original Perspex holes remain fixed physical interfaces.
+
 Platform: Autodesk Fusion 360. Manufacture: FDM 3D print.
 
 ## 1. Reason for redesign
@@ -106,7 +115,9 @@ Use the measured and print-confirmed dimensions already recorded in the reposito
 - Original Perspex thickness: 3.00 mm.
 - Existing aperture: **35.20 mm W × 15.30 mm H**.
 - Existing fixing-hole pitch: **49.00 mm horizontal**.
-- Fixing-hole centreline: vertically centred on the display aperture.
+- Existing fixing-hole vertical position: controlled by the physical Perspex
+  holes, independently of the OLED active-area centre. Do not move or redrill
+  the Perspex and do not derive carrier-hole Y from screen centring.
 - No additional holes, cutting or irreversible modification to the original Perspex.
 - The original Decca bolts enter from the front of the Perspex and fasten into
   their original matching nuts captured by the rear carrier.
@@ -375,6 +386,74 @@ The closed cavity shall not trap the module permanently. The CAD build review
 must identify how the sprung posts are deliberately released and the OLED is
 withdrawn from the front with the rear wall present.
 
+### 8.4 Rev P.5 packaging and vertical-datum correction
+
+#### Carrier depth
+
+Reduce the carrier's plastic Z envelope by exactly 2.00 mm:
+
+- Rev P.4 carrier depth: 8.00 mm;
+- Rev P.5 carrier depth: **6.00 mm** measured from the Perspex seating plane to
+  the carrier rear plane; and
+- retain `rear_light_shield_t = 1.20 mm` unless the actual extrusion-width rule
+  in §8.3 requires a greater value.
+
+The project owner confirms that the resulting nominal space behind the seated
+screen is available. The CAD shall nevertheless recalculate the shield-to-PCB,
+header, sprung-post relief, pedestal-root, nut-pocket and wiring clearances from
+the finished 6.00 mm geometry. Do not truncate a root relief, fillet, nut seat or
+connector envelope merely to meet the external depth.
+
+#### Four-pin opening and internal light blocks
+
+The Rev P.4 finished four-pin opening is 11.20 × 3.35 mm. Increase both finished
+linear dimensions by 25%:
+
+- width: **14.00 mm**;
+- height: **4.19 mm** nominal (4.1875 mm unrounded); and
+- centre the opening on the transformed four-pin/header envelope.
+
+This explicit finished size supersedes the earlier minimum-opening instruction.
+Keep the opening local; do not reopen the general rear window.
+
+Add two integral opaque light-block walls, one immediately to each lateral side
+of the four-pin opening. The walls shall form a short internal tunnel beside the
+pins, extending forward from the inside face of the rear shield while remaining
+clear of the header, conductors, wire bend and OLED insertion/removal sweep.
+Each wall shall be at least three actual extrusion widths thick and shall join
+the rear shield as part of the same carrier solid.
+
+Neither light-block wall may extend behind the revised carrier rear plane,
+outside the existing back-plate X/Y footprint, into the deleted end-rail region,
+or beyond the **6.00 mm** overall carrier envelope. They are internal baffles,
+not external fins and not separate components.
+
+#### Screen and fixing-hole vertical datum
+
+Use the measured Perspex opening as the panel datum. With the opening centre at
+`y = 0`, its bottom edge is:
+
+`panel_open_bottom_y = -panel_open_h / 2 = -7.65 mm`.
+
+Rotate the complete OLED module reference **180 degrees in its plane** so the
+four-pin/header side is the bottom side. Do not mirror only selected features;
+transform the PCB, glass, active area, four mounting holes, header, solder tips,
+datum pads, posts, pocket, rear-wall opening and light blocks consistently.
+
+Align the bottom edge of the visible OLED active area with the bottom edge of
+the Perspex opening. With `oled_active_h = 14.70 mm`, this gives:
+
+`oled_active_center_y = panel_open_bottom_y + oled_active_h / 2 = -0.30 mm`.
+
+The OLED active area remains horizontally centred. It is intentionally no longer
+vertically centred: the top margin becomes 0.60 mm and the bottom margin 0.00 mm.
+
+The existing Perspex fixing holes are not moved. Their exact 49.00 mm horizontal
+pitch and physical vertical centreline remain the mounting authority. Correct
+the carrier by moving the OLED bay and all OLED-dependent geometry relative to
+the panel-fixed bosses/holes. Do not merely change `panel_fix_y`, and do not move
+the holes with the OLED transform.
+
 ## 9. Required corrective CAD changes for open Rev P
 
 1. Replace rear insertion with flush/Perspex-side insertion moving rearwards.
@@ -393,7 +472,8 @@ withdrawn from the front with the rear wall present.
 9. Model display-side protrusions at 1.00 mm maximum after preparation.
 10. Use the measured 49.00 mm fixing pitch and 35.20 × 15.30 mm aperture.
 11. Retain the existing bezel unless new test evidence requires a change.
-12. Preserve active-area centring relative to the original Decca aperture.
+12. Preserve horizontal active-area centring; supersede vertical centring with
+    the connector-side bottom-edge alignment specified in §8.4.
 13. Keep the design fully parametric in Fusion 360.
 14. Remove the complete lighting-unit-side end rail and integral cable-tie
     projection as specified in §8.1, while retaining the post pedestals and side
@@ -408,6 +488,8 @@ withdrawn from the front with the rear wall present.
     the Fusion assembly, generator, verification model, drawings and exports.
 19. Close the OLED bay with the integral opaque rear wall specified in §8.3,
     leaving only the local four-pin/header opening.
+20. Apply all four Rev P.5 packaging corrections in §8.4 as one controlled datum
+    update; do not move the original Perspex or its existing fixing holes.
 
 ## 10. Mandatory CAD validation gate
 
@@ -463,7 +545,20 @@ Before the corrected Rev P geometry is accepted for a prototype print, verify al
   does not change the fixed datum, snap engagement, release path or optical gap;
 - the selected wall thickness and opaque black print produce no visible light
   transmission or edge glow under the installed cabinet lighting;
-- screen active area remains centred behind the bezel/aperture;
+- carrier depth from Perspex seating plane to rear plane is exactly 6.00 mm;
+- shortening the carrier leaves valid sprung-post reliefs, pedestal roots,
+  fillets, nut seats and a positive rear-wall-to-PCB/component clearance;
+- the finished four-pin opening measures 14.00 × 4.19 mm and remains centred on
+  the transformed connector envelope;
+- two integral light-block walls exist beside the opening, remain inside the
+  back-plate X/Y footprint and 6.00 mm Z envelope, and clear the pins, wires and
+  insertion/removal sweep;
+- the complete OLED reference and OLED-dependent carrier geometry have undergone
+  one consistent 180-degree in-plane transform, placing the connector at the bottom;
+- the visible active area remains horizontally centred and its bottom edge is
+  coincident with the Perspex opening bottom edge to the CAD model tolerance;
+- the panel-fixed boss/hole centres remain coincident with the existing Perspex
+  holes at exactly 49.00 mm horizontal pitch and are not moved with the OLED;
 - no unprintable thin slivers or unsupported critical features;
 - normal FDM wall thickness is restored in structural areas.
 
@@ -487,7 +582,10 @@ Before generating the next Fusion model, produce and review a simple side-sectio
 - local positive snap overlap on the PCB front face; and
 - the flush-side insertion direction;
 - the integral rear light-shield wall; and
-- the local four-pin/header opening and wire-exit path.
+- the 6.00 mm carrier rear plane;
+- the 14.00 × 4.19 mm four-pin/header opening and wire-exit path;
+- the two internal light-block walls; and
+- the connector-side active-area bottom edge aligned to the Perspex opening bottom.
 
 The CAD build must not proceed unless the section shows positive stops in both
 axial directions: fixed rear datum pads stopping insertion and sprung noses
@@ -508,7 +606,9 @@ this order:
 5. the stated release method removes the OLED without damaging posts or PCB;
 6. carrier seats flat against Perspex;
 7. actual OLED-to-Perspex gap;
-8. active-area centring when powered;
+8. powered active-area alignment: horizontally centred, connector-side bottom
+   edge aligned to the Perspex opening bottom edge, with 0.00 mm nominal bottom
+   margin and 0.60 mm nominal top margin;
 9. bezel alignment;
 10. tightening the original Decca bolts does not change OLED depth or stress the module;
 11. prepared solder joints and header clear the Perspex and carrier;
@@ -518,8 +618,8 @@ this order:
     seating and removal, with the lighting unit left in place;
 15. the open-ended carrier shows no perceptible lateral rack or twist when
     handled and when the two original bolts are snug; and
-16. the OLED retention, removal, gap and centring results remain unchanged after
-    removal of the end rail;
+16. the OLED retention, removal and gap remain unchanged after removal of the
+    end rail, while the intentional §8.4 vertical alignment is achieved;
 17. both original nuts seat fully in their hex pockets without rotation, cracking
     or excessive insertion force, remain captive with the loose carrier inverted,
     and can still be deliberately removed for service;
@@ -535,7 +635,17 @@ this order:
 22. with the OLED powered through black, dim and normal display content and the
     Decca cabinet LEDs operated through their usable brightness range, no visible
     rear-light glow, edge leakage or contrast washout appears through the Perspex
-    aperture in representative room lighting.
+    aperture in representative room lighting;
+23. the carrier measures 6.00 mm from Perspex seating plane to rear plane and
+    still seats without contact behind the screen;
+24. the connector opening measures 14.00 × 4.19 mm and the pins, conductors and
+    wire bend pass freely;
+25. both internal light-block walls remain within the back-plate footprint and
+    carrier-depth envelope and show no pin/wire contact;
+26. the four-pin side is physically at the bottom and the visible active-area
+    bottom edge aligns with the Perspex opening bottom edge; and
+27. both original carrier fixing holes align with the untouched Perspex holes,
+    retaining exactly 49.00 mm horizontal pitch.
 
 CAD and mesh checks may release this prototype print, but they shall not close
 the retention finding. Physical tests 1–5 are mandatory before Rev P can regain
@@ -571,4 +681,9 @@ rear-accessible, anti-rotation pockets for the original 3.80 mm six-sided,
 non-standard-thread front bolts at exactly 49.00 mm pitch. The synthetic Rev P.3
 lighting keepout component is rejected and shall be removed. The carrier itself
 shall close the rear of the OLED bay as an integral opaque light shield, with
-only the minimum local opening for the four input/header pins and wiring.**
+only the local opening for the four input/header pins and wiring. Rev P.5 shall
+reduce the carrier depth to 6.00 mm, enlarge that finished opening to
+14.00 × 4.19 mm, add two envelope-contained internal side light blocks, rotate
+the complete OLED reference so the connector is at the bottom, and align the
+visible active-area bottom edge with the Perspex opening bottom while leaving
+the original panel holes fixed at exactly 49.00 mm horizontal pitch.**

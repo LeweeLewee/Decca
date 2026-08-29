@@ -22,3 +22,8 @@ their matching six-sided captive nuts are reused at the unchanged 49.00 mm pitch
 The Rev P.3 follow-up rejects the unmeasured synthetic lighting-unit keepout
 component and requires an integral opaque rear wall over the OLED bay, with only
 a local four-pin/header opening, to prevent cabinet-light contamination.
+The Rev P.5 packaging correction reduces carrier depth from 8.00 to 6.00 mm,
+enlarges the finished pin opening by 25% in both axes to 14.00 × 4.19 mm, adds
+two internal side light blocks within the back-plate envelope, places the
+four-pin side at the bottom and aligns the visible active-area bottom edge to
+the Perspex opening bottom without moving the original 49.00 mm-pitch holes.
