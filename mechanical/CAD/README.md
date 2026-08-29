@@ -11,14 +11,15 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## Display mount — current revision: **P**
+## Display mount — current revision: **P — OPEN, NOT RELEASED**
 
-Rev P is the corrected rear-loaded architecture. The `.f3d` is the source of
+Rev P.2 is the corrected **flush-side-insertion** architecture, rebuilt after the
+printed Rev P.1 failed its physical retention test. The `.f3d` is the source of
 truth; the STEPs and the STL are derived exports.
 
 | File | Role |
 |---|---|
-| `Decca_Display_Mount_revP.f3d` | **editable source of truth** — fully parametric, 80 named user parameters |
+| `Decca_Display_Mount_revP.f3d` | **editable source of truth** — fully parametric, 101 named user parameters |
 | `Decca_Display_Mount_revP_fusion.py` | the generator that builds the `.f3d`; single source of truth for every dimension |
 | `Decca_Display_Mount_revP_verify.py` | independent offline verification of the exported STL (numpy only) |
 | `Rear_Display_Carrier_revP.step` | the one structural part |
@@ -34,14 +35,22 @@ equivalent.
 ### Rebuilding
 
 Inside Fusion (Utilities → Add-Ins → Scripts), point `OUT_DIR` at this clone's
-`mechanical` folder and run `main()`, `validate()`, `import_bezel()`, `export()`.
-`main()` creates its own new document and never modifies the Rev N or Rev O
-files. Then, offline:
+`mechanical` folder and run `main()`, `validate()`, `import_bezel()`,
+`snapshots()`, `export()`. `main()` creates its own new document and never
+modifies the Rev N or Rev O files; `snapshots()` regenerates the four Drawings
+PNGs from the live model. Then, offline:
 
 ```bash
 python mechanical/CAD/Decca_Display_Mount_revP_verify.py
 ```
 
 It reads only the exported STL and exits non-zero on failure, so it works as a
-gate. See `../Drawings/Decca_OLED_Display_Mount_CAD_Build_revP.md` §10 for why
-it is deliberately not a second run of the same recipe.
+gate. See `../Drawings/Decca_OLED_Display_Mount_CAD_Build_revP.md` §13 for why
+it is deliberately not a second run of the same recipe — and for the silent
+Fusion `createTorus` failure it caught.
+
+> **Rev P is OPEN.** Two items are outstanding: the glass envelope at the two
+> header-side mounting holes must be measured before any print, and a printed
+> carrier must pass a physical inversion and gentle-shake retention test before
+> the finding raised by the Rev P.1 print can be closed. See the build review
+> §9 and §14.

@@ -1,84 +1,136 @@
 # Decca OLED Display Mount — CAD Build Review (Rev P)
 
-Supersedes Rev N. Implements the corrected rear-loaded architecture specified in
-`Decca_OLED_Display_Mount_CAD_Review_revO.md`.
+Supersedes Rev N. Implements the corrected flush-side-insertion architecture
+required by `Decca_OLED_Display_Mount_CAD_Review_revO.md` as amended
+2026-08-29 (`main` @ `666abca`).
 Platform: Autodesk Fusion 360, script-generated parametric build.
 
-> **Status: RELEASED for the geometry-validation prototype print.**
-> All 20 mandatory validations pass, on the real solid and again independently on
-> the exported mesh. One mandatory **assembly-preparation** step applies: nothing
-> on the OLED's display-side face may stand more than **1.00 mm** proud. The
-> project owner confirmed on 2026-08-28 that the tips will be reduced, which
-> closed the only open item. See **§8**.
+> ## Status: PHYSICAL RETENTION FAILURE — CORRECTIVE WORK IN PROGRESS
+>
+> The printed **Rev P.1** carrier **failed its retention test**: the OLED screen
+> falls forward through the loose carrier.
+>
+> The failure is **architectural, not a tolerance adjustment**. Rev P.1 loaded
+> the module from the rear and placed its only positive shoulders at the PCB
+> rear plane, so they restrained the *opposite* direction; forward retention was
+> left to four 0.10 mm edge-grip tongues acting through assumed friction. There
+> was no positive geometric stop against forward movement, and the printed part
+> proved it.
+>
+> This document now describes **Rev P.2**, the corrected geometry. Rev P remains
+> an **OPEN** prototype revision. It is **not released**. The earlier
+> "released / all validations pass" status is withdrawn.
+>
+> Two things stand between Rev P.2 and a closed finding:
+>
+> 1. **One blocking measurement before any print** — the OLED glass envelope
+>    relative to the two header-side mounting holes (§9). It has never been
+>    measured and it is **not** assumed here.
+> 2. **The physical handling test** — a printed carrier with the OLED installed
+>    must survive inversion in every axis and a gentle shake (§14). CAD and mesh
+>    checks cannot close the retention finding.
 
 Sources:
 
 | File | Role |
 |---|---|
-| `mechanical/Drawings/Decca_OLED_Display_Mount_Topology_revP.md` | Stage 1 pre-CAD topology gate |
+| `mechanical/Drawings/Decca_OLED_Display_Mount_Topology_revP.md` | Stage 1 pre-CAD topology gate, corrected |
 | `mechanical/CAD/Decca_Display_Mount_revP_fusion.py` | the generator — single source of truth for every dimension |
 | `mechanical/CAD/Decca_Display_Mount_revP_verify.py` | independent verification of the exported STL |
 | `mechanical/CAD/Decca_Display_Mount_revP.f3d` | **editable source of truth** |
 
-![Rev P carrier, rear](Decca_OLED_Display_Mount_revP_rear.png)
+![Rev P.2 carrier, front three-quarter — the four locating posts, their datum pads and root reliefs](Decca_OLED_Display_Mount_revP_posts.png)
 
 ---
 
-## 1. What Rev P changes
+## 1. The Rev P.1 failure, and what changes
 
-Rev N was front-loaded: a 1.10 mm full-area front plate stood between the OLED
-PCB and the Perspex and set the screen depth, and a separately printed retainer
-bar was the primary retention. Rev P inverts the whole arrangement.
+### 1.1 Root cause
 
-| | Rev N | **Rev P** |
+Rev P.1 inserted the OLED **from the rear**, moving forwards towards the
+Perspex. Its four snap-finger shoulders sat at the **PCB rear plane**
+(z = −2.70) and stopped motion **rearward** — back out of the pocket. Once the
+board passed them, nothing prevented further forward travel.
+
+The only loose-carrier restraint was four 0.10 mm edge-grip tongues pressing on
+the PCB **edge** through assumed PETG friction. The Rev P.1 gate verified that:
+
+- the rear shoulders exist — they do, and they restrain the wrong direction;
+- the tongues stop behind the PCB front plane — they do, which is precisely why
+  they cannot block forward travel;
+- computed friction (0.55 N) exceeds module weight (0.039 N) — a calculation,
+  not a geometric stop.
+
+It never demonstrated a positive geometric stop against forward movement. There
+was not one to demonstrate.
+
+**None of the following was attempted as a fix**, and none would have addressed
+the defect: increasing `finger_grip`, revising the assumed friction coefficient,
+increasing spring force, or adding another rear-loaded edge finger.
+
+### 1.2 Rev P.1 → Rev P.2
+
+| | Rev P.1 (failed) | **Rev P.2** |
 |---|---|---|
-| Load direction | front-loaded | **rear-loaded** |
-| Material between the PCB face and the Perspex | 1.10 mm front plate | **none — proven, §5** |
-| OLED Z datum | forward plate face | **rear support shoulders at the PCB rear face** |
-| Final axial capture | retainer bar glued to the carrier | **the Perspex, when the carrier is bolted on** |
-| Primary retention | separate glued retainer bar | **none needed — deleted** |
-| Snap features | 4 sprung pegs, 0.100 mm hook, 3.06 % strain | **4 cantilever fingers, 0.40 mm shoulder, 1.73 % strain** |
-| Features entering the PCB mounting holes | 4 pegs | **none** |
-| Parts to print | 3 | **2** (carrier + unchanged bezel) |
-| Carrier | 56.50 × 45.10 × 6.20, 3.004 cm³ | **56.60 × 47.20 × 9.60, 7.154 cm³** |
-| Carrier × solder tips | needed a relief slot | **impossible to interfere, at any tip length** |
+| Insertion direction | from the **rear**, moving forward | **from the flush / Perspex side, moving rearward** |
+| Rearward stop | snap-finger shoulders on a moving spring | **four fixed, rigid datum pads** at z = −2.70 |
+| Forward stop | **none** | **two sprung post hooks, 0.10 mm radial overlap, square face** |
+| Retention basis | assumed friction, 0.55 N vs 0.039 N | **positive geometric interference** |
+| PCB X/Y location | pocket walls | four posts in the four mounting holes, plus the pocket walls |
+| Features in the PCB mounting holes | none | **four locating posts** |
+| Carrier × PCB, seated | 2.40 mm³ (the tongues gripping the edge) | **CLEAR — nothing touches the board but the pads** |
+| Removal | four Ø2.20 mm radial prise holes | pinch the two barbs from the front; push out through the open rear |
+| Carrier | 56.60 × 47.20 × 9.60, 7.154 cm³ | **56.60 × 47.20 × 8.00, 6.928 cm³** |
+| Parts to print | 2 | 2 (carrier + unchanged Rev N bezel) |
 
-The carrier got deeper and heavier. That is bought deliberately: the rear support
-shoulders sit 2.70 mm behind the Perspex, so a snap finger that reaches them from
-the carrier's rear frame needs 5.70 mm of free length to stay under 2 % strain.
-9.60 mm of depth is what that costs, and it is still 1.20 mm shallower than the
-header, which projects to z = −10.80 regardless.
+**Deleted:** the four PCB-edge friction fingers, their shoulders, their 0.10 mm
+tongues, their four radial prise holes, and the friction-versus-weight
+acceptance gate. Neither tool contains a friction criterion any more.
+
+**Retained unchanged:** the 49.00 mm measured M2 pitch, the 35.20 × 15.30 mm
+measured Perspex opening, the 0.30 mm nominal glass-to-Perspex gap, the ≤ 1.00 mm
+front-side solder protrusion, the Rev N bezel, the direct carrier-to-Perspex
+hard-stop rim, the M2 load path through Perspex → carrier rim → boss → insert
+only, active-area centring, open rear header and cable access, and no separate
+retainer bar.
+
+The carrier lost 1.60 mm of depth because Rev P.1's 9.60 mm existed only to give
+its 8.40 mm cantilever fingers room. With the fingers gone, the depth falls out
+of the M2 insert stack and the post root relief instead.
 
 ---
 
 ## 2. Panel geometry — measured values, unchanged
 
-Built on the physically measured fascia dimensions, exactly as Rev N was:
-
 - Perspex 3.00 mm; aperture **35.20 × 15.30 mm**; M2 pitch **49.00 mm**.
 
-These were corrected from Spec v1.0 by measurement at Rev C, print-confirmed at
-Rev D, re-confirmed by the project owner on 2026-08-28, and are now **locked in
-Spec v1.1 §2** so the superseded estimates cannot be re-quoted again. No
-additional drilling, cutting or modification of the original fascia.
+Corrected from Spec v1.0 by measurement at Rev C, print-confirmed at Rev D,
+re-confirmed by the project owner on 2026-08-28, and locked in **Spec v1.1 §2**.
+No modification of the original fascia.
 
 ---
 
 ## 3. The optical Z-chain
 
-Everything forward of the PCB follows from two numbers: how far the glass stands
-proud of the PCB face (measured, 0.80 mm) and how much gap you want behind the
-Perspex (chosen, 0.30 mm).
+Unchanged from Rev P.1 forward of the PCB. Everything follows from two numbers:
+how far the glass stands proud of the PCB face (measured, 0.80 mm) and the gap
+chosen behind the Perspex (0.30 mm).
 
 ```text
 z = +3.000   Perspex front face — M2 screw heads bear here
 z =  0.000   Perspex rear face  == carrier hard stop            DATUM A
 z = -0.300   OLED glass front face          <- oled_perspex_gap 0.30
-z = -1.100   OLED PCB front face             <- + oled_glass_proud 0.80
-z = -1.200   forward limit of ALL carrier material in the aperture
-z = -2.700   OLED PCB rear face == rear support shoulder        DATUM B
-z = -8.400   snap-finger cantilever root
-z = -9.600   carrier rear face
+z = -0.400   sprung post nose tip — 0.400 mm clear of the Perspex
+z = -0.750   barb full-diameter land begins
+z = -1.000   SNAP-HOOK RETAINING FACE — the forward stop
+z = -1.100   OLED PCB front face            <- + oled_glass_proud 0.80
+z = -1.200   forward limit of all carrier material in the aperture, noses aside
+z = -1.350   plain post tops
+z = -2.700   OLED PCB rear face == FIXED DATUM PADS             DATUM B
+z = -3.000   post pedestal tops
+z = -3.700   plain post root relief floor
+z = -5.900   sprung post root relief floor
+z = -8.000   carrier rear face
 z = -10.800  header rear extent — clear of the carrier
 ```
 
@@ -86,12 +138,14 @@ z = -10.800  header rear extent — clear of the carrier
 oled_perspex_gap 0.30 + oled_glass_proud 0.80 + oled_pcb_t 1.60 = 2.700
 ```
 
-![Rev P section at x = +10, through a snap finger](Decca_OLED_Display_Mount_revP_sections.png)
+![Rev P.2 section at x = +15, through a sprung locating post](Decca_OLED_Display_Mount_revP_sections.png)
 
-Section at x = +10.00, through a snap finger. White is the original Perspex, red
-the unchanged Rev N bezel, blue the OLED glass, green the PCB, black the carrier.
-The glass projects forward through the carrier aperture and stops 0.30 mm short
-of the Perspex. Between the two there is nothing at all.
+Section on x = +15.00, through a sprung locating post, clipped to a window
+around the module so the reference Perspex patch does not swamp the view. The
+slab on the right is the original 3.00 mm Perspex; the carrier body is on the
+left; the module sits between them. The sprung post runs up from its root
+relief, through the PCB, and hooks over the PCB front face. The plain post at
+the bottom of the frame stops short of that plane.
 
 ### Why 0.30 mm and not 0.15 mm
 
@@ -99,13 +153,18 @@ Unchanged from the Rev O analysis, which remains sound: the one-sided
 contributors to the gap (land Z position on the print, seating-face flatness
 across 56.6 mm, `oled_glass_proud` sample variation, face finish, debris) sum to
 0.19 mm RSS. 0.30 mm is the only value in the approved 0.15–0.30 band that keeps
-a positive gap under that stack. Through 3 mm of Perspex the optical difference
-between 0.15 and 0.30 is not perceptible; the tunnel effect is dominated by the
-Perspex thickness, which is fixed.
+a positive gap under that stack.
+
+### The assembled gap, and float
+
+The module seats on the four fixed pads, so the **nominal assembled gap is
+0.300 mm**. Its only freedom is the deliberate 0.10 mm axial clearance under the
+hooks, so the worst case is **0.20 mm** and the glass can never reach the
+Perspex.
 
 ---
 
-## 4. M2 load path — verified
+## 4. M2 load path — verified, unchanged
 
 ```text
 M2 screw head → Perspex front face → Perspex 3.00 → Perspex rear face
@@ -118,188 +177,334 @@ M2 screw head → Perspex front face → Perspex 3.00 → Perspex rear face
 | Forward-most carrier material | **z = +0.00000** |
 | Forward-most OLED glass | z = −0.300 → 0.300 mm clear |
 | Forward-most OLED PCB | z = −1.100 → 1.100 mm clear |
+| Forward-most snap nose | z = −0.400 → 0.400 mm clear |
 | Seating-face area at z = 0 | **707.8 mm²** |
 | Synthetic Perspex fixture plate × carrier | **no penetration** |
-| Insert bore | z 0.00 … −4.50, backing 5.10 mm, boss wall 2.20 mm |
+| Insert bore | z 0.00 … −4.50, backing 3.50 mm, boss wall 2.20 mm |
 
-The carrier and the module are in **parallel**, not in series. The carrier
-bottoms out on the Perspex 0.30 mm before anything can reach the glass and
-1.10 mm before anything can reach the PCB, so **no amount of M2 torque can alter
-OLED depth or load the glass or the PCB**. Rev N reached the same intent through
-a full-area 1.10 mm plate; Rev P reaches it by having no material there at all.
+Carrier and module are in **parallel**, never in series. The carrier bottoms out
+on the Perspex 0.30 mm before anything can reach the glass and 1.10 mm before
+anything can reach the PCB, so **no amount of M2 torque can alter OLED depth or
+load the glass or the PCB**. The retention features are not in the load path
+either — the noses stop 0.40 mm short of the Perspex.
+
+M2×6 into a 4.00 mm insert gives 2.5 mm of engagement and cannot bottom out in
+3.50 mm of backing.
 
 ---
 
-## 5. The proof: nothing ahead of the PCB front face
+## 5. The two positive stops — the check Rev P.1 did not have
 
-Stated as an invariant and machine-checked, rather than inspected.
+Both stops are demonstrated by moving the real PCB solid and asking whether it
+runs into carrier material. Nothing below is a friction estimate.
 
-> **P1.** With `A` = the module-aperture prism
-> `{ |x| ≤ 18.55, −13.60 ≤ y ≤ +21.60 }`, `Carrier ∩ A ∩ { z > −1.20 } = ∅`.
->
-> **P2.** The whole OLED module envelope lies strictly inside `A` — the PCB by
-> 0.85 mm on all four sides, the glass by 1.30/4.55/7.65 mm, the solder tips by
-> 2.45 mm, the header by 0.85 mm.
+### 5.1 Forward — the sprung hooks
 
-P1 ∧ P2 ⟹ no carrier plate, land, lip, shoulder, snap or datum exists between
-the OLED PCB front face and the Perspex anywhere within the OLED module
-envelope, with a 0.10 mm margin.
+The board is moved forward **continuously** from its seated position. Motion is
+continuous, so an obstruction anywhere in the swept volume stops it; it cannot
+skip past the hook.
 
-| Verification | Method | Result |
+| Swept forward excursion | Result |
+|---:|---|
+| +0.05 mm | free — inside the designed hook clearance |
+| +0.10 mm | free — the clearance exactly |
+| **+0.15 mm** | **BLOCKED**, 0.083 mm³ at the two barbs |
+| +0.30 mm | **BLOCKED**, 0.333 mm³ |
+| +0.50 … +12.00 mm | **BLOCKED**, 0.512 mm³ |
+
+The hook could only be stripped by forcing the board **2.07 mm** forward, which
+the swept result above shows is impossible — the board is stopped at 0.15 mm.
+2.07 mm of travel is reachable only with the barbs held squeezed, and that *is*
+the removal action.
+
+The retaining land is a **straight cylinder, not a taper**: measured constant at
+Ø3.200 mm over its full 0.25 mm height on the exported mesh. A square face
+cannot cam open under an axial pull, so there is no release path under load.
+
+### 5.2 Rearward — the fixed datum pads
+
+| Rearward excursion | Result |
+|---:|---|
+| −0.02 mm | BLOCKED, 0.682 mm³, **0.000 mm³ of it outside the datum pads** |
+| −0.05 mm | BLOCKED, 1.705 mm³, 0.000 mm³ outside the pads |
+| −0.20 mm | BLOCKED, 6.820 mm³, 0.000 mm³ outside the pads |
+
+Every scrap of rearward interference is on the pads and nowhere else. All four
+pads are solid carrier body — confirmed by point probe in Fusion and, on the
+mesh, by probing a continuous solid column from the pad face down through the
+pedestal to the carrier rear face. **No spring appears anywhere in either
+stop.**
+
+### 5.3 Neither stop loads the glass, and neither preloads the board
+
+| | |
+|---|---|
+| Rear stop acts on | the PCB **rear** face, 1.60 mm behind the glass |
+| Forward stop acts on | the PCB **front** face, **inside a Ø3.00 mounting hole** — a keep-out on both faces of the board by construction |
+| Seated spring deflection | **0.00 mm** — the barb clears the PCB front face entirely |
+| Seated axial clearance under the hook | **0.10 mm** |
+| Seated radial clearance, shaft in hole | **0.10 mm** (sprung), 0.15 mm (plain) |
+| Carrier × OLED_PCB, seated | **CLEAR** |
+
+That last line is the point of the whole revision. Seated, the module is touched
+by **nothing except the four rigid pads it rests on**. It is not clamped, not
+bent, and not preloaded in any direction.
+
+---
+
+## 6. Locating posts — geometry, inheritance and recalculated mechanics
+
+### 6.1 Arrangement
+
+| Pair | Position | Type | Why |
+|---|---|---|---|
+| Header side ("wide") | x ±15.00, y +18.25 | **two split sprung posts** | modelled 4.30 mm from the glass edge — the pair with room for a nose |
+| Display side ("narrow") | x ±15.00, y −10.25 | **two plain posts** | the modelled glass *overhangs* these holes; a plain post that stops behind the PCB front plane is safe whatever the real envelope is |
+
+Rev K put sprung pegs in the narrow pair on **0.20 mm of assumed glass
+clearance**. That unmeasured dependency is not recreated.
+
+### 6.2 Sprung post
+
+| z range | feature | Ø | note |
+|---|---|---:|---|
+| −5.90 … −5.10 | R0.80 root fillet | 2.80 → 4.40 | inside the Ø4.80 relief, 2.40 mm behind DATUM B |
+| −5.90 … −1.00 | split shaft | **2.80** | 0.10 mm radial clearance in the Ø3.00 hole |
+| −1.10 … −1.00 | axial clearance zone | 2.80 | **0.10 mm — the hook does not clamp the PCB** |
+| **z = −1.00** | **retaining face, square, rearward-facing** | 2.80 → **3.20** | **0.10 mm radial overlap = the forward stop** |
+| −1.00 … −0.75 | full-diameter land | 3.20 | measured 3.200 mm on the mesh |
+| −0.75 … −0.40 | insertion lead-in cone | 3.20 → 2.60 | 40.6° from the axis |
+| slot | 0.70 mm, normal to Y, from the fillet top to the tip | | halves deflect **inward** only |
+
+### 6.3 Plain post
+
+| z range | feature | Ø |
+|---|---|---:|
+| −3.70 … −2.90 | R0.80 root fillet | 2.70 → 4.30 |
+| −3.70 … −1.65 | shaft | **2.70** (0.15 mm radial clearance) |
+| −1.65 … −1.35 | entry chamfer | 2.70 → 2.10 |
+
+Top face **0.25 mm behind the PCB front plane**, so a plain post satisfies the
+original prohibition without needing the controlled exception at all. Measured
+clearance to the modelled glass: **0.292 mm**.
+
+### 6.4 What was reused from Rev D / Rev K, and what changed
+
+| Rev D / Rev K value | Rev P.2 | Change and reason |
 |---|---|---|
-| P1 at z > −1.20 | Fusion boolean | **empty** |
-| P1 at z > the PCB front face | Fusion boolean | **empty** |
-| P1 at z > −1.20 | triangle/AABB on the exported STL | **empty** |
-| P1 over the PCB footprint | triangle/AABB on the exported STL | **empty** |
-| Forward-most carrier material | face enumeration | z = +0.00000 |
+| sprung shaft Ø2.80 | **Ø2.80** | reused unchanged — printed and fit-tested at Rev D |
+| split slot 0.70 | **0.70** | reused unchanged; measured 0.700 mm on the exported mesh |
+| barb Ø3.20, 0.10 mm radial hook | **Ø3.20, 0.10 mm** | reused unchanged — the brief's starting value, measured 3.200 mm |
+| R0.80 root fillet | **R0.80** | reused unchanged; relief bore measured 4.800 mm |
+| plain post Ø2.70 | **Ø2.70** | reused unchanged |
+| root relief ≈ 1.00 mm | **3.20 mm sprung / 1.00 mm plain** | **changed.** In Rev D/K the relief sat *in front of* the PCB, so the glass capped its depth — that is what forced Rev K's narrow pair to a 0.40 mm relief on 0.20 mm of assumed clearance. In Rev P.2 the relief is **behind** the PCB, where the glass cannot constrain it, so the depth is set by strain instead. |
+| hook land (Rev D, one layer or less) | **0.25 mm** | **changed.** A retaining land thinner than a print layer is not a retaining land. 0.25 mm is 1.25 layers at 0.20 mm. |
+| Rev D peak strain 1.64 % (a = 3.10) | **0.83 %** (a = 4.35) | consequence of the deeper relief |
+| Rev K narrow pair on 0.20 mm assumed glass clearance | **deleted** | replaced by plain posts — the dependency is removed, not re-estimated |
 
-Every carrier feature satisfies P1 by construction: the rim, the M2 bosses, the
-arms and the cable-tie flange are all outside `A`; the pocket walls, the four
-fingers, their tongues and their shoulders all lie at z ≤ −1.20.
+### 6.5 Recalculated mechanics
 
-**Corollary.** Because the carrier has no material forward of z = −1.20 inside
-`A`, **carrier × solder-tip interference is geometrically impossible at any tip
-length**. Confirmed at 0.40, 0.80, 1.00, 1.10, 1.20, 1.50 and 2.00 mm proud:
-CLEAR every time, minimum clearance 1.853 mm. Rev N needed a relief slot for
-this; Rev P gets it free from the topology.
-
----
-
-## 6. Rear support, location and retention
-
-**DATUM B — the rear Z datum.** Four forward-facing shoulders at z = −2.70 bear
-on the PCB rear face, 0.40 × 4.00 mm each, 6.40 mm² total, measured 6.40 mm² on
-the solid. They are one-sided: material behind DATUM B, none ahead of it, all
-four confirmed by point probe in two independent tools. They carry no load in
-service — nothing pushes the PCB rearward — so they position rather than support,
-and bearing area is not the figure of merit.
-
-**X/Y location** is by the rigid pocket walls, 0.25 mm clearance, engaging the
-PCB edge over z −1.20 … −2.70, i.e. 1.50 mm of the 1.60 mm board thickness.
-**Nothing enters the four Ø3.00 mm PCB mounting holes.**
-
-**The four fingers.** Cantilevers at x = ±10.00, section 0.75 (Y) × 4.00 (X),
-rooted at the carrier's **rear** frame (z = −8.40) and reaching **forward**, so
-the whole finger including its root is behind the PCB front plane.
-
-| z range | inner face y (top finger) | function |
-|---|---:|---|
-| −9.60 … −8.40 | +21.00 | rigid root, flush with the pocket wall |
-| −8.40 … −4.00 | +21.00 | free cantilever, 0.25 mm clear of the PCB |
-| −4.00 … −2.70 | +21.00 → +20.25 | 30° insertion lead-in ramp |
-| **z = −2.70** | +20.25 → +20.65 | **retaining shoulder — DATUM B**, 0.40 mm, square |
-| −2.70 … −1.20 | +20.65 | tongue, 0.10 mm interference on the PCB **edge** |
+Split cantilever fixed at the top of the root fillet (z = −4.90 effective),
+loaded at the full-diameter land: **a = 4.35 mm**, half-section
+t = (2.80 − 0.70)/2 = **1.05 mm**, PETG E = 2000 MPa.
 
 | Quantity | Value |
 |---|---:|
-| Effective cantilever length | 5.70 mm |
-| Deflection to pass the shoulder | 0.50 mm |
-| Peak strain, PCB centred | **1.73 %** |
-| Peak strain, PCB hard against one pocket wall | **2.60 %** |
-| Seated deflection / strain | 0.10 mm / 0.35 % |
-| Insertion force (30° ramp, µ 0.30) | 2.42 N per finger → **9.7 N total** |
-| Seated normal force | 0.46 N per finger |
-| Friction hold | **0.55 N** vs 0.039 N module weight → **14×** |
-| Z preload on the PCB | **zero** |
-| PCB bending from retention | **none** — four opposed in-plane forces |
-| Spring section measured off the exported STL | **0.750 mm** |
-| Flex relief measured off the exported STL | **1.000 mm** |
+| Deflection to pass the barb, per half | 0.10 mm |
+| **Peak strain, hole centred** | **0.83 %** |
+| **Peak strain, board hard against one side** (0.20 mm on one half) | **1.66 %** |
+| Strain limit | 3.00 % |
+| Insertion force at a 40.6° cam | ≈ 6.1 N per post → **≈ 12.3 N total** |
+| Seated deflection | **0.00 mm** |
+| Seated preload on the PCB | **none, in any direction** |
+| PCB bending from retention | **none** |
+| Forward retention mechanism | **positive geometric overlap; square face, cannot cam** |
 
-The tongue is what actually retains the loose module, and it does it by friction
-on the PCB **edge**, not by overlapping the PCB face. It ends at z = −1.20,
-0.10 mm behind the PCB front face, so it cannot act as a forward datum — checked
-separately on the STL.
-
-**What the fingers are not.** They are not the final retention system. Final
-axial capture happens only when the carrier is bolted to the Perspex, which
-closes the front of the pocket. The module is then trapped between DATUM B and
-the Perspex, 0.30 mm apart, with **no preload path in any position within that
-float**. The assembly is on a near-vertical fascia, so Z is horizontal and
-gravity does not push the module forward; 0.55 N of friction against 0.039 N of
-weight holds it on the datum.
+The µ 0.30 in the insertion-force estimate is used **only** to predict push-on
+effort. No acceptance criterion in either tool depends on friction.
 
 ---
 
-## 7. Insertion and removal — validated as swept corridors, not final positions
+## 7. Fixed rear PCB datum
 
-Rev O passed a static interference matrix, a 19-point probe, a load-path check
-and a clearance table while being physically impossible to assemble. Rev P
-treats the corridor as a first-class requirement and, more usefully, is
-*designed* so that the corridor is clear by construction.
+| | |
+|---|---:|
+| Four annular pads, concentric with the four Ø3.00 mounting holes | x ±15.00, y +18.25 / −10.25 |
+| Outer Ø / inner Ø | 6.00 / 4.80 |
+| Forward-facing pad area at z = −2.70 | **38.96 mm²** |
+| Area actually bearing on the 35.40 × 33.50 PCB outline | **34.10 mm²** |
+| Four-point pattern | **30.00 × 28.50 mm** |
+| Carried on | Ø8.60 pedestals, z −8.00 … −3.00, merged into the pocket walls |
+| Spring content | **none** |
+
+They bear **inside the board's own mounting-hole keep-outs**, which are
+component-free on both faces by construction. Every earlier revision took its
+PCB datum from the board edge band, which is an assumption about where
+components are not; this one is not an assumption. The 30.00 × 28.50 mm pattern
+is the widest the board offers, so the seated board cannot rock.
+
+Loading is the ≈ 12 N insertion push only — nothing pushes the module rearward
+in service — which is 0.35 MPa across 34 mm².
+
+The Ø8.60 pedestal diameter is not a round number for a reason: at Ø8.00 the
+pedestal arc passes 0.033 mm inside the pocket corner and leaves four hair
+slivers. Ø8.60 swallows the corner by 0.27 mm instead, and the sliver count goes
+to zero.
+
+---
+
+## 8. Invariant P1′ — the controlled exception, stated as geometry
+
+Rev P.1's invariant said the aperture prism is empty forward of the PCB face.
+Rev P.2 needs positive forward retention, so the invariant is **tightened to
+name its own exception** rather than relaxed:
+
+> **P1′.** With `A` = the module-aperture prism
+> `{ |x| ≤ 18.55, −13.60 ≤ y ≤ +21.60 }` and `N` = the two nose envelopes
+> `{ (x ∓ 15.00)² + (y − 18.25)² ≤ 1.60², −1.20 < z ≤ −0.40 }`,
+>
+> `Carrier ∩ A ∩ { z > −1.20 } ⊆ N`, and `N` lies strictly inside the two
+> Ø3.00 mounting-hole corridors.
+
+| Verification | Method | Result |
+|---|---|---|
+| Material in `A` above z = −1.20 | Fusion boolean | 7.8298 mm³ |
+| …all of it inside `N` | Fusion boolean residual | **EMPTY** |
+| …all of it inside the hole keep-out, R2.10 | Fusion boolean residual | **EMPTY** |
+| `A` above z = −1.20, outside `N` | triangle/AABB on the exported STL | **empty** |
+| Nose radius about the hole centre | measured off the STL | **1.600 mm** ≤ 2.10 |
+| PCB footprint above the PCB front face, `N` excepted | triangle/AABB on the STL | **empty** |
+| Plain posts above z = −1.35 | triangle/AABB on the STL | **empty** |
+| Forward-most carrier material | face enumeration | z = +0.00000 |
+
+There is still **no carrier plate, seating land, structural shoulder or other
+load-bearing feature** between the PCB front face and the Perspex. `N` carries no
+load, sets no datum, and touches the PCB only when the module is being pulled
+forwards out of the carrier.
+
+### What `N` is proven clear of
+
+| `N` vs | Result |
+|---|---|
+| the Perspex | **0.400 mm clear** (nose tip z = −0.40) |
+| the Rev N bezel | **CLEAR** — rearmost bezel material z = +0.200 |
+| the active display area | 9.30 mm clear in Y; carrier → active area 2.034 mm |
+| solder joints / tips | 8.49 mm clear in X; carrier → tips 1.853 mm |
+| the insertion and removal corridor | **CLEAR** — `N` sits inside the hole corridor it is meant to occupy |
+| **the OLED glass** | **NOT DEMONSTRATED — §9** |
+
+---
+
+## 9. The one blocking measurement — reported, not assumed
+
+The brief is explicit: *if the real glass envelope cannot be demonstrated clear,
+stop and report the missing measurement rather than assuming it.*
+
+**It cannot be demonstrated. It is reported, and it is not assumed away.**
+
+| | |
+|---|---|
+| Missing dimension | the OLED glass X/Y envelope relative to the two **header-side** Ø3.00 mounting holes at (±15.00, +18.25) |
+| Status | **never measured.** `oled_glass_w`, `_h` and `_off_y` are flagged NOT MEASURED in every revision since Rev B. The only measured glass dimension is `oled_glass_proud` = 0.80 mm. |
+| Acceptance criterion | hole centre to nearest bonded-glass edge **≥ 2.10 mm**, at both holes — i.e. the glass must not pass y = +16.15 |
+| How | digital calipers on the module in hand. One number, both ends. |
+| Modelled, unmeasured | 4.30 mm |
+| If it fails | the sprung noses foul the glass. The design does **not** go to a printer on an assumption. |
+
+Evidence that is suggestive but deliberately **not** treated as proof: the
+front-face solder pads sit at y ≈ +17.95 … +19.15 and bonded glass cannot cover
+solder pads, which bounds a rectangular glass panel below y ≈ +17.95. That is
+1.80 mm short of what the nose needs, and it rests on the pad position rather
+than on the glass. Not sufficient.
+
+Note what the modelled envelope itself implies: it puts the glass **0.30 mm over
+the display-side mounting holes**, which would make the module unmountable with
+any screw. The modelled numbers are known to be unreliable in exactly this
+region — a further reason not to lean on them.
+
+**The exposure is as small as it can be made.** Worst case, with the glass
+modelled as the **full PCB outline** and swept through the whole corridor, every
+scrap of contact is inside the two declared noses: the plain posts, the pads,
+the pedestals, the pocket walls and the rim are clear of the glass even then.
+Two Ø3.20 mm noses, inside two mounting holes, are the entire glass exposure of
+the design.
+
+Contingency if the measurement fails: move the sprung pair outboard in X within
+the keep-out, or fall back to a forward stop bearing on the PCB **corners**
+outside the glass footprint. Neither is designed until the number exists.
+
+---
+
+## 10. Insertion and removal — validated as swept corridors
 
 Motion is a **pure ±Z translation** — no tilt, no rotation, no lateral shift.
-That is a deliberate choice: it is the only motion whose swept point set is
-exactly the module cross-section extruded along Z, which makes the corridor
-impossible to fudge.
+Insertion is from the flush / Perspex side moving rearward; removal is the same
+line forward, so one corridor covers both.
 
 | Swept body, 12 mm travel | Fusion boolean | STL triangle/AABB |
 |---|---|---|
-| OLED glass | **CLEAR** | **CLEAR** |
+| OLED glass (modelled envelope) | **CLEAR** | **CLEAR** |
 | Solder tips @ 1.00 mm proud | **CLEAR** | **CLEAR** |
 | Header body | **CLEAR** | **CLEAR** |
-| OLED PCB | HIT 5.8641 mm³ | — |
-| OLED PCB, outside the four spring footprints | **CLEAR** | **CLEAR** |
-| Four PCB mounting holes, full axial corridor | — | **CLEAR** |
+| OLED PCB | HIT 0.5123 mm³ | — |
+| OLED PCB, outside the two nose envelopes | **CLEAR** | **CLEAR** |
+| PCB corridor outside the four mounting holes | — | **CLEAR** |
 
-The 5.8641 mm³ is the designed 0.50 mm finger deflection and nothing else: the
-residual after subtracting the four finger envelopes is an empty solid, and the
-STL check re-derives the same result by decomposing the corridor into seven boxes
-that exclude the spring footprints exactly.
+**Only the two intended sprung noses deflect.** The entire 0.5123 mm³ is the
+designed 0.10 mm snap deflection; the residual after subtracting the two nose
+envelopes is an empty solid, and the STL check re-derives the same result by
+decomposing the corridor into boxes that exclude the hole footprints exactly.
 
-**Removal.** The retaining shoulder is square rather than tapered. A release
-taper on a µ = 0.30 interface is self-locking below about 17°, so any taper
-shallow enough to preserve a crisp Z datum would not release, and any taper steep
-enough to release would spoil the datum. Instead the carrier carries **four
-Ø2.20 mm radial prise holes** at z = −5.00, one per finger, opening on the
-outside of the rim. A 2 mm pin pushes each finger the 0.50 mm it needs.
+### Insertion sequence
 
-Validated by rebuilding the carrier with all four fingers modelled retracted
-0.55 mm (0.50 required + 0.05 margin) and re-running the full corridor set:
+1. Offer the module to the **front** of the carrier, glass towards the carrier,
+   header at the top. The glass enters the open module aperture, 0.85 mm larger
+   than the PCB all round.
+2. The two sprung barb tips (Ø2.60 at z = −0.40) enter the header-side holes
+   first and align the board.
+3. The PCB rear face enters the pocket at z = −1.20, 0.25 mm clearance.
+4. The barbs cam inward 0.10 mm per half; the plain posts enter the
+   display-side holes.
+5. The PCB rear face lands on the **four fixed datum pads** at z = −2.70. Motion
+   stops there — on rigid carrier body, not on a spring. About 12 N by thumb.
+6. As the PCB front face passes z = −1.00 the barbs snap fully clear and relax
+   to zero deflection, standing 0.10 mm ahead of the board.
 
-| Retracted carrier × | Result |
+### Removal — identified tool path, no prise holes
+
+1. Remove the two M2 screws and lift the carrier off the Perspex.
+2. From the front, squeeze each barb inward with fine-nose tweezers or snipe
+   pliers, 0.10 mm per half. **0.70 mm of nose stands proud of the PCB front
+   face and is completely exposed**, because nothing at all sits in front of
+   the PCB.
+3. With a barb pinched, lift that corner clear; or push the PCB forward through
+   the **open rear window** with a fingertip or spudger.
+4. The plain posts slide straight out.
+
+Validated by rebuilding the carrier with both barbs modelled squeezed 0.12 mm
+per half (0.10 required + 0.02 margin) and re-running the full corridor set:
+
+| Pinched carrier × | Result |
 |---|---|
 | Swept PCB | **CLEAR** |
 | Swept glass | **CLEAR** |
 | Swept tips | **CLEAR** |
 | Swept header | **CLEAR** |
-| Prise access to all four fingers | **4 of 4 open** |
-
-### Rev O's blocking unknown is designed out
-
-Rev O died because barbs sat in the four PCB mounting holes, which made an
-**unmeasured** dimension — the glass envelope relative to those holes —
-load-bearing on the whole design. Rev P puts nothing in those holes.
-
-| | Rev O | **Rev P** |
-|---|---|---|
-| Features in the PCB holes | 4 barbs | **none** |
-| Nearest sprung feature to the modelled glass edge | 0.500 mm **overlap** | **3.20 mm clear** |
-| Result if the glass envelope is wrong | unassemblable | no effect until it is wrong by > 3.20 mm |
-
-Worst case, with the glass modelled as the **full PCB outline** and swept: clear
-of every rigid feature; only the four springs are in the path. **That
-measurement is no longer required.**
+| Open rear push-out window | **clear at the carrier rear face** |
 
 ---
 
-## 8. The solder-tip budget — resolved by module preparation
+## 11. The solder-tip budget — unchanged, resolved by module preparation
 
-This is arithmetic between the module and the original panel. The carrier is not
-in the path, and no carrier architecture can change it.
-
-Anything standing on the PCB's display-side face has a budget of exactly
+Arithmetic between the module and the original panel. The carrier is not in the
+path at any tip length.
 
 ```text
 oled_perspex_gap 0.30  +  oled_glass_proud 0.80  =  1.10 mm
 ```
 
-before it reaches z = 0 and strikes the Perspex.
-
-**Decision, 2026-08-28: the tips will be reduced.** `oled_tip_proud` is
-therefore modelled at **1.00 mm**, which is the preparation limit with 0.10 mm of
-clearance. Validated CLEAR against both the Perspex and the carrier.
-
-The full sweep is retained as evidence, because it is what sets the limit:
+**Decision, 2026-08-28: the tips will be reduced.** `oled_tip_proud` is modelled
+at **1.00 mm** — the preparation limit with 0.10 mm of clearance.
 
 | Tip proud of the PCB face | vs Perspex | vs carrier | Verdict |
 |---:|---|---|---|
@@ -311,216 +516,223 @@ The full sweep is retained as evidence, because it is what sets the limit:
 | 1.50 | HIT 3.619 mm³ | CLEAR | FAIL — the brief's original figure |
 | 2.00 | HIT 8.143 mm³ | CLEAR | FAIL — untrimmed |
 
-Two things are worth recording.
-
-First, **the 1.50 mm figure in the brief was never compatible with a 0.30 mm
-optical gap**, and would not have been compatible with any carrier geometry.
-Reversing the load direction moved the *carrier* out of the tips' way — that part
-Rev P does deliver, unconditionally — but it cannot move the Perspex. Had the
-tips been fixed at 1.50 mm, the only remedy would have been to open the gap to
-0.80 mm, which is 2.7× the approved 0.15–0.30 band and puts the screen visibly
-deeper behind the fascia. Reducing the tips was the right call.
-
-Second, **carrier × tips is CLEAR at every length**, up to and beyond the
-untrimmed 2.00 mm, with 1.853 mm of clearance. That is the §5 corollary: because
-the carrier has no material forward of z = −1.20 inside the module aperture,
-carrier-to-tip interference is geometrically impossible. Rev N needed a
-dedicated relief slot for this; Rev P cannot have the problem. **The tip length
-is now purely a module-to-panel matter, with no carrier sensitivity at all.**
+**Carrier × tips is CLEAR at every length**, because the carrier has no material
+forward of z = −1.20 inside the module aperture except the two noses, and the
+noses are 8.49 mm away from the tips in X. Minimum measured clearance 1.853 mm.
 
 ### Required preparation
 
 Prepare the module so that nothing on its display-side face stands more than
-**1.00 mm** proud:
+**1.00 mm** proud.
 
 - **Preferred** — remove the pin header and solder the four leads to the pads
-  **from the rear**, dressing the front-side joints flush. Rev P leaves the
-  entire rear of the board open and the header region unenclosed, so this is
-  comfortable to do and gives the largest margin.
-- **Acceptable** — keep the header, trim the front-side pins and dress the solder
-  below 1.00 mm proud.
+  **from the rear**, dressing the front-side joints flush. Rev P.2 leaves the
+  entire rear of the board open.
+- **Acceptable** — keep the header, trim the front-side pins and dress the
+  solder below 1.00 mm proud.
 
-Check it with a depth gauge or a straight edge before assembly. 1.10 mm is the
-hard ceiling; aim for 1.00 mm or less.
+Check with a depth gauge or straight edge before assembly. 1.10 mm is the hard
+ceiling; aim for 1.00 mm or less.
 
 ---
 
-## 9. Validation summary
+## 12. Validation summary
 
-Run with `main()` then `validate()` inside Fusion, and
-`python mechanical/CAD/Decca_Display_Mount_revP_verify.py` offline.
+Run `main()`, `validate()`, `import_bezel()`, `snapshots()` and `export()` inside
+Fusion, then `python mechanical/CAD/Decca_Display_Mount_revP_verify.py` offline.
 
-| # | Mandatory check | Result |
+The gate is the **revised** one required by the corrected brief.
+
+| # | Required proof | Result |
 |---|---|---|
-| 1 | carrier × Perspex | **CLEAR** — plane contact only |
-| 2 | carrier × OLED glass | **CLEAR** (0.707 mm) |
-| 3 | carrier × PCB | 2.4000 mm³ — the designed 0.10 mm edge grip, at the four tongues only |
-| 4 | carrier × header | **CLEAR** (0.250 mm) |
-| 5 | carrier × tips, any length to 2.00 mm | **CLEAR** (1.853 mm) |
-| 6 | prepared 1.00 mm tips × Perspex | **CLEAR** (+0.10 mm) — see §8 for the sweep |
-| 7 | OLED glass × Perspex nominal gap | **0.300 mm** |
-| 8 | rear PCB datum correctness | **6.40 mm² at z = −2.70, one-sided, 4 of 4** |
-| 9 | M2 load path | **terminates at the seating face, 707.8 mm²** |
-| 10 | no M2 preload through glass or PCB | **glass 0.300 / PCB 1.100 mm clear of z = 0** |
-| 11 | no carrier geometry ahead of the PCB front face | **invariant P1, empty in both tools** |
-| 12 | snap / locating strain | **1.73 % nominal, 2.60 % worst case** |
-| 13 | full swept insertion corridor | **CLEAR outside the four springs** |
-| 14 | full swept removal corridor | **CLEAR with the fingers retracted 0.55 mm** |
-| 15 | glass never sweeps a rigid post or barb | **3.20 mm clear; nothing in the PCB holes** |
-| 16 | carrier seats flat | **continuous rim at z = 0, no protrusion** |
-| 17 | active-area alignment | **centred on (0.0000, 0.0000)** |
-| 18 | printability and minimum sections | **single closed solid, 0 slivers** |
-| 19 | front bezel × everything | **CLEAR, unchanged from Rev N** |
-| 20 | cable-tie path | **3.50 × 1.40 mm section passes, never reaches z = 0** |
+| 1 | OLED inserts from the flush/Perspex side by a straight controlled motion | **PASS** — pure −Z, corridor clear, §10 |
+| 2 | Only intended sprung post noses deflect during insertion | **PASS** — 0.5123 mm³, residual outside the two noses EMPTY |
+| 3 | PCB rear face seats on fixed, non-spring datum pads | **PASS** — 38.96 mm² at z = −2.70 on Ø8.60 pedestals, 4 of 4 rigid |
+| 4 | The module cannot translate forward out of the loose carrier | **PASS** — blocked from +0.15 mm through +12.00 mm, §5.1 |
+| 5 | Retention is positive geometric overlap, not assumed friction | **PASS** — 0.10 mm radial, square face; no friction criterion in either tool |
+| 6 | Snap hooks have axial clearance and do not clamp or bend the PCB | **PASS** — 0.10 mm axial, 0.10 mm radial, carrier × PCB **CLEAR** seated |
+| 7 | Plain and sprung posts correctly locate X/Y | **PASS** — 4 of 4 posts in the four holes, shafts measured 2.800 / 2.700 mm |
+| 8 | Glass clear of all posts and roots through insertion, seating and removal | **PARTIAL — the two noses are the sole exposure and it is UNMEASURED, §9** |
+| 9 | Assembled glass-to-Perspex gap remains 0.30 mm nominal | **PASS** — 0.300 mm; worst case 0.20 mm |
+| 10 | Carrier-to-Perspex hard stops carry all M2 preload | **PASS** — 707.8 mm² at z = 0, module in parallel |
+| 11 | Prepared ≤ 1.00 mm solder protrusions clear the carrier and Perspex | **PASS** — +0.10 mm to the Perspex, 1.853 mm to the carrier |
+| 12 | Removal is possible with an identified tool path | **PASS** — pinch and push out; all four corridors clear when pinched |
+| 13 | Print orientation supports the post roots, no unsupported critical barbs | **PASS** — rear-face-down, no supports; the only overhang is the 0.10 mm hook ledge |
+| 14 | No retainer bar is required | **PASS** — two printed parts |
+| 15 | Loose carrier passes a real inversion and gentle-shake handling test | **NOT DONE — this is a physical test, §14** |
 
-**All 20 pass.** The Fusion gate reports `GATE RESULT: ALL CHECKS PASS` and
-the independent STL checker exits 0.
+Plus the carried-over checks:
+
+| Check | Result |
+|---|---|
+| carrier × Perspex | **CLEAR** — plane contact only |
+| carrier × OLED glass / active area / header / tips / PCB | **all CLEAR** |
+| boolean slivers | **0 faces < 0.02 mm², 0 edges < 0.05 mm** |
+| carrier is a single closed solid | **6.928 cm³, 130 faces** |
+| active-area alignment | **centred on (0.0000, 0.0000)** |
+| front bezel × everything | **CLEAR, unchanged from Rev N** |
+| cable-tie path | **3.50 × 1.40 mm section passes, never reaches z = 0** |
+| point probes | **26 of 26 in Fusion, 21 of 21 on the mesh** |
+
+**The Fusion gate reports `GATE RESULT: ALL CHECKS PASS` with one blocking open
+item, and the independent STL checker exits 0 with the same open item.**
 
 ### Clearance table
 
 | Interface | mm |
 |---|---:|
 | OLED glass → Perspex | **0.300** |
-| carrier → OLED glass | 0.707 |
-| carrier → active area | 3.350 |
+| carrier → OLED glass | 0.292 * |
+| carrier → active area | 2.034 |
 | carrier → header body | 0.250 |
 | carrier → solder tips | 1.853 |
-| carrier → OLED PCB | 0.000 * |
+| carrier → OLED PCB | 0.000 † |
 | header → Perspex | 2.700 |
+| snap nose tip → Perspex | 0.400 |
 
-\* Intended line contact: the four tongues press 0.10 mm into the PCB edge.
+\* the plain post tops, 0.25 mm behind the PCB front plane and 0.15 mm outside
+the modelled glass edge in Y.
+† intended face contact: the PCB rear face rests on the four datum pads.
 
 ### Optical alignment
 
-The active area is centred on (0, 0) — the aperture centre — by construction.
-The PCB outline is offset 4.00 mm above it and is never used as the datum.
-
 | | mm |
 |---|---:|
-| Active area | 29.42 × 14.70 |
+| Active area | 29.42 × 14.70, centred on (0, 0) |
 | Aperture (measured) | 35.20 × 15.30 |
 | Margin to the aperture | x 2.89, **y 0.30** |
 
-Unchanged from Rev N, so **firmware must still mask 2 pixel rows top and
-bottom**.
+Unchanged, so **firmware must still mask 2 pixel rows top and bottom**.
 
 ---
 
-## 10. Verification independence
+## 13. Verification independence — and a silent failure it caught
 
-The Rev O check set ran the same parameter table and the same body recipes
-through a second geometry kernel. Both sides agreed and both were wrong in the
-same way, because agreement between two transcriptions of one recipe proves only
-that the transcription was faithful.
+`Decca_Display_Mount_revP_verify.py` never imports, parses or executes the
+generator. It reads the **exported binary STL**, re-enters the requirements from
+the measured repository values and the brief, and uses algorithms different in
+kind — triangle/AABB separating-axis tests, ray-cast membership and material
+spans, edge-manifold counting, a divergence-theorem volume.
 
-`Decca_Display_Mount_revP_verify.py` is built so that it cannot repeat that
-mistake. It never imports, parses or executes the generator. It:
+It also now checks a different *class* of thing. Rev P.1's checkers agreed with
+each other and with the model, and the model was exactly as drawn; the
+**acceptance criteria** were what was wrong. So the verifier's §C does not ask
+"does a named retention feature exist?" — it measures the barb's outer diameter
+off the mesh at five heights and confirms it is larger than the hole it has to
+hold, at a z ahead of the PCB front face. There is **no friction calculation
+anywhere in the file**.
 
-* reads the **exported binary STL** — the artefact that actually gets printed;
-* re-enters the requirements from the **measured repository values and the
-  brief**, so a silent parameter drift in the generator shows up as a failure;
-* uses different algorithms in kind — triangle/AABB separating-axis tests,
-  ray-cast point membership, edge-manifold counting, a divergence-theorem
-  volume — rather than BRep booleans;
-* covers the seated state, the assembly path, the disassembly path, the load
-  path, the retention function and the dimensional assumptions.
+Independent verdict on the exported STL: **6240 triangles, closed 2-manifold, 0
+non-manifold edges, consistent winding, 6.9232 cm³ by divergence theorem against
+Fusion's 6.928 cm³, 21 of 21 ray-cast membership probes agreeing with Fusion's
+26 of 26, split slot measured 0.700 mm, barb land measured 3.200 mm, root relief
+bore measured 4.800 mm, every geometric check passing.**
 
-It **measures sections off the mesh** instead of trusting the generator's
-numbers: the spring section reads 0.750 mm and the flex relief 1.000 mm from the
-STL alone.
+### A silent Fusion API failure, caught and guarded
 
-It also earned its keep. On its first run it flagged three things the Fusion
-BRep checks had reported as clean, and working each one out changed the
-documentation:
+The R0.80 root fillets are built from primitive torus geometry, the Rev D
+technique. In this Fusion build (2704.1.53) `TemporaryBRepManager.createTorus`
+**ignores its `center` argument** and always returns a torus at the world origin.
+A fillet built by subtracting such a torus therefore removes nothing, and the
+result is a plain cylindrical **collar** — which passes every clearance,
+interference and printability check, because it is smaller than the relief bore
+that contains it. Nothing reports an error.
 
-1. **12 triangles "intruding" on invariant P1.** All 12 lie *exactly on* the
-   aperture boundary planes — those planes *are* the pocket wall inner faces.
-   Tangency is not intrusion; Fusion's booleans return empty, the SAT test
-   returns a hit. The check now tests for material strictly inside and reports
-   the tangency separately, which is a more honest statement of the invariant
-   than "empty".
-2. **The carrier envelope reading 56.58 instead of 56.60.** Real, and only
-   visible on the mesh: the STL tessellates the cylindrical M2 ear ends, so the
-   printed part is 0.022 mm under nominal at those radii. Now toleranced and
-   stated.
-3. **"Shoulder material ahead of DATUM B".** The check box was too wide in Y and
-   was catching the 0.10 mm edge-grip tongue, which is a different feature with
-   a different job. Splitting the two produced the extra check that the tongue
-   stops 0.10 mm behind the PCB front face — a check that did not exist before
-   and that directly guards the brief's central prohibition.
-
-Independent verdict on the exported STL: **1880 triangles, closed 2-manifold, 0
-non-manifold edges, consistent winding, 7.1506 cm³ by divergence theorem against
-Fusion's 7.154 cm³, 15 of 15 ray-cast membership probes agreeing with Fusion's
-21 of 21, every geometric check passing except §8.**
+It was caught because the point probes disagreed with the intended profile. The
+generator now translates the torus explicitly, and `root_fillet` raises if the
+boolean leaves the collar volume intact, so the same failure cannot ship
+silently again.
 
 ---
 
-## 11. Printing and assembly
+## 14. Prototype acceptance tests — the retention finding stays open
 
-**Orientation: the carrier REAR FACE flat on the bed, building forward (+Z).**
+**CAD and mesh checks may release a corrected geometry-validation print. They
+cannot close the retention finding.** Only a printed part can.
 
-This is the opposite of what Rev O chose, and the reason is the fingers. They are
-rooted at the carrier's rear frame, so rear-face-down puts all four roots on the
-bed and every finger becomes a self-supporting column. It also makes the aperture
-step at z = −1.20 an *upward*-facing ledge and the 30° nose lead-in a 60°
-self-supporting face. **No supports anywhere.** The trade is that the Perspex
-seating face becomes a top surface rather than a bed-flat one — use 4+ top layers
-or ironing. It is a narrow continuous 3.00 mm rim, which prints flat.
+Before printing: take the §9 measurement.
 
-The optical chain's accuracy is unaffected by the choice: DATUM A (z = 0) and
-DATUM B (z = −2.70) are both in the same Z stack, so the 2.70 mm between them is
-layer-count accurate in either orientation.
+Then, in order — tests 1 to 5 are mandatory before Rev P can regain any release
+recommendation:
+
+1. **flush-side insertion** of the OLED, straight in, no glass or component
+   contact, no board flex; both barbs click;
+2. the PCB rear face **seats consistently on all four fixed datum pads** — no
+   rock, no rattle;
+3. both sprung posts **engage with visible positive overlap**, and the board is
+   not bowed;
+4. **the loose carrier retains the OLED when inverted in every axis and through
+   a gentle handling shake** — no fall-through, no fall-away. *This is the test
+   Rev P.1 failed.*
+5. the stated release method removes the OLED without damaging the posts or the
+   board;
+6. carrier seats flat against the Perspex before the screws are snug;
+7. actual OLED-to-Perspex gap (target 0.30 mm);
+8. active-area centring when powered, and the real `oled_pcb_off_y`;
+9. bezel alignment in the aperture;
+10. M2 tightening does not change OLED depth — measure the gap before and after;
+11. prepared solder joints and header clear the Perspex and the carrier;
+12. no rattle when assembled;
+13. cable tie threads and holds;
+14. no separate retainer is required.
+
+---
+
+## 15. Printing and assembly
+
+**Orientation: the carrier REAR FACE flat on the bed, building forward (+Z).
+No supports.**
+
+| Feature | In this orientation |
+|---|---|
+| Post pedestals | grow from the bed, fully supported columns |
+| Root reliefs | upward-opening blind pockets |
+| Post roots | start on the solid relief floor |
+| Datum pads at z = −2.70 | upward-facing, on a layer boundary — layer-count accurate |
+| Aperture step at z = −1.20 | upward-facing ledge |
+| Barb retaining face at z = −1.00 | a **0.10 mm** radial downward-facing ledge — the Rev D 0.10 / Rev K 0.175 class, both of which printed |
+| Barb lead-in cone | 49° from horizontal, self-supporting |
+| Seating face at z = 0 | a top surface — use 4+ top layers or ironing |
+
+DATUM A (z = 0) and DATUM B (z = −2.70) are in the same Z stack, so the 2.70 mm
+between them is layer-count accurate.
 
 | Section | mm |
 |---|---:|
 | Structural wall | 3.00 |
 | M2 boss wall around the insert | 2.20 |
-| Material behind the blind insert bore | 5.10 |
-| Local rim wall outboard of a finger relief | 1.85 |
-| Snap-finger spring section | 0.75 |
-| Finger side gap / flex relief | 0.80 / 1.00 |
+| Material behind the blind insert bore | 3.50 |
+| Sprung post shaft | Ø2.80, 5.50 mm tall, 0.70 mm slot |
+| Plain post shaft | Ø2.70, 2.35 mm tall |
+| Datum pad annulus | 6.00 / 4.80 |
 
-The 0.75 mm finger is a spring by intent — 2 perimeters at 0.35 mm line width.
-Print it slowly: it is a 0.75 × 4.00 mm column standing 8.40 mm tall.
-
-Material PETG / PETG-HF. Hardware: 2 × M2 heat-set inserts (Ø3.2 × 4.0),
-2 × M2×6 screws entering from the front. Press each insert **0.50 mm below the
-seating face** — anything proud of that face lifts the carrier off the Perspex —
-into a bore with a 0.40 mm chamfer at the mouth to take displaced plastic. M2×6
-gives 2.5 mm of engagement and cannot bottom out in 5.10 mm of backing.
-
-### Assembly preparation — required
-
-**Prepare the OLED module so that nothing on its display-side face stands more
-than 1.00 mm proud** (§8). Preferred: remove the pin header and solder the four
-leads to the pads from the rear, dressing the front-side joints flush. The whole
-rear of the board is open, so this is comfortable to do.
+Print the posts slowly — the sprung ones are 2.80 mm split columns standing
+5.50 mm tall. Material PETG / PETG-HF. Hardware: 2 × M2 heat-set inserts
+(Ø3.2 × 4.0), 2 × M2×6 screws entering from the front. Press each insert
+**0.50 mm below the seating face** into a bore with a 0.40 mm mouth chamfer.
 
 ### Assembly sequence
 
 1. Press the two M2 inserts into the carrier from the seating face.
-2. Prepare the module per §8 and verify the front-side protrusion.
-3. Push the OLED into the carrier pocket **from the rear**, glass forward, header
-   at the top, until all four fingers click. About 10 N by thumb on the PCB rear
-   face. It then rests on the four shoulders with zero Z preload.
+2. Prepare the module per §11 and verify the front-side protrusion.
+3. Push the OLED into the carrier pocket **from the front / seating-face side**,
+   glass towards the carrier, header at the top, until both barbs click. About
+   12 N by thumb. It then rests on the four fixed pads with zero preload.
 4. Offer the carrier to the rear of the Perspex and fit the two M2 screws from
-   the front. Tighten until the carrier is flat — it will not go further, and
-   further torque cannot reach the module.
-5. Fit the bezel to the front of the aperture (removable adhesive on the recessed
-   pads, unchanged since Rev G).
+   the front. Tighten until the carrier is flat — further torque cannot reach
+   the module.
+5. Fit the bezel to the front of the aperture (removable adhesive on the
+   recessed pads, unchanged since Rev G).
 6. Strain-relieve the cable with a tie through the flange relief and slots.
-
-**To remove the module:** push a 2 mm pin into each of the four Ø2.20 mm radial
-prise holes to lift each finger 0.50 mm clear, then withdraw the board rearward.
 
 ---
 
-## 12. Front bezel — unchanged
+## 16. Front bezel — unchanged
 
-Carried over from Rev N untouched, per the brief. Imported into the Rev P design
-as a reference body from `Front_Bezel_revN.step` and re-checked against the new
-carrier: clear of the carrier, the glass, the PCB and the solder tips.
+Carried over from Rev N untouched. Imported into the Rev P.2 design as a
+reference body from `Front_Bezel_revN.step` and re-checked against the new
+carrier: clear of the carrier, the Perspex, the glass, the PCB and the solder
+tips.
 
 | | mm |
 |---|---:|
@@ -528,51 +740,32 @@ carrier: clear of the carrier, the glass, the PCB and the solder tips.
 | Locating lip depth into the 3.00 mm Perspex | 2.80 |
 | Rearmost bezel material | z = **+0.200** |
 | Clearance to the OLED glass front face | **0.500** |
+| Clearance to the snap-nose tips | **0.600** |
 
-`Front_Bezel_revN.step` / `Front_Bezel_revN.stl` remain the files of record.
-No Rev P geometry requires a change, so no duplicate revP-named bezel file is
-added.
+`Front_Bezel_revN.step` / `.stl` remain the files of record.
 
 ---
 
-## 13. Open items
+## 17. Open items
 
 | # | Item | Blocks print? | Blocks CAD? |
 |---|---|---|---|
-| ~~1~~ | ~~Front-side solder protrusion~~ | **CLOSED** 2026-08-28 — tips will be reduced; modelled at 1.00 mm, §8 | — |
-| 2 | `oled_glass_proud` = 0.80 mm from a single sample; it sets the whole chain | no | no |
-| 3 | `oled_pcb_off_y` = 4.00 mm still assumed — affects active-area centring only | no | no |
-| 4 | Anything on the PCB front face other than glass and solder tips is assumed absent | no | no |
-| 5 | Firmware must mask 2 pixel rows top and bottom | no | no |
-| 6 | Bezel retention is removable adhesive on recessed pads | no | no |
-| ~~7~~ | ~~Glass envelope relative to the four mounting holes~~ | **CLOSED** — designed out, §7 | — |
+| **1** | **Glass envelope vs the two header-side mounting holes — §9** | **YES** | no |
+| **2** | **Physical inversion and gentle-shake retention test — §14** | — | **blocks release** |
+| 3 | `oled_glass_proud` = 0.80 mm from a single sample; it sets the whole chain | no | no |
+| 4 | `oled_pcb_off_y` = 4.00 mm still assumed — affects active-area centring only | no | no |
+| 5 | Anything on the PCB front face other than glass and solder tips is assumed absent | no | no |
+| 6 | Nothing on the PCB **rear** face within the four Ø6.00 pad annuli — check at fit test | no | no |
+| 7 | Firmware must mask 2 pixel rows top and bottom | no | no |
+| 8 | Bezel retention is removable adhesive on recessed pads | no | no |
+| ~~9~~ | ~~Front-side solder protrusion~~ | **CLOSED** 2026-08-28 — tips reduced, modelled at 1.00 mm | — |
 
-Rev O listed four unmeasured OLED properties as gating items. Both of the
-blocking ones are now closed: the glass envelope by designing the dependency out,
-and the solder-tip length by the owner's decision to reduce the tips. **Nothing
-outstanding blocks the print.** Items 2 to 6 are prototype-measurement and
-firmware items, all correctable in a single parameter or a single commit.
-
----
-
-## 14. Prototype acceptance tests
-
-First Rev P print is a geometry-validation prototype. Check, in order:
-
-1. rear insertion of the OLED — all four fingers click, ~10 N, no board flex;
-2. the module rests on the four shoulders with no rattle and no rock;
-3. removal via the four prise holes;
-4. carrier seats flat against the Perspex before the screws are snug;
-5. actual OLED-to-Perspex gap (target 0.30 mm);
-6. M2 tightening does not change OLED depth — measure the gap before and after;
-7. prepared solder joints and header clear the Perspex;
-8. active-area centring when powered, and the real `oled_pcb_off_y`;
-9. bezel alignment in the aperture;
-10. cable tie threads and holds.
+Item 1 is the only thing standing between this geometry and a printer. Item 2 is
+the only thing standing between a printed carrier and a release recommendation.
 
 ---
 
-## 15. Reproducing this build
+## 18. Reproducing this build
 
 `Decca_Display_Mount_revP.f3d` is written **by Fusion**, from the generator:
 
@@ -581,14 +774,13 @@ First Rev P print is a geometry-validation prototype. Check, in order:
    `mechanical/CAD/Decca_Display_Mount_revP_fusion.py`.
 3. Set `OUT_DIR` to your clone's `mechanical` folder (currently
    `D:\GitHub\Decca\mechanical`).
-4. Run `main()`, then `validate()`, then `import_bezel()`, then `export()`.
+4. Run `main()`, then `validate()`, `import_bezel()`, `snapshots()`, `export()`.
 
-`main()` creates a **new** document on the first run — it never opens, modifies
-or Save-As's the Rev N or Rev O files — and rebuilds in place on later runs, so
-re-running never accumulates stray documents and never touches a document you
-opened. It writes all 80 values into `design.userParameters`, builds
+`main()` creates a **new** document on the first run and rebuilds in place on
+later runs. It writes 101 values into `design.userParameters`, builds
 `REF_Decca_Panel`, `REF_SH1106_1P3` and `Rear_Display_Carrier`, and exports the
-`.f3d`, both STEPs and the STL.
+`.f3d`, both STEPs and the STL. `snapshots()` regenerates the four Drawings PNGs
+from the live model, so the images always document the geometry in the file.
 
 Then, offline and independently:
 
@@ -597,25 +789,28 @@ python mechanical/CAD/Decca_Display_Mount_revP_verify.py
 ```
 
 It exits non-zero when a check fails, so it is usable as a gate. It only reads
-the STL — it never writes any CAD artefact, so the repository keeps a single
-source for each file.
+the STL.
 
 ---
 
-## 16. Design decision
+## 19. Design decision
 
-**Rev P is released for the geometry-validation prototype print.**
+**Rev P is OPEN. It is not released.**
 
-The architecture is delivered in full and validated on the real solid and again,
-independently, on the exported mesh: rear-loaded, rear PCB Z datum, separate
-carrier-to-Perspex hard stops carrying all M2 preload, nothing whatsoever between
-the PCB front face and the Perspex, locating and light-retention snaps only, no
-separate retainer bar, active area centred, both swept corridors clear in both
-directions, and Rev O's blocking unknown designed out rather than deferred.
+The corrected architecture is delivered in full and validated on the real solid
+and again, independently, on the exported mesh: flush-side insertion, fixed rear
+PCB datum pads, positive geometric forward retention by two sprung post hooks,
+zero preload on the seated module, separate carrier-to-Perspex hard stops
+carrying all M2 preload, nothing structural between the PCB front face and the
+Perspex, an identified removal path, no separate retainer bar, and both swept
+corridors clear in both directions.
 
-Print one carrier, prepare one module to ≤ 1.00 mm front-side protrusion, and run
-the §14 acceptance tests. The two figures most worth measuring on that print are
-the actual glass-to-Perspex gap and the real `oled_pcb_off_y`; both are single
-parameters if they move.
+Two things remain, and neither is a CAD result:
+
+1. **Measure the glass envelope at the two header-side mounting holes** (§9).
+   Until that number exists, no corrected carrier is printed.
+2. **Print one and try to shake the screen out of it** (§14). The Rev P.1
+   retention finding closes when a real carrier holds a real module upside down,
+   and not before.
 
 Rev N receives no further work.

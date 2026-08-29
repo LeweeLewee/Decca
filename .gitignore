@@ -34,3 +34,4 @@ secrets.h
 # *.gbr
 # *.step
 # *.stl
+mechanical/CAD/__pycache__/
