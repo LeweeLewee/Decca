@@ -30,11 +30,36 @@ bolt / captive-nut interface that replaces the deleted M2 heat-set inserts.
   shield, part of the carrier, with a single local four-pin/header opening —
   build review §24.
 
+**Rev P.5** is a mandatory amendment that changes load-bearing numbers:
+
+- both **plain locating posts are deleted** and replaced by sprung
+  locating-and-retaining posts — all four PCB mounting holes now hold a split
+  sprung post, and no plain-post parameter, body, branch or probe survives;
+- the complete OLED reference is rotated **180° in plane**, so the four-pin
+  connector is at the **bottom** and the active area's bottom edge sits on the
+  Perspex opening bottom edge. The panel-fixed holes do not move. **The open
+  lighting-unit end of the carrier travelled with the module, +Y → −Y**;
+- the carrier drops to **6.00 mm** deep, the finished rear opening grows 25 % to
+  **14.00 × 4.19 mm**, and two integral **light-block** baffles are added
+  beside it, running out into the sprung pedestals.
+
+Nothing numeric is inherited: the depth reduction shortens every cantilever, so
+the split slot goes 0.70 → 1.20 mm and the root relief 3.20 → 2.00 mm. Build
+review §25.3 has the recalculation.
+
+> **The bonded-glass boundary is now THE print gate.** The two converted posts
+> put a nose ahead of the PCB at holes the plain posts never reached, and the
+> modelled glass envelope — which has never been measured, and which puts the
+> glass over the mounting holes — says it fouls by 0.40 mm. Both tools report
+> those checks as **BLOCKED**, not passed and not failed. Measure the boundary,
+> enter it, set `oled_glass_measured` / `GLASS_MEASURED`, and they become
+> ordinary hard gates. Build review §25.4.
+
 The `.f3d` is the source of truth; the STEPs and the STL are derived exports.
 
 | File | Role |
 |---|---|
-| `Decca_Display_Mount_revP.f3d` | **editable source of truth** — fully parametric, 130 named user parameters |
+| `Decca_Display_Mount_revP.f3d` | **editable source of truth** — fully parametric, 192 named user parameters |
 | `Decca_Display_Mount_revP_fusion.py` | the generator that builds the `.f3d`; single source of truth for every dimension |
 | `Decca_Display_Mount_revP_verify.py` | independent offline verification of the exported STL (numpy only) |
 | `Rear_Display_Carrier_revP.step` | the one structural part |
@@ -74,6 +99,8 @@ Fusion `createTorus` failure it caught.
 > rack/twist, the captive-nut behaviour, and the **powered light-leak test**
 > (§14.22).
 >
-> **No CAD result in this folder proves lighting-unit clearance or freedom from
-> light leakage.** There is no measured lighting-unit geometry and no LED
-> measurement anywhere in the project. Both are physical tests.
+> **No CAD result in this folder proves the bonded-glass boundary, lighting-unit
+> clearance or freedom from light leakage.** None of the three has ever been
+> measured. All three are physical, and the first one blocks the print.
+> The lighting-unit test is also a **RE-TEST**, not a regression check: the 180°
+> transform moved the carrier's open end to the other side of the fixing bolts.

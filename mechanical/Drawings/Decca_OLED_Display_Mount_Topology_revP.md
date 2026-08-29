@@ -33,9 +33,28 @@ No Fusion geometry may be generated until this section is clean.
 > - **§13** the open rear window is **closed** by an integral opaque rear light
 >   shield, part of the carrier, with a single local four-pin/header opening.
 >   §6 is amended accordingly: release was never rearward, and still is not.
+>
+> **Rev P.5 — MANDATORY AMENDMENT 2026-08-29.** Brief §5.3 and §8.4 together.
+> These interact, so they are applied as one controlled update:
+>
+> - **§14** both plain locating posts are **deleted** and replaced by sprung
+>   locating-and-retaining posts. Every one of the four PCB mounting holes now
+>   holds a split sprung post. No plain-post parameter, body, branch, probe or
+>   report entry survives;
+> - **§15** the complete OLED reference is rotated **180° in plane**, so the
+>   four-pin connector is at the **bottom**, and the visible active area is
+>   dropped until its bottom edge meets the Perspex opening bottom edge. The
+>   panel-fixed holes do **not** move;
+> - **§16** the carrier drops to **6.00 mm** deep, the finished rear opening
+>   grows 25% to **14.00 × 4.19 mm**, and two integral **light-block** baffles
+>   are added beside it.
+>
+> **Nothing numeric is inherited.** The 2.00 mm depth reduction shortens every
+> sprung cantilever, so both pairs are re-solved from the finished solid.
+> §1–§10 remain the architecture; their *numbers* are superseded by §14–§16.
 
-Baseline: `main` @ `e3a9aa1`, whose §8.1, §8.2, §8.3, §9, §10 and §12 are
-authoritative over anything written on this branch before them.
+Baseline: `main` @ `7e115e3`, whose §5.3, §8.1, §8.2, §8.3, §8.4, §9, §10 and
+§12 are authoritative over anything written on this branch before them.
 
 ---
 
@@ -944,7 +963,264 @@ unsupported cantilever. The sliver check reports 0 faces < 0.02 mm² and 0 edges
 
 ---
 
-## 14. Rev P.4 pre-CAD gate — self-review verdict
+## 14. Four sprung retaining posts (brief §5.3) — Rev P.5
+
+### 14.1 What is deleted
+
+| Deleted | Where it was |
+|---|---|
+| `plain_post_d`, `plain_relief_d`, `plain_relief_depth`, `plain_lead`, `plain_setback` | parameter table |
+| `plain_post()` | generator |
+| `d["plain"]` coordinate list, `z_plain_floor`, `z_plain_top`, `plain_clear` | `derive()` |
+| the plain root-relief bore and the plain construction branch | `build_carrier()` |
+| three plain-post point probes and the "plain posts stay behind the PCB front plane" gate | `validate()` |
+| the plain-post shaft row, the plain-post P1′ box set and the "display-side pair is safe at any glass size" note | independent verifier |
+| every plain-post line in the topology, build report and images | documentation |
+
+Nothing is left that could quietly behave like a plain post: the verifier now
+measures a **split slot** and a **retaining barb** at every one of the four
+holes, and a plain post has neither.
+
+### 14.2 The two pairs
+
+Both pairs are split sprung locating-and-retaining posts. The converted pair
+carries its own `sprung_far_*` names so it can be reduced once the bonded glass
+is measured, **without disturbing geometry that has physical evidence behind
+it**.
+
+| | connector pair | converted far pair |
+|---|---|---|
+| position after the transform | x ±15.00, **y −18.55** | x ±15.00, **y +9.95** |
+| shaft | 2.80 | `sprung_far_shaft_d` 2.80 |
+| split slot | **1.20** | `sprung_far_slot_w` **1.20** |
+| barb | 3.20 | `sprung_far_barb_d` 3.20 |
+| nose tip | 2.60 | `sprung_far_tip_d` 2.60 |
+| root relief | Ø4.80 × **2.00 deep** | `sprung_far_relief_d/depth` Ø4.80 × **2.00** |
+| root fillet | R0.80 | `sprung_far_root_fillet_r` R0.80 |
+| split rotation | 0° | `sprung_far_split_angle` **0°** |
+
+`sprung_far_split_angle` is modelled and functional but set to 0°: rotating the
+split does not change the barb's swept envelope, so it buys nothing against the
+glass. It is there so the option survives the measurement.
+
+### 14.3 Recalculated mechanics — nothing inherited
+
+Both pairs come out identical, because both face the same 6.00 mm envelope.
+
+| Quantity | connector | far | note |
+|---|---:|---:|---|
+| radial hook overlap | **0.100 mm** | **0.100 mm** | barb 3.20 in a Ø3.00 hole |
+| insertion cam angle | 40.6° | 40.6° | 49.4° self-supporting cone |
+| required deflection, per half | 0.100 mm | 0.100 mm | the overlap |
+| nominal peak strain | **1.21 %** | **1.21 %** | limit 3.00 % |
+| worst-case off-centre strain | **2.42 %** | **2.42 %** | 0.20 mm on one half; 19 % margin |
+| insertion force per post | **7.1 N** | **7.1 N** | µ 0.30, estimate only |
+| **combined four-post force** | **28.6 N** | **28.6 N** | total, all four; at the old 0.70 slot it would be 64.6 N |
+| PCB bow, worst case | **0.057 mm** | **0.057 mm** | all 28.6 N at mid-span; under the 0.10 mm hook clearance |
+| root section at the built-in point | 0.80 × 2.80 mm | same | exactly two 0.40 mm perimeters |
+| material behind each relief | **1.30 mm** | **1.30 mm** | ≥ the 1.20 mm shield |
+| clearance to the rear shield | **0.10 mm** | **0.10 mm** | relief floor to shield inner face |
+| clearance to the light blocks | 2.50 mm+ | n/a | blocks stop at x ±11.94 |
+| release deflection / travel | 0.100 / 0.70 mm | 0.100 / 0.70 mm | elastic, 1.45 % strain |
+
+**Two proven values had to change, and both are consequences of §16's 6.00 mm
+depth, not preferences.**
+
+- **Split slot 0.70 → 1.20 mm.** The relief can no longer be 3.20 mm deep, so
+  the cantilever falls from 4.35 to 3.15 mm. Strain goes as 1/a², so the proven
+  0.70 slot would give **3.17 %** worst-case — over the limit — and 64.6 N of
+  combined insertion force. Opening the slot thins each half from 1.05 to
+  0.80 mm and brings those to 2.42 % and 28.6 N. 0.80 mm is exactly two 0.40 mm
+  extrusion widths, where 1.05 mm was two perimeters plus a sliver.
+- **Root relief 3.20 → 2.00 mm.** At 3.20 the bore would end 0.10 mm short of
+  the rear face and cut clean through the 1.20 mm light shield. At 2.00 it
+  leaves a **1.30 mm** solid floor — the shield thickness plus 0.10 mm — so the
+  shield stays light-tight under every post.
+
+Neither change weakens retention. Retention is the **square land** at
+`z_hook_face` bearing on the PCB front face; a forward load on that land has no
+inward component, so it cannot deflect a barb out of its hole at any stiffness.
+Stiffness sets insertion and release effort only.
+
+### 14.4 The bonded glass — this is the print gate
+
+| hole pair | y | modelled glass edge | gap | keep-out needed | margin |
+|---|---:|---:|---:|---:|---:|
+| connector | −18.55 | −14.25 | 4.30 | 2.10 | **+2.20** |
+| far | +9.95 | +8.75 | **1.20** | 2.10 | **−0.90** |
+
+Against the bare Ø3.20 barb the far pair is **−0.40 mm**. That is the number the
+brief quotes and it is reproduced unchanged rather than tuned away.
+
+**The modelled envelope is not evidence.** `oled_glass_w`, `oled_glass_h` and
+`oled_glass_off_y` have never been measured. As modelled the glass spans
+x ±17.25 and y −14.25 … +8.75, which puts **both far mounting holes completely
+underneath the bonded glass**. A board like that could not be screw-mounted at
+all. The model is kept unedited because replacing a wrong number with a
+convenient one would hide the measurement that is actually needed.
+
+**The far nose is not simply made smaller.** The only lever on the keep-out
+radius is the barb, and its floor is the Ø3.00 hole radius — below that there is
+no overlap and no retention. The 0.10 mm overlap is the only overlap figure with
+physical evidence behind it: it is what Rev P.2 actually retained with.
+Shrinking the barb would trade proven retention for a keep-out reduction that
+*still* would not clear the modelled glass.
+
+Both tools therefore report the three glass checks as **BLOCKED**, not passed
+and not failed — a check against a fictional envelope can be neither. Set
+`oled_glass_measured` (generator) / `GLASS_MEASURED` (verifier) once the real
+boundary is entered and they become ordinary hard gates with no other change.
+
+**Before print release:** measure hole centre to nearest bonded-glass edge at
+**all four** holes; model that measured boundary; demonstrate full swept
+clearance for every shaft, split, lead-in and nose through insertion, seating,
+retention, release and withdrawal; and keep every sprung feature inside its
+verified hole/glass keep-out.
+
+### 14.5 The four-post release sequence
+
+Four sprung posts cannot all be pinched at once, and the brief does not require
+it — only that the board never needs all four inaccessible at the same time. It
+is released **a row at a time, about the other row**:
+
+1. remove the two original bolts and lift the carrier off the Perspex — nothing
+   after this needs the radio;
+2. pinch **both connector-side barbs** (y −18.55) and lift that edge 0.70 mm.
+   The board pivots on the far pair, which stays engaged and keeps control of
+   it. The pivot is **1.41°**; the 0.10 mm radial clearance in a 1.60 mm board
+   allows **7.13°** before a hole binds on a shaft;
+3. pinch **both far barbs** (y +9.95) and withdraw the module straight forward,
+   out through the Perspex side.
+
+Steps 2 and 3 are the same operation on opposite rows, so the order reverses if
+the far pair is easier to reach.
+
+| Requirement | How it is met |
+|---|---|
+| no other rear-wall opening | removal travel is +Z; the wall is 2.10 mm behind the PCB rear face and never enters the path |
+| the rear shield is not removed or damaged | it is never touched — nothing acts on it |
+| nothing levers against the glass | every tool contact is a nose at z −0.40 or the PCB edge at z −1.20; the glass front face at z −0.30 is never a reaction surface |
+| no post permanently deformed | 0.12 mm per half is **1.45 %** strain, the same as insertion, well under 3.00 % |
+| not all four inaccessible at once | two rows, released independently |
+| PCB mounting holes undamaged | the nose is squeezed clear **before** the board moves; the board is never dragged over an engaged barb |
+
+---
+
+## 15. The 180° module transform and the vertical datum (brief §8.4) — Rev P.5
+
+The panel is the datum. The Perspex opening is centred on the origin, so its
+bottom edge is at `−panel_open_h/2 = −7.65`. Aligning the visible active area's
+bottom edge to it fixes the active centre at **y = −0.30**.
+
+The transform is applied **once**, in `derive()`, to every module-local value —
+PCB, glass, active area, all four mounting holes, header, solder tips, datum
+pads, posts, pocket, rear-wall opening and light blocks. Nothing downstream
+transforms anything again, so no feature can be moved twice or missed.
+
+| Feature | module-local | after 180° + offset |
+|---|---:|---:|
+| active-area centre | 0.00 | **−0.30** |
+| PCB centre | +4.00 | **−4.30** |
+| glass centre | +2.45 | −2.75 |
+| header centre | +19.25 | **−19.55** |
+| connector-side holes | +18.25 | **−18.55** |
+| far holes | −10.25 | **+9.95** |
+| solder-tip rows | +18.55 / −10.55 | −18.85 / +10.25 |
+| tip x offset | +0.50 | −0.50 |
+| **fixing holes** | — | **y 0.00, pitch 49.00000 — NOT MOVED** |
+
+Result: active area **horizontally centred**, bottom margin **0.00 mm**, top
+margin **0.60 mm**, connector at the **bottom**. The vertical off-centring is
+intentional and both tools assert it as such, so it cannot later be mistaken for
+drift.
+
+### 15.1 The open end travelled with the module — this matters
+
+Brief §8.1 puts the open lighting-unit side *below/outboard of the connector-side
+sprung pair*. That pair rotated from +Y to −Y, so **the cut travelled with it**:
+the uprights now terminate at **y −20.80** instead of +20.50, and the solid
+transverse rail is at +16.30.
+
+> **The Rev P.3/P.4 installed fit does NOT carry over.** The carrier's open end
+> is now on the opposite side of the panel-fixed bolts. Brief §12.14 is a
+> **RE-TEST against the radio**, not a regression check. Both tools say so in
+> their open items.
+
+---
+
+## 16. 6.00 mm depth, the enlarged opening and the light blocks (brief §8.4)
+
+### 16.1 Depth
+
+`carrier_depth` 8.00 → **6.00 mm**, measured Perspex seating plane to rear
+plane. Everything recalculated from the finished 6.00 mm geometry:
+
+| Clearance | Rev P.4 | **Rev P.5** | verdict |
+|---|---:|---:|---|
+| shield front face to DATUM B | 4.10 | **2.10 mm** | clear, no contact |
+| relief floor thickness | 3.10 | **1.30 mm** | ≥ the 1.20 mm shield |
+| relief floor to shield inner face | 1.90 | **0.10 mm** | no break-through, no membrane |
+| R0.80 root fillet inside the relief | yes | **yes** | 2.00 mm relief, not truncated |
+| nut clearance bore behind the lead-in | 3.90 | **1.90 mm** | ample |
+| light-block front face to DATUM B | — | **0.50 mm** | behind the sweep |
+| bolt grip | 5.00 | **5.00 mm** | unchanged |
+
+Nothing was truncated to reach the depth. The cost is paid entirely in post
+stiffness, and that is where §14.3 reports it.
+
+### 16.2 The finished four-pin opening
+
+Brief §8.4 fixes it at **14.00 × 4.19 mm** — 25 % up on the Rev P.4
+11.20 × 3.35. Delivered by the two named clearances, symmetrically about the
+transformed header envelope:
+
+- width `= oled_header_w + 2 × pin_slot_clear_x = 10.00 + 2 × 2.00 =` **14.00**
+- height `=` the header envelope grown by `pin_slot_clear_y = 1.44` each way,
+  clipped below by the carrier's own termination `=` **4.19**
+
+Measured off both the solid and the mesh. Still the **only** penetration: a
+4757-point sweep of the bay finds material everywhere outside it.
+
+### 16.3 The two internal light blocks
+
+Two integral opaque baffles, one immediately outboard of each lateral edge of
+the opening, growing **forward** off the shield's inner face to form a short
+tunnel beside the pins.
+
+| Property | Value |
+|---|---|
+| X | ±7.00 … **±11.94** — from the opening edge **out to the sprung pedestal, and 0.60 mm into it** |
+| Y | −20.80 … −16.61, matching the opening |
+| Z | −4.80 … **−3.20**, i.e. 1.60 mm forward off the shield |
+| clearance to DATUM B | **0.50 mm** — behind the seated PCB, out of the sweep |
+| clearance to the header | **2.00 mm** each side |
+| thickness | 4.94 mm actual, against a 1.20 mm minimum (3 extrusion widths) |
+| part of | `Rear_Display_Carrier` — one solid, not fins, not components |
+
+**They run out to the pedestals deliberately.** Stopping at the nominal 1.20 mm
+wall left a 2.50 mm open gap between each block and its tower — a straight
+sideways path for light out of the pin opening into the bay, and visible in the
+rendered part. The pedestal is a cylinder, so its inner edge retreats outboard
+away from the post centre line; taking the tangent at the centre line would
+leave a 0.04 mm slot at the block's far edge. The tie is therefore solved at the
+**worst y the block reaches**, and both tools check the junction there.
+
+They stay entirely **above** `light_cut_y`, inside the back-plate X/Y footprint
+and inside the 6.00 mm Z envelope. The §8.1 rail cut is untouched.
+
+### 16.4 One artefact removed while here
+
+The rounded-rectangle corner radius is a cosmetic top-corner feature. Applied at
+the cut end as well, it pulled the outer wall inward exactly where the R1.80
+upright cap pushed it back out; the two crossed and left a visible **step in the
+left and right outer walls**. The corner is now squared off over the cap band,
+so each upright runs at constant width right down to its termination and the cap
+lands tangent to it. The outer silhouette is a straight line from the transverse
+rail to the cap. Nothing else moved, and the sliver check still reports 0 / 0.
+
+---
+
+## 17. Rev P.5 pre-CAD gate — self-review verdict
 
 | Required demonstration | Result |
 |---|---|
@@ -979,6 +1255,22 @@ unsupported cantilever. The sliver check reports 0 faces < 0.02 mm² and 0 edges
 | Original bolts do not bottom | PASS — 5.00 mm grip, 15.00 mm ceiling, both reported open |
 | No thin slivers or unsupported critical geometry | PASS — 0 faces < 0.02 mm², 0 edges < 0.05 mm |
 | Rear-face-down print orientation still suitable | PASS — the wall is the first 6 layers, bed-supported |
+| Four sprung-post bodies exist, one per mounting hole | PASS — 4 of 4, both tools |
+| Four split slots exist | PASS — 4 of 4 measured at 1.20 mm off the mesh |
+| Four positive retaining noses exist | PASS — 4 of 4 measured at Ø3.20 ahead of the PCB front face |
+| No plain-post body or parameter remains | PASS — a plain post has neither split nor barb; all four have both |
+| All four posts concentric with the transformed holes | PASS — shafts measured Ø2.79 in Ø3.00 at all four |
+| All four hooks: positive overlap and axial clearance | PASS — 0.100 mm radial, 0.10 mm axial, all four |
+| Combined insertion force does not bow the PCB | PASS — 28.6 N, 0.057 mm worst-case bow < 0.10 mm hook clearance |
+| All four roots connected and printable in the 6.00 mm carrier | PASS — 1.30 mm floor, R0.80 fillet intact, 0 slivers |
+| Rear shield and connector light blocks intact | PASS — 1.20 mm everywhere, blocks tied into both pedestals |
+| PCB can be deliberately released and withdrawn | PASS — §14.5, row at a time, 1.41° pivot inside a 7.13° allowance |
+| Carrier depth exactly 6.00 mm | PASS — measured on the solid and the mesh |
+| Finished pin opening 14.00 × 4.19 mm | PASS — measured both ways |
+| One consistent 180° transform; connector at the bottom | PASS — header envelope entirely below the active centre |
+| Active area horizontally centred, bottom edge on the opening bottom | PASS — margins 0.00 / 0.60 mm |
+| Panel-fixed holes not moved with the OLED | PASS — y 0.00, 49.00000 mm pitch |
+| **Bonded-glass boundary at all four holes** | **BLOCKED — §14.4. THE Rev P.5 print gate** |
 | **Lighting-unit position** | **NOT MODELLED AND NOT MEASURED — §11.5. CAD makes no clearance claim** |
 | **Light leakage** | **NOT MEASURED — powered test §12.22 gates release** |
 | **Nut across-corners, bolt length, pocket fit** | **NOT MEASURED — §12.6** |

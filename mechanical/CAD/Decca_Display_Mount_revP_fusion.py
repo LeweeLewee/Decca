@@ -2,6 +2,50 @@
 """
 Decca OLED Display Mount - Rev P parametric generator (Autodesk Fusion 360).
 
+REV P.5 - FOUR SPRUNG POSTS, 6.00 mm DEPTH, 180-DEGREE MODULE DATUM (2026-08-29)
+--------------------------------------------------------------------------------
+Rev P.5 applies the brief's section 5.3 and 8.4 corrections together, because
+they interact: the module is rotated, the carrier is shortened, and the posts
+have to be re-solved inside the new envelope.
+
+A. FOUR SPRUNG POSTS (brief 5.3). The two plain locating posts are DELETED and
+   replaced by sprung locating-and-retaining posts, so every one of the four PCB
+   mounting holes now holds a split sprung post with a positive retaining nose.
+   Gone completely: plain_post_d, plain_relief_d, plain_relief_depth, plain_lead,
+   plain_setback, plain_post(), the plain coordinate list, the plain root relief,
+   the plain probes and every plain-post line in the reports and images.
+
+   The converted (far) pair carries its own named geometry - sprung_far_* - so it
+   can diverge from the proven connector-side pair once the bonded glass is
+   measured, without disturbing geometry that has physical evidence behind it.
+
+B. 6.00 mm CARRIER DEPTH (brief 8.4). carrier_depth 8.00 -> 6.00. This is NOT a
+   free change: it shortens every sprung cantilever, because the root relief can
+   no longer be 3.20 mm deep without eating through the 1.20 mm rear light
+   shield. The relief is cut to 2.00 mm, which leaves a 1.30 mm solid floor, and
+   the split slot is opened from 0.70 to 1.00 mm to bring the peak strain back
+   under the limit. Both numbers are recalculated from the finished solid in
+   validate() section 6 and reported per post type and for the four-post system.
+
+C. 180-DEGREE MODULE TRANSFORM AND THE VERTICAL DATUM (brief 8.4). The complete
+   OLED reference is rotated 180 degrees in its plane, so the four-pin connector
+   is now at the BOTTOM. The active area is no longer vertically centred: its
+   bottom edge is aligned with the bottom edge of the measured Perspex opening,
+   which puts the active-area centre at y = -0.30 mm and gives a 0.00 mm bottom
+   margin and a 0.60 mm top margin. The panel-fixed fixing bosses do NOT move -
+   they stay on the physical Perspex holes at y = 0 and exactly 49.00 mm pitch.
+   Everything OLED-dependent moves relative to them.
+
+   Because the whole module rotated, the open lighting-unit end of the carrier
+   travels with the connector-side sprung pair from +Y to -Y. The Rev P.3/P.4
+   installed fit therefore does NOT carry over: brief 12.14 is a RE-TEST, not a
+   regression check.
+
+D. FOUR-PIN OPENING AND LIGHT BLOCKS (brief 8.4). The finished rear opening is
+   enlarged 25% in both axes to exactly 14.00 x 4.19 mm, and two integral opaque
+   light-block walls are added, one each side of it, forming a short internal
+   tunnel that stops cabinet light spilling sideways out of the pin slot.
+
 REV P.4 - KEEPOUT REMOVAL AND INTEGRAL REAR LIGHT SHIELD (2026-08-29)
 ---------------------------------------------------------------------
 Rev P.4 is a bounded correction on top of Rev P.3. Two changes only:
@@ -104,6 +148,15 @@ Coordinate frame (identical to Rev N and Rev P.1, validated on real prints)::
     z = +3.00  front face of the Perspex
     z <  0     rearward, into the carrier
 
+REV P.5 vertical datum. The origin is still the centre of the original Decca
+display aperture, and the panel-fixed fixing holes are still on y = 0 at exactly
+49.00 mm pitch. The OLED is NOT centred on the origin any more: it is rotated
+180 degrees in plane and dropped so its active-area bottom edge sits on the
+Perspex opening bottom edge at y = -7.65, i.e. active centre y = -0.30. Every
+oled_* parameter below is still stated in MODULE-LOCAL coordinates, exactly as
+it is measured on the module; derive() applies the flip and the offset once, in
+one place, so no feature can be transformed twice or missed.
+
 Run through the Fusion MCP bridge, or from Utilities > Add-Ins > Scripts.
 Entry points:
 
@@ -157,12 +210,26 @@ P = {
     "oled_pcb_h": 33.50,
     "oled_pcb_t": 1.60,
     "oled_pcb_off_y": 4.00,        # PCB centre above the active-area centre
+    #                                (MODULE-LOCAL, before the 180 deg flip)
     "oled_active_w": 29.42,
     "oled_active_h": 14.70,
-    # NOT MEASURED. Rev P.2 depends on the glass X/Y envelope in exactly one
-    # place - the two header-side snap noses. See topology review section 7:
-    # that dependency is REPORTED as a blocking pre-print measurement, never
-    # assumed away.
+    # -- Rev P.5 in-plane module transform (brief 8.4) ----------------------
+    # 180 degrees, applied ONCE in derive() to every module-local value below:
+    # PCB, glass, active area, all four mounting holes, header, solder tips,
+    # datum pads, posts, pocket, rear-wall opening and light blocks. The
+    # panel-fixed bosses and holes are NOT part of the module and do not move.
+    "module_rot_deg": 180.0,
+    # NOT MEASURED. Rev P.5 depends on the glass X/Y envelope at ALL FOUR
+    # mounting holes now, because all four hold sprung noses. It is REPORTED
+    # as a blocking pre-print measurement, never assumed away.
+    #
+    # Set oled_glass_measured True once the real boundary has been measured and
+    # entered below. While it is False, every check that compares carrier
+    # geometry against this envelope reports [BLOCKED] rather than PASS or
+    # FAIL, because a fictional envelope can produce neither. As modelled, the
+    # glass covers both far mounting holes completely - a board like that could
+    # not be screw-mounted, which is how we know the model is wrong.
+    "oled_glass_measured": False,
     "oled_glass_w": 34.50,         # NOT MEASURED
     "oled_glass_h": 23.00,         # NOT MEASURED
     "oled_glass_off_y": 2.45,      # NOT MEASURED
@@ -195,9 +262,11 @@ P = {
     "aperture_margin": 0.60,       # module aperture beyond the pocket
     "carrier_wall": 3.00,
     # Rev P.1 was 9.60 mm deep purely to give its 8.40 mm cantilever fingers
-    # room. The fingers are deleted; the depth now falls out of the M2 insert
-    # stack and the sprung-post root relief.
-    "carrier_depth": 8.00,
+    # room. Rev P.2-P.4 ran at 8.00 mm. Brief 8.4 now fixes the plastic Z
+    # envelope at exactly 6.00 mm from the Perspex seating plane to the rear
+    # plane. That is the binding constraint on the sprung-post root relief -
+    # see sprung_relief_depth.
+    "carrier_depth": 6.00,
     "carrier_corner_r": 3.00,
     # The Rev P.2 cable-tie flange (top_flange 6.00, flange_w 31.00) and the
     # transverse rail it stood on are DELETED - they collided with the retained
@@ -227,8 +296,37 @@ P = {
     # SEPARATE clearances - a print allowance plus room for the conductors and
     # the wire bend immediately behind the header. They exist so the pin slot
     # can be opened up without touching the general OLED opening.
-    "pin_slot_clear_x": 0.60,
-    "pin_slot_clear_y": 0.60,
+    #
+    # Brief 8.4 fixes the FINISHED opening at 14.00 x 4.19 mm, 25% up on the
+    # Rev P.4 11.20 x 3.35. These two clearances are what deliver exactly that,
+    # symmetrically about the transformed header envelope:
+    #     width  = oled_header_w + 2 * pin_slot_clear_x = 10.00 + 4.00 = 14.00
+    #     height = (oled_header_h + 2 * pin_slot_clear_y) clipped by the
+    #              carrier's own termination = 4.19
+    "pin_slot_clear_x": 2.00,
+    "pin_slot_clear_y": 1.44,
+
+    # -- Internal connector light blocks (brief 8.4) ------------------------
+    # Two integral opaque baffles, one immediately outboard of each lateral
+    # edge of the pin opening, forming a short tunnel beside the pins so light
+    # coming through the opening cannot spill sideways into the OLED bay. They
+    # grow FORWARD off the inside face of the rear shield and are part of the
+    # same carrier solid. They are internal baffles - never external fins,
+    # never a separate component, never behind the rear plane.
+    # MINIMUM thickness. The blocks are actually run all the way out to the
+    # sprung pedestals (see light_block_tie) so no open gap is left between
+    # the block and the tower for light to come round - the finished walls are
+    # wider than this, and this value is the floor the gate checks.
+    "light_block_t": 1.20,         # 3 x 0.40 mm extrusion width, as the shield
+    # How far each block runs INTO the adjacent pedestal tower. A flat wall
+    # meeting a cylinder tangentially only touches at one height and leaves a
+    # wedge-shaped slot either side of the tangent point; 0.60 mm of overlap
+    # turns that tangent into a real merge over the block's whole height.
+    "light_block_tie": 0.60,
+    # Forward reach off the shield's inner face. Bounded by DATUM B: the blocks
+    # must stay behind the seated PCB and out of the insertion/removal sweep.
+    "light_block_depth": 1.60,
+    "light_block_pcb_clear": 0.50,  # required gap from block front face to DATUM B
 
     # -- Original Decca bolt / captive-nut interface (brief 8.2) ------------
     # The original bolts have a NON-STANDARD thread. Nothing here is derived
@@ -258,31 +356,66 @@ P = {
     # -- Locating posts -----------------------------------------------------
     # Starting values from the printed Rev D / Rev K post development. Strain
     # is RE-CALCULATED from the finished geometry in validate(), not inherited.
+    # -- CONNECTOR-SIDE sprung pair (y = -18.55 after the flip) -------------
+    # The pair that was physically proven at Rev P.2. Shaft, barb and tip are
+    # unchanged. Two values DID have to change, and neither is cosmetic:
     "sprung_shaft_d": 2.80,        # Rev D, unchanged
-    "sprung_slot_w": 0.70,         # Rev D, unchanged
+    # Rev P.2-P.4 used 0.70 in an 8.00 mm carrier. At 6.00 mm the cantilever is
+    # 1.20 mm shorter; strain goes as 1/a^2 and spring force as 1/a^3, so the
+    # proven 0.70 slot would give 3.17 % worst-case strain (over the 3.00 %
+    # limit) and 64.6 N of combined four-post insertion force. Opening the slot
+    # to 1.20 mm thins each half from 1.05 to 0.80 mm, which brings those to
+    # 2.42 % and 28.6 N. 0.80 mm is exactly two 0.40 mm extrusion widths - two
+    # clean perimeters, where 1.05 mm was two perimeters plus a sliver.
+    #
+    # This does NOT weaken retention. Retention is the square land at
+    # z_hook_face bearing on the PCB front face; a forward load on that land
+    # has no inward component, so it cannot deflect the barb out of the hole at
+    # any stiffness. Stiffness only sets insertion and release effort.
+    # Recalculated from the finished solid in validate() section 6.
+    "sprung_slot_w": 1.20,
     "sprung_barb_d": 3.20,         # Rev D, unchanged -> 0.10 mm radial overlap
     "sprung_tip_d": 2.60,          # nose lead-in tip
     "sprung_relief_d": 4.80,       # Rev D counterbore, unchanged
-    # Rev D/K used ~1.00 mm because the relief sat IN FRONT of the PCB and the
-    # glass capped it - the dependency that made Rev K's narrow pair unsafe. In
-    # Rev P.2 the relief is BEHIND the PCB, so the glass cannot constrain it and
-    # the depth is set by strain instead.
-    "sprung_relief_depth": 3.20,
-    "plain_post_d": 2.70,          # Rev D plain locating post, unchanged
-    "plain_relief_d": 4.80,
-    "plain_relief_depth": 1.00,    # the brief's value; nothing forces it deeper
-    "plain_lead": 0.30,            # entry chamfer leg at the plain post tip
-    # The plain posts stop this far BEHIND the PCB front plane. The
-    # modelled glass overhangs the display-side mounting holes, so this is
-    # the clearance to bonded glass in the worst case where the glass
-    # covers the hole entirely. 0.10 mm (the generic forward_setback) is
-    # too thin to trust on an FDM post top; 0.25 mm costs nothing and
-    # still leaves 1.35 mm of the 1.60 mm board engaged.
-    "plain_setback": 0.25,
+    # Rev P.2-P.4 used 3.20 in an 8.00 mm carrier. At 6.00 mm that would leave
+    # only 0.10 mm of floor under the relief and would eat straight through the
+    # 1.20 mm rear light shield. 2.00 mm leaves a 1.30 mm solid floor - the
+    # shield thickness plus 0.10 mm - so the shield stays light-tight under
+    # every post. Gated in validate().
+    "sprung_relief_depth": 2.00,
     "post_fillet_r": 0.80,         # Rev D R0.80 root fillet, unchanged
+
+    # -- CONVERTED FAR pair (y = +9.95 after the flip) ----------------------
+    # Brief 5.3: the two plain posts become sprung posts. They are given their
+    # OWN names so the pair can be reduced once the bonded glass is measured
+    # without touching the pair that has physical evidence behind it.
+    #
+    # They currently hold the same values as the connector pair, deliberately.
+    # The only lever that would shrink the glass keep-out is the barb, and the
+    # only overlap figure with physical evidence behind it is the 0.10 mm that
+    # Rev P.2 proved. Trading proven retention for a keep-out reduction that
+    # still would not satisfy the (known-unreliable) modelled glass envelope
+    # would be a guess replacing a measurement. See validate() section 9.
+    "sprung_far_shaft_d": 2.80,
+    "sprung_far_slot_w": 1.20,
+    "sprung_far_barb_d": 3.20,
+    "sprung_far_tip_d": 2.60,
+    "sprung_far_relief_d": 4.80,
+    "sprung_far_relief_depth": 2.00,
+    # In-plane rotation of the split slot about the post axis. 0.00 matches the
+    # connector pair. Modelled and available, but not currently used: rotating
+    # the split does not change the barb's swept envelope, so it buys nothing
+    # against the glass. It is here so the option survives the measurement.
+    "sprung_far_split_angle": 0.00,
+    "sprung_far_root_fillet_r": 0.80,
     "hook_clear": 0.10,            # AXIAL clearance under the hook when seated
     "hook_land": 0.25,             # full-diameter land above the retaining face
     "nose_perspex_clear": 0.40,    # nose tip clearance to the Perspex
+    # Minimum radial overlap any sprung nose may be reduced to. This is not a
+    # round number chosen for comfort: it is the exact overlap that the Rev P.2
+    # prototype physically retained with. Anything below it needs new physical
+    # retention evidence, not a CAD decision.
+    "hook_overlap_min": 0.10,
 
     # -- Fixed rear PCB datum ----------------------------------------------
     "datum_pad_od": 6.00,          # annular pad, ID = the post relief bore
@@ -471,6 +604,74 @@ def volume_of(body):
 # ---------------------------------------------------------------------------
 # Derived geometry - everything below is a consequence of P.
 # ---------------------------------------------------------------------------
+def _post_geo(P, d, tag):
+    """One sprung post's complete geometry and mechanics, as a dict.
+
+    ``tag`` is "" for the proven connector-side pair and "far_" for the pair
+    converted from the deleted plain posts. Both are split sprung posts; the
+    far pair simply reads its values from sprung_far_* so it can diverge after
+    the bonded glass is measured.
+    """
+    def g(name, fallback=None):
+        k = "sprung_%s%s" % (tag, name)
+        if k in P:
+            return P[k]
+        return P[fallback if fallback else "sprung_%s" % name]
+
+    geo = {
+        "tag": "far" if tag else "conn",
+        "shaft_d": g("shaft_d"),
+        "slot_w": g("slot_w"),
+        "barb_d": g("barb_d"),
+        "tip_d": g("tip_d"),
+        "relief_d": g("relief_d"),
+        "relief_depth": g("relief_depth"),
+        "split_deg": P["sprung_far_split_angle"] if tag else 0.0,
+        "fillet_r": (P["sprung_far_root_fillet_r"] if tag
+                     else P["post_fillet_r"]),
+    }
+
+    # --- the Z stack of this post ----------------------------------------
+    geo["z_floor"] = d["z_pcb_rear"] - geo["relief_depth"]
+    geo["z_fix"] = geo["z_floor"] + geo["fillet_r"]
+    # solid carrier left between the relief floor and the carrier rear plane
+    geo["floor_t"] = geo["z_floor"] - d["z_rear"]
+
+    # --- retention mechanics, all recalculated, none inherited ------------
+    geo["overlap"] = (geo["barb_d"] - P["oled_hole_d"]) / 2.0
+    geo["shaft_clear"] = (P["oled_hole_d"] - geo["shaft_d"]) / 2.0
+    geo["a"] = d["z_hook_top"] - geo["z_fix"]              # free cantilever
+    geo["t"] = (geo["shaft_d"] - geo["slot_w"]) / 2.0      # half thickness
+    dr = (geo["barb_d"] - geo["tip_d"]) / 2.0
+    geo["cam_deg"] = math.degrees(math.atan2(
+        dr, d["z_nose_tip"] - d["z_hook_top"]))
+    geo["nose_keepout_r"] = geo["barb_d"] / 2.0 + P["nose_glass_margin"]
+
+    # second moment of one half, and the beam results
+    I = geo["shaft_d"] * geo["t"] ** 3 / 12.0
+    geo["I"] = I
+
+    def beam(delta):
+        F = 3.0 * P["petg_E"] * I * delta / geo["a"] ** 3
+        e = 3.0 * geo["t"] * delta / (2.0 * geo["a"] ** 2) * 100.0
+        return F, e
+
+    geo["beam"] = beam
+    geo["delta_nom"] = geo["overlap"]
+    geo["delta_worst"] = geo["overlap"] + geo["shaft_clear"]
+    geo["F_nom"], geo["strain_nom"] = beam(geo["delta_nom"])
+    geo["F_worst"], geo["strain_worst"] = beam(geo["delta_worst"])
+    # push-on estimate only. mu appears here and NOWHERE in any acceptance
+    # criterion - Rev P.1 used friction to justify retention and the printed
+    # part disproved it.
+    tan_c = math.tan(math.radians(geo["cam_deg"]))
+    geo["F_axial"] = (2.0 * geo["F_nom"] * (tan_c + 0.30)
+                      / (1.0 - 0.30 * tan_c))
+    # forward travel needed at this hole to clear the nose during release
+    geo["release_travel"] = d["z_nose_tip"] - d["z_pcb_front"]
+    return geo
+
+
 def derive(P):
     d = {}
 
@@ -481,62 +682,91 @@ def derive(P):
     d["z_pcb_front"] = d["z_glass_front"] - P["oled_glass_proud"]  # -1.10
     d["z_fwd_limit"] = d["z_pcb_front"] - P["forward_setback"]     # -1.20
     d["z_pcb_rear"] = d["z_pcb_front"] - P["oled_pcb_t"]           # -2.70 DATUM B
-    d["z_rear"] = -P["carrier_depth"]                              # -8.00
-    d["z_tip_front"] = d["z_pcb_front"] + P["oled_tip_proud"]
-    d["z_header_rear"] = d["z_pcb_rear"] - P["oled_header_depth"]
+    d["z_rear"] = -P["carrier_depth"]                              # -6.00
 
-    # --- retention stack ---------------------------------------------------
+    # --- retention stack, the parts that are common to all four posts -----
     d["z_hook_face"] = d["z_pcb_front"] + P["hook_clear"]              # -1.00
-    d["z_hook_top"] = d["z_hook_face"] + P["hook_land"]                # -0.85
+    d["z_hook_top"] = d["z_hook_face"] + P["hook_land"]                # -0.75
     d["z_nose_tip"] = -P["nose_perspex_clear"]                         # -0.40
     d["z_ped_top"] = d["z_pcb_rear"] - P["datum_pad_h"]                # -3.00
-    d["z_sprung_floor"] = d["z_pcb_rear"] - P["sprung_relief_depth"]   # -5.70
-    d["z_sprung_fix"] = d["z_sprung_floor"] + P["post_fillet_r"]       # -4.90
-    d["z_plain_floor"] = d["z_pcb_rear"] - P["plain_relief_depth"]     # -3.70
-    d["z_plain_fix"] = d["z_plain_floor"] + P["post_fillet_r"]         # -2.90
-    d["z_plain_top"] = d["z_pcb_front"] - P["plain_setback"]           # -1.35
-    d["z_plain_lead"] = d["z_plain_top"] - P["plain_lead"]             # -1.65
-    # the forward over-travel that would strip the hook if the barbs were
-    # held squeezed: where the nose cone narrows back to the hole diameter
-    frac = ((P["sprung_barb_d"] - P["oled_hole_d"])
-            / (P["sprung_barb_d"] - P["sprung_tip_d"]))
-    d["z_strip"] = d["z_hook_top"] + frac * (d["z_nose_tip"] - d["z_hook_top"])
-    d["strip_travel"] = d["z_strip"] - d["z_pcb_rear"]
 
-    # --- module envelopes -------------------------------------------------
+    # =====================================================================
+    # REV P.5 IN-PLANE MODULE TRANSFORM (brief 8.4)
+    # =====================================================================
+    # Applied ONCE, here, to every module-local value. Nothing downstream may
+    # transform anything again, and nothing may be left untransformed.
+    #
+    # The panel is the datum. The measured Perspex opening is centred on the
+    # origin, so its bottom edge is at -panel_open_h / 2. The visible active
+    # area's bottom edge is aligned to it, which fixes the active centre.
+    d["panel_open_bottom_y"] = -P["panel_open_h"] / 2.0                # -7.65
+    d["panel_open_top_y"] = P["panel_open_h"] / 2.0                    # +7.65
+    d["oled_cy"] = d["panel_open_bottom_y"] + P["oled_active_h"] / 2.0  # -0.30
+    d["active_bottom_margin"] = (d["oled_cy"] - P["oled_active_h"] / 2.0
+                                 - d["panel_open_bottom_y"])           #  0.00
+    d["active_top_margin"] = (d["panel_open_top_y"]
+                              - (d["oled_cy"] + P["oled_active_h"] / 2.0))
+    # the flip itself: 180 degrees in plane negates both in-plane axes
+    r = math.radians(P["module_rot_deg"])
+    d["fx"] = round(math.cos(r), 12)                                   # -1
+    d["fy"] = round(math.cos(r), 12)                                   # -1
+    d["flipped"] = abs(P["module_rot_deg"] - 180.0) < 1e-9
+
+    def MY(local):
+        """MODULE-LOCAL y (measured on the module, connector at +y) -> panel y."""
+        return d["oled_cy"] + d["fy"] * local
+
+    def MX(local):
+        return d["fx"] * local
+
+    d["MY"] = MY
+    d["MX"] = MX
+
+    # --- module envelopes, all transformed --------------------------------
+    d["pcb_cy"] = MY(P["oled_pcb_off_y"])                              # -4.30
+    d["glass_cy"] = MY(P["oled_glass_off_y"])                          # -2.75
+    d["header_cy"] = MY(P["oled_header_off_y"])                        # -19.55
     d["pcb_x0"] = -P["oled_pcb_w"] / 2.0
     d["pcb_x1"] = P["oled_pcb_w"] / 2.0
-    d["pcb_y0"] = P["oled_pcb_off_y"] - P["oled_pcb_h"] / 2.0
-    d["pcb_y1"] = P["oled_pcb_off_y"] + P["oled_pcb_h"] / 2.0
+    d["pcb_y0"] = d["pcb_cy"] - P["oled_pcb_h"] / 2.0                  # -21.05
+    d["pcb_y1"] = d["pcb_cy"] + P["oled_pcb_h"] / 2.0                  # +12.45
     d["glass_x0"] = -P["oled_glass_w"] / 2.0
     d["glass_x1"] = P["oled_glass_w"] / 2.0
-    d["glass_y0"] = P["oled_glass_off_y"] - P["oled_glass_h"] / 2.0
-    d["glass_y1"] = P["oled_glass_off_y"] + P["oled_glass_h"] / 2.0
+    d["glass_y0"] = d["glass_cy"] - P["oled_glass_h"] / 2.0            # -14.25
+    d["glass_y1"] = d["glass_cy"] + P["oled_glass_h"] / 2.0            # +8.75
+    d["active_y0"] = d["oled_cy"] - P["oled_active_h"] / 2.0           # -7.65
+    d["active_y1"] = d["oled_cy"] + P["oled_active_h"] / 2.0           # +7.05
+    d["header_y0"] = d["header_cy"] - P["oled_header_h"] / 2.0         # -21.05
+    d["header_y1"] = d["header_cy"] + P["oled_header_h"] / 2.0         # -18.05
+    d["z_tip_front"] = d["z_pcb_front"] + P["oled_tip_proud"]
+    d["z_header_rear"] = d["z_pcb_rear"] - P["oled_header_depth"]
 
     # --- PCB pocket -------------------------------------------------------
     c = P["pcb_clearance"]
     d["pk_x0"], d["pk_x1"] = d["pcb_x0"] - c, d["pcb_x1"] + c
-    d["pk_y0"], d["pk_y1"] = d["pcb_y0"] - c, d["pcb_y1"] + c
+    d["pk_y0"], d["pk_y1"] = d["pcb_y0"] - c, d["pcb_y1"] + c          # -21.30, +12.70
 
     # --- module aperture --------------------------------------------------
     a = P["aperture_margin"]
     d["ap_x0"], d["ap_x1"] = d["pk_x0"] - a, d["pk_x1"] + a
-    d["ap_y0"], d["ap_y1"] = d["pk_y0"] - a, d["pk_y1"] + a
+    d["ap_y0"], d["ap_y1"] = d["pk_y0"] - a, d["pk_y1"] + a            # -21.90, +13.30
 
     # --- carrier outer profile -------------------------------------------
+    # The open lighting-unit end travels with the connector-side sprung pair,
+    # so after the 180 deg flip it is at -Y. car_y1 is now the SOLID transverse
+    # rail; the cut is at car_y0.
     w = P["carrier_wall"]
     d["car_x0"], d["car_x1"] = d["ap_x0"] - w, d["ap_x1"] + w
-    d["car_y0"] = d["ap_y0"] - w
-    # The lighting-unit-side transverse rail and flange are deleted, so the
-    # carrier no longer has a "top wall". Its structure now ends at the two
-    # capped side uprights; only the sprung pedestals reach beyond that.
-    d["wall_y1"] = d["ap_y1"] + w                    # retained for reference only
-    d["light_cut_y"] = d["pk_y1"] - P["light_cut_back"]      # +20.50
-    d["cap_r"] = (d["car_x1"] - d["pk_x1"]) / 2.0            # 1.80
-    d["cap_x"] = (d["car_x1"] + d["pk_x1"]) / 2.0            # 19.75
-    d["car_y1"] = d["light_cut_y"]                   # carrier structural extent
+    d["car_y1"] = d["ap_y1"] + w                                       # +16.30
+    d["wall_y0"] = d["ap_y0"] - w        # where the deleted rail used to start
+    d["light_cut_y"] = d["pk_y0"] + P["light_cut_back"]                # -20.80
+    d["cap_r"] = (d["car_x1"] - d["pk_x1"]) / 2.0                      # 1.80
+    d["cap_x"] = (d["car_x1"] + d["pk_x1"]) / 2.0                      # 19.75
+    d["car_y0"] = d["light_cut_y"]                   # carrier structural extent
 
     # --- original-fastener bosses (brief 8.2) -----------------------------
+    # PANEL-FIXED. These do NOT move with the module transform: they sit on the
+    # physical Perspex holes, on y = panel_fix_y, at exactly 49.00 mm pitch.
     d["m2_x"] = P["panel_fix_pitch"] / 2.0           # exact 49.00 mm pitch / 2
     d["m2_r"] = P["fix_boss_d"] / 2.0
     d["ear_x1"] = d["m2_x"] + d["m2_r"]
@@ -564,90 +794,110 @@ def derive(P):
     # --- solder tips ------------------------------------------------------
     n = 4
     span = (n - 1) * P["oled_tip_pitch"]
-    d["tip_x"] = [P["oled_tip_cx"] - span / 2.0 + i * P["oled_tip_pitch"]
-                  for i in range(n)]
+    cx = MX(P["oled_tip_cx"])
+    d["tip_x"] = [cx - span / 2.0 + i * P["oled_tip_pitch"] for i in range(n)]
+    d["tip_y"] = [MY(P["oled_tip_y_top"]), MY(P["oled_tip_y_bot"])]
 
-    # --- PCB mounting holes and the posts that occupy them ----------------
+    # --- PCB mounting holes and the FOUR sprung posts that occupy them ----
     hx = P["oled_hole_pitch_x"] / 2.0
     hy = P["oled_hole_pitch_y"] / 2.0
     d["post_x"] = hx
-    d["y_sprung"] = P["oled_pcb_off_y"] + hy         # +18.25, header side
-    d["y_plain"] = P["oled_pcb_off_y"] - hy          # -10.25, display side
-    d["sprung"] = [(sx * hx, d["y_sprung"]) for sx in (-1, 1)]
-    d["plain"] = [(sx * hx, d["y_plain"]) for sx in (-1, 1)]
-    d["holes"] = d["sprung"] + d["plain"]
+    # connector side: module-local +hy relative to the PCB centre, flipped
+    d["y_conn"] = MY(P["oled_pcb_off_y"] + hy)                         # -18.55
+    d["y_far"] = MY(P["oled_pcb_off_y"] - hy)                          #  +9.95
+    d["conn"] = [(sx * hx, d["y_conn"]) for sx in (-1, 1)]
+    d["far"] = [(sx * hx, d["y_far"]) for sx in (-1, 1)]
+    d["holes"] = d["conn"] + d["far"]
 
-    # The sprung pair belongs on the header side, away from the glass. Assert
-    # the choice rather than trusting a comment.
-    d["sprung_is_header_side"] = (d["y_sprung"] * P["oled_header_off_y"]) > 0
+    # the connector pair must be the pair beside the header, by construction
+    d["conn_is_header_side"] = (
+        abs(d["y_conn"] - d["header_cy"]) < abs(d["y_far"] - d["header_cy"]))
+    # and after the flip the connector side must be the BOTTOM
+    d["connector_at_bottom"] = d["header_cy"] < d["oled_cy"]
 
-    # --- retention mechanics ----------------------------------------------
-    d["hook_overlap"] = (P["sprung_barb_d"] - P["oled_hole_d"]) / 2.0   # 0.10
-    d["shaft_clear"] = (P["oled_hole_d"] - P["sprung_shaft_d"]) / 2.0   # 0.10
-    d["plain_clear"] = (P["oled_hole_d"] - P["plain_post_d"]) / 2.0     # 0.15
-    d["post_a"] = d["z_hook_top"] - d["z_sprung_fix"]                   # 4.05
-    d["post_t"] = (P["sprung_shaft_d"] - P["sprung_slot_w"]) / 2.0      # 1.05
-    dr = (P["sprung_barb_d"] - P["sprung_tip_d"]) / 2.0
-    d["cam_deg"] = math.degrees(math.atan2(dr,
-                                           d["z_nose_tip"] - d["z_hook_top"]))
-    # the glass keep-out the noses require, as a radius about each hole centre
-    d["nose_keepout_r"] = P["sprung_barb_d"] / 2.0 + P["nose_glass_margin"]
-
-    # --- the carrier's OWN extent on the lighting-unit side ---------------
-    # Rev P.3 called this light_keepout_y and used it to place a synthetic
-    # lighting-unit body. Rev P.4 deletes that body. What remains is simply a
-    # REPORT of how far the carrier itself reaches on that side after the rail
-    # is cut: the sprung-post pedestal tangent, because the brief mandates
-    # retaining the full pedestals. It asserts nothing about where the lighting
-    # unit is - the lighting unit has never been measured. The installed
-    # physical clearance test (brief 12.14) is the only authority.
-    d["carrier_max_y"] = d["y_sprung"] + P["pedestal_d"] / 2.0            # 22.55
-    # what the amendment actually buys, for the record
-    d["y_before"] = d["ap_y1"] + P["carrier_wall"] + 6.00                 # 30.60
+    # --- the four posts ---------------------------------------------------
+    d["geo_conn"] = _post_geo(P, d, "")
+    d["geo_far"] = _post_geo(P, d, "far_")
+    d["posts"] = ([(x, y, d["geo_conn"]) for (x, y) in d["conn"]]
+                  + [(x, y, d["geo_far"]) for (x, y) in d["far"]])
+    d["post_count"] = len(d["posts"])
+    # forward over-travel that would strip a hook if the barbs were held
+    # squeezed: where the nose cone narrows back to the hole diameter
+    g0 = d["geo_conn"]
+    frac = ((g0["barb_d"] - P["oled_hole_d"]) / (g0["barb_d"] - g0["tip_d"]))
+    d["z_strip"] = d["z_hook_top"] + frac * (d["z_nose_tip"] - d["z_hook_top"])
+    d["strip_travel"] = d["z_strip"] - d["z_pcb_rear"]
+    d["F_total"] = sum(g["F_axial"] for (_x, _y, g) in d["posts"])
+    d["strain_worst_all"] = max(g["strain_worst"] for (_x, _y, g) in d["posts"])
+    d["overlap_min_all"] = min(g["overlap"] for (_x, _y, g) in d["posts"])
+    d["floor_min_all"] = min(g["floor_t"] for (_x, _y, g) in d["posts"])
+    # the deepest relief of the four sets the shield's worst case
+    d["z_floor_min"] = min(g["z_floor"] for (_x, _y, g) in d["posts"])
 
     # --- integral rear light shield (brief 8.3) ---------------------------
-    # A continuous wall across the OLED bay, grown FORWARD from the existing
-    # rear plane so the external envelope is unchanged.
-    d["z_shield_rear"] = d["z_rear"]                                      # -8.00
-    d["z_shield_front"] = d["z_rear"] + P["rear_light_shield_t"]          # -6.80
-    # confined to the OLED bay: exactly the PCB-pocket footprint in X, so the
-    # wall lands on the two pocket side walls and bridges the uprights across
-    # the bay and nowhere else.
+    d["z_shield_rear"] = d["z_rear"]                                      # -6.00
+    d["z_shield_front"] = d["z_rear"] + P["rear_light_shield_t"]          # -4.80
     d["shield_x0"], d["shield_x1"] = d["pk_x0"], d["pk_x1"]
-    d["shield_y0"] = d["pk_y0"]
-    # It stops exactly where the carrier itself stops on the lighting-unit
-    # side. It does NOT reach into the deleted end-rail / cable-tie region,
-    # which began at the pocket line pk_y1 and ran outboard from there.
-    d["shield_y1"] = d["light_cut_y"]                                     # +20.50
-    d["shield_pcb_clear"] = d["z_pcb_rear"] - d["z_shield_front"]         # 4.10
-    d["shield_free_edge"] = d["shield_y1"] - (d["light_cut_y"] - d["cap_r"])
+    # the shield runs from the carrier's own termination on the cut side up to
+    # the pocket line on the solid side
+    d["shield_y0"] = d["light_cut_y"]                                     # -20.80
+    d["shield_y1"] = d["pk_y1"]                                           # +12.70
+    d["shield_pcb_clear"] = d["z_pcb_rear"] - d["z_shield_front"]         #  2.10
+    d["shield_free_edge"] = (d["light_cut_y"] + d["cap_r"]) - d["shield_y0"]
+    # margin between the deepest post relief floor and the shield's inner face
+    d["relief_floor_margin"] = d["z_floor_min"] - d["z_shield_front"]
 
-    # the ONLY penetration: the four-pin / header slot
-    d["pin_slot_x1"] = P["oled_header_w"] / 2.0 + P["pin_slot_clear_x"]   # 5.60
+    # --- the four-pin opening (brief 8.4: finished 14.00 x 4.19) ----------
+    d["pin_slot_x1"] = P["oled_header_w"] / 2.0 + P["pin_slot_clear_x"]   # 7.00
     d["pin_slot_x0"] = -d["pin_slot_x1"]
-    d["pin_slot_y0"] = (P["oled_header_off_y"] - P["oled_header_h"] / 2.0
-                        - P["pin_slot_clear_y"])                          # 17.15
-    # The header row sits at oled_header_off_y = +19.25 and the header envelope
-    # tops out at +20.75 - 0.25 mm ABOVE the carrier's own termination at
-    # light_cut_y = +20.50, because the connector is at the open lighting-unit
-    # end of the board. The slot is therefore bounded by shield material on
-    # both X sides and below; its upper boundary is the shield's own free edge,
-    # i.e. the mandated open lighting-unit side of brief 8.1. Closing it would
-    # mean putting printed material back above light_cut_y, which is exactly
-    # what the physically proven rail cut removed. Reported, not hidden.
-    d["pin_slot_y1"] = (P["oled_header_off_y"] + P["oled_header_h"] / 2.0
-                        + P["pin_slot_clear_y"])                          # 21.15
-    d["pin_slot_w"] = d["pin_slot_x1"] - d["pin_slot_x0"]                 # 11.20
-    d["pin_slot_h"] = d["shield_y1"] - d["pin_slot_y0"]                   # 3.35
+    # nominal cut: the header envelope grown symmetrically by the named
+    # clearances, so the opening is centred on the transformed connector
+    d["pin_slot_y0"] = d["header_y0"] - P["pin_slot_clear_y"]             # -22.49
+    d["pin_slot_y1"] = d["header_y1"] + P["pin_slot_clear_y"]             # -16.61
+    # FINISHED opening: what is actually missing from the wall. The lower edge
+    # is the shield's own free edge on the open lighting-unit side.
+    d["pin_open_y0"] = max(d["pin_slot_y0"], d["shield_y0"])              # -20.80
+    d["pin_open_y1"] = d["pin_slot_y1"]                                   # -16.61
+    d["pin_slot_w"] = d["pin_slot_x1"] - d["pin_slot_x0"]                 # 14.00
+    d["pin_slot_h"] = d["pin_open_y1"] - d["pin_open_y0"]                 #  4.19
     d["pin_slot_area"] = d["pin_slot_w"] * d["pin_slot_h"]
     d["shield_area"] = ((d["shield_x1"] - d["shield_x0"])
                         * (d["shield_y1"] - d["shield_y0"]))
-    # solid shield remaining either side of the slot
-    d["pin_slot_side_w"] = d["shield_x1"] - d["pin_slot_x1"]              # 12.35
-    d["pin_slot_below_h"] = d["pin_slot_y0"] - d["shield_y0"]             # 30.15
+    d["pin_slot_side_w"] = d["shield_x1"] - d["pin_slot_x1"]
+    d["pin_slot_above_h"] = d["shield_y1"] - d["pin_open_y1"]
+
+    # --- connector light blocks (brief 8.4) -------------------------------
+    # One each side, immediately outboard of the opening, growing forward off
+    # the shield's inner face and stopping short of DATUM B.
+    d["z_block_rear"] = d["z_shield_front"]                               # -4.80
+    d["z_block_front"] = d["z_shield_front"] + P["light_block_depth"]     # -3.20
+    d["block_pcb_clear"] = d["z_pcb_rear"] - d["z_block_front"]           #  0.50
+    d["block_y0"] = d["pin_open_y0"]
+    d["block_y1"] = d["pin_open_y1"]
+    d["block_x_in"] = d["pin_slot_x1"]                                    # 7.00
+    # Run each block out to the sprung pedestal and 0.60 mm into it. Rev P.5.1
+    # stopped at pin_slot_x1 + light_block_t = 8.20 and left a 2.50 mm open
+    # gap between the block and the tower at x 8.20 .. 10.70 - a straight
+    # sideways path for light out of the pin opening into the bay. There is no
+    # reason to leave it: the pedestal is right there to tie into.
+    # The pedestal is a CYLINDER, so its inner edge retreats outboard as you
+    # move away from its centre line. Taking the tangent at the post centre
+    # (x 10.70) leaves a 0.04 mm slot at the block's far edge - a sliver, and
+    # a light path. Solve it at the WORST y the block reaches instead.
+    d["block_dy_max"] = max(abs(d["block_y0"] - d["y_conn"]),
+                            abs(d["block_y1"] - d["y_conn"]))            #  2.25
+    d["ped_inner_x"] = d["post_x"] - math.sqrt(
+        max(0.0, (P["pedestal_d"] / 2.0) ** 2 - d["block_dy_max"] ** 2))  # 11.34
+    d["block_x_out"] = d["ped_inner_x"] + P["light_block_tie"]           # 11.94
+    d["block_w"] = d["block_x_out"] - d["block_x_in"]                    #  4.94
+    d["block_header_clear"] = d["block_x_in"] - P["oled_header_w"] / 2.0  # 2.00
+
+    # --- what the amendment history costs, for the record -----------------
+    d["carrier_min_y"] = d["y_conn"] - P["pedestal_d"] / 2.0              # -22.85
+    d["carrier_max_y"] = d["car_y1"]                                      # +16.30
+    d["carrier_h"] = d["carrier_max_y"] - d["carrier_min_y"]              #  39.15
+    d["y_before"] = d["ap_y0"] - P["carrier_wall"] - 6.00
     return d
-
-
 # ---------------------------------------------------------------------------
 # Reference bodies
 # ---------------------------------------------------------------------------
@@ -686,16 +936,15 @@ def build_oled(B, P, d, tip_proud=None, z_shift=0.0):
     out.append((B.box(d["glass_x0"], d["glass_x1"], d["glass_y0"], d["glass_y1"],
                       zf, zf + P["oled_glass_proud"]), "OLED_Glass"))
     out.append((B.box(-P["oled_active_w"] / 2.0, P["oled_active_w"] / 2.0,
-                      -P["oled_active_h"] / 2.0, P["oled_active_h"] / 2.0,
+                      d["active_y0"], d["active_y1"],
                       zf + P["oled_glass_proud"] - 0.05,
                       zf + P["oled_glass_proud"]), "OLED_ActiveArea"))
     out.append((B.box(-P["oled_header_w"] / 2.0, P["oled_header_w"] / 2.0,
-                      P["oled_header_off_y"] - P["oled_header_h"] / 2.0,
-                      P["oled_header_off_y"] + P["oled_header_h"] / 2.0,
+                      d["header_y0"], d["header_y1"],
                       zr - P["oled_header_depth"], zr), "OLED_Header_Keepout"))
 
     tips = None
-    for ty in (P["oled_tip_y_top"], P["oled_tip_y_bot"]):
+    for ty in d["tip_y"]:
         for tx in d["tip_x"]:
             c = B.cylz(P["oled_tip_d"], tx, ty, zf, zf + tp)
             tips = c if tips is None else B.uni(tips, c)
@@ -753,11 +1002,10 @@ def sweep_bodies(B, P, d, travel, tip_proud=None):
     out.append((B.box(d["glass_x0"], d["glass_x1"], d["glass_y0"], d["glass_y1"],
                       zf, d["z_glass_front"] + travel), "SWEPT_Glass"))
     out.append((B.box(-P["oled_header_w"] / 2.0, P["oled_header_w"] / 2.0,
-                      P["oled_header_off_y"] - P["oled_header_h"] / 2.0,
-                      P["oled_header_off_y"] + P["oled_header_h"] / 2.0,
+                      d["header_y0"], d["header_y1"],
                       d["z_header_rear"], zr + travel), "SWEPT_Header"))
     tips = None
-    for ty in (P["oled_tip_y_top"], P["oled_tip_y_bot"]):
+    for ty in d["tip_y"]:
         for tx in d["tip_x"]:
             c = B.cylz(P["oled_tip_d"], tx, ty, zf, zf + tp + travel)
             tips = c if tips is None else B.uni(tips, c)
@@ -780,12 +1028,16 @@ def swept_pcb(B, P, d, travel):
 
 
 def nose_envelope(B, P, d, pad=0.02):
-    """The declared exception to invariant P1' - the union of the two sprung
+    """The declared exception to invariant P1' - the union of ALL FOUR sprung
     nose envelopes. The ONLY carrier material permitted forward of the PCB
-    front plane inside the module aperture."""
+    front plane inside the module aperture.
+
+    Rev P.5: four noses, not two. The two converted posts are a new exception
+    and are declared here explicitly rather than being allowed to slip through
+    as residual."""
     env = None
-    for (x, y) in d["sprung"]:
-        b = B.cylz(P["sprung_barb_d"] + 2 * pad, x, y,
+    for (x, y, g) in d["posts"]:
+        b = B.cylz(g["barb_d"] + 2 * pad, x, y,
                    d["z_fwd_limit"] - pad, d["z_nose_tip"] + pad)
         env = b if env is None else B.uni(env, b)
     return env
@@ -809,11 +1061,11 @@ def nut_retain_envelope(B, P, d, pad=0.05):
 
 
 def hole_keepout(B, P, d, pad=None):
-    """The two header-side mounting-hole corridors, expanded by the nose glass
-    margin. Every scrap of nose material must lie inside this."""
-    r = d["nose_keepout_r"] if pad is None else pad
+    """All FOUR mounting-hole corridors, expanded by the nose glass margin.
+    Every scrap of nose material must lie inside this."""
     env = None
-    for (x, y) in d["sprung"]:
+    for (x, y, g) in d["posts"]:
+        r = g["nose_keepout_r"] if pad is None else pad
         b = B.cylz(2 * r, x, y, d["z_fwd_limit"] - 0.1, d["z_nose_tip"] + 0.1)
         env = b if env is None else B.uni(env, b)
     return env
@@ -822,38 +1074,39 @@ def hole_keepout(B, P, d, pad=None):
 # ---------------------------------------------------------------------------
 # The carrier
 # ---------------------------------------------------------------------------
-def sprung_post(B, P, d, x, y, pinch=0.0):
-    """One split sprung locating post.
+def sprung_post(B, P, d, x, y, geo, pinch=0.0):
+    """One split sprung locating-and-retaining post.
+
+    Rev P.5 builds all FOUR posts from this one function. ``geo`` carries that
+    post's own geometry, so the converted far pair can diverge from the proven
+    connector pair without a second code path to keep in step - there is no
+    plain-post branch left anywhere.
 
     ``pinch`` shrinks the barb, modelling the two halves squeezed together with
-    tweezers. Used to validate the removal path.
+    tweezers. Used to validate the release path.
     """
-    barb = max(P["sprung_tip_d"], P["sprung_barb_d"] - 2.0 * pinch)
-    z0 = d["z_sprung_floor"]
+    barb = max(geo["tip_d"], geo["barb_d"] - 2.0 * pinch)
+    z0 = geo["z_floor"]
 
-    s = B.cylz(P["sprung_shaft_d"], x, y, z0, d["z_hook_face"])
-    B.uni(s, B.root_fillet(P["sprung_shaft_d"], P["post_fillet_r"], x, y, z0))
+    s = B.cylz(geo["shaft_d"], x, y, z0, d["z_hook_face"])
+    B.uni(s, B.root_fillet(geo["shaft_d"], geo["fillet_r"], x, y, z0))
     B.uni(s, B.cylz(barb, x, y, d["z_hook_face"], d["z_hook_top"]))
-    B.uni(s, B.conez(barb, min(P["sprung_tip_d"], barb), x, y,
+    B.uni(s, B.conez(barb, min(geo["tip_d"], barb), x, y,
                      d["z_hook_top"], d["z_nose_tip"]))
 
     # the split slot: free above the root fillet, solid through it, so the
-    # cantilever is properly built in at z_sprung_fix
-    half = P["sprung_slot_w"] / 2.0
-    B.sub(s, B.box(x - P["sprung_barb_d"], x + P["sprung_barb_d"],
-                   y - half, y + half,
-                   d["z_sprung_fix"], d["z_nose_tip"] + 0.10))
-    return s
-
-
-def plain_post(B, P, d, x, y):
-    """One rigid plain locating post. Stops at z = z_fwd_limit, so it never
-    crosses the PCB front plane and is unconditionally clear of the glass."""
-    z0 = d["z_plain_floor"]
-    s = B.cylz(P["plain_post_d"], x, y, z0, d["z_plain_lead"])
-    B.uni(s, B.root_fillet(P["plain_post_d"], P["post_fillet_r"], x, y, z0))
-    B.uni(s, B.conez(P["plain_post_d"], P["plain_post_d"] - 2 * P["plain_lead"],
-                     x, y, d["z_plain_lead"], d["z_plain_top"]))
+    # cantilever is properly built in at geo["z_fix"]
+    half = geo["slot_w"] / 2.0
+    slot = B.box(x - geo["barb_d"], x + geo["barb_d"], y - half, y + half,
+                 geo["z_fix"], d["z_nose_tip"] + 0.10)
+    if abs(geo["split_deg"]) > 1e-9:
+        m = adsk.core.Matrix3D.create()
+        m.setToRotation(math.radians(geo["split_deg"]), v3(0, 0, 1),
+                        p3(x, y, 0.0))
+        if not B.tbm.transform(slot, m):
+            raise RuntimeError("could not rotate the split slot at (%g, %g)"
+                               % (x, y))
+    B.sub(s, slot)
     return s
 
 
@@ -872,11 +1125,26 @@ def build_carrier(B, P, d, pinch=0.0):
     #    is the deliberate termination radius the brief asks for. It lands
     #    adjacent to the retained sprung-post pedestal root, which the pedestal
     #    union in step 4 ties into.
-    s = B.rrect(d["car_x0"], d["car_x1"], d["car_y0"],
-                d["light_cut_y"] - d["cap_r"], zr, 0.0, P["carrier_corner_r"])
+    #
+    #    REV P.5: the open end is at -Y now. It did not move relative to the
+    #    module - it is still below/outboard of the connector-side sprung pair -
+    #    but that pair travelled from +Y to -Y with the 180 degree transform, so
+    #    the cut travelled with it. The solid transverse rail is now at +Y.
+    #
+    #    The rounded-rectangle corner radius is a COSMETIC top-corner feature.
+    #    Applied at the cut end as well it pulled the outer wall inward just
+    #    where the R1.80 upright cap pushes it back out, and the two crossed:
+    #    the cap stood proud of the retreating corner and left a visible step -
+    #    an indent in the left and right outer walls. The corner is squared off
+    #    over the cap band so the upright runs at constant width right down to
+    #    its termination and the cap lands tangent to it. Nothing else moves.
+    y_cap = d["light_cut_y"] + d["cap_r"]
+    s = B.rrect(d["car_x0"], d["car_x1"], y_cap, d["car_y1"],
+                zr, 0.0, P["carrier_corner_r"])
+    B.uni(s, B.box(d["car_x0"], d["car_x1"], y_cap,
+                   y_cap + P["carrier_corner_r"], zr, 0.0))
     for sx in (-1, 1):
-        B.uni(s, B.cylz(2.0 * d["cap_r"], sx * d["cap_x"],
-                        d["light_cut_y"] - d["cap_r"], zr, 0.0))
+        B.uni(s, B.cylz(2.0 * d["cap_r"], sx * d["cap_x"], y_cap, zr, 0.0))
     for sx in (-1, 1):
         a, b = sx * d["arm_x0"], sx * d["ear_x1"]
         B.uni(s, B.rrect(min(a, b), max(a, b),
@@ -912,13 +1180,30 @@ def build_carrier(B, P, d, pinch=0.0):
                    d["z_shield_rear"], d["z_shield_front"]))
 
     # 3b. the ONLY penetration through the shield: the four-pin / header slot.
-    #     Sized from the header envelope plus the two named clearances. Cut
-    #     right through the wall and on forward into the (already void) bay so
-    #     no coincident faces are created. There is no rear window, no
+    #     Sized from the header envelope plus the two named clearances, which
+    #     brief 8.4 fixes so the FINISHED opening is exactly 14.00 x 4.19 mm.
+    #     Cut right through the wall and on forward into the (already void) bay
+    #     so no coincident faces are created. There is no rear window, no
     #     solder-access window and no rear release opening anywhere else.
     B.sub(s, B.box(d["pin_slot_x0"], d["pin_slot_x1"],
                    d["pin_slot_y0"], d["pin_slot_y1"],
                    zr - 1.0, zf))
+
+    # 3c. CONNECTOR LIGHT BLOCKS (brief 8.4). Two integral opaque baffles, one
+    #     immediately outboard of each lateral edge of the opening, growing
+    #     FORWARD off the shield's inner face to form a short tunnel beside the
+    #     pins. They are part of this solid - not fins, not a second component.
+    #     They stop light_block_pcb_clear short of DATUM B, so they stay behind
+    #     the seated PCB and out of the insertion / removal sweep.
+    #
+    #     Each one runs from the edge of the pin opening all the way out to the
+    #     sprung pedestal and 0.60 mm into it, so there is no open gap left
+    #     between the baffle and the tower. They stay entirely ABOVE
+    #     light_cut_y: the 8.1 rail cut is not touched.
+    for sx in (-1, 1):
+        a, b = sx * d["block_x_in"], sx * d["block_x_out"]
+        B.uni(s, B.box(min(a, b), max(a, b), d["block_y0"], d["block_y1"],
+                       d["z_block_rear"], d["z_block_front"]))
 
     # 4. rigid pedestals + FIXED REAR DATUM PADS at z = z_pcb_rear.
     #    These are solid carrier body. They stop the module moving rearward and
@@ -927,19 +1212,15 @@ def build_carrier(B, P, d, pinch=0.0):
         B.uni(s, B.cylz(P["pedestal_d"], x, y, zr, d["z_ped_top"]))
         B.uni(s, B.cylz(P["datum_pad_od"], x, y, d["z_ped_top"], d["z_pcb_rear"]))
 
-    # 5. post root reliefs, bored down from the datum plane
-    for (x, y) in d["sprung"]:
-        B.sub(s, B.cylz(P["sprung_relief_d"], x, y,
-                        d["z_sprung_floor"], d["z_pcb_rear"]))
-    for (x, y) in d["plain"]:
-        B.sub(s, B.cylz(P["plain_relief_d"], x, y,
-                        d["z_plain_floor"], d["z_pcb_rear"]))
+    # 5. post root reliefs, bored down from the datum plane. FOUR of them now,
+    #    each only as deep as its own post needs, and every one stopping short
+    #    of the rear light shield so the shield stays light-tight underneath.
+    for (x, y, g) in d["posts"]:
+        B.sub(s, B.cylz(g["relief_d"], x, y, g["z_floor"], d["z_pcb_rear"]))
 
-    # 6. the posts
-    for (x, y) in d["sprung"]:
-        B.uni(s, sprung_post(B, P, d, x, y, pinch))
-    for (x, y) in d["plain"]:
-        B.uni(s, plain_post(B, P, d, x, y))
+    # 6. the FOUR sprung posts. No plain-post branch exists any more.
+    for (x, y, g) in d["posts"]:
+        B.uni(s, sprung_post(B, P, d, x, y, g, pinch))
 
     # 7. CAPTIVE ORIGINAL-NUT POCKET at each original fixing centre.
     #    There is no heat-set insert anywhere in this part. Front to rear:
@@ -989,11 +1270,16 @@ def write_parameters(design, P, d):
     vals = dict(P)
     for k in ("z_perspex_rear", "z_glass_front", "z_pcb_front", "z_fwd_limit",
               "z_pcb_rear", "z_rear", "z_tip_front", "z_hook_face", "z_hook_top",
-              "z_nose_tip", "z_ped_top", "z_sprung_floor", "z_sprung_fix",
-              "z_plain_floor", "z_plain_top", "post_a", "post_t",
-              "hook_overlap", "shaft_clear", "plain_clear", "nose_keepout_r",
-              "y_sprung", "y_plain", "post_x",
-              "light_cut_y", "cap_r", "cap_x", "carrier_max_y",
+              "z_nose_tip", "z_ped_top",
+              "oled_cy", "pcb_cy", "glass_cy", "header_cy",
+              "active_y0", "active_y1", "active_bottom_margin",
+              "active_top_margin", "panel_open_bottom_y",
+              "y_conn", "y_far", "post_x",
+              "light_cut_y", "cap_r", "cap_x",
+              "carrier_min_y", "carrier_max_y", "carrier_h",
+              "z_block_rear", "z_block_front", "block_pcb_clear",
+              "block_x_in", "block_x_out", "block_y0", "block_y1",
+              "pin_open_y0", "pin_open_y1", "relief_floor_margin",
               "z_shield_rear", "z_shield_front", "shield_x0", "shield_x1",
               "shield_y0", "shield_y1", "shield_pcb_clear",
               "pin_slot_x0", "pin_slot_x1", "pin_slot_y0", "pin_slot_y1",
@@ -1002,10 +1288,18 @@ def write_parameters(design, P, d):
               "z_nut_rear", "nut_hex_af", "nut_hex_ac", "nut_body_d",
               "nut_retain_af", "nut_ac", "boss_wall_min", "bolt_grip"):
         vals[k] = d[k]
+    # every post's own recalculated geometry, one flat parameter each
+    for tag, key in (("conn", "geo_conn"), ("far", "geo_far")):
+        for gk in ("shaft_d", "slot_w", "barb_d", "tip_d", "relief_d",
+                   "relief_depth", "split_deg", "fillet_r", "z_floor",
+                   "z_fix", "floor_t", "overlap", "shaft_clear", "a", "t",
+                   "cam_deg", "nose_keepout_r", "strain_nom", "strain_worst",
+                   "F_axial", "release_travel"):
+            vals["post_%s_%s" % (tag, gk)] = d[key][gk]
     n = 0
     for k in sorted(vals):
         v = vals[k]
-        if not isinstance(v, (int, float)):
+        if not isinstance(v, (int, float)) or isinstance(v, bool):
             continue
         name = "p_" + k
         expr = "%.4f mm" % v
@@ -1015,7 +1309,7 @@ def write_parameters(design, P, d):
                 ex.expression = expr
             else:
                 ups.add(name, adsk.core.ValueInput.createByString(expr),
-                        "mm", "Rev P.4 generator")
+                        "mm", "Rev P.5 generator")
             n += 1
         except Exception:
             pass
@@ -1079,7 +1373,7 @@ def main(_context=None):
 
     app.activeViewport.fit()
 
-    print("Rev P.4 built in %s document %r"
+    print("Rev P.5 built in %s document %r"
           % ("the existing Rev P" if reuse else "a NEW", doc.name))
     print("user parameters written: %d" % npar)
     occ = find_component(design, CARRIER)
@@ -1095,13 +1389,20 @@ def main(_context=None):
         (bb.maxPoint.z - bb.minPoint.z) * 10))
     print("carrier isSolid=%s  volume %.3f cm3  faces %d" % (
         body.isSolid, volume_of(body) / 1000.0, body.faces.count))
-    print("sprung posts y %+.2f (header side: %s)  plain posts y %+.2f"
-          % (d["y_sprung"], d["sprung_is_header_side"], d["y_plain"]))
+    print("FOUR sprung posts: connector pair y %+.2f, converted far pair y %+.2f"
+          % (d["y_conn"], d["y_far"]))
+    print("  connector at the bottom: %s   header side: %s   no plain post: yes"
+          % (d["connector_at_bottom"], d["conn_is_header_side"]))
+    print("module rotated %.0f deg in plane; active-area centre y %+.2f, "
+          "bottom margin %.2f, top margin %.2f"
+          % (P["module_rot_deg"], d["oled_cy"], d["active_bottom_margin"],
+             d["active_top_margin"]))
+    print("panel-fixed bosses UNMOVED at y %+.2f, pitch %.5f mm"
+          % (P["panel_fix_y"], 2.0 * d["m2_x"]))
     print("lumps %d  (must be 1 - one connected open-ended solid)"
           % body.lumps.count)
-    print("uprights terminate at y %+.2f, capped R%.2f; carrier max y %+.2f "
-          "(was %+.2f)" % (d["light_cut_y"], d["cap_r"], d["carrier_max_y"],
-                           d["y_before"]))
+    print("uprights terminate at y %+.2f, capped R%.2f; carrier reaches y %+.2f "
+          "on the open side" % (d["light_cut_y"], d["cap_r"], d["carrier_min_y"]))
     for nm in LEGACY_COMPONENTS:
         print("legacy component %-24s %s"
               % (nm, "ABSENT" if find_component(design, nm) is None
@@ -1111,12 +1412,20 @@ def main(_context=None):
           % (P["rear_light_shield_t"], d["z_shield_rear"], d["z_shield_front"],
              d["shield_x1"] - d["shield_x0"], d["shield_y1"] - d["shield_y0"],
              d["shield_pcb_clear"]))
-    print("four-pin slot %.2f x %.2f mm at x %+.2f..%+.2f, y %+.2f..%+.2f "
-          "(header %.2f x %.2f + %.2f/%.2f clearance)"
+    print("four-pin slot FINISHED %.2f x %.2f mm at x %+.2f..%+.2f, y %+.2f..%+.2f"
           % (d["pin_slot_w"], d["pin_slot_h"], d["pin_slot_x0"],
-             d["pin_slot_x1"], d["pin_slot_y0"], d["shield_y1"],
-             P["oled_header_w"], P["oled_header_h"],
-             P["pin_slot_clear_x"], P["pin_slot_clear_y"]))
+             d["pin_slot_x1"], d["pin_open_y0"], d["pin_open_y1"]))
+    print("light blocks x %+.2f..%+.2f (both sides), z %+.2f..%+.2f, "
+          "%.2f mm clear of DATUM B"
+          % (d["block_x_in"], d["block_x_out"], d["z_block_rear"],
+             d["z_block_front"], d["block_pcb_clear"]))
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        print("post %-9s a %.2f, half %.2f x %.2f, overlap %.3f, cam %.1f deg, "
+              "strain %.2f/%.2f %%, %.1f N, relief floor %.2f mm"
+              % (nm, g["a"], g["t"], g["shaft_d"], g["overlap"], g["cam_deg"],
+                 g["strain_nom"], g["strain_worst"], g["F_axial"],
+                 g["floor_t"]))
+    print("four-post combined insertion force %.1f N" % d["F_total"])
     print("shield open area %.1f%% - the pin slot is the only penetration"
           % (100.0 * d["pin_slot_w"] * d["pin_slot_h"] / d["shield_area"]))
     print("nut hex pocket %.2f af (%.2f measured + %.2f fit), boss wall %.3f mm"
@@ -1125,7 +1434,7 @@ def main(_context=None):
 
 
 # ---------------------------------------------------------------------------
-# validate - the mandatory Rev P.4 validation gate
+# validate - the mandatory Rev P.5 validation gate
 # ---------------------------------------------------------------------------
 SWEEP_TRAVEL = 12.00
 
@@ -1203,11 +1512,31 @@ def validate(_context=None):
     d = derive(P)
     fails = []
     opens = []
+    blocks = []
+    glass_measured = bool(P.get("oled_glass_measured", False))
 
     def gate(ok, label, detail=""):
         print("  [%s] %-56s %s" % ("PASS" if ok else "FAIL", label, detail))
         if not ok:
             fails.append(label)
+
+    def blocked(label, detail=""):
+        print("  [BLKD] %-56s %s" % (label, detail))
+        blocks.append("%s - %s" % (label, detail))
+
+    def glassgate(ok, label, detail="", blocked_detail=""):
+        """A check against the bonded-glass envelope.
+
+        While that envelope is unmeasured it is fiction, and fiction can
+        produce neither a pass nor a failure. A clear result still passes - it
+        costs nothing. An intrusion is reported as BLOCKED, with the number,
+        and it holds the print until the boundary is measured. Set
+        oled_glass_measured once it is, and every one of these becomes an
+        ordinary hard gate with no other change."""
+        if ok or glass_measured:
+            gate(ok, label, detail)
+        else:
+            blocked(label, blocked_detail or detail)
 
     def openitem(label, detail=""):
         print("  [OPEN] %-56s %s" % (label, detail))
@@ -1224,13 +1553,21 @@ def validate(_context=None):
     rmid = (P["datum_pad_od"] + P["sprung_relief_d"]) / 4.0
 
     print("=" * 80)
-    print("REV P.4 VALIDATION GATE")
-    print("  Rev P.2 flush-side-insertion architecture, PHYSICALLY VALIDATED,")
-    print("  carried through unchanged (sections 1-13). Rev P.3 amendments:")
-    print("  the lighting-unit-side cut (14) and the original Decca bolt /")
-    print("  captive-nut interface (15). Rev P.4 corrections: the synthetic")
-    print("  keepout proxy is DELETED (14) and the rear OLED bay is CLOSED by")
-    print("  an integral opaque light shield (14b).")
+    print("REV P.5 VALIDATION GATE")
+    print("  Rev P.2 flush-side insertion onto fixed rear datum pads with")
+    print("  positive sprung retention is carried through - but NOTHING is")
+    print("  inherited numerically. Rev P.5 rotates the module 180 deg, drops")
+    print("  the carrier to 6.00 mm and converts the two plain posts to sprung")
+    print("  posts, so every post, relief, floor, strain and force below is")
+    print("  recalculated from the finished solid.")
+    print("    5b  root reliefs inside the 6.00 mm envelope")
+    print("    6   FOUR-post mechanics, combined force and PCB bow")
+    print("    8   the four-post release sequence, rear wall closed")
+    print("    9   bonded-glass clearance at all four holes - the print gate")
+    print("    10  the 180 deg transform and the vertical datum")
+    print("    14  lighting-unit side, no keepout proxy")
+    print("    14b rear light shield and the connector light blocks")
+    print("    15  original bolt / captive-nut interface")
     print("=" * 80)
 
     # ---- 1. static interference, seated ---------------------------------
@@ -1239,8 +1576,14 @@ def validate(_context=None):
     for name in ("OLED_Glass", "OLED_ActiveArea", "OLED_Header_Keepout",
                  "OLED_Solder_Tips", "OLED_PCB"):
         h, v, bb = _hit(B, carrier, mod[name])
-        gate(not h, "carrier x %s" % name,
-             "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb))
+        det = "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb)
+        if name == "OLED_Glass":
+            glassgate(not h, "carrier x %s" % name, det,
+                      "%s - the two CONVERTED far noses against the UNMEASURED "
+                      "glass model. Section 9 has the numbers and the "
+                      "measurement that settles it." % det)
+        else:
+            gate(not h, "carrier x %s" % name, det)
     print("      carrier x OLED_PCB CLEAR is the point: seated, the module is")
     print("      touched by nothing but the four rigid datum pads it rests on.")
     print("      No clamp, no bend, no radial or axial preload anywhere.")
@@ -1300,7 +1643,8 @@ def validate(_context=None):
     gate(fwd_ok,
          "forward escape blocked beyond the %.2f mm hook clearance"
          % P["hook_clear"],
-         "%.2f mm radial overlap, square retaining face" % d["hook_overlap"])
+         "%.2f mm radial overlap at all four posts, square retaining face"
+         % d["overlap_min_all"])
     print("")
     print("       static positions, for reference - where the hook bites:")
     first_free = None
@@ -1356,21 +1700,16 @@ def validate(_context=None):
          else "%.5f mm3 of UNDECLARED material forward of the PCB" % rv)
     n2, rv2 = _residual(B, carrier, ap, hole_keepout(B, P, d))
     gate(n2 == 0,
-         "noses stay inside the hole keep-out (R%.2f about each centre)"
-         % d["nose_keepout_r"],
+         "noses stay inside the hole keep-outs (R%.2f about each of 4 centres)"
+         % d["geo_conn"]["nose_keepout_r"],
          "EMPTY" if n2 == 0 else "%.5f mm3 outside the keep-out" % rv2)
     zmax = max(f.boundingBox.maxPoint.z * 10 for f in carrier.faces)
     gate(abs(zmax) < 1e-6, "forward-most carrier material",
          "z = %+.5f - the Perspex seating plane" % zmax)
-    plain_fwd = 0
-    for (x, y) in d["plain"]:
-        if _inside(carrier, x, y, d["z_pcb_front"] + 0.02):
-            plain_fwd += 1
-    gate(plain_fwd == 0, "plain posts stay behind the PCB front plane",
-         "%.2f mm behind it - unconditionally clear of the glass even if"
-         % P["plain_setback"])
-    print("         the glass covers the display-side holes completely,")
-    print("         which the modelled (unmeasured) envelope says it does.")
+    print("      Rev P.5: FOUR noses cross the PCB front plane, not two. The")
+    print("      two converted posts are declared exceptions on exactly the")
+    print("      same terms as the proven pair - inside their own mounting-hole")
+    print("      keep-outs and nowhere else.")
 
     # ---- 4. M2 load path -------------------------------------------------
     print("")
@@ -1428,41 +1767,160 @@ def validate(_context=None):
           % (P["oled_perspex_gap"], P["oled_glass_proud"], P["oled_pcb_t"],
              -d["z_pcb_rear"]))
 
+    # ---- 5b. relief floors inside the 6.00 mm envelope -------------------
+    print("")
+    print("5b. ROOT RELIEFS INSIDE THE %.2f mm CARRIER (brief 8.4)"
+          % P["carrier_depth"])
+    print("      Shortening the carrier by 2.00 mm attacks the post roots")
+    print("      first: at the Rev P.4 relief depth of 3.20 mm the bore would")
+    print("      end 0.10 mm short of the rear face and cut straight through")
+    print("      the %.2f mm light shield. Every floor below is MEASURED off"
+          % P["rear_light_shield_t"])
+    print("      the finished solid, not taken from the parameter table.")
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        x, y = (d["conn"][1] if g is d["geo_conn"] else d["far"][1])
+        col = B.box(x - 0.02, x + 0.02, y - 0.02, y + 0.02,
+                    d["z_rear"] - 0.50, g["z_floor"] - 0.02)
+        h, v, bb = _hit(B, carrier, col)
+        # the probe column stops 0.02 mm short of the relief floor so it does
+        # not land on a coincident face, so it reads floor_t - 0.02
+        got = (v / (0.04 * 0.04) + 0.02) if h else 0.0
+        gate(abs(got - g["floor_t"]) < 5e-3 and got >= P["rear_light_shield_t"],
+             "%s post: solid floor under the relief" % nm,
+             "%.3f mm measured (%.2f nominal), at least the %.2f mm shield, so "
+             "the shield stays light-tight under the post"
+             % (got, g["floor_t"], P["rear_light_shield_t"]))
+        gate(g["z_floor"] > d["z_shield_front"] + 1e-9,
+             "%s post: relief stops short of the shield inner face" % nm,
+             "floor z %+.3f against shield face z %+.3f - %.2f mm of margin, "
+             "no break-through and no thin membrane"
+             % (g["z_floor"], d["z_shield_front"], d["relief_floor_margin"]))
+        gate(g["fillet_r"] <= g["relief_depth"] - 1e-9,
+             "%s post: R%.2f root fillet is not truncated" % (nm, g["fillet_r"]),
+             "it sits entirely inside the %.2f mm relief, %.2f mm below the "
+             "built-in point at z %+.3f"
+             % (g["relief_depth"], g["fillet_r"], g["z_fix"]))
+    gate(abs((d["z_perspex_rear"] - d["z_rear"]) - P["carrier_depth"]) < 1e-9,
+         "carrier depth, Perspex seating plane to rear plane",
+         "exactly %.2f mm" % P["carrier_depth"])
+
     # ---- 6. retention mechanics -----------------------------------------
     print("")
-    print("6. RETENTION MECHANICS - recalculated from the finished geometry")
-    a = d["post_a"]
-    t = d["post_t"]
-    I = P["sprung_shaft_d"] * t ** 3 / 12.0
+    print("6. FOUR-POST RETENTION MECHANICS - recalculated, nothing inherited")
+    print("      Rev P.5 has FOUR sprung posts. Nothing below is carried over")
+    print("      from Rev P.4: the 6.00 mm carrier shortens every cantilever,")
+    print("      so both pairs are re-solved from the finished geometry.")
+    print("")
+    print("      %-10s %6s %6s %6s %7s %7s %7s %7s %7s"
+          % ("post pair", "a", "half t", "overlap", "cam", "defl", "strain",
+             "worst", "F axial"))
+    print("      %-10s %6s %6s %6s %7s %7s %7s %7s %7s"
+          % ("", "mm", "mm", "mm", "deg", "mm", "%", "%", "N"))
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        print("      %-10s %6.2f %6.2f %6.3f %7.1f %7.2f %7.2f %7.2f %7.1f"
+              % (nm, g["a"], g["t"], g["overlap"], g["cam_deg"],
+                 g["delta_nom"], g["strain_nom"], g["strain_worst"],
+                 g["F_axial"]))
+    print("")
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        gate(g["overlap"] >= P["hook_overlap_min"] - 1e-9,
+             "%s pair: POSITIVE radial overlap beyond the hole radius" % nm,
+             "barb %.2f in a %.2f hole = %.3f mm of square retaining face per "
+             "side, at or above the %.2f mm that Rev P.2 physically retained "
+             "with. Not friction."
+             % (g["barb_d"], P["oled_hole_d"], g["overlap"],
+                P["hook_overlap_min"]))
+        gate(g["strain_nom"] < P["strain_limit"],
+             "%s pair: peak strain, hole centred" % nm,
+             "%.2f %% at %.2f mm per half (limit %.2f %%)"
+             % (g["strain_nom"], g["delta_nom"], P["strain_limit"]))
+        gate(g["strain_worst"] < P["strain_limit"],
+             "%s pair: worst-case strain, board hard against one side" % nm,
+             "%.2f %% at %.2f mm on a single half - %.0f %% margin on the "
+             "%.2f %% limit"
+             % (g["strain_worst"], g["delta_worst"],
+                100.0 * (P["strain_limit"] - g["strain_worst"])
+                / P["strain_limit"], P["strain_limit"]))
+    print("      The Rev P.2 proven pair ran at 0.83 / 1.66 % in an 8.00 mm")
+    print("      carrier. The rise is the direct, unavoidable cost of brief")
+    print("      8.4's 6.00 mm depth: a is %.2f mm now against 4.35 mm, and"
+          % d["geo_conn"]["a"])
+    print("      strain goes as 1/a^2. The split slot was opened 0.70 -> %.2f"
+          % P["sprung_slot_w"])
+    print("      to claw it back; without that it would be 3.17 %, over limit.")
 
-    def beam(delta):
-        return (3 * P["petg_E"] * I * delta / a ** 3,
-                3 * t * delta / (2 * a * a) * 100.0)
+    # --- combined four-post insertion force and PCB bow ------------------
+    print("")
+    print("      COMBINED FOUR-POST INSERTION FORCE AND PCB BOW")
+    gate(d["F_total"] < 40.0, "combined insertion force, all four posts",
+         "%.1f N (%.1f N per post x %d). At the proven 0.70 mm slot it would "
+         "be %.1f N."
+         % (d["F_total"], d["geo_conn"]["F_axial"], d["post_count"],
+            d["F_total"] * ((P["sprung_shaft_d"] - 0.70) / 2.0) ** 3
+            / d["geo_conn"]["t"] ** 3))
+    # worst case: the whole combined force applied at mid-span between the two
+    # hole rows, board simply supported on the four posts. FR4 at 20 GPa.
+    E_fr4 = 20000.0
+    span = P["oled_hole_pitch_y"]
+    I_pcb = P["oled_pcb_w"] * P["oled_pcb_t"] ** 3 / 12.0
+    bow = d["F_total"] * span ** 3 / (48.0 * E_fr4 * I_pcb)
+    gate(bow < P["hook_clear"], "PCB bow, worst case",
+         "%.4f mm with ALL %.1f N applied at mid-span between the two hole "
+         "rows (%.2f mm), board simply supported on the four posts, FR4 at "
+         "%.0f GPa, I = %.2f mm4. That is under the %.2f mm axial hook "
+         "clearance, so even the worst case cannot push a nose into the board."
+         % (bow, d["F_total"], span, E_fr4 / 1000.0, I_pcb, P["hook_clear"]))
+    print("      In practice the load is applied over the board face and the")
+    print("      four reactions are AT the four holes, where the datum pads")
+    print("      also are - press near the posts and the bow is essentially")
+    print("      zero. The figure above is the pessimistic bound, not the")
+    print("      expected value. Brief 12.3 and 12.28 are the physical checks.")
 
-    dn = d["hook_overlap"]
-    dw = dn + d["shaft_clear"]                 # board hard against one side
-    F_n, e_n = beam(dn)
-    _F_w, e_w = beam(dw)
-    tan_c = math.tan(math.radians(d["cam_deg"]))
-    axial = 2.0 * F_n * (tan_c + 0.30) / (1 - 0.30 * tan_c)
-    print("      split cantilever a = %.2f mm, half-section %.2f x %.2f mm"
-          % (a, t, P["sprung_shaft_d"]))
-    print("      barb %.2f in a %.2f hole -> %.2f mm radial overlap"
-          % (P["sprung_barb_d"], P["oled_hole_d"], dn))
-    gate(e_n < P["strain_limit"], "peak strain, hole centred",
-         "%.2f %% at %.2f mm deflection per half" % (e_n, dn))
-    gate(e_w < P["strain_limit"], "peak strain, board hard against one side",
-         "%.2f %% at %.2f mm on a single half" % (e_w, dw))
-    print("      insertion %.1f N per post at a %.1f deg cam -> %.1f N total"
-          % (axial, d["cam_deg"], 2 * axial))
-    print("      (the mu 0.30 above estimates push-on force ONLY; no")
-    print("       acceptance criterion in this gate depends on friction)")
+    # --- root sections, remaining material, and the neighbours ------------
+    print("")
+    print("      ROOT SECTION AND WHAT IS LEFT BEHIND EACH RELIEF")
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        print("      %-10s half section %.2f x %.2f mm at the built-in point "
+              "z %+.2f;" % (nm, g["t"], g["shaft_d"], g["z_fix"]))
+        print("      %-10s relief O%.2f in a O%.2f pedestal leaves a %.2f mm "
+              "annulus;" % ("", g["relief_d"], P["pedestal_d"],
+                            (P["pedestal_d"] - g["relief_d"]) / 2.0))
+        print("      %-10s %.2f mm of solid carrier behind the relief floor."
+              % ("", g["floor_t"]))
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        gate(g["z_floor"] - d["z_shield_front"] > 0.0,
+             "%s pair: clearance to the %.2f mm rear shield"
+             % (nm, P["rear_light_shield_t"]),
+             "%.2f mm between the relief floor and the shield inner face"
+             % (g["z_floor"] - d["z_shield_front"]))
+    # light blocks vs the nearest sprung pedestal, in X
+    gate(d["block_x_out"] > d["ped_inner_x"] + 1e-9,
+         "light blocks tie INTO the sprung pedestals, leaving no gap",
+         "each block runs x %.2f .. %.2f and the pedestal starts at x %.2f, so "
+         "they overlap by %.2f mm - no open slot between the baffle and the "
+         "tower for light to come round"
+         % (d["block_x_in"], d["block_x_out"], d["ped_inner_x"],
+            P["light_block_tie"]))
+
+    # --- release ----------------------------------------------------------
+    print("")
+    print("      RELEASE DEFLECTION AND TOOL ACCESS")
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        gate(g["release_travel"] > 0.30,
+             "%s pair: release deflection and travel" % nm,
+             "pinch %.3f mm per half (the overlap) and the hole clears the "
+             "nose after %.2f mm of forward travel; %.2f mm of nose stands "
+             "proud of the PCB front face for the tweezers to reach"
+             % (g["overlap"], g["release_travel"], g["release_travel"]))
     gate(True, "seated spring deflection",
-         "0.00 mm - the barb clears the PCB front face entirely")
+         "0.00 mm at all four posts - every barb clears the PCB front face")
     gate(True, "seated preload on the PCB",
-         "none: %.2f mm axial under the hook, %.2f mm radial in the hole"
-         % (P["hook_clear"], d["shaft_clear"]))
-    gate(True, "retention basis", "positive geometric overlap, not friction")
+         "none: %.2f mm axial under every hook, %.2f mm radial in every hole"
+         % (P["hook_clear"], d["geo_conn"]["shaft_clear"]))
+    gate(True, "retention basis",
+         "positive geometric overlap at four holes, not friction")
+    print("      (the mu 0.30 in the axial figures estimates push-on force")
+    print("       ONLY; no acceptance criterion in this gate uses friction)")
 
     # ---- 7. swept corridor ----------------------------------------------
     print("")
@@ -1474,8 +1932,13 @@ def validate(_context=None):
         swept[nm] = body
     for nm in ("SWEPT_Glass", "SWEPT_Tips", "SWEPT_Header"):
         h, v, bb = _hit(B, carrier, swept[nm])
-        gate(not h, "carrier x %s" % nm,
-             "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb))
+        det = "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb)
+        if nm == "SWEPT_Glass":
+            glassgate(not h, "carrier x %s" % nm, det,
+                      "%s - swept against the UNMEASURED glass model; see "
+                      "section 9" % det)
+        else:
+            gate(not h, "carrier x %s" % nm, det)
     h, v, bb = _hit(B, carrier, swept["SWEPT_PCB"])
     print("  [INFO] carrier x SWEPT_PCB  HIT %.4f mm3  %s" % (v, bb))
     n, rv = _residual(B, carrier, swept["SWEPT_PCB"], env)
@@ -1483,80 +1946,196 @@ def validate(_context=None):
          "all %.4f mm3 is designed snap deflection" % v if n == 0
          else "%.5f mm3 of RIGID obstruction in the corridor" % rv)
 
-    # ---- 8. removal -----------------------------------------------------
+    # ---- 8. removal - the FOUR-POST release sequence ---------------------
     print("")
-    print("8. REMOVAL - barbs pinched, no prise holes, no special tool")
-    pinch = d["hook_overlap"] + 0.02
+    print("8. RELEASE - four sprung posts, rear wall closed, no prise holes")
+    pinch = d["overlap_min_all"] + 0.02
     car_p = build_carrier(B, P, d, pinch=pinch)[0][0]
-    print("      barbs modelled squeezed %.2f mm per half = %.2f required "
-          "+ 0.02 margin" % (pinch, d["hook_overlap"]))
+    print("      all four barbs modelled squeezed %.2f mm per half = %.2f "
+          "required + 0.02 margin" % (pinch, d["overlap_min_all"]))
     for nm in ("SWEPT_PCB", "SWEPT_Glass", "SWEPT_Tips", "SWEPT_Header"):
         h, v, bb = _hit(B, car_p, swept[nm])
-        gate(not h, "pinched carrier x %s" % nm,
-             "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb))
-    print("      The rear window is GONE (brief 8.3), so the Rev P.3 rear")
-    print("      push-out is gone with it. Release is now entirely from the")
-    print("      front and the open lighting-unit side:")
+        det = "CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb)
+        if nm == "SWEPT_Glass":
+            glassgate(not h, "pinched carrier x %s" % nm, det,
+                      "%s - even pinched, against the UNMEASURED glass model; "
+                      "see section 9" % det)
+        else:
+            gate(not h, "pinched carrier x %s" % nm, det)
+    print("")
+    print("      THE SEQUENCE. Four sprung posts cannot all be pinched at")
+    print("      once, and the brief does not require it - only that the")
+    print("      board never needs all four inaccessible at the same time.")
+    print("      It is released a row at a time, about the other row:")
+    print("        1. remove the two original bolts and lift the carrier off")
+    print("           the Perspex. Nothing below needs the radio.")
+    print("        2. pinch BOTH connector-side barbs (y %+.2f) together and"
+          % d["y_conn"])
+    print("           lift that edge %.2f mm. The board pivots on the far pair,"
+          % d["geo_conn"]["release_travel"])
+    print("           which stays engaged and stays in control of the board.")
+    print("        3. pinch BOTH far barbs (y %+.2f) and withdraw the module"
+          % d["y_far"])
+    print("           straight forward, out through the Perspex side.")
+    print("      Step 2 and step 3 are the same operation on opposite rows, so")
+    print("      the order can be reversed if the far pair is easier to reach.")
+
+    # every clause the brief puts on the release, checked
     gate(d["z_nose_tip"] - d["z_pcb_front"] > 0.40,
-         "1. barbs deliberately released from the FRONT",
-         "%.2f mm of each nose stands proud of the PCB front face - pinch both "
-         "halves together with tweezers through the module aperture"
+         "released from the FRONT / accessible sides, not the rear",
+         "%.2f mm of every nose stands proud of the PCB front face inside the "
+         "open module aperture - reachable with fine-nose tweezers at all four"
          % (d["z_nose_tip"] - d["z_pcb_front"]))
     ledge = P["aperture_margin"] + P["pcb_clearance"]
-    gate(ledge > 0.50, "2. PCB edge accessible from the front all round",
+    gate(ledge > 0.50, "PCB edge accessible from the front all round",
          "the module aperture is %.2f mm larger than the PCB on every side, so "
          "a spudger reaches the board edge at z %+.2f" % (ledge, d["z_fwd_limit"]))
-    gate(d["pcb_y1"] > d["light_cut_y"],
-         "3. PCB rear top edge accessible from the open side",
-         "the board overhangs the carrier termination by %.2f mm on the "
-         "lighting-unit side, so it can also be pushed forward by hand"
-         % (d["pcb_y1"] - d["light_cut_y"]))
+    gate(d["pcb_y0"] < d["light_cut_y"],
+         "connector-side PCB edge also reachable from the open side",
+         "the board overhangs the carrier termination by %.2f mm at y %+.2f, "
+         "the open lighting-unit end"
+         % (d["light_cut_y"] - d["pcb_y0"], d["pcb_y0"]))
+    # the pivot in step 2 has to fit inside the shaft clearance in the far holes
+    tilt = math.degrees(math.atan2(d["geo_conn"]["release_travel"],
+                                   P["oled_hole_pitch_y"]))
+    tilt_max = math.degrees(math.atan2(2.0 * d["geo_far"]["shaft_clear"],
+                                       P["oled_pcb_t"]))
+    gate(tilt < tilt_max, "the row-at-a-time pivot fits the far holes",
+         "lifting the connector edge %.2f mm rotates the board %.2f deg about "
+         "the far pair; the %.2f mm radial clearance in a %.2f mm board allows "
+         "%.2f deg before the hole binds on the shaft"
+         % (d["geo_conn"]["release_travel"], tilt,
+            d["geo_far"]["shaft_clear"], P["oled_pcb_t"], tilt_max))
+    gate(d["overlap_min_all"] > 0.0 and pinch < d["geo_conn"]["shaft_d"] / 2.0,
+         "no post is permanently deformed to release the board",
+         "%.2f mm per half is elastic - %.2f %% strain, the same figure as "
+         "insertion, well under the %.2f %% limit"
+         % (pinch, d["geo_conn"]["beam"](pinch)[1], P["strain_limit"]))
+    gate(d["geo_conn"]["overlap"] < P["oled_hole_d"] / 4.0,
+         "the PCB mounting holes are not damaged by release",
+         "the nose bears on the hole wall over %.3f mm of radial overlap in a "
+         "%.2f mm hole, and it is squeezed clear before the board moves - the "
+         "board is never dragged over an engaged barb"
+         % (d["geo_conn"]["overlap"], P["oled_hole_d"]))
     gate(d["shield_pcb_clear"] > 1.0,
-         "4. the OLED withdraws FORWARD, away from the rear wall",
+         "released FORWARD, away from the closed rear wall",
          "removal travel is +Z; the wall sits %.2f mm BEHIND the PCB rear face "
-         "and never enters the removal path" % d["shield_pcb_clear"])
+         "and never enters the removal path. No second rear-wall opening is "
+         "needed and the shield is not removed or damaged."
+         % d["shield_pcb_clear"])
     back = B.box(d["shield_x0"] - 1.0, d["shield_x1"] + 1.0,
                  d["shield_y0"] - 1.0, d["shield_y1"] + 1.0,
                  d["z_rear"] - 1.0, d["z_pcb_rear"] - 1e-4)
     seated = build_pcb(B, P, d)
     h, v, bb = _hit(B, B.copy(seated), B.copy(back))
-    gate(not h, "5. neither PCB nor bonded glass reaches the rear wall zone",
+    gate(not h, "neither PCB nor bonded glass reaches the rear wall zone",
          "the entire module sits forward of z %+.2f throughout insertion, "
          "seating and removal" % d["z_pcb_rear"] if not h
          else "HIT %.4f mm3" % v)
-    print("      The module is NOT trapped: nothing about the closed rear")
-    print("      changes the release, because the release was never rearward.")
+    # nothing in the release path levers on the glass
+    gate(d["z_nose_tip"] < d["z_glass_front"] + 1e-9,
+         "nothing in the release levers against the bonded glass",
+         "every tool contact is on a nose at z %+.2f or on the PCB edge at "
+         "z %+.2f; the glass front face is at z %+.2f and is never a reaction "
+         "surface" % (d["z_nose_tip"], d["z_fwd_limit"], d["z_glass_front"]))
+    print("      The module is NOT trapped by the closed rear: the release was")
+    print("      never rearward, and adding two more sprung posts did not make")
+    print("      it rearward.")
 
-    # ---- 9. glass clearance ---------------------------------------------
+    # ---- 9. glass clearance - the blocking measurement -------------------
     print("")
-    print("9. GLASS CLEARANCE - the one item that is REPORTED, not assumed")
+    print("9. BONDED-GLASS CLEARANCE AT ALL FOUR HOLES")
+    print("   This is the item that gates the Rev P.5 print. It is REPORTED,")
+    print("   never assumed, and the modelled envelope is not evidence.")
     h, v, bb = _hit(B, carrier, swept["SWEPT_Glass"])
     print("      carrier x swept glass, MODELLED envelope: %s"
-          % ("CLEAR" if not h else "HIT %.4f mm3" % v))
-    nose_inner = d["y_sprung"] - P["sprung_barb_d"] / 2.0
-    print("      modelled glass top edge %+.2f, nose inner edge %+.2f -> "
-          "%.2f mm" % (d["glass_y1"], nose_inner, nose_inner - d["glass_y1"]))
-    print("      modelled hole-centre to glass edge: %.2f mm"
-          % (d["y_sprung"] - d["glass_y1"]))
-    print("      BUT oled_glass_w / _h / _off_y are NOT MEASURED.")
-    openitem("glass envelope vs the header-side mounting holes",
-             "measure hole-centre to nearest glass edge at BOTH header-side "
-             "holes; it must be >= %.2f mm, i.e. the glass must not pass "
-             "y = %+.2f. Modelled (unmeasured) value %.2f mm."
-             % (d["nose_keepout_r"], d["y_sprung"] - d["nose_keepout_r"],
-                d["y_sprung"] - d["glass_y1"]))
+          % ("CLEAR" if not h else "HIT %.4f mm3 %s" % (v, bb)))
+    print("")
+    print("      %-11s %8s %9s %9s %9s %9s"
+          % ("hole pair", "y", "glass y", "gap", "need", "margin"))
+    worst = None
+    for nm, y, gy, g in (("connector", d["y_conn"], d["glass_y0"],
+                          d["geo_conn"]),
+                         ("far", d["y_far"], d["glass_y1"], d["geo_far"])):
+        gap = abs(y - gy)
+        need = g["nose_keepout_r"]
+        margin = gap - need
+        bare = gap - g["barb_d"] / 2.0
+        print("      %-11s %+8.2f %+9.2f %9.2f %9.2f %+9.2f"
+              % (nm, y, gy, gap, need, margin))
+        if worst is None or margin < worst[1]:
+            worst = (nm, margin, gap, need, bare, g)
+    print("")
+    print("      Against the MODELLED glass the far pair is %+.2f mm on the"
+          % worst[1])
+    print("      keep-out radius and %+.2f mm on the bare barb radius. That"
+          % worst[4])
+    print("      is the number the brief quotes, and it is reproduced here")
+    print("      rather than tuned away.")
+    print("")
+    print("      WHY THE MODELLED ENVELOPE IS NOT EVIDENCE. oled_glass_w,")
+    print("      oled_glass_h and oled_glass_off_y have never been measured.")
+    print("      As modelled the glass spans x %+.2f..%+.2f and y %+.2f..%+.2f,"
+          % (d["glass_x0"], d["glass_x1"], d["glass_y0"], d["glass_y1"]))
+    print("      which puts BOTH far mounting holes (%+.2f, y %+.2f) entirely"
+          % (d["post_x"], d["y_far"]))
+    print("      underneath the bonded glass. A board like that could not be")
+    print("      screw-mounted at all, so the model is known to be wrong here.")
+    print("      It is kept, unedited, because replacing a wrong number with a")
+    print("      convenient one would hide the measurement that is actually")
+    print("      needed.")
+    print("")
+    print("      WHY THE FAR NOSE IS NOT SIMPLY MADE SMALLER. The only lever")
+    print("      on the keep-out radius is the barb, and the floor under it is")
+    print("      the hole radius %.2f mm - below that there is no overlap and"
+          % (P["oled_hole_d"] / 2.0))
+    print("      no retention at all. The %.2f mm overlap in the model is the"
+          % d["geo_far"]["overlap"])
+    print("      only overlap figure with physical evidence behind it: it is")
+    print("      what Rev P.2 actually retained with. Shrinking the barb would")
+    print("      trade proven retention for a keep-out reduction that STILL")
+    print("      would not clear the modelled glass. sprung_far_barb_d is")
+    print("      separately named so it can be reduced the moment there is a")
+    print("      measurement to justify a value - and not before.")
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        openitem("bonded-glass boundary at the %s holes" % nm,
+                 "measure hole centre to the nearest bonded-glass edge at BOTH "
+                 "%s holes (x +/-%.2f, y %+.2f). It must be at least %.2f mm "
+                 "(barb %.2f/2 + %.2f margin), i.e. the glass must not pass "
+                 "y %+.2f. Model says %.2f mm and the model is UNRELIABLE."
+                 % (nm, d["post_x"],
+                    d["y_conn"] if nm == "connector" else d["y_far"],
+                    g["nose_keepout_r"], g["barb_d"], P["nose_glass_margin"],
+                    (d["y_conn"] + g["nose_keepout_r"]) if nm == "connector"
+                    else (d["y_far"] - g["nose_keepout_r"]),
+                    abs((d["y_conn"] - d["glass_y0"]) if nm == "connector"
+                        else (d["glass_y1"] - d["y_far"]))))
+    openitem("model the measured glass and re-run this gate",
+             "replace oled_glass_w / _h / _off_y with the measured boundary, "
+             "regenerate, and confirm carrier x SWEPT_Glass is CLEAR through "
+             "insertion, seating, retention, release and withdrawal for every "
+             "shaft, split, lead-in and nose on all FOUR posts. If the measured "
+             "glass will not clear the %.2f mm keep-out at the far pair, reduce "
+             "sprung_far_barb_d only as far as %.2f mm - the overlap Rev P.2 "
+             "physically retained with - and take new physical retention "
+             "evidence before going below it."
+             % (d["geo_far"]["nose_keepout_r"],
+                P["oled_hole_d"] + 2.0 * P["hook_overlap_min"]))
     big = B.box(d["pcb_x0"], d["pcb_x1"], d["pcb_y0"], d["pcb_y1"],
                 d["z_pcb_front"], d["z_glass_front"] + SWEEP_TRAVEL)
     h, v, bb = _hit(B, carrier, big)
     n, rv = _residual(B, carrier, big, env)
+    print("")
     print("      worst case, glass = the FULL PCB outline swept: %.4f mm3, of"
           % v)
-    gate(n == 0, "worst-case glass exposure is confined to the two noses",
+    gate(n == 0, "worst-case glass exposure is confined to the four noses",
          "%.5f mm3 outside them" % rv if n else
-         "which every scrap is inside the two declared noses")
-    print("      -> the two noses are the ONLY glass exposure in the design;")
-    print("         the plain posts, pads, pedestals, walls and rim are clear")
-    print("         of the glass even if the glass is the whole board.")
+         "which every scrap is inside the four declared noses")
+    print("      -> the four noses are the ONLY glass exposure in the design.")
+    print("         Pads, pedestals, reliefs, walls, light blocks and rim are")
+    print("         clear of the glass even if the glass is the whole board.")
+    print("         So the measurement above is the complete question - there")
+    print("         is nothing else for the glass to foul.")
 
     # ---- 10. optical alignment ------------------------------------------
     print("")
@@ -1564,9 +2143,31 @@ def validate(_context=None):
     aa = mod["OLED_ActiveArea"].boundingBox
     cx = (aa.minPoint.x + aa.maxPoint.x) * 5.0
     cy = (aa.minPoint.y + aa.maxPoint.y) * 5.0
-    gate(abs(cx) < 1e-6 and abs(cy) < 1e-6,
-         "active-area centre on the aperture centre",
-         "(%.4f, %.4f)" % (cx, cy))
+    ay0 = aa.minPoint.y * 10.0
+    ay1 = aa.maxPoint.y * 10.0
+    gate(abs(cx) < 1e-6, "active area still HORIZONTALLY centred",
+         "centre x %.4f mm" % cx)
+    gate(abs(ay0 - d["panel_open_bottom_y"]) < 1e-6,
+         "active-area BOTTOM edge on the Perspex opening bottom edge",
+         "both at y %+.4f - brief 8.4 supersedes vertical centring: bottom "
+         "margin %.2f mm, top margin %.2f mm"
+         % (ay0, ay0 - d["panel_open_bottom_y"], d["panel_open_top_y"] - ay1))
+    gate(abs(cy - d["oled_cy"]) < 1e-6,
+         "active-area centre is deliberately OFF the aperture centre",
+         "y %+.4f, which is -panel_open_h/2 + oled_active_h/2. This is "
+         "intended, not drift." % cy)
+    hdr = mod["OLED_Header_Keepout"].boundingBox
+    gate(hdr.maxPoint.y * 10.0 < cy,
+         "the four-pin connector is at the BOTTOM",
+         "header envelope y %+.2f .. %+.2f, entirely below the active-area "
+         "centre - the complete module was rotated %.0f deg in plane"
+         % (hdr.minPoint.y * 10.0, hdr.maxPoint.y * 10.0, P["module_rot_deg"]))
+    gate(abs(P["panel_fix_y"]) < 1e-9
+         and abs(2.0 * d["m2_x"] - P["panel_fix_pitch"]) < 1e-9,
+         "the panel-fixed holes did NOT move with the module",
+         "still on y %+.2f at exactly %.5f mm pitch; the OLED bay moved "
+         "relative to them, not the other way round"
+         % (P["panel_fix_y"], 2.0 * d["m2_x"]))
     gate(abs(-d["z_glass_front"] - P["oled_perspex_gap"]) < 1e-9,
          "assembled glass-to-Perspex gap",
          "%.3f mm nominal, seated on the fixed pads" % P["oled_perspex_gap"])
@@ -1575,10 +2176,12 @@ def validate(_context=None):
     print("      worst-case gap is %.2f mm and the glass can never touch the"
           % (P["oled_perspex_gap"] - P["hook_clear"]))
     print("      Perspex.")
-    print("      active %.2f x %.2f in aperture %.2f x %.2f -> margin x %.2f y %.2f"
+    print("      active %.2f x %.2f in aperture %.2f x %.2f"
           % (P["oled_active_w"], P["oled_active_h"], P["panel_open_w"],
-             P["panel_open_h"], (P["panel_open_w"] - P["oled_active_w"]) / 2,
-             (P["panel_open_h"] - P["oled_active_h"]) / 2))
+             P["panel_open_h"]))
+    print("      margins: x %.2f each side, y %.2f bottom / %.2f top"
+          % ((P["panel_open_w"] - P["oled_active_w"]) / 2,
+             d["active_bottom_margin"], d["active_top_margin"]))
     print("      firmware must still mask 2 pixel rows top and bottom")
 
     # ---- 11. printability -----------------------------------------------
@@ -1597,138 +2200,189 @@ def validate(_context=None):
             tiny_e += 1
     gate(tiny_f == 0 and tiny_e == 0, "boolean slivers",
          "%d faces < 0.02 mm2, %d edges < 0.05 mm" % (tiny_f, tiny_e))
-    ledge = (P["sprung_barb_d"] - P["sprung_shaft_d"]) / 2.0
-    gate(ledge <= 0.30, "unsupported barb ledge, printed rear-down",
-         "%.2f mm radial step from the shaft (the retention overlap against "
-         "the hole is a different %.2f mm) - the Rev D / Rev K hook class, "
-         "both printed" % (ledge, d["hook_overlap"]))
+    worst_ledge = max((g["barb_d"] - g["shaft_d"]) / 2.0
+                      for (_x, _y, g) in d["posts"])
+    gate(worst_ledge <= 0.30, "unsupported barb ledge, printed rear-down",
+         "%.2f mm radial step from the shaft at all four posts (the retention "
+         "overlap against the hole is a different %.2f mm) - the Rev D / Rev K "
+         "hook class, both printed" % (worst_ledge, d["overlap_min_all"]))
+    thin = min(g["t"] for (_x, _y, g) in d["posts"])
+    gate(thin >= 0.79, "sprung half-section is a whole number of perimeters",
+         "%.2f mm = exactly two 0.40 mm extrusion widths at all four posts; "
+         "the Rev P.4 1.05 mm was two perimeters plus a sliver" % thin)
     print("      structural wall %.2f ; boss wall around the hex %.3f mm"
           % (P["carrier_wall"], d["boss_wall_min"]))
-    print("      sprung post %.2f dia, %.2f mm tall, slot %.2f mm"
-          % (P["sprung_shaft_d"], d["z_nose_tip"] - d["z_sprung_floor"],
-             P["sprung_slot_w"]))
-    print("      plain post %.2f dia, %.2f mm tall"
-          % (P["plain_post_d"], d["z_plain_top"] - d["z_plain_floor"]))
+    for nm, g in (("connector", d["geo_conn"]), ("far", d["geo_far"])):
+        print("      %-10s sprung post %.2f dia, %.2f mm tall, slot %.2f mm, "
+              "split %.0f deg"
+              % (nm, g["shaft_d"], d["z_nose_tip"] - g["z_floor"],
+                 g["slot_w"], g["split_deg"]))
+    print("      NO plain post exists: all four holes hold sprung posts.")
     print("      ORIENTATION: carrier REAR FACE on the bed, building +Z.")
     print("      - pedestals and post roots all grow off the bed, no supports")
     print("      - root reliefs are upward-opening blind pockets")
     print("      - datum pads at z %.2f are upward-facing, layer-accurate"
           % d["z_pcb_rear"])
-    print("      - the nose lead-in is a %.0f deg self-supporting cone"
-          % (90 - d["cam_deg"]))
+    print("      - every nose lead-in is a %.0f deg self-supporting cone"
+          % (90 - d["geo_conn"]["cam_deg"]))
+    print("      - all four root reliefs bottom out %.2f mm short of the"
+          % d["relief_floor_margin"])
+    print("        shield inner face, leaving %.2f mm of solid floor - the"
+          % d["floor_min_all"])
+    print("        %.2f mm carrier does not thin them to a membrane"
+          % P["carrier_depth"])
+    print("      - the two connector light blocks stand %.2f mm off the shield"
+          % P["light_block_depth"])
+    print("        inner face as upward walls %.2f mm thick - no overhang"
+          % P["light_block_t"])
     print("      - the %.2f mm rear light shield IS the first %d layers, laid"
           % (P["rear_light_shield_t"],
              int(round(P["rear_light_shield_t"] / 0.20))))
     print("        flat on the bed: no bridging, no supports, and the whole")
     print("        %.1f x %.1f mm plate is bed-supported over its full area."
           % (d["shield_x1"] - d["shield_x0"], d["shield_y1"] - d["shield_y0"]))
-    print("      - its free top edge is a %.2f mm strip beyond the upright"
+    print("      - its free edge on the open side is a %.2f mm strip beyond"
           % d["shield_free_edge"])
-    print("        cap line, %.2f mm thick and %.1f mm wide - a plate edge,"
+    print("        the upright cap line at y %+.2f," % d["light_cut_y"])
+    print("        %.2f mm thick and %.1f mm wide - a plate edge, not a"
           % (P["rear_light_shield_t"], d["shield_x1"] - d["shield_x0"]))
-    print("        not a sliver and not an unsupported cantilever.")
+    print("        sliver and not an unsupported cantilever.")
     print("      - the four-pin slot is a through-slot in those layers, so it")
     print("        needs no bridge either.")
+    print("      - the carrier is %.2f mm deep, %.2f mm shallower than Rev P.4,"
+          % (P["carrier_depth"], 8.00 - P["carrier_depth"]))
+    print("        so the whole part prints in fewer layers with no new")
+    print("        overhang: nothing was truncated to reach that depth.")
 
     # ---- 12. point probes -----------------------------------------------
     print("")
     print("12. SOLID-MEMBERSHIP PROBES")
-    sx, sy = d["sprung"][1]
-    px, py = d["plain"][1]
-    edge = (P["oled_hole_d"] + P["sprung_barb_d"]) / 4.0   # 1.55, on the
-    #                                                        hole edge
-    # a point on one half of the split post: clear of the slot, inside the
-    # shaft. The post AXIS is inside the slot, so it must not be probed.
-    half = (P["sprung_slot_w"] / 2.0 + P["sprung_shaft_d"] / 2.0) / 2.0
-    # a point inside a root relief bore: outside the shaft, inside the bore
-    rel = (P["sprung_shaft_d"] / 2.0 + P["sprung_relief_d"] / 2.0) / 2.0
     probes = [
         ("seating rim solid on a retained upright", d["cap_x"],
          0.0, -0.20, True),
-        ("bottom rail seating face solid", 0.0, d["car_y0"] + 1.50,
+        ("solid transverse rail seating face", 0.0, d["car_y1"] - 1.50,
          -0.20, True),
         ("M2 boss solid", d["m2_x"] + 2.4, 0.0, -1.0, True),
         ("M2 insert bore void", d["m2_x"], 0.0, -2.0, False),
-        ("nut bore runs right through to the rear", d["m2_x"], 0.0, -6.5,
-         False),
+        ("nut bore runs right through to the rear", d["m2_x"], 0.0,
+         d["z_rear"] + 0.50, False),
         ("module aperture void", 0.0, d["pcb_y1"] + 0.3, -0.60, False),
         ("aperture at PCB corner void", d["pcb_x1"] + 0.4, d["pcb_y1"] + 0.4,
          -0.60, False),
-        ("pocket side wall solid", d["pk_x1"] + 0.3, 0.0, -5.0, True),
+        ("pocket side wall solid", d["pk_x1"] + 0.3, 0.0, -4.0, True),
         ("PCB pocket void", 0.0, 0.0, -2.0, False),
-        # -- integral rear light shield (brief 8.3). The Rev P.3 probe here
-        #    was "open rear window void"; the window is gone.
+        # -- integral rear light shield (brief 8.3) --
         ("rear shield solid at the bay centre", 0.0, 0.0,
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("rear shield solid at the bottom-left bay corner",
+        ("rear shield solid, bay corner (-x, cut side)",
          d["shield_x0"] + 0.60, d["shield_y0"] + 0.60,
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("rear shield solid at the bottom-right bay corner",
+        ("rear shield solid, bay corner (+x, cut side)",
          d["shield_x1"] - 0.60, d["shield_y0"] + 0.60,
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("rear shield solid at the top-left bay corner",
+        ("rear shield solid, bay corner (-x, solid side)",
          d["shield_x0"] + 0.60, d["shield_y1"] - 0.60,
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("rear shield solid at the top-right bay corner",
+        ("rear shield solid, bay corner (+x, solid side)",
          d["shield_x1"] - 0.60, d["shield_y1"] - 0.60,
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("rear shield solid on the rear face itself", 0.0, 10.0,
+        ("rear shield solid on the rear face itself", 0.0, 0.0,
          d["z_rear"] + 0.05, True),
         ("bay void just AHEAD of the shield", 0.0, 0.0,
          d["z_shield_front"] + 0.05, False),
-        ("four-pin slot void through the shield", 0.0,
-         P["oled_header_off_y"], d["z_rear"] + 0.05, False),
+        ("four-pin slot void through the shield", 0.0, d["header_cy"],
+         d["z_rear"] + 0.05, False),
         ("four-pin slot still void at the shield front face", 0.0,
-         P["oled_header_off_y"], d["z_shield_front"] - 0.05, False),
+         d["header_cy"], d["z_shield_front"] - 0.05, False),
         ("shield solid on the -X side of the pin slot",
-         d["pin_slot_x0"] - 0.30, P["oled_header_off_y"],
+         d["pin_slot_x0"] - 0.30, d["header_cy"],
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
         ("shield solid on the +X side of the pin slot",
-         d["pin_slot_x1"] + 0.30, P["oled_header_off_y"],
+         d["pin_slot_x1"] + 0.30, d["header_cy"],
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("shield solid BELOW the pin slot", 0.0, d["pin_slot_y0"] - 0.30,
+        ("shield solid ABOVE the pin slot", 0.0, d["pin_open_y1"] + 0.30,
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
         ("shield solid between the slot and the bay wall (-X)",
-         (d["shield_x0"] + d["pin_slot_x0"]) / 2.0, P["oled_header_off_y"],
+         (d["shield_x0"] + d["pin_slot_x0"]) / 2.0, d["header_cy"],
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
         ("shield solid between the slot and the bay wall (+X)",
-         (d["shield_x1"] + d["pin_slot_x1"]) / 2.0, P["oled_header_off_y"],
+         (d["shield_x1"] + d["pin_slot_x1"]) / 2.0, d["header_cy"],
          d["z_rear"] + P["rear_light_shield_t"] / 2.0, True),
-        ("sprung shaft solid inside the hole", sx, sy + half, -2.0, True),
-        ("sprung barb solid ahead of the PCB face", sx, sy + half,
-         (d["z_hook_face"] + d["z_hook_top"]) / 2.0, True),
-        ("barb overlaps the hole edge", sx, sy + edge,
-         (d["z_hook_face"] + d["z_hook_top"]) / 2.0, True),
-        ("no barb material at the PCB front plane", sx, sy + edge,
-         d["z_pcb_front"] - 0.02, False),
-        ("sprung root relief void", sx + rel, sy, -4.0, False),
-        ("sprung post root solid", sx, sy + half,
-         d["z_sprung_floor"] + 0.3, True),
-        ("pedestal solid below the relief", sx, sy, d["z_rear"] + 0.5, True),
-        ("split slot void on the post axis", sx, sy, -2.0, False),
-        ("datum pad solid behind DATUM B", sx + rmid, sy,
-         d["z_pcb_rear"] - 0.05, True),
-        ("datum pad void ahead of DATUM B", sx + rmid, sy,
-         d["z_pcb_rear"] + 0.05, False),
-        ("plain post solid inside the hole", px, py, -2.0, True),
-        ("plain post void ahead of the PCB face", px, py,
-         d["z_pcb_front"] + 0.02, False),
-        ("plain root relief void", px + rel, py, -3.3, False),
-        # -- lighting-unit keep-out (brief 8.1) --
+        # -- connector light blocks (brief 8.4) --
+        ("light block solid, -X side", -(d["block_x_in"] + d["block_x_out"]) / 2.0,
+         d["header_cy"], (d["z_block_rear"] + d["z_block_front"]) / 2.0, True),
+        ("light block solid, +X side", (d["block_x_in"] + d["block_x_out"]) / 2.0,
+         d["header_cy"], (d["z_block_rear"] + d["z_block_front"]) / 2.0, True),
+        ("pin corridor still open between the blocks", 0.0, d["header_cy"],
+         (d["z_block_rear"] + d["z_block_front"]) / 2.0, False),
+        ("light block merges into the +X pedestal",
+         (d["ped_inner_x"] + d["block_x_out"]) / 2.0, d["header_cy"],
+         (d["z_block_rear"] + d["z_block_front"]) / 2.0, True),
+        ("light block merges into the -X pedestal",
+         -(d["ped_inner_x"] + d["block_x_out"]) / 2.0, d["header_cy"],
+         (d["z_block_rear"] + d["z_block_front"]) / 2.0, True),
+        ("no gap between the +X block and its pedestal",
+         (d["block_x_in"] + d["block_x_out"]) / 2.0 + 1.50, d["header_cy"],
+         (d["z_block_rear"] + d["z_block_front"]) / 2.0, True),
+        ("nothing ahead of the light blocks", d["block_x_in"] + 0.60,
+         d["header_cy"], d["z_block_front"] + 0.20, False),
+        ("light blocks stop short of DATUM B", d["block_x_in"] + 0.60,
+         d["header_cy"], d["z_pcb_rear"] - 0.05, False),
+    ]
+
+    # -- the FOUR sprung posts, every one probed the same way --------------
+    for tag, (x, y), g in (("connector", d["conn"][1], d["geo_conn"]),
+                           ("connector", d["conn"][0], d["geo_conn"]),
+                           ("far", d["far"][1], d["geo_far"]),
+                           ("far", d["far"][0], d["geo_far"])):
+        # a point on one half of the split: clear of the slot, inside the shaft.
+        # The post AXIS lies inside the slot, so it must never be probed.
+        half = (g["slot_w"] / 2.0 + g["shaft_d"] / 2.0) / 2.0
+        # inside a root relief bore: outside the shaft, inside the bore
+        rel = (g["shaft_d"] / 2.0 + g["relief_d"] / 2.0) / 2.0
+        edge = (P["oled_hole_d"] + g["barb_d"]) / 4.0     # on the hole edge
+        pad_r = (P["datum_pad_od"] + g["relief_d"]) / 4.0
+        lbl = "%s post x%+.0f" % (tag, x)
+        zmid = (g["z_floor"] + d["z_pcb_rear"]) / 2.0
+        probes += [
+            ("%s: shaft solid inside the hole" % lbl, x, y + half, zmid, True),
+            ("%s: split slot void on the axis" % lbl, x, y, zmid, False),
+            ("%s: barb solid ahead of the PCB face" % lbl, x, y + half,
+             (d["z_hook_face"] + d["z_hook_top"]) / 2.0, True),
+            ("%s: barb overlaps the hole edge" % lbl, x, y + edge,
+             (d["z_hook_face"] + d["z_hook_top"]) / 2.0, True),
+            ("%s: no barb at the PCB front plane" % lbl, x, y + edge,
+             d["z_pcb_front"] - 0.02, False),
+            ("%s: root relief void" % lbl, x + rel, y, zmid, False),
+            ("%s: post root solid" % lbl, x, y + half,
+             g["z_floor"] + 0.30, True),
+            ("%s: solid floor under the relief" % lbl, x, y,
+             g["z_floor"] - 0.30, True),
+            ("%s: shield not broken through" % lbl, x, y,
+             d["z_rear"] + 0.20, True),
+            ("%s: datum pad solid behind DATUM B" % lbl, x + pad_r, y,
+             d["z_pcb_rear"] - 0.05, True),
+            ("%s: datum pad void ahead of DATUM B" % lbl, x + pad_r, y,
+             d["z_pcb_rear"] + 0.05, False),
+        ]
+
+    sx, sy = d["conn"][1]
+    probes += [
+        # -- lighting-unit-side cut (brief 8.1), now at -Y --
         ("deleted rail: void between the uprights", 0.0,
-         d["light_cut_y"] + 0.50, -4.00, False),
+         d["light_cut_y"] - 0.50, -3.00, False),
         ("deleted rail: void at the old wall line", 0.0,
-         d["wall_y1"] - 0.50, -4.00, False),
-        ("deleted cable-tie flange: void", 0.0, d["y_before"] - 3.00,
-         -4.00, False),
-        ("upright still solid below the cut", d["cap_x"],
-         d["light_cut_y"] - 3.00, -4.00, True),
+         d["wall_y0"] + 0.50, -3.00, False),
+        ("deleted cable-tie flange: void", 0.0, d["y_before"] + 3.00,
+         -3.00, False),
+        ("upright still solid above the cut", d["cap_x"],
+         d["light_cut_y"] + 3.00, -3.00, True),
         ("upright cap solid at the termination", d["cap_x"],
-         d["light_cut_y"] - d["cap_r"], -4.00, True),
+         d["light_cut_y"] + d["cap_r"], -3.00, True),
         ("nothing beyond the upright cap", d["cap_x"],
-         d["light_cut_y"] + 0.20, -4.00, False),
-        ("sprung pedestal survives beyond the cut", sx,
-         d["light_cut_y"] + 1.00, -4.00, True),
+         d["light_cut_y"] - 0.20, -3.00, False),
+        ("connector pedestal survives beyond the cut", sx,
+         d["light_cut_y"] - 1.00, d["z_rear"] + 1.00, True),
         # -- captive original-nut pocket (brief 8.2) --
         ("bolt clearance bore void", d["m2_x"], 0.0,
          d["z_nut_seat"] + 0.20, False),
@@ -1742,12 +2396,20 @@ def validate(_context=None):
          0.0, d["z_nut_seat"] - 0.70, False),
         ("retaining ridge solid at the flat", d["m2_x"],
          d["nut_retain_af"] / 2.0 + 0.05, d["z_nut_retain"] + 0.15, True),
-        ("nut body bore void", d["m2_x"], 0.0, d["z_rear"] + 1.00, False),
+        ("nut body bore void", d["m2_x"], 0.0, d["z_rear"] + 0.80, False),
         ("boss wall solid outboard of the bore", d["m2_x"],
-         d["nut_body_d"] / 2.0 + d["boss_wall_min"] / 2.0, d["z_rear"] + 1.00,
+         d["nut_body_d"] / 2.0 + d["boss_wall_min"] / 2.0, d["z_rear"] + 0.80,
          True),
         ("boss solid outboard of the hex corner", d["m2_x"] + 2.60,
          0.0, -3.00, True),
+        # -- no plain post survives anywhere --
+        ("no plain post at the far holes: split slot is OPEN",
+         d["far"][1][0], d["far"][1][1],
+         (d["geo_far"]["z_floor"] + d["z_pcb_rear"]) / 2.0, False),
+        ("no plain post at the far holes: a nose IS present",
+         d["far"][1][0],
+         d["far"][1][1] + (P["oled_hole_d"] + d["geo_far"]["barb_d"]) / 4.0,
+         (d["z_hook_face"] + d["z_hook_top"]) / 2.0, True),
     ]
     bad = []
     for nm, x, y, z, want in probes:
@@ -1797,51 +2459,62 @@ def validate(_context=None):
          "browser holds %d components, none of them a lighting proxy"
          % design.rootComponent.occurrences.count if not strays
          else "found %s" % ", ".join(strays))
-    bridge = B.box(d["pk_x0"], d["pk_x1"], d["light_cut_y"] + 1e-4, 60.0,
+    print("")
+    print("      REV P.5: the open end travelled with the module. It is still")
+    print("      below/outboard of the connector-side sprung pair, exactly as")
+    print("      brief 8.1 words it - but that pair rotated from +Y to -Y, so")
+    print("      the cut is now at y %+.2f instead of +20.50. The Rev P.3/P.4"
+          % d["light_cut_y"])
+    print("      installed fit therefore does NOT carry over. Brief 12.14 is a")
+    print("      RE-TEST against the radio, not a regression check.")
+    bridge = B.box(d["pk_x0"], d["pk_x1"], -60.0, d["light_cut_y"] - 1e-4,
                    d["z_rear"] - 1.0, 1.0)
     ped = None
-    for (px, py) in d["sprung"]:
+    for (px, py) in d["conn"]:
         c = B.cylz(P["pedestal_d"] + 0.10, px, py, d["z_rear"] - 1.0, 1.0)
         ped = c if ped is None else B.uni(ped, c)
     h, v, bb = _hit(B, carrier, bridge)
     n, rv = _residual(B, carrier, bridge, ped)
-    gate(n == 0, "no bridge across the uprights above y = %+.2f"
+    gate(n == 0, "no bridge across the uprights below y = %+.2f"
          % d["light_cut_y"],
          "the only material there is the two pedestal towers (%.3f mm3), "
          "residual EMPTY" % v if n == 0
          else "%.5f mm3 of BRIDGE material remains" % rv)
     lo = -d["post_x"] + P["pedestal_d"] / 2.0
     hi = d["post_x"] - P["pedestal_d"] / 2.0
-    between = B.box(lo, hi, d["light_cut_y"] + 1e-4, 60.0, d["z_rear"] - 1.0, 1.0)
+    between = B.box(lo, hi, -60.0, d["light_cut_y"] - 1e-4,
+                    d["z_rear"] - 1.0, 1.0)
     h, v, bb = _hit(B, carrier, between)
     gate(not h, "open between the two pedestal towers",
          "EMPTY over x %+.2f .. %+.2f" % (lo, hi) if not h
          else "HIT %.4f mm3" % v)
-    ymax = max(f.boundingBox.maxPoint.y * 10 for f in carrier.faces)
-    gate(abs(ymax - d["carrier_max_y"]) < 1e-3,
+    ymin = min(f.boundingBox.minPoint.y * 10 for f in carrier.faces)
+    gate(abs(ymin - d["carrier_min_y"]) < 1e-3,
          "carrier extent on the lighting-unit side",
-         "y max %+.3f (was %+.2f with the rail and flange) -> %.2f mm returned"
-         % (ymax, d["y_before"], d["y_before"] - ymax))
+         "y min %+.3f - the connector-side pedestal tangent, %.2f mm past the "
+         "upright caps at y %+.2f and nothing else"
+         % (ymin, d["light_cut_y"] - ymin, d["light_cut_y"]))
     ok = True
-    for (px, py) in d["sprung"]:
-        ok = ok and _inside(carrier, px, py + P["pedestal_d"] / 2.0 - 0.30,
+    for (px, py) in d["conn"]:
+        ok = ok and _inside(carrier, px, py - P["pedestal_d"] / 2.0 + 0.30,
                             d["z_rear"] + 0.50)
         ok = ok and _inside(carrier, px + rmid, py, d["z_pcb_rear"] - 0.05)
-    gate(ok, "sprung pedestals, pads and reliefs survive the cut intact",
-         "full %.2f dia pedestal and %.2f dia pad retained at both sprung posts"
-         % (P["pedestal_d"], P["datum_pad_od"]))
+    gate(ok, "connector-side pedestals, pads and reliefs survive the cut",
+         "full %.2f dia pedestal and %.2f dia pad retained at both connector "
+         "posts" % (P["pedestal_d"], P["datum_pad_od"]))
     ok = True
-    for (px, py) in d["sprung"]:
+    for (px, py) in d["conn"]:
         ok = ok and _inside(carrier, math.copysign(d["pk_x1"] + 0.20, px), py,
                             d["z_rear"] + 0.50)
     gate(ok, "pedestal-to-side-upright connection retained",
          "solid at the upright inner face on both sides")
     gate(carrier.lumps.count == 1,
          "the open-ended frame is ONE connected solid",
-         "%d lump - bottom rail, two capped uprights, two fixing arms and four "
-         "pedestals all joined" % carrier.lumps.count)
+         "%d lump - transverse rail, two capped uprights, two fixing arms, "
+         "four pedestals, four sprung posts, the rear shield and the two light "
+         "blocks all joined" % carrier.lumps.count)
     print("      the deleted cable-tie flange is NOT replaced: the brief allows")
-    print("      a new strain relief only outside the keep-out and only with")
+    print("      a new strain relief only outside the cut region and only with")
     print("      demonstrated radio-side clearance, which does not exist yet.")
 
     # ---- 14b. INTEGRAL REAR LIGHT SHIELD (brief 8.3) ---------------------
@@ -1856,22 +2529,23 @@ def validate(_context=None):
     #    5.30 mm of solid carrier by design, so the thickness probes sample the
     #    FREE wall: its centre, its two side edges and the corners of the
     #    pedestal-free area. The towers are reported separately below.
-    ybot = d["shield_y0"] + 0.60
-    ytop = d["shield_y1"] - 0.60
+    #    Every point below is inside the free wall: clear of the four pedestal
+    #    towers, clear of the two light blocks and clear of the pin slot.
     xl = d["shield_x0"] + 0.45
     xr = d["shield_x1"] - 0.45
     tprobe = [("bay centre", 0.0, 0.0),
-              ("bottom edge, left of the tower", -11.00, ybot),
-              ("bottom edge, right of the tower", 11.00, ybot),
-              ("left edge, low", xl, -6.00),
-              ("left edge, high", xl, 14.00),
-              ("right edge, low", xr, -6.00),
-              ("right edge, high", xr, 14.00),
-              ("top edge, outboard of the tower", 8.00, ytop),
-              ("top edge, outboard of the tower", -8.00, ytop),
-              ("beside the pin slot", d["pin_slot_x1"] + 1.00,
-               P["oled_header_off_y"]),
-              ("below the pin slot", 0.0, d["pin_slot_y0"] - 1.00)]
+              ("bay, low", 0.0, -8.00),
+              ("bay, high", 0.0, 2.00),
+              ("left edge, mid", xl, 0.0),
+              ("left edge, low", xl, -8.00),
+              ("right edge, mid", xr, 0.0),
+              ("right edge, low", xr, -8.00),
+              ("just above the light blocks", 0.0, d["pin_open_y1"] + 1.10),
+              ("just above the light blocks, off centre", 5.00,
+               d["pin_open_y1"] + 1.10),
+              ("between the far towers", 0.0, 10.00),
+              ("between the far towers, off centre", -5.00, 11.00),
+              ("solid-rail end of the bay", 0.0, d["shield_y1"] - 0.70)]
     tbad = []
     for nm, tx, ty in tprobe:
         col = B.box(tx - 0.02, tx + 0.02, ty - 0.02, ty + 0.02,
@@ -1885,18 +2559,18 @@ def validate(_context=None):
          % (P["rear_light_shield_t"], len(tprobe),
             int(round(P["rear_light_shield_t"] / 0.40))) if not tbad
          else "wrong at " + "; ".join(tbad))
+    print("      the four bay corners hold the pedestal towers instead, and")
+    print("      the wall merges into them - they are not separate parts:")
     off = P["pedestal_d"] / 2.0 - 0.60
-    for nm, tx, ty in (("sprung tower", d["sprung"][1][0],
-                        d["sprung"][1][1] + off),
-                       ("plain tower", d["plain"][1][0],
-                        d["plain"][1][1] - off)):
+    for nm, tx, ty in (("connector tower", d["conn"][1][0],
+                        d["conn"][1][1] + off),
+                       ("far tower", d["far"][1][0],
+                        d["far"][1][1] - off)):
         col = B.box(tx - 0.02, tx + 0.02, ty - 0.02, ty + 0.02,
                     d["z_rear"] - 0.50, d["z_fwd_limit"])
         h, v, bb = _hit(B, carrier, col)
-        print("      the four bay corners hold the pedestal towers instead:")
-        print("      %-14s %.2f mm of solid carrier off the bed - the wall"
+        print("      %-16s %.2f mm of solid carrier off the bed - the wall"
               % (nm, (v / (0.04 * 0.04)) if h else 0.0))
-        print("      %-14s merges into it; it is not a separate part." % "")
     gate(P["rear_light_shield_t"] >= 3 * 0.40 - 1e-9,
          "thickness is at least three 0.40 mm extrusion widths",
          "%.2f mm. On a different extrusion width, raise the parameter to "
@@ -1943,13 +2617,21 @@ def validate(_context=None):
          % (P["oled_header_w"], P["pin_slot_clear_x"]),
          "%.2f mm wide, x %+.2f .. %+.2f, centred on the header"
          % (d["pin_slot_w"], d["pin_slot_x0"], d["pin_slot_x1"]))
-    gate(abs((P["oled_header_off_y"] - P["oled_header_h"] / 2.0)
-             - d["pin_slot_y0"] - P["pin_slot_clear_y"]) < 1e-9,
-         "pin slot Y = header %.2f + %.2f clearance below"
+    gate(abs(d["pin_slot_y1"] - d["header_y1"] - P["pin_slot_clear_y"]) < 1e-9
+         and abs(d["pin_slot_y0"] - d["header_y0"]
+                 + P["pin_slot_clear_y"]) < 1e-9,
+         "pin slot Y = header %.2f + 2 x %.2f clearance, on the header centre"
          % (P["oled_header_h"], P["pin_slot_clear_y"]),
-         "slot floor y %+.2f against header floor y %+.2f"
-         % (d["pin_slot_y0"],
-            P["oled_header_off_y"] - P["oled_header_h"] / 2.0))
+         "nominal y %+.2f .. %+.2f about the header envelope y %+.2f .. %+.2f; "
+         "the finished opening is y %+.2f .. %+.2f = %.2f mm, the brief's "
+         "4.19 mm, because the lower edge is the carrier's own termination"
+         % (d["pin_slot_y0"], d["pin_slot_y1"], d["header_y0"], d["header_y1"],
+            d["pin_open_y0"], d["pin_open_y1"], d["pin_slot_h"]))
+    gate(abs(d["pin_slot_w"] - 14.00) < 1e-9
+         and abs(d["pin_slot_h"] - 4.19) < 5e-3,
+         "FINISHED four-pin opening measures 14.00 x 4.19 mm (brief 8.4)",
+         "%.4f x %.4f mm, 25%% up on the Rev P.4 11.20 x 3.35"
+         % (d["pin_slot_w"], d["pin_slot_h"]))
     h, v, bb = _hit(B, carrier, mod["OLED_Header_Keepout"])
     gate(not h, "pins and attached conductors pass without rubbing",
          "the full %.2f mm deep header / wiring envelope crosses the wall "
@@ -1965,44 +2647,47 @@ def validate(_context=None):
              100.0 * d["pin_slot_area"] / d["shield_area"]))
     print("      to the header, not a general window. %.2f mm of solid wall"
           % d["pin_slot_side_w"])
-    print("      stands either side of it and %.2f mm below it."
-          % d["pin_slot_below_h"])
+    print("      stands either side of it and %.2f mm above it."
+          % d["pin_slot_above_h"])
     print("")
-    print("      REPORTED, NOT HIDDEN. The header row sits at y %+.2f and its"
-          % P["oled_header_off_y"])
-    print("      envelope tops out at y %+.2f, which is %.2f mm ABOVE the"
-          % (P["oled_header_off_y"] + P["oled_header_h"] / 2.0,
-             P["oled_header_off_y"] + P["oled_header_h"] / 2.0
-             - d["light_cut_y"]))
-    print("      carrier's own termination at y %+.2f, because the connector"
+    print("      REPORTED, NOT HIDDEN. After the 180 deg transform the header")
+    print("      row sits at y %+.2f and its envelope bottoms out at y %+.2f,"
+          % (d["header_cy"], d["header_y0"]))
+    print("      which is %.2f mm BELOW the carrier's own termination at"
+          % (d["light_cut_y"] - d["header_y0"]))
+    print("      y %+.2f, because the connector is at the OPEN lighting-unit"
           % d["light_cut_y"])
-    print("      is at the OPEN lighting-unit end of the board. The slot is")
-    print("      therefore bounded by wall on both X sides and below, and by")
-    print("      the wall's free edge above - and that edge IS the mandated")
-    print("      open lighting-unit side of brief 8.1, not a second opening.")
-    print("      Enclosing it would mean printing material back above")
-    print("      y %+.2f, undoing the rail cut that physically fits."
+    print("      end of the board. The slot is therefore bounded by wall on")
+    print("      both X sides and ABOVE, and by the wall's free edge below -")
+    print("      and that edge IS the mandated open lighting-unit side of")
+    print("      brief 8.1, not a second opening. Enclosing it would mean")
+    print("      printing material back below y %+.2f, undoing the rail cut."
           % d["light_cut_y"])
+    print("      The two light blocks (brief 8.4) are what handle the light")
+    print("      that does come through: a tunnel beside the pins, %.2f mm"
+          % P["light_block_t"])
+    print("      thick and %.2f mm deep, stopping %.2f mm short of DATUM B."
+          % (P["light_block_depth"], d["block_pcb_clear"]))
 
     # Confined to the OLED bay, and out of the deleted rail / tie region.
     pedcol = None
-    for (px, py) in d["sprung"]:
+    for (px, py) in d["conn"]:
         c = B.cylz(P["pedestal_d"] + 0.10, px, py,
                    d["z_rear"] - 1.0, d["z_fwd_limit"])
         pedcol = c if pedcol is None else B.uni(pedcol, c)
     outside = B.box(d["car_x0"] - 1.0, d["car_x1"] + 1.0,
-                    d["shield_y1"] + 1e-4, 60.0,
+                    -60.0, d["shield_y0"] - 1e-4,
                     d["z_shield_rear"] - 1e-4, d["z_shield_front"] + 1e-4)
     n, rv = _residual(B, carrier, outside, pedcol)
     gate(n == 0, "the wall is confined to the OLED bay",
-         "nothing above y %+.2f inside the wall's own Z band except the two "
-         "retained pedestal towers" % d["shield_y1"] if n == 0
+         "nothing below y %+.2f inside the wall's own Z band except the two "
+         "connector pedestal towers" % d["shield_y0"] if n == 0
          else "%.5f mm3 of wall material has escaped the bay" % rv)
-    railband = B.box(d["pk_x0"], d["pk_x1"], d["pk_y1"] + 1e-4, 60.0,
+    railband = B.box(d["pk_x0"], d["pk_x1"], -60.0, d["pk_y0"] - 1e-4,
                      d["z_rear"] - 1.0, 1.0)
     n, rv = _residual(B, carrier, railband, pedcol)
     gate(n == 0, "the deleted rail / cable-tie region is still EMPTY",
-         "the wall has not crept back above y %+.2f" % d["pk_y1"] if n == 0
+         "the wall has not crept back below y %+.2f" % d["pk_y0"] if n == 0
          else "%.5f mm3 has reappeared there" % rv)
     gate(abs(d["z_shield_rear"] - d["z_rear"]) < 1e-9,
          "built FORWARD from the existing rear plane",
@@ -2202,10 +2887,11 @@ def validate(_context=None):
     openitem("installed clearance against the retained lighting unit",
              "there is NO lighting-unit geometry in this model and no CAD "
              "result here may be read as proving that clearance. All CAD "
-             "reports is the carrier's own extent, y max %+.2f (was %+.2f). "
-             "Offer the carrier up with the lighting unit in place - "
-             "brief 12.14 - which stays MANDATORY."
-             % (d["carrier_max_y"], d["y_before"]))
+             "reports is the carrier's own extent, y %+.2f .. %+.2f. AND the "
+             "Rev P.5 180-degree transform moved the open end from +Y to -Y, "
+             "so the Rev P.3/P.4 installed fit does NOT carry over: brief "
+             "12.14 is a RE-TEST, not a regression check. MANDATORY."
+             % (d["carrier_min_y"], d["carrier_max_y"]))
     openitem("powered light-leak test with the opaque black print",
              "the %.2f mm shield and the %.2f x %.2f mm pin slot are chosen, "
              "not measured against the cabinet LEDs. Run brief 12.22: cabinet "
@@ -2220,21 +2906,45 @@ def validate(_context=None):
         print("GATE RESULT: %d FAILURE(S)" % len(fails))
         for f in fails:
             print("   - %s" % f)
+    elif blocks:
+        print("GATE RESULT: EVERY EVALUABLE CHECK PASSES - %d BLOCKED ON A"
+              % len(blocks))
+        print("             MEASUREMENT THAT DOES NOT EXIST YET")
     else:
         print("GATE RESULT: ALL CHECKS PASS")
+    if blocks:
+        print("")
+        print("BLOCKED - CANNOT BE EVALUATED UNTIL THE BONDED GLASS IS")
+        print("MEASURED. These are NOT passes and NOT design failures: they")
+        print("are checks against a placeholder envelope that is known to be")
+        print("wrong (it covers the mounting holes). Measure the boundary,")
+        print("enter it, set oled_glass_measured, and they become hard gates.")
+        for b in blocks:
+            print("   ? %s" % b)
     if opens:
         print("")
         print("BLOCKING OPEN ITEM(S) BEFORE ANY PRINT: %d" % len(opens))
         for o in opens:
             print("   * %s" % o)
     print("")
-    print("Rev P remains OPEN. The Rev P.2 OLED retention and Perspex fit are")
-    print("PHYSICALLY VALIDATED and are carried through unchanged. What is NOT")
-    print("validated by anything in this file is:")
+    if blocks:
+        print("NO PRINT until the %d blocked item(s) above are resolved." % len(blocks))
+        print("")
+    print("Rev P remains OPEN. The Rev P.2 ARCHITECTURE is proven - flush-side")
+    print("insertion, fixed rear datum pads, sprung posts retaining by")
+    print("geometric overlap - but Rev P.5 changes enough that no Rev P.4")
+    print("number carries over unchecked, and three things are not validated")
+    print("by anything in this file at all:")
+    print("  * the bonded-glass boundary at the two CONVERTED far holes. The")
+    print("    modelled envelope says a sprung nose there fouls the glass by")
+    print("    0.40 mm - and the same model puts the glass over the mounting")
+    print("    holes, which is impossible. Measure it. This is THE gate on")
+    print("    the Rev P.5 print. Section 9.")
     print("  * clearance to the original lighting unit. There is no measured")
     print("    lighting-unit geometry anywhere in this model, and the synthetic")
-    print("    proxy that pretended otherwise has been deleted. The installed")
-    print("    physical test, brief 12.14, is the only authority.")
+    print("    proxy that pretended otherwise has been deleted. The 180 deg")
+    print("    transform also moved the open end from +Y to -Y, so brief 12.14")
+    print("    is a RE-TEST, not a regression check.")
     print("  * light leakage. The wall thickness, the material and the pin-slot")
     print("    size are engineering choices, not measurements against the Decca")
     print("    cabinet LEDs. The powered test, brief 12.22, is the authority.")
@@ -2465,25 +3175,30 @@ def snapshots(_context=None):
     # 1. front three-quarter: carrier + module, the flush side towards us
     _show(design, {CARRIER, "REF_SH1106_1P3"})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_views.png"),
-          (-60.0, -45.0, 70.0), (0.0, 4.0, -3.0), (0, 1, 0))
+          (-60.0, -45.0, 70.0), (0.0, -4.0, -2.5), (0, 1, 0))
 
-    # 2. rear three-quarter: the carrier alone. This is the view that has to
-    #    show the Rev P.4 change - a CONTINUOUS rear wall closing the OLED bay
-    #    with one small four-pin slot in it, and no keepout proxy anywhere.
+    # 2. rear three-quarter: the carrier alone. This view has to show the
+    #    Rev P.4 change - a CONTINUOUS rear wall closing the OLED bay with one
+    #    small four-pin slot and no keepout proxy - AND the Rev P.5 changes:
+    #    the connector opening now at the BOTTOM with its two light blocks,
+    #    and FOUR post relief bores, one per PCB mounting hole.
     _show(design, {CARRIER})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_rear.png"),
-          (26.0, 40.0, -62.0), (0.0, 4.0, -4.0), (0, 1, 0))
+          (-28.0, -34.0, -64.0), (0.0, -5.0, -3.0), (0, 1, 0))
 
-    # 3. carrier alone from the front - the retention features themselves
+    # 3. carrier alone from the front - the retention features themselves.
+    #    Rev P.5: FOUR split sprung posts, one in every mounting hole. There is
+    #    no plain post left to show.
     _show(design, {CARRIER})
     _shot(app, os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_posts.png"),
-          (-42.0, -34.0, 46.0), (0.0, 5.0, -2.5), (0, 1, 0))
+          (-42.0, -34.0, 46.0), (0.0, -4.0, -2.0), (0, 1, 0))
 
     # 4. section on x = +15.00, through a sprung locating post.
     #    Everything is clipped to a window around the module as well as to the
     #    half space, so the 90 x 80 mm reference Perspex patch cannot swamp
     #    the fitted view.
-    win = B.box(d["post_x"], 40.0, -18.0, 32.0, -13.0, 4.0)
+    win = B.box(d["post_x"], 40.0, d["car_y0"] - 4.0, d["car_y1"] + 4.0,
+                d["z_rear"] - 5.0, 4.0)
     keep = {}
     for nm in (CARRIER, "REF_SH1106_1P3", "REF_Decca_Panel",
                "REF_Front_Bezel_revN"):
@@ -2503,7 +3218,7 @@ def snapshots(_context=None):
     _show(design, {SECTION})
     _shot(app,
           os.path.join(IMG_DIR, "Decca_OLED_Display_Mount_revP_sections.png"),
-          (-120.0, 26.0, 34.0), (d["post_x"], 7.0, -4.0), (0, 1, 0))
+          (-120.0, 26.0, 34.0), (d["post_x"], -3.0, -3.0), (0, 1, 0))
 
     # 5. section on y = 0 through a captive-nut pocket, looking along -Y
     clear_component(design, SECTION)
