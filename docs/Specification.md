@@ -8,7 +8,7 @@
 | Status   | Draft. Safe bootstrap runtime now initialises hardware and provides authenticated, non-blocking local-network OTA. Dual OTA partitions protect against interrupted transfer; automatic rollback after a fully received but boot-invalid image remains Phase 3. Control orchestration and WiiM integration remain in progress. |
 | Version  | 0.17                                              |
 | Owner    | LeweeLewee                                        |
-| Related  | `README.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
+| Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
 Requirements are identified as `FR-*` (functional), `NFR-*` (non-functional),
 `HW-*` (hardware), and `IF-*` (interface). IDs are stable once assigned so they
@@ -239,7 +239,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ## 12. Traceability
 
 - **Requirements → design:** `docs/Firmware Architecture.md` (modules, phase map).
-- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 SW deferred, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2, 0007 display presentation, 0008 streamer/amplifier architecture, 0009 function-only display hierarchy).
+- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 superseded multi-button plan, 0005 Stereo/Mono unwired, 0006 WiiM Phase 2, 0007 display presentation, 0008 streamer/separate-amplifier architecture, 0009 function-only display hierarchy, 0010 Fosi ZA3 and system power, 0011 Gram-only source selection, 0012 authenticated local OTA).
 - **Requirements → hardware:** `docs/Hardware Architecture.md`, `docs/Wiring.md`.
 - **Requirements → verification:** test suites under `test/`, one per module.
 - **Change history:** `docs/Revision History.md`.
