@@ -178,11 +178,12 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
 2. Connect the purchased Pi Hut SH1106 panel:
    - OLED GND → ESP32 GND (Brown);
    - OLED VCC → ESP32 3V3 (Red), never 5 V for this build;
-   - OLED SDA → GPIO21 / board label D21 (Orange);
-   - OLED SCL → GPIO22 / board label D22 (Yellow).
+   - OLED SDA → GPIO21 / board label D21 (Yellow);
+   - OLED SCL → GPIO22 / board label D22 (Orange).
 
-   H4 is a documented colour-standard exception: its Orange conductor is SDA,
-   not 5 V. Never connect that Orange wire to the 5 V rail.
+   H4 is a documented colour-standard exception: its Orange conductor is SCL
+   and its Yellow conductor is SDA. Both are signals; never connect either to
+   the 5 V rail.
 3. In the PlatformIO terminal run:
 
    ```powershell
@@ -210,7 +211,9 @@ Pass criteria:
 Recorded result (2026-08-25): the purchased SH1106 panel was detected at 0x3C,
 all ten `test_display` cases passed, and the animated startup and revised
 dashboard were upright, complete, unclipped and free of persistent display
-artefacts. GPIO21 (SDA) and GPIO22 (SCL) are bench-verified.
+artefacts. GPIO21 (SDA) and GPIO22 (SCL) are bench-verified. Final loom
+orientation was physically confirmed on 2026-08-30: Brown = GND, Red = VCC,
+Orange = SCL and Yellow = SDA.
 
 If the panel is blank, disconnect USB before checking VCC/GND order and the
 SDA/SCL labels.
