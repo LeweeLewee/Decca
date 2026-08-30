@@ -27,9 +27,9 @@ its original conductors, **Red** and **Green**. These are pre-existing and are
 See the on/off section.
 
 **Exception — H4 OLED harness.** The installed and bench-verified screen loom
-uses **Orange for SDA** and **Yellow for SCL**. These are signal conductors in H4:
-the Orange SDA wire must **never** be connected to the 5 V rail. H4 retains Red
-for 3.3 V and Brown for GND. See the OLED section.
+uses **Orange for SCL** and **Yellow for SDA**. These are signal conductors in H4
+and must **never** be connected to the 5 V rail. H4 retains Red for 3.3 V and
+Brown for GND. This final orientation was physically confirmed on 2026-08-30. See the OLED section.
 
 H3 now uses only the verified right-hand Gram dry-contact pair. It has its own
 return and no common-return conductor. All other selector conductors are left
@@ -183,12 +183,12 @@ with a pre-soldered four-pin header. Expected address: **0x3C**.
 
 - VCC → 3.3 V (Red)
 - GND → GND (Brown)
-- SDA → GPIO21 / board label **D21** (Orange, bench-verified)
-- SCL → GPIO22 / board label **D22** (Yellow, bench-verified)
+- SDA → GPIO21 / board label **D21** (Yellow, bench-verified)
+- SCL → GPIO22 / board label **D22** (Orange, bench-verified)
 
 The H4 Orange and Yellow signal colours are a documented exception to the
-general loom colour standard. In particular, do not treat the Orange SDA
-conductor as 5 V.
+general loom colour standard. Orange is the SCL signal and Yellow is the SDA
+signal; neither conductor is a power rail.
 
 Check the labels printed on the delivered module before applying power because
 four-pin OLED modules do not all use the same physical pin order.
@@ -196,7 +196,9 @@ four-pin OLED modules do not all use the same physical pin order.
 Bench verification completed 2026-08-25. The panel responded as an SH1106 at
 0x3C on GPIO21/GPIO22, all ten on-target `test_display` cases passed, and visual
 inspection confirmed the startup and revised dashboard were upright, complete,
-unclipped and free of persistent display artefacts.
+unclipped and free of persistent display artefacts. Final loom orientation was
+physically confirmed on 2026-08-30: Brown = GND, Red = VCC, Orange = SCL and
+Yellow = SDA.
 
 ## H5 — Dial Illumination
 
