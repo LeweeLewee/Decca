@@ -124,26 +124,27 @@ P = {
     "bezel_t": 4.00,                # PRESERVED
     "bezel_outer_r": 2.00,          # PRESERVED   external corner radius
     "bezel_edge_break": 0.40,       # PRESERVED   front face edge fillet
-    # THE FACE OPENING IS NOW FLUSH WITH THE SKIRT ON ALL FOUR SIDES.
-    # X was made flush by the owner's earlier change; Y follows here.
-    # Moving the skirt walls out to a 15.60 inner opening would otherwise
-    # leave the 15.35 face opening as the new limiter and deliver +1.83 mm
-    # of vertical opening instead of the +2.00 mm asked for, so the face
-    # opening goes to 15.60 with it. The owner chose this explicitly.
+    # THE FACE OPENING IS FLUSH WITH THE SKIRT ON ALL FOUR SIDES, so all
+    # three values below are held equal to the derived skirt inner envelope
+    # and derive() refuses to build if any of them drifts. X was made flush
+    # by the owner's third change; the height and the corner joined it with
+    # the fourth, because a face opening smaller than the skirt becomes the
+    # limiter and a face CORNER smaller than the skirt corner becomes the
+    # visible one - at R0.80 against a skirt R1.75 it would have sharpened
+    # the clear opening rather than leaving it alone. Flush on all four
+    # sides also makes the aperture a single straight bore instead of a
+    # taper, which is what removed the last unsupported overhang.
     #
-    # The corner radius follows for a different reason. At R0.80 the face
-    # corner is FULLER than the skirt's R1.75, so once the two share the
-    # same extents the face corner becomes the visible one and the clear
-    # opening would sharpen from R1.75 to R0.80. R1.75 leaves what the eye
-    # actually sees exactly as it is today, and makes the aperture a
-    # single straight bore instead of a taper. derive() refuses to build
-    # if either value drifts away from the skirt inner envelope.
+    # The fifth change moves the skirt inner envelope again, so these
+    # follow it: 15.60 -> 13.85 and R1.75 -> R3.00. The height tracks the
+    # 1.75 mm the owner took off the skirt; the corner is
+    # (bezel_lip_corner_r - bezel_lip_wall_x) = 4.25 - 1.25.
     #
     # DECLARED DEVIATION from brief 2/4 (face opening 30.90 x 15.35,
-    # R0.80) - the third, after the owner's width and corner changes.
+    # R0.80). The brief's figures are superseded by owner instruction.
     "bezel_window_w": 32.90,        # OWNER       was 30.90, = skirt inner
-    "bezel_window_h": 15.60,        # OWNER       was 15.35, = skirt inner
-    "bezel_window_r": 1.75,         # OWNER       was 0.80,  = skirt inner R
+    "bezel_window_h": 13.85,        # OWNER       was 15.60, = skirt inner
+    "bezel_window_r": 3.00,         # OWNER       was 1.75,  = skirt inner R
     # -- recessed adhesive pads - DELETED at owner instruction -------------
     # Rev N has two: 24.00 x 2.00 mm, 0.30 mm deep into the seating face at
     # y +/-7.85..9.85. The owner inspected the model, identified them as the
@@ -183,13 +184,29 @@ P = {
     #      opens the vertical aperture by 2.00 mm:
     #          15.20 -> 17.20 outer,   13.60 -> 15.60 inner
     #
-    # Both moves push material OUTWARD into the Perspex opening, and
-    # derive() reports what that does to the fit: horizontal interference
-    # 0.100 -> 0.500 mm per side, vertical from a 0.050 mm CLEARANCE to
-    # 0.950 mm of INTERFERENCE. The panel_open_* figures above are
-    # MEASURED Rev C values and are deliberately NOT adjusted to suit.
-    "bezel_lip_outer_w": 36.20,     # OWNER       35.40 + 2 x 0.40, one loop
-    "bezel_lip_outer_h": 17.20,     # OWNER       15.20 + 2 x 1.00
+    # Both moves pushed material OUTWARD into the Perspex opening, and the
+    # fit went with them: horizontal interference 0.100 -> 0.500 mm per side
+    # and vertical from a 0.050 mm CLEARANCE to 0.950 mm of INTERFERENCE.
+    # At 36.20 x 17.20 into a MEASURED 35.20 x 15.30 opening the part could
+    # not enter at all, which is what the build report and both validators
+    # reported rather than softening.
+    #
+    # OWNER 2026-08-30, THE FIFTH CHANGE - pull it back to a fit that can
+    # actually be pressed home. Three moves:
+    #
+    #   1. width  36.20 -> 35.40   (-0.80), which returns the side wall to
+    #      1.25 mm and exactly undoes the outward loop of move 1 above
+    #   2. height 17.20 -> 15.45   (-1.75)
+    #   3. outer corner 3.40 -> 4.25 (+25%) - see bezel_lip_corner_r
+    #
+    # The result is the first genuinely printable interference this revision
+    # has had: +0.100 mm per side across and +0.075 mm per side up, both
+    # inside the 0.05-0.15 band a thin printed wall can take up by flexing,
+    # and the 0.20 mm lead-in buys free entry again (0.100 and 0.125 mm of
+    # clearance per side at the tip). The panel_open_* figures above are
+    # MEASURED Rev C values and have never been adjusted to suit the part.
+    "bezel_lip_outer_w": 35.40,     # OWNER       36.20 - 0.80
+    "bezel_lip_outer_h": 15.45,     # OWNER       17.20 - 1.75
     "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
 
     # THE WALL IS NO LONGER UNIFORM, at owner instruction 2026-08-30.
@@ -211,19 +228,28 @@ P = {
     # see derive().
     "bezel_lip_wall_y": 0.80,       # OWNER       top/bottom, 2 loops
     #                                 X wall is DERIVED - see derive()
-    # Owner refinement 2026-08-30: R2.00 did not match the real Perspex
-    # opening corner, so the outer corner radius went up 50% to R3.00, and
-    # it then took the extra outward loop with the rest of the side
-    # profile, 3.00 -> 3.40. That +0.40 is not decoration. The inner corner
-    # radius is (corner_r - wall_x), so holding the outer at 3.00 while the
-    # wall went 1.25 -> 1.65 would have dragged the OPENING corner
-    # 1.75 -> 1.35. The instruction was to leave the horizontal opening
-    # alone, so the outer corner absorbs the loop and the opening corner
-    # stays at R1.75. Brief 7 explicitly allows the named corner parameters
-    # to be changed when the fit needs it; the brief's stated 2.00 is
-    # therefore superseded by observation, and this is recorded as a
-    # deviation from brief 2/4.
-    "bezel_lip_corner_r": 3.40,     # OWNER       3.00 + the outward loop
+    # The outer corner is the one interface that mates with the Perspex
+    # opening corner, and its history is a sequence of owner corrections:
+    # R2.00 (brief) -> R3.00 (+50%, "does not match the perspex opening")
+    # -> R3.40 (it took the outward loop with the rest of the side profile)
+    # -> R4.25 (+25%, the fifth change).
+    #
+    # WHY IT ONLY EVER GOES UP. The failure modes are asymmetric. An insert
+    # corner SQUARER than the opening corner touches before the flanks do,
+    # so the part jams and never seats - a hard failure. An insert corner
+    # ROUNDER than the opening merely leaves a crescent of cut edge visible
+    # at each corner apex - cosmetic. So every unit of uncertainty in the
+    # opening corner should be spent on the round side, and it has been.
+    #
+    # At R4.25 the flanks set the fit for any opening corner up to R4.00,
+    # which covers the whole plausible range. panel_open_corner_r remains
+    # UNRESOLVED - a drill-shank estimate exists but has not been confirmed,
+    # so nothing in this model depends on it.
+    #
+    # Brief 7 explicitly allows the named corner parameters to be changed
+    # when the fit needs it; the brief's stated 2.00 is therefore superseded
+    # by observation, and this is recorded as a deviation from brief 2/4.
+    "bezel_lip_corner_r": 4.25,     # OWNER       3.40 + 25%
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
 
     # The established production extrusion width. Every wall must be at least
@@ -1607,15 +1633,26 @@ def validate(P=P):
           "(%.2f - %.2f)/2 = %+.4f mm"
           % (P["bezel_lip_outer_h"], P["panel_open_h"],
              d["bezel_lip_interf_y"]))
-    _report("BOTH AXES ARE NOW AN INTERFERENCE - AND IT WILL NOT ENTER",
-            "a %.2f x %.2f skirt into a %.2f x %.2f hole is %.2f mm "
-            "oversize across and %.2f mm oversize up. As modelled the part "
-            "cannot be assembled. OWNER-DIRECTED; either the MEASURED "
-            "panel_open_h is stale or the vertical move overshoots, and no "
-            "check in this file can settle which."
+    _report("BOTH AXES ARE AN INTERFERENCE",
+            "a %.2f x %.2f skirt into a %.2f x %.2f hole - %.3f mm per side "
+            "across and %.3f mm per side up. Both sit inside the 0.05-0.15 "
+            "band a thin printed wall can take up by flexing, and the %.2f "
+            "mm lead-in leaves the tip UNDER the opening so entry is free "
+            "before the interference engages. Still a PHYSICAL gate: brief "
+            "3.8 requires the wall to take the deflection and the Perspex "
+            "to be left unstressed, and only the fit gauge can show that."
             % (P["bezel_lip_outer_w"], P["bezel_lip_outer_h"],
                P["panel_open_w"], P["panel_open_h"],
-               2 * d["bezel_lip_interf_x"], 2 * d["bezel_lip_interf_y"]))
+               d["bezel_lip_interf_x"], d["bezel_lip_interf_y"],
+               P["bezel_lip_lead"]))
+    _report("entry clearance at the tip, after the lead-in",
+            "%.3f mm per side across, %.3f mm per side up; full section "
+            "restored by z = %+.3f"
+            % ((P["panel_open_w"] - (P["bezel_lip_outer_w"]
+                                     - 2 * P["bezel_lip_lead"])) / 2.0,
+               (P["panel_open_h"] - (P["bezel_lip_outer_h"]
+                                     - 2 * P["bezel_lip_lead"])) / 2.0,
+               d["z_lip_rear"] + P["bezel_lip_lead"]))
 
     print("")
     print("4. THE ORIGINAL PERSPEX - the declared interference, and nothing else")
@@ -1746,9 +1783,8 @@ def validate(P=P):
           % (P["bezel_window_w"], d["bezel_lip_inner_h"]),
           "%.3f x %.3f" % (d["optical_w"], d["optical_h"]))
     _report("versus the figure brief 4 predicts",
-            "30.90 x 13.60 - now %+.2f mm wider and %+.2f mm taller, both "
-            "owner-directed: the face opened 1.00 mm per side, then the "
-            "skirt walls moved out 1.00 mm each"
+            "30.90 x 13.60 - now %+.2f mm wider and %+.2f mm taller, all of "
+            "it owner-directed across five changes made on the model"
             % (d["optical_w"] - 30.90, d["optical_h"] - 13.60))
     _report("controlled by",
             "the skirt inner envelope on ALL FOUR sides - the face opening "
@@ -1763,8 +1799,7 @@ def validate(P=P):
             % (d["optical_w"], d["optical_h"], d["optical_r"]))
     _report("change versus Rev N",
             "width %.3f -> %.3f (%+.3f), height %.3f -> %.3f (%+.3f mm "
-            "total, %+.3f per side). The lip no longer COSTS opening - "
-            "after the owner moves it gives some back."
+            "total, %+.3f per side)"
             % (d["revN_window_w"], d["optical_w"],
                d["optical_w"] - d["revN_window_w"],
                d["revN_window_h"], d["optical_h"],

@@ -39,27 +39,27 @@ BEZEL_W, BEZEL_H, BEZEL_T = 40.00, 20.30, 4.00      # Rev N envelope, PRESERVED
 Z_FRONT = 4.20                                       # bezel front face
 Z_SEAT = 3.00                                        # Perspex front / seating
 Z_TIP = 0.20                                         # lip rear tip
-LIP_OUT_W, LIP_OUT_H = 36.20, 17.20                  # inset-wall outer envelope
-LIP_IN_W, LIP_IN_H = 32.90, 15.60                    # derived, split wall
-LIP_WALL_X = 1.65                    # sides, flush with the face opening
+LIP_OUT_W, LIP_OUT_H = 35.40, 15.45                  # inset-wall outer envelope
+LIP_IN_W, LIP_IN_H = 32.90, 13.85                    # derived, split wall
+LIP_WALL_X = 1.25                    # sides, flush with the face opening
 LIP_WALL_Y = 0.80                    # top/bottom, unchanged by the refinement
 LIP_WALL_MIN = LIP_WALL_Y            # the corners never go below this
 LIP_DEPTH = 2.80
-LIP_CORNER_R = 3.40                                  # 3.00 + the outward loop
-LIP_INNER_R = 1.75                                   # derived: 3.40 - 1.65
+LIP_CORNER_R = 4.25                                  # owner +25%, was 3.40
+LIP_INNER_R = 3.00                                   # derived: 4.25 - 1.25
 LIP_LEAD = 0.20
 EXTRUSION_W = 0.40                                   # production extrusion
 MIN_LOOPS = 2                        # AT LEAST two, applied PER SIDE
-FACE_OPEN_W, FACE_OPEN_H = 32.90, 15.60              # bezel face opening
-FACE_OPEN_R = 1.75                                   # flush with the skirt
-OPTICAL_W, OPTICAL_H = 32.90, 15.60                  # effective clear opening
+FACE_OPEN_W, FACE_OPEN_H = 32.90, 13.85              # bezel face opening
+FACE_OPEN_R = 3.00                                   # flush with the skirt
+OPTICAL_W, OPTICAL_H = 32.90, 13.85                  # effective clear opening
 AP_ROOT_RELIEF = 0.00                                # no longer needed
 AP_REAR_H = OPTICAL_H + 2 * AP_ROOT_RELIEF           # aperture at the seat
 PANEL_OPEN_W, PANEL_OPEN_H = 35.20, 15.30            # MEASURED
 PANEL_T = 3.00
 GLASS_FRONT_Z = -0.30
-INTERF_X = 0.50                                      # per side, INTERFERENCE
-INTERF_Y = 0.95                                      # per side, INTERFERENCE
+INTERF_X = 0.100                                     # per side, INTERFERENCE
+INTERF_Y = 0.075                                     # per side, INTERFERENCE
 CLEAR_Y = -INTERF_Y                  # the old name, now honestly negative
 
 TOL = 0.02          # mesh/chord tolerance, mm
@@ -524,13 +524,13 @@ def main():
     note("the lip is WIDER than the hole ON BOTH AXES by design",
          "brief 3.7/3.8: the printed wall takes the deflection, the Perspex "
          "is not to be spread or stressed - a PHYSICAL gate")
-    note("AND AS MODELLED IT CANNOT ENTER",
-         "%.2f x %.2f into a %.2f x %.2f hole is %.2f mm oversize across "
-         "and %.2f mm oversize up. Either the MEASURED panel opening height "
-         "is stale or the vertical move overshoots - owner-directed, and no "
-         "mesh check can settle which"
-         % (LIP_OUT_W, LIP_OUT_H, PANEL_OPEN_W, PANEL_OPEN_H,
-            2 * ix, 2 * iy))
+    note("both figures sit in the band a thin printed wall can flex out",
+         "0.05-0.15 mm per side. The %.2f mm lead-in also leaves the tip "
+         "UNDER the opening - %.3f mm per side across and %.3f mm per side "
+         "up - so entry is free before the interference engages"
+         % (LIP_LEAD,
+            (PANEL_OPEN_W - (LIP_OUT_W - 2 * LIP_LEAD)) / 2.0,
+            (PANEL_OPEN_H - (LIP_OUT_H - 2 * LIP_LEAD)) / 2.0))
     note("and the wall resisting it is now %.2f mm" % LIP_WALL_X,
          "%.0fx stiffer in bending than the original 0.40 mm wall, %.1fx "
          "stiffer than 0.80 - print the fit gauge first"
@@ -575,7 +575,9 @@ def main():
          "flush with it at %.2f x %.2f R%.2f, so neither one masks the other"
          % (FACE_OPEN_W, FACE_OPEN_H, FACE_OPEN_R))
     note("versus Rev N (30.40 x 14.90)",
-         "width +2.500, height +0.700 total (+0.350 per side)")
+         "width %+.3f, height %+.3f total (%+.3f per side)"
+         % (OPTICAL_W - 30.40, OPTICAL_H - 14.90,
+            (OPTICAL_H - 14.90) / 2.0))
 
     print("")
     print("8. THE LEAD-IN MUST NOT EAT THE COVERAGE")
@@ -589,13 +591,12 @@ def main():
          "full envelope restored by z = +0.400, so 2.600 mm of the 3.000 mm "
          "Perspex is covered at full section",
          "%.4f" % (bbf[1] - bbf[0]))
-    note("the lead-in NO LONGER buys free entry",
-         "at %.2f mm the tip is still %.2f mm OVER the %.2f mm opening, so "
-         "the %.2f mm per side is being resisted from the first contact - "
-         "the lead-in only softens the start of it"
-         % (LIP_OUT_W - 2 * LIP_LEAD,
-            (LIP_OUT_W - 2 * LIP_LEAD) - PANEL_OPEN_W, PANEL_OPEN_W,
-            INTERF_X))
+    tip_gap = (PANEL_OPEN_W - (LIP_OUT_W - 2 * LIP_LEAD)) / 2.0
+    gate(tip_gap > 0.0,
+         "the lead-in leaves the tip UNDER the opening, so entry is free "
+         "before the %.3f mm per side engages" % INTERF_X,
+         "%.2f mm tip vs %.2f mm opening, %+.3f mm per side"
+         % (LIP_OUT_W - 2 * LIP_LEAD, PANEL_OPEN_W, tip_gap))
 
     print("")
     print("=" * 74)
@@ -608,14 +609,14 @@ def main():
     print("RESULT: %d/%d PASS - the exported mesh matches the Rev Q claims"
           % (CHECKS, CHECKS))
     print("")
-    print("This proves geometry only. It does NOT prove the bezel FITS, and")
-    print("on the MEASURED opening it plainly does not: %.2f x %.2f into"
-          % (LIP_OUT_W, LIP_OUT_H))
-    print("%.2f x %.2f is %.2f mm oversize across and %.2f mm oversize up."
-          % (PANEL_OPEN_W, PANEL_OPEN_H,
-             LIP_OUT_W - PANEL_OPEN_W, LIP_OUT_H - PANEL_OPEN_H))
-    print("Re-measure the Perspex opening before printing a bezel. Print")
-    print("Bezel_Fit_Gauge_revQ first either way, and see the build report.")
+    print("This proves geometry only. It does NOT prove the bezel FITS. The")
+    print("%.3f mm per side across and %.3f mm per side up are resisted by a"
+          % (INTERF_X, INTERF_Y))
+    print("%.2f mm side wall and a %.2f mm top and bottom wall, and whether"
+          % (LIP_WALL_X, LIP_WALL_Y))
+    print("those flex instead of stressing the Perspex is physical. The")
+    print("opening corner radius has still never been confirmed. Print")
+    print("Bezel_Fit_Gauge_revQ FIRST, and see the Rev Q build report.")
     print("=" * 74)
     return 0
 
