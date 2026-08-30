@@ -59,8 +59,8 @@ void test_buttons_physical_snapshot() {
     UnityPrint(decca::buttons::sourceMode() == SourceMode::Vinyl
                    ? "vinyl"
                    : "digital");
-    UnityPrint(" stereo=");
-    UnityPrintNumberUnsigned(decca::buttons::isPressed(Button::Stereo) ? 1U : 0U);
+    UnityPrint(" stereo_mono_contact=");
+    UnityPrintNumberUnsigned(decca::buttons::isPressed(Button::StereoMono) ? 1U : 0U);
     UnityPrint(" lights=");
     UnityPrint(decca::buttons::lightingRequest() == LightingRequest::On
                    ? "on"
@@ -70,27 +70,27 @@ void test_buttons_physical_snapshot() {
 }
 
 void test_buttons_confirmed_control_set() {
-    const Button controls[] = {Button::OnOff, Button::Vhf, Button::Stereo};
+    const Button controls[] = {Button::OnOff, Button::Vhf, Button::StereoMono};
     TEST_ASSERT_EQUAL_UINT32(3, sizeof(controls) / sizeof(controls[0]));
 }
 
-void test_buttons_defaults_to_lights_off_when_stereo_open() {
+void test_buttons_stereo_open_requests_lights_on() {
     startInjected();
-    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::Off),
+    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::On),
                       static_cast<int>(decca::buttons::lightingRequest()));
 }
 
-void test_buttons_stereo_close_requests_lights_on_and_release_requests_off() {
+void test_buttons_mono_close_requests_lights_off_and_stereo_release_requests_on() {
     startInjected();
     press(decca::hardware::kSwitchStereoMono);
 
-    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::On),
+    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::Off),
                       static_cast<int>(decca::buttons::lightingRequest()));
-    TEST_ASSERT_EQUAL(static_cast<int>(Button::Stereo),
+    TEST_ASSERT_EQUAL(static_cast<int>(Button::StereoMono),
                       static_cast<int>(decca::buttons::nextEvent()));
 
     release(decca::hardware::kSwitchStereoMono);
-    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::Off),
+    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::On),
                       static_cast<int>(decca::buttons::lightingRequest()));
 }
 
@@ -175,7 +175,7 @@ void test_buttons_queue_simultaneous_presses_in_pin_order() {
                       static_cast<int>(decca::buttons::nextEvent()));
     TEST_ASSERT_EQUAL(static_cast<int>(Button::Vhf),
                       static_cast<int>(decca::buttons::nextEvent()));
-    TEST_ASSERT_EQUAL(static_cast<int>(Button::Stereo),
+    TEST_ASSERT_EQUAL(static_cast<int>(Button::StereoMono),
                       static_cast<int>(decca::buttons::nextEvent()));
     TEST_ASSERT_EQUAL(static_cast<int>(Button::None),
                       static_cast<int>(decca::buttons::nextEvent()));
@@ -194,7 +194,7 @@ void test_buttons_initial_latched_states_have_no_false_event() {
     TEST_ASSERT_TRUE(decca::buttons::isPressed(Button::OnOff));
     TEST_ASSERT_EQUAL(static_cast<int>(SourceMode::DigitalStreamer),
                       static_cast<int>(decca::buttons::sourceMode()));
-    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::On),
+    TEST_ASSERT_EQUAL(static_cast<int>(LightingRequest::Off),
                       static_cast<int>(decca::buttons::lightingRequest()));
     TEST_ASSERT_EQUAL(static_cast<int>(Button::None),
                       static_cast<int>(decca::buttons::nextEvent()));
@@ -203,8 +203,8 @@ void test_buttons_initial_latched_states_have_no_false_event() {
 void runAll() {
     RUN_TEST(test_buttons_physical_snapshot);
     RUN_TEST(test_buttons_confirmed_control_set);
-    RUN_TEST(test_buttons_defaults_to_lights_off_when_stereo_open);
-    RUN_TEST(test_buttons_stereo_close_requests_lights_on_and_release_requests_off);
+    RUN_TEST(test_buttons_stereo_open_requests_lights_on);
+    RUN_TEST(test_buttons_mono_close_requests_lights_off_and_stereo_release_requests_on);
     RUN_TEST(test_buttons_defaults_to_vinyl_when_vhf_open);
     RUN_TEST(test_buttons_debounce_vhf_to_digital);
     RUN_TEST(test_buttons_reject_vhf_contact_bounce);

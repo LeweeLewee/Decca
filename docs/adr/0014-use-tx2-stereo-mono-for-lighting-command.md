@@ -13,8 +13,8 @@ supports an internal pull-up.
 ## Decision
 Connect the isolated Stereo/Mono contact between TX2/GPIO17 and GND. Configure
 GPIO17 as `INPUT_PULLUP` and debounce it with the other retained controls.
-Closed/LOW in Stereo requests dial lights on; open/HIGH in Mono requests them
-off. Expose the stable request from the buttons module without directly calling
+The installed contact is open/HIGH in Stereo and closed/LOW in Mono. Stereo
+requests dial lights on; Mono requests them off. Expose the stable request from the buttons module without directly calling
 the lighting module.
 
 ## Consequences

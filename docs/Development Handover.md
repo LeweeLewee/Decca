@@ -73,7 +73,7 @@ button panel is deferred.
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
-| Stereo/Mono lighting request | GPIO17/TX2 | Assigned, physical test pending |
+| Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted, open Stereo = on / closed Mono = off |
 | Dial-light PWM | GPIO25/D25 | Proposed, load test pending |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
@@ -113,6 +113,9 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
   hardware 3, lighting 7, OTA 5, pots 6, power 5 and settings 3). Production
   firmware was restored by USB; serial reported `[POWER] state=ON` and
   `[OTA] ready at 192.168.1.79 (decca.local)`.
+- After TX2 Stereo/Mono integration, the release build passed and all eight
+  on-target suites passed 55/55 (buttons 11, display 15, hardware 3, lighting 7,
+  OTA 5, pots 6, power 5 and settings 3).
 - Display mount Rev P.5 is released and physically validated.
 - Root documentation and the final OLED loom colours were reconciled at chat
   close-out.
@@ -170,7 +173,7 @@ the user's Wi-Fi or OTA passwords.
 
 1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
 2. **Complete (2026-08-30):** full PlatformIO `esp32dev` release build and all
-   eight on-target suites; latest accepted run passed 53/53 tests.
+   eight on-target suites; latest accepted run passed 55/55 tests.
 3. **Complete (2026-08-30):** fitted-Perspex display calibration, visual design
    cycle and physical acceptance.
 4. **Complete (2026-08-30):** implement the logical `power` module, bench-test
@@ -180,9 +183,9 @@ the user's Wi-Fi or OTA passwords.
 6. **Current:** bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade
    behaviour.
 7. Commission normal and standby lighting levels.
-8. **Assigned, physical test pending:** wire the original Stereo/Mono switch to
-   TX2/GPIO17 and GND. Stereo closed requests dial lights on; Mono open requests
-   them off. Keep the GPIO25 load disabled while verifying this input.
+8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
+   and GND. Physical snapshots confirmed Stereo open requests dial lights on and
+   Mono closed requests them off. GPIO25 load remained disabled during testing.
 9. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 10. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought

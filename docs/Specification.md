@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI and VHF source acceptance are complete. Eight on-target suites pass 53/53. TX2/GPIO17 is assigned to Stereo/Mono with physical verification pending. GPIO25 commissioning and WiiM integration remain outstanding. |
+| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. Eight on-target suites pass 55/55. GPIO25 commissioning and WiiM integration remain outstanding. |
 | Version  | 0.24                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
@@ -45,7 +45,7 @@ Confirmed Phase 1 front-panel controls:
 - Four rotary controls as 10 kΩ position sensors: **Balance, Treble, Bass, Volume**.
 - Retained original **on/off switch** (low-voltage logic input).
 - Original **source button bank** retained mechanically. Only **VHF** provides a reliable electrical state: VHF latched = **Digital Streamer**; every other selector position = **Vinyl**.
-- Original **Stereo/Mono** contact assigned to TX2/GPIO17: Stereo closed requests lights on; Mono open requests lights off. Physical verification remains pending.
+- Original **Stereo/Mono** contact on TX2/GPIO17: Stereo open requests lights on; Mono closed requests lights off. Both positions are physically verified.
 - **OLED** display and **warm dial illumination**.
 
 See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
@@ -82,7 +82,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-BTN-02 | The system shall expose the stable VHF state continuously and emit one event per confirmed press without hold repeats. | 1 |
 | FR-BTN-03 | Closed/latched VHF shall select Digital Streamer; open/released VHF shall select Vinyl. | 1 |
 | FR-BTN-04 | SW, MW, LW and Gram shall have no individual ESP32 input; their authoritative effect is to release VHF and select Vinyl through the original interlock. A replacement button panel is a deferred fallback only. | 1 |
-| FR-BTN-05 | The system shall debounce the active-low Stereo/Mono contact on GPIO17 and expose its stable lighting request continuously: Stereo closed = on; Mono open = off. | 1 |
+| FR-BTN-05 | The system shall debounce the Stereo/Mono contact on GPIO17 and expose its stable lighting request continuously: Stereo open/high = on; Mono closed/low = off. | 1 |
 
 > Digital service, station, playlist and track selection remain in the WiiM app.
 > In Phase 2 the ESP32 maps Vinyl to WiiM Line-In and Digital Streamer to the
@@ -194,7 +194,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 | ID     | Interface                                                                       |
 |--------|---------------------------------------------------------------------------------|
-| IF-01  | **Front panel:** four 10 kΩ pots on ADC1; retained on/off switch; sole debounced VHF source contact on GPIO23; active-low Stereo/Mono lighting-request contact on GPIO17/TX2. VHF closed = Digital Streamer; VHF open = Vinyl. Stereo closed = lights requested on; Mono open = off. |
+| IF-01  | **Front panel:** four 10 kΩ pots on ADC1; retained on/off switch; sole debounced VHF source contact on GPIO23; pulled-up Stereo/Mono lighting-request contact on GPIO17/TX2. VHF closed = Digital Streamer; VHF open = Vinyl. Stereo open/high = lights requested on; Mono closed/low = off. |
 | IF-02  | **Display:** purchased Pi Hut 1.3-inch white 128×64 **SH1106** OLED over **I²C** at address 0x3C, powered from 3.3 V and mounted behind the dial glass. |
 | IF-03  | **Lighting:** PWM-driven warm dial illumination via logic-level N-channel MOSFET (dial only in Phase 1). |
 | IF-04  | **WiiM Pro local API (Phase 2):** two-state Line-In/digital-path switching, volume control, and metadata/playback-state feedback. Digital content selection remains in the WiiM app. |
@@ -224,6 +224,9 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06/08, FR-LGT, FR-SET satisfied.
 - Local controls and vinyl selection remain available without a network; digital content selection requires the WiiM app/network.
 - **Confirmed 2026-08-30:** all eight `esp32dev` on-target suites passed, 53/53 tests after power, controls, VHF source integration and OLED protection.
+- **Confirmed 2026-08-30:** after TX2 Stereo/Mono integration, the release build
+  passed and all eight on-target suites passed 55/55 (buttons 11, display 15,
+  hardware 3, lighting 7, OTA 5, pots 6, power 5, settings 3).
 - **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.1.79 (decca.local)`.
 - Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
 - **Confirmed 2026-08-30:** the final `esp32dev` release build passed cleanly (RAM 49,760 bytes / 15.2%; flash 833,321 bytes / 63.6%).

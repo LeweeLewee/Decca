@@ -17,7 +17,7 @@ constexpr uint8_t kEventQueueCapacity = 4;
 constexpr Button kButtons[kButtonCount] = {
     Button::OnOff,
     Button::Vhf,
-    Button::Stereo,
+    Button::StereoMono,
 };
 
 constexpr uint8_t kPins[kButtonCount] = {
@@ -132,8 +132,8 @@ SourceMode sourceMode() {
 }
 
 LightingRequest lightingRequest() {
-    return isPressed(Button::Stereo) ? LightingRequest::On
-                                     : LightingRequest::Off;
+    return isPressed(Button::StereoMono) ? LightingRequest::Off
+                                         : LightingRequest::On;
 }
 
 #ifdef PIO_UNIT_TESTING

@@ -336,7 +336,8 @@ Keep GPIO25 and the lamp load disconnected for this input-only test.
    ```
 
 3. Capture the `BUTTON_SNAPSHOT` once in each stable position. Stereo must show
-   `stereo=1 lights=on`; Mono must show `stereo=0 lights=off`.
+   `stereo_mono_contact=0 lights=on`; Mono must show
+   `stereo_mono_contact=1 lights=off`.
 4. Confirm all eleven button tests pass. If the two physical positions are
    reversed, stop and correct the documented contact/polarity before enabling
    any lighting output.

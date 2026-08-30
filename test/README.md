@@ -114,8 +114,12 @@ appearance were accepted. The release build passed and all eight suites passed
 power 5/5 and settings 3/3. Production was restored over COM3.
 
 Stereo/Mono assignment (2026-08-30): TX2/GPIO17 is now included in the buttons
-suite as an active-low lighting request. Stereo closed maps to on; Mono open maps
-to off. The release firmware builds successfully (RAM 49,880 bytes / 15.2%; flash
+suite as a pulled-up lighting request. Stereo open/high maps to on; Mono
+closed/low maps to off. The release firmware builds successfully (RAM 49,880 bytes / 15.2%; flash
 836,337 bytes / 63.8%) and all eight test suites compile without uploading. The
-expanded buttons suite contains 11 tests, but the accepted on-target baseline
-remains 53/53 until both physical switch states and the new suite are run.
+expanded buttons suite passed 11/11 on target in both physical positions:
+`stereo_mono_contact=0 lights=on` in Stereo and
+`stereo_mono_contact=1 lights=off` in Mono.
+The final release build passed and the complete physical run passed 55/55:
+buttons 11/11, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
+power 5/5 and settings 3/3.

@@ -64,7 +64,7 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
 | Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
 | SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
-| Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Closed Stereo = lights requested on; open Mono = off |
+| Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (proposed) | D25 | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
@@ -182,12 +182,12 @@ internal pull-up. Wire the isolated contact only:
 
 | Stereo/Mono contact | ESP32 termination |
 |---------------------|-------------------|
-| Contact that closes in Stereo | GPIO17 / board label TX2 |
+| Contact that closes in Mono | GPIO17 / board label TX2 |
 | Common / return | GND |
 
-Do not connect either contact to 3.3 V or 5 V. Closed/LOW means **Stereo** and
-requests dial lights on; open/HIGH means **Mono** and requests them off. This
-assignment and input behaviour are implemented but remain physically unverified.
+Do not connect either contact to 3.3 V or 5 V. Open/HIGH means **Stereo** and
+requests dial lights on; closed/LOW means **Mono** and requests them off. This
+assignment and both physical input states were accepted on 2026-08-30.
 GPIO25 and the lamp load are commissioned separately. See ADR-0014, which
 supersedes ADR-0005.
 

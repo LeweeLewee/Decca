@@ -5,8 +5,8 @@
  * The original selector PCB is unreliable for multi-button electrical use.
  * Only the reliable VHF contact is read. Its stable state is authoritative:
  * latched/closed selects Digital Streamer; released/open selects Vinyl.
- * The Stereo/Mono contact is active-low: closed requests dial lights on;
- * open requests them off. The lighting output is commissioned separately.
+ * The Stereo/Mono contact closes in Mono: open Stereo requests dial lights on;
+ * closed Mono requests them off. The lighting output is commissioned separately.
  */
 #pragma once
 
@@ -18,7 +18,7 @@ enum class Button : uint8_t {
     None,
     OnOff,
     Vhf,
-    Stereo,
+    StereoMono,
 };
 
 enum class SourceMode : uint8_t {
@@ -45,7 +45,7 @@ bool isPressed(Button button);
 SourceMode sourceMode();
 
 /**
- * @return On while the debounced Stereo contact is closed; otherwise Off.
+ * @return On while the contact is open in Stereo; Off while closed in Mono.
  */
 LightingRequest lightingRequest();
 

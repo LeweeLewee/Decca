@@ -33,7 +33,7 @@ validation remains.
 | Original on/off switch  | Retained with original solder joints and cable. Low-voltage logic input only (Red/Green). Not switching mains. |
 | Original selector PCB   | **Retained** as mechanical carrier for the interlocked selector (ADR-0001). Not disposable. |
 | Original source buttons | Original mechanism retained. Only VHF has a reliable electrical state: closed = Digital Streamer, open = Vinyl. SW/MW/LW/Gram mechanically release VHF and have no individual GPIO; replacement panel deferred (ADR-0013). |
-| Original Stereo/Mono control | Retained; TX2/GPIO17 active-low lighting-request input assigned, wiring and physical test pending (ADR-0014). |
+| Original Stereo/Mono control | Retained and physically verified on TX2/GPIO17: open Stereo requests lights on; closed Mono requests lights off (ADR-0014). |
 | Original Decca knobs    | Retained via mechanical adaptor strategy (see `mechanical/Knob Adaptors/`). |
 
 ## Audio Path / Phase 2

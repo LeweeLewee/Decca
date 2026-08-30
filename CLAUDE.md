@@ -54,10 +54,11 @@ GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
 physically verified. Lighting PWM GPIO25 remains proposed pending its
 documented physical test.
 
-Stereo/Mono is assigned to TX2/GPIO17 as an active-low input with the internal
-pull-up: closed Stereo requests lights on; open Mono requests lights off. The
-input and GPIO25 load both remain physically unverified; do not energise the
-lamp load merely to test the switch.
+Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
+closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
+requests lights off. Both input positions are physically accepted. The GPIO25
+load remains physically unverified; do not energise the lamp load merely to
+retest the switch.
 
 Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
 every other selector position = Vinyl. GPIO16/17/18 remain released from the
