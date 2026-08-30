@@ -129,7 +129,7 @@ R = dict(
     light_block_depth=1.60, light_block_pcb_clear=0.50,
     light_block_tie=0.60,        # overlap into the sprung pedestal
     # original Decca bolt / captive nut (brief 8.2) - NON-STANDARD thread
-    nut_af=3.80,                # ASSUMED across flats, see section N
+    nut_af=3.80,                # ACROSS FLATS - CONFIRMED 2026-08-30
     nut_head_seat=1.40,
     nut_total_len=10.00,
     nut_fit=0.20,
@@ -1325,8 +1325,9 @@ def main():
     print("N. ORIGINAL DECCA BOLT AND CAPTIVE-NUT INTERFACE")
     print("   The original thread is NON-STANDARD. Nothing below is derived")
     print("   from an M2, BA, UNC or any other catalogue nut.")
-    print("   ASSUMED: the reported %.2f mm is ACROSS FLATS - see the open item."
+    print("   CONFIRMED 2026-08-30: the %.2f mm is ACROSS FLATS. Carried as an"
           % R["nut_af"])
+    print("   interpretation through Rev P.3-P.5, now a measured value.")
     # no heat-set insert may survive anywhere
     ins = []
     for sx in (-1, 1):
@@ -1723,9 +1724,10 @@ def main():
              "true across-flats is %.2f mm and this pocket is %.2f mm oversize."
              % (R["nut_af"], R["nut_af"] * math.sqrt(3.0) / 2.0,
                 R["nut_af"] - R["nut_af"] * math.sqrt(3.0) / 2.0),
-             outcome="The original nuts seat and stay captive in the printed "
-             "pocket, so the ACROSS-FLATS interpretation held in practice. No "
-             "across-corners figure was taken.")
+             outcome="CLOSED. The %.2f mm is CONFIRMED as ACROSS FLATS "
+             "(2026-08-30), and the original nuts seat and stay captive in the "
+             "printed pocket. It is a measured value now, not an "
+             "interpretation." % R["nut_af"])
     openitem("original bolt length under the head",
              "must exceed the %.2f mm grip to engage and stay under %.2f mm to "
              "remain inside the nut" % (R["perspex_t"] + R["nut_seat_depth"],
@@ -1830,12 +1832,13 @@ def main():
         if PROTOTYPE_VALIDATED:
             print("")
             print("         MODELLING CAVEAT, not a blocker: the bonded-glass")
-            print("         envelope, the nut across-corners figure and the")
-            print("         original bolt length were never measured. The")
-            print("         built part works; the MODEL still carries")
-            print("         placeholders for those three, and GLASS_MEASURED")
-            print("         stays False. Measure before regenerating any post,")
-            print("         nose, glass keep-out or nut pocket.")
+            print("         envelope and the original bolt length were never")
+            print("         measured. The built part works; the MODEL still")
+            print("         carries placeholders for those two, and")
+            print("         GLASS_MEASURED stays False. Measure before")
+            print("         regenerating any post, nose or glass keep-out.")
+            print("         The nut across-flats figure was CONFIRMED on")
+            print("         2026-08-30 and is no longer a caveat.")
     print("=" * 80)
     return 1 if (FAILS or BLOCKS or OPENS) else 0
 

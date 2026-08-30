@@ -105,11 +105,13 @@ Print-ready meshes exported from the CAD sources.
 record them as `[TEST]` and neither check was changed to get there.
 
 > **What is still a modelling caveat, and is not a blocker.** The bonded-glass
-> envelope, the nut across-corners figure and the original bolt length were
-> never measured. The built part works; the **model** still carries
-> placeholders for those three, and `oled_glass_measured` / `GLASS_MEASURED`
-> stay `False`. Measure before regenerating any post, nose, glass keep-out or
-> nut pocket.
+> envelope and the original bolt length were never measured. The built part
+> works; the **model** still carries placeholders for those two, and
+> `oled_glass_measured` / `GLASS_MEASURED` stay `False`. Measure before
+> regenerating any post, nose or glass keep-out.
+>
+> The nut across-flats figure of **3.80 mm was confirmed on 2026-08-30** and is
+> no longer a caveat — the nut pocket can be regenerated as it stands.
 >
 > **One mandatory assembly-preparation step:** nothing on the OLED's display-side
 > face may stand more than **1.00 mm** proud. The budget is

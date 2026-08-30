@@ -402,11 +402,15 @@ P = {
     # from an M2, BA, UNC or any other catalogue nut. Every value below is a
     # measurement of, or an allowance against, the physical original parts.
     #
-    # INTERPRETATION, RECORDED AS REQUIRED BY THE BRIEF: the reported 3.80 mm
-    # is taken as the distance ACROSS OPPOSITE FLAT FACES. Before release the
-    # physical nut must be checked across flats AND across corners. If 3.80 mm
-    # proves to be across corners, change this one parameter and regenerate.
-    "original_nut_hex_width": 3.80,        # ACROSS FLATS - assumed, see above
+    # CONFIRMED 2026-08-30: the 3.80 mm IS the distance ACROSS OPPOSITE FLAT
+    # FACES. It was carried through Rev P.3-P.5 as an interpretation, recorded
+    # as such and flagged for checking before release; the project owner has
+    # now confirmed the across-flats reading is correct. Nothing changes
+    # numerically - the model always used it this way - but it is a measured
+    # value now, not an assumption. The across-corners figure below is derived
+    # arithmetically from it for a regular hexagon; it was not measured, and it
+    # does not need to be.
+    "original_nut_hex_width": 3.80,        # ACROSS FLATS - CONFIRMED
     "original_nut_head_seat_depth": 1.40,  # axial depth of the head seat
     "original_nut_total_length": 10.00,    # full nut envelope to be cleared
     # printer/material fit allowance on the pocket. This is a process fit, NOT
@@ -3083,9 +3087,12 @@ def validate(_context=None):
     print("15. ORIGINAL DECCA BOLT AND CAPTIVE-NUT INTERFACE")
     print("      NO heat-set insert architecture remains: no insert bore, no")
     print("      insert depth or recess, no bore chamfer, no backing figure.")
-    print("      ASSUMED: the measured %.2f mm is ACROSS FLATS. Check the real"
+    print("      CONFIRMED: the measured %.2f mm is ACROSS FLATS. That was an"
           % P["original_nut_hex_width"])
-    print("      nut across flats AND across corners before release.")
+    print("      interpretation through Rev P.3-P.5 and is now confirmed, so")
+    print("      the %.2f mm pocket and the %.2f mm derived across-corners"
+          % (d["nut_hex_af"], d["nut_ac"]))
+    print("      figure rest on a measurement, not an assumption.")
     fast_occ = find_component(design, "REF_Decca_Fasteners")
     fast = {}
     if fast_occ:
@@ -3232,10 +3239,12 @@ def validate(_context=None):
                 P["original_nut_hex_width"] * math.sqrt(3.0) / 2.0,
                 P["original_nut_hex_width"]
                 - P["original_nut_hex_width"] * math.sqrt(3.0) / 2.0),
-             outcome="The original nuts seat and stay captive in the printed "
-             "pocket, so the ACROSS-FLATS interpretation held in practice. No "
-             "across-corners figure was taken, so original_nut_hex_width "
-             "remains an interpretation, not a measurement.")
+             outcome="CLOSED. The %.2f mm is CONFIRMED as ACROSS FLATS "
+             "(2026-08-30), and the original nuts seat and stay captive in the "
+             "printed pocket. original_nut_hex_width is a measured value, not "
+             "an interpretation; the %.2f mm across-corners figure is derived "
+             "from it arithmetically."
+             % (P["original_nut_hex_width"], d["nut_ac"]))
     openitem("original bolt length under the head",
              "must exceed the %.2f mm grip to engage at all, and stay under "
              "%.2f mm to remain inside the nut. Neither end is measured."
@@ -3331,16 +3340,18 @@ def validate(_context=None):
         print("14.00 x 4.19 mm connector opening and the original captive-nut")
         print("fasteners at exactly 49.00 mm pitch.")
         print("")
-        print("WHAT REMAINS A MODELLING CAVEAT, NOT A BLOCKER. Three inputs in")
+        print("WHAT REMAINS A MODELLING CAVEAT, NOT A BLOCKER. Two inputs in")
         print("the parameter table were never measured, and the prototype")
-        print("passing does not measure them:")
+        print("passing did not measure them:")
         print("  * oled_glass_w / _h / _off_y - the bonded-glass envelope. It")
         print("    is still the placeholder that puts glass over the mounting")
         print("    holes. The built part clears the real glass; the MODEL does")
         print("    not describe it. oled_glass_measured stays False.")
-        print("  * original_nut_hex_width - 3.80 mm is still interpreted as")
-        print("    ACROSS FLATS. The real nuts fit the printed pocket, so the")
-        print("    interpretation held, but no across-corners figure was taken.")
+        print("  * (RESOLVED 2026-08-30) original_nut_hex_width - the")
+        print("    %.2f mm is CONFIRMED as ACROSS FLATS. It is a measured"
+              % P["original_nut_hex_width"])
+        print("    value now, not an interpretation, and needs no further")
+        print("    check before regenerating the nut pocket.")
         print("  * the original bolt length under the head. The bolts engage")
         print("    and clamp; the length itself was not recorded.")
         print("These matter only if the geometry is regenerated with changed")

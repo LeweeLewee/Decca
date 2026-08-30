@@ -1238,11 +1238,19 @@ the uprights into the module pocket. **Brief §12.15 is the actual test.**
 with no thread implication. The hardware list is now **two original Decca bolts
 and their two original matching nuts, reused**.
 
-### 21.2 The measured nut — and the interpretation, on record
+### 21.2 The measured nut — the across-flats reading, now confirmed
+
+> **CONFIRMED 2026-08-30.** The 3.80 mm **is** the distance across opposite flat
+> faces. It was carried through Rev P.3–P.5 as an interpretation, recorded as
+> such and flagged for checking before release; that check is now done and the
+> reading is correct. Nothing changes numerically — the model always used it
+> this way — but it is a **measured value**, not an assumption. The section
+> below is left as written, because the reasoning behind treating it carefully
+> is still the reason the pocket is right.
 
 | Named parameter | Value | Status |
 |---|---:|---|
-| `original_nut_hex_width` | **3.80 mm** | **ASSUMED to be ACROSS FLATS** |
+| `original_nut_hex_width` | **3.80 mm** | **ACROSS FLATS — CONFIRMED 2026-08-30** |
 | `original_nut_head_seat_depth` | 1.40 mm | measured axial head seat |
 | `original_nut_total_length` | 10.00 mm | measured, cleared in full |
 | `nut_pocket_fit_allowance` | 0.20 mm | **printer/material fit**, coupon-validated |
@@ -1251,13 +1259,17 @@ and their two original matching nuts, reused**.
 | `nut_retain_lip` | 0.25 mm | captive retaining ridge |
 | `bolt_clear_d` | 2.60 mm | original bolt clearance (panel hole 2.40) |
 
-> **DRAWING NOTE.** The reported 3.80 mm is modelled as the distance across
-> opposite **flat** faces. It is **not** derived from any standard M2, BA, UNC,
-> metric or other catalogue nut — the original thread is non-standard and the
-> physical part is the only authority. **Before release, check the real nut
-> across flats and across corners.** If 3.80 mm proves to be across corners, the
-> true across-flats is 3.29 mm; change `original_nut_hex_width` alone and
-> regenerate the pocket.
+> **DRAWING NOTE.** The 3.80 mm is the distance across opposite **flat**
+> faces — **confirmed 2026-08-30**. It is **not** derived from any standard M2,
+> BA, UNC, metric or other catalogue nut: the original thread is non-standard
+> and the physical part is the only authority. The across-corners figure of
+> 4.39 mm follows arithmetically for a regular hexagon and was not measured
+> separately; it does not need to be.
+>
+> *Superseded caution, retained for the record:* until this was confirmed, the
+> risk was that 3.80 mm might have been an across-corners reading, which would
+> have made the true across-flats 3.29 mm and the pocket 0.51 mm oversize. It
+> was not.
 
 The pocket fit allowance is a **print-process fit**. It is not permission to
 alter the 3.80 mm physical measurement.
@@ -2072,7 +2084,7 @@ CAD explicitly could not settle. The built part settled them.
 | installed lighting-unit clearance (§20.6, §26.1) | **OPEN** — a re-test, because the 180° transform moved the open end from +Y to −Y | **PASS** — no collision; the bottom/open connector side has the required clearance |
 | powered light-leak test (§24.7) | **OPEN** — wall thickness, material and slot size were engineering choices | **PASS** — rear closure and light blocks work; no hood needed, nothing reopened |
 | powered fit and screen position (§28.3) | **OPEN** — CAD could report where the screen would sit, not whether that was acceptable | **PASS** — the 7.00 mm rise gives the required OLED position; the intended screen information is visible |
-| original nut across flats / across corners (§21.6) | **OPEN** — 3.80 mm was an interpretation | **PASS in practice** — the nuts seat and stay captive in the printed pocket |
+| original nut across flats / across corners (§21.6) | **OPEN** — 3.80 mm was an interpretation | **CLOSED** — the nuts seat and stay captive in the printed pocket, and the across-flats reading was **confirmed 2026-08-30**. `original_nut_hex_width` is a measured value |
 | original bolt length (§21.6) | **OPEN** — neither end measured | **PASS in practice** — the bolts engage, do not bottom, and clamp |
 | hex-pocket fit coupon (§21.7) | **OPEN** — de-risking before a carrier print | **SUPERSEDED** — the carrier itself printed and both nuts fit |
 | four-post seat / retain / release (§14.28) | **OPEN** | **PASS** |
@@ -2086,18 +2098,19 @@ the original OPEN/BLOCKED wording exactly.
 
 ### 29.3 What is still a modelling caveat, and is not a blocker
 
-Three inputs in the parameter table were never measured, and the prototype
-passing does not measure them:
+Two inputs in the parameter table were never measured, and the prototype
+passing did not measure them:
 
 - `oled_glass_w` / `_h` / `_off_y` — the bonded-glass envelope is still the
   placeholder that puts glass over the mounting holes. The built part clears the
   real glass; the **model** does not describe it. `oled_glass_measured` stays
   `False`, and both tools still print the modelled intrusion;
-- `original_nut_hex_width` — 3.80 mm is still interpreted as **across flats**.
-  The real nuts fit, so the interpretation held, but no across-corners figure
-  was taken;
 - the original bolt length under the head. The bolts engage and clamp; the
   length itself was not recorded.
+
+**Resolved 2026-08-30:** `original_nut_hex_width` was the third item on this
+list. The 3.80 mm across-flats reading is now **confirmed**, so it is a measured
+value and the nut pocket can be regenerated without further checking.
 
 These matter only if the geometry is regenerated with changed dimensions. As
 built, the part is proven. **Anyone changing a post, a nose, the glass keep-out

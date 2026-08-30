@@ -785,11 +785,15 @@ manufacturing pack:
 `m2_boss_d` and `m2_arm_h` are renamed `fix_boss_d` and `fix_arm_h`: they are
 now structural boss and arm dimensions with no thread implication.
 
-### 12.2 The measured nut, and the interpretation on record
+### 12.2 The measured nut — the across-flats reading, now confirmed
+
+> **CONFIRMED 2026-08-30.** The 3.80 mm **is** across opposite flat faces. It
+> was carried as an interpretation through Rev P.3–P.5 and flagged for checking;
+> the check is done and the reading is correct. No number changes.
 
 | Named parameter | Value | Status |
 |---|---:|---|
-| `original_nut_hex_width` | **3.80 mm** | **ASSUMED to be ACROSS FLATS** — see §12.6 |
+| `original_nut_hex_width` | **3.80 mm** | **ACROSS FLATS — CONFIRMED 2026-08-30** — see §12.6 |
 | `original_nut_head_seat_depth` | 1.40 mm | measured axial head seat |
 | `original_nut_total_length` | 10.00 mm | measured, must be cleared in full |
 | `nut_pocket_fit_allowance` | 0.20 mm | **printer/material fit**, coupon-validated |
@@ -1377,7 +1381,7 @@ sequence unchanged.
 | One connected open-ended solid | PASS — 1 lump in Fusion, 1 connected component on the mesh |
 | M2 heat-set architecture completely removed | PASS — no bore, depth, recess, chamfer, backing or BOM entry |
 | Named original-nut parameters created | PASS — §12.2 |
-| 3.80 mm across-flats interpretation recorded | PASS — §12.2, §12.6, and in the generator source |
+| 3.80 mm across-flats reading recorded, then **confirmed** | PASS — §12.2; confirmed 2026-08-30, now a measured value |
 | Hex pocket, seat, head-seat depth, envelope, boss wall, captive retention | PASS — §12.4 |
 | Original load path, no clamp through glass or PCB | PASS — §12.5 |
 | 49.00 mm pitch unchanged | PASS — 49.00000 mm exactly |

@@ -152,10 +152,12 @@ lighting-unit clearance or freedom from light leakage.** None of the three was
 ever measured — and all three were settled by the physical prototype instead,
 which is what both tools always said would be required.
 
-> **Modelling caveat, not a blocker.** The bonded-glass envelope, the nut
-> across-corners figure and the original bolt length remain unmeasured
-> placeholders in the parameter table. The built part works; the model does not
-> describe those three. Measure before regenerating any post, nose, glass
-> keep-out or nut pocket.
+> **Modelling caveat, not a blocker.** The bonded-glass envelope and the
+> original bolt length remain unmeasured placeholders in the parameter table.
+> The built part works; the model does not describe those two. Measure before
+> regenerating any post, nose or glass keep-out.
+>
+> The nut across-flats figure of **3.80 mm was confirmed on 2026-08-30** and is
+> no longer a caveat.
 
 Module preparation is unchanged — front-side solder protrusion ≤ 1.00 mm.

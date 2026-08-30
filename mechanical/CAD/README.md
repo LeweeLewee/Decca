@@ -119,17 +119,16 @@ Fusion `createTorus` failure it caught.
 > powered fit — was closed by the built and tested prototype. Both tools record
 > them as `[TEST]`, and neither check was changed to get there.
 
-> **What is still a modelling caveat, and is not a blocker.** Three inputs in
-> the parameter table were never measured, and the prototype passing does not
+> **What is still a modelling caveat, and is not a blocker.** Two inputs in
+> the parameter table were never measured, and the prototype passing did not
 > measure them:
 >
 > - `oled_glass_w` / `_h` / `_off_y` — the bonded-glass envelope is still the
 >   placeholder that puts glass over the mounting holes. The built part clears
 >   the real glass; the **model** does not describe it. `oled_glass_measured`
 >   stays `False`;
-> - `original_nut_hex_width` — 3.80 mm is still interpreted as **across
->   flats**. The real nuts fit the printed pocket, so the interpretation held,
->   but no across-corners figure was taken;
+> - *(resolved 2026-08-30 — `original_nut_hex_width` was here; the 3.80 mm
+>   across-flats reading is **confirmed**, so it is a measured value now)*
 > - the original bolt length under the head. The bolts engage and clamp; the
 >   length itself was not recorded.
 >
