@@ -124,7 +124,7 @@ P = {
     "bezel_t": 4.00,                # PRESERVED
     "bezel_outer_r": 2.00,          # PRESERVED   external corner radius
     "bezel_edge_break": 0.40,       # PRESERVED   front face edge fillet
-    "bezel_window_w": 30.90,        # AMENDED     Rev N 30.40 + 0.50
+    "bezel_window_w": 32.90,        # OWNER       was 30.90, +1.00 per side
     "bezel_window_h": 15.35,        # AMENDED     face opening, AT THE FRONT FACE
     "bezel_window_r": 0.80,         # PRESERVED   window corner radius
     # -- recessed adhesive pads - DELETED at owner instruction -------------
@@ -155,26 +155,50 @@ P = {
     "bezel_lip_outer_w": 35.40,     # AMENDED     Rev N 34.90 + 2 x 0.25
     "bezel_lip_outer_h": 15.20,     # AMENDED     Rev N 15.00 + 2 x 0.10
     "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
-    "bezel_lip_wall": 0.80,         # AMENDED     two 0.40 mm wall loops
+
+    # THE WALL IS NO LONGER UNIFORM, at owner instruction 2026-08-30.
+    #
+    # The owner asked for three things at once: the horizontal opening out by
+    # 1.00 mm per side, the side wall thickened until its inner face is FLUSH
+    # with that opening (i.e. no set-back on the left and right, which is what
+    # the old 1.45 mm ledge was), and the outer envelope left alone. With a
+    # single uniform wall those three force 1.25 mm everywhere, which would
+    # drag the vertical clear opening 13.60 -> 12.70 and cost 0.45 mm more of
+    # the lit band. The owner then ruled that loss out, and clarified that the
+    # loop rule is AT LEAST two loops and that the side and the top/bottom
+    # walls need not carry the same number.
+    #
+    # So the wall is split. Y stays at the proven 0.80 (two loops) and holds
+    # the 13.60 clear height; X is DERIVED from the flush requirement and
+    # comes out at 1.25 (three loops). Through the corners the wall tapers
+    # smoothly between them and never drops below 0.80 - see derive().
+    "bezel_lip_wall_y": 0.80,       # OWNER       top/bottom, 2 loops, holds 13.60
+    #                                 X wall is DERIVED - see derive()
     # Owner refinement 2026-08-30: R2.00 did not match the real Perspex
     # opening corner, so the outer corner radius is increased by 50% to
-    # R3.00. The inner corner radius follows from it (3.00 - 0.80 = 2.20) and
-    # is not entered separately. Brief 7 explicitly allows the named corner
-    # parameters to be changed when the fit needs it; the brief's stated 2.00
-    # is therefore superseded by observation, and this is recorded as a
-    # deviation from brief 2/4.
+    # R3.00. The inner corner radius follows from it and the X wall
+    # (3.00 - 1.25 = 1.75) and is not entered separately. Brief 7 explicitly
+    # allows the named corner parameters to be changed when the fit needs it;
+    # the brief's stated 2.00 is therefore superseded by observation, and this
+    # is recorded as a deviation from brief 2/4.
     "bezel_lip_corner_r": 3.00,     # OWNER       was 2.00, +50% 2026-08-30
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
 
-    # The established production extrusion width. bezel_lip_wall must be an
-    # exact whole multiple of it, and that multiple must be 2.
+    # The established production extrusion width. Every wall must be at least
+    # TWO of these - that is the rule, and it is a MINIMUM, applied per side.
     "extrusion_width": 0.40,        # PRODUCTION  nozzle / extrusion width
 
     # How far the tapered aperture stops OUTSIDE the lip inner opening at the
     # seating plane, so the two surfaces meet transversally instead of
     # tangentially. Purely a meshing measure - see derive(). The lip still
     # controls the clear height.
-    "ap_root_relief": 0.02,         # MODELLING   anti-tangency relief
+    # Was 0.02, to stop the aperture landing exactly on the skirt inner face.
+    # That was needed while the two profiles COINCIDED along the straight
+    # runs but DIFFERED at the corners - the tessellator answered the
+    # mismatch with 52 zero-area triangles. The aperture rear section is now
+    # the skirt inner profile exactly, corner radius included, so there is no
+    # mismatch left to relieve. Both tools still check for degenerates.
+    "ap_root_relief": 0.00,         # MODELLING   no longer needed
 
     # -- OLED reference, for the optical report only -----------------------
     # From the RELEASED Rev P.5 model. oled_glass_* remains an UNMEASURED
@@ -214,23 +238,30 @@ def derive(P):
     d["z_bezel_front"] = d["z_panel_front"] + d["bezel_face_t"]      # +4.200
     d["z_lip_rear"] = d["z_panel_front"] - P["bezel_lip_depth"]      # +0.200
 
-    # Wall loops - the whole point of the 0.80 mm amendment ------------------
-    d["wall_loops"] = P["bezel_lip_wall"] / P["extrusion_width"]      # 2.000
-    if abs(d["wall_loops"] - round(d["wall_loops"])) > 1e-9:
-        raise ValueError(
-            "bezel_lip_wall (%.3f) is not a whole multiple of extrusion_width "
-            "(%.3f): the slicer cannot resolve it as complete wall loops and "
-            "will substitute gap fill or a variable-width wall"
-            % (P["bezel_lip_wall"], P["extrusion_width"]))
-    if round(d["wall_loops"]) < 2:
-        raise ValueError(
-            "bezel_lip_wall (%.3f) gives only %d loop(s) at a %.3f mm "
-            "extrusion width; the Rev Q amendment requires TWO"
-            % (P["bezel_lip_wall"], round(d["wall_loops"]),
-               P["extrusion_width"]))
+    # THE SPLIT WALL ---------------------------------------------------------
+    #
+    # X is DERIVED from the flush requirement: the side wall is exactly as
+    # thick as it needs to be for its inner face to land on the face opening,
+    # so there is no set-back on the left and right. Y is the entered value,
+    # held at the proven 0.80 so the vertical clear opening stays at 13.60.
+    d["bezel_lip_wall_x"] = (P["bezel_lip_outer_w"]
+                             - P["bezel_window_w"]) / 2.0            # 1.250
+    d["bezel_lip_wall_y"] = P["bezel_lip_wall_y"]                    # 0.800
+    ew = P["extrusion_width"]
+    d["wall_loops_x"] = d["bezel_lip_wall_x"] / ew                   # 3.125
+    d["wall_loops_y"] = d["bezel_lip_wall_y"] / ew                   # 2.000
+
+    # The loop rule is a MINIMUM of two, applied per side. The sides and the
+    # top/bottom are free to carry different numbers.
+    for axis, w in (("x", d["bezel_lip_wall_x"]), ("y", d["bezel_lip_wall_y"])):
+        if w / ew < 2.0 - 1e-9:
+            raise ValueError(
+                "bezel_lip_wall_%s (%.3f) gives only %.2f loop(s) at a %.3f mm "
+                "extrusion width; at least TWO are required on every side"
+                % (axis, w, w / ew, ew))
 
     # Fit against the MEASURED opening --------------------------------------
-    # Horizontal is now a deliberate INTERFERENCE, vertical stays a clearance.
+    # Horizontal is a deliberate INTERFERENCE, vertical stays a clearance.
     # Sign convention: interference positive means the lip is WIDER than the
     # hole and the lip must flex to enter.
     d["bezel_lip_interf_x"] = (P["bezel_lip_outer_w"]
@@ -238,16 +269,29 @@ def derive(P):
     d["bezel_lip_clear_y"] = (P["panel_open_h"]
                               - P["bezel_lip_outer_h"]) / 2.0        # +0.050
 
-    d["bezel_lip_inner_w"] = P["bezel_lip_outer_w"] - 2 * P["bezel_lip_wall"]
-    d["bezel_lip_inner_h"] = P["bezel_lip_outer_h"] - 2 * P["bezel_lip_wall"]
-    # A uniform wall makes the inner corner radius (corner_r - wall), so the
-    # outer corner radius can never be smaller than the wall.
-    if P["bezel_lip_corner_r"] < P["bezel_lip_wall"] - 1e-9:
+    d["bezel_lip_inner_w"] = (P["bezel_lip_outer_w"]
+                              - 2 * d["bezel_lip_wall_x"])           # 32.900
+    d["bezel_lip_inner_h"] = (P["bezel_lip_outer_h"]
+                              - 2 * d["bezel_lip_wall_y"])           # 13.600
+
+    # The inner corner radius follows the THICKER (X) wall. That choice is not
+    # arbitrary: it puts the inner corner arc centre on the same x as the outer
+    # arc centre, so the wall sweeps smoothly from 1.250 at the side to 0.800
+    # at the top and bottom and reaches its minimum exactly at the top/bottom
+    # tangent. Any smaller inner radius squares the corner off, drags it toward
+    # the outer arc and thins the wall BELOW 0.800 - at R0 it collapses to
+    # 0.189 mm. R1.75 is the smallest value that keeps two full loops all the
+    # way round; validate() re-measures it rather than trusting this comment.
+    if P["bezel_lip_corner_r"] < d["bezel_lip_wall_x"] - 1e-9:
         raise ValueError(
-            "bezel_lip_corner_r (%.3f) is below bezel_lip_wall (%.3f): a "
-            "uniform-wall lip cannot have an outer corner radius smaller "
-            "than its wall" % (P["bezel_lip_corner_r"], P["bezel_lip_wall"]))
-    d["bezel_lip_inner_r"] = P["bezel_lip_corner_r"] - P["bezel_lip_wall"]
+            "bezel_lip_corner_r (%.3f) is below the X wall (%.3f): the inner "
+            "corner radius would go negative"
+            % (P["bezel_lip_corner_r"], d["bezel_lip_wall_x"]))
+    d["bezel_lip_inner_r"] = (P["bezel_lip_corner_r"]
+                              - d["bezel_lip_wall_x"])               # 1.750
+    d["lip_corner_r"] = P["bezel_lip_corner_r"]
+    d["wall_min"] = min(d["bezel_lip_wall_x"], d["bezel_lip_wall_y"])
+    d["wall_max"] = max(d["bezel_lip_wall_x"], d["bezel_lip_wall_y"])
 
     # Half extents ---------------------------------------------------------
     d["bezel_window_w"] = P["bezel_window_w"]                        # 30.900
@@ -299,11 +343,17 @@ def derive(P):
     # now the wider of the two. The lip keeps 0.760 of its 0.800 mm wall
     # rooted on solid face material.
     d["ap_root_relief"] = P["ap_root_relief"]
-    d["ap_rear_w"] = d["bezel_window_w"]                             # 30.900
+    d["ap_rear_w"] = d["bezel_lip_inner_w"]                          # 32.900
     d["ap_rear_h"] = (d["bezel_lip_inner_h"]
-                      + 2 * d["ap_root_relief"])                     # 13.640
-    d["ap_front_w"] = d["bezel_window_w"]                            # 30.900
+                      + 2 * d["ap_root_relief"])                     # 13.600
+    d["ap_front_w"] = d["bezel_window_w"]                            # 32.900
     d["ap_front_h"] = d["bezel_window_h"]                            # 15.350
+    # The rear section carries the SKIRT inner corner radius, not the window
+    # one. Anything smaller bulges outside the skirt corner and leaves a
+    # crescent-shaped 90-degree ledge hanging over the aperture - it measured
+    # 3.40 mm2 of unsupported overhang across the four corners at R0.80.
+    d["ap_rear_r"] = d["bezel_lip_inner_r"]                          #  1.750
+    d["ap_front_r"] = P["bezel_window_r"]                            #  0.800
     d["ap_taper_dy"] = (d["ap_front_h"] - d["ap_rear_h"]) / 2.0      #  0.875
     d["ap_taper_deg"] = math.degrees(math.atan2(d["ap_taper_dy"],
                                                 d["bezel_face_t"]))  # 36.10
@@ -320,8 +370,10 @@ def derive(P):
     # Exactly what brief section 4 predicts.
     d["optical_w"] = min(d["bezel_window_w"], d["bezel_lip_inner_w"])  # 30.900
     d["optical_h"] = min(d["ap_rear_h"], d["bezel_lip_inner_h"])       # 13.600
-    d["lip_root_supported"] = P["bezel_lip_wall"] - d["ap_root_relief"]
-    d["optical_r"] = P["bezel_window_r"]                               #  0.800
+    d["lip_root_supported"] = d["bezel_lip_wall_y"] - d["ap_root_relief"]
+    # the clear opening corner is the SKIRT inner corner - it cuts in
+    # further than the window corner does
+    d["optical_r"] = d["bezel_lip_inner_r"]                            #  1.750
 
     # what Rev N showed, for the honest before/after
     d["revN_window_w"] = 30.40
@@ -495,22 +547,29 @@ def build_aperture(comp, P, d, over=0.05):
     """The tapered aperture, as a real Fusion LOFT between two rounded-rect
     profiles, then combined out of the bezel.
 
-    Constant 30.900 wide; in Y it runs from the lip inner opening at the
-    seating plane to the specified face opening at the front face. Both
-    sections are pushed `over` beyond their planes, along the same straight
-    taper, so the cut breaks cleanly through both faces without any coincident
-    boolean and without touching the lip - at the rear the extrapolated
-    section is strictly smaller than the lip inner opening, so it removes no
-    lip material.
+    Constant 32.900 wide; in Y it runs from the skirt inner opening at the
+    seating plane to the specified face opening at the front face.
+
+    The FRONT section is pushed `over` beyond its plane so the cut breaks
+    cleanly through the front face. The REAR section stops exactly on the
+    seating plane and must not go below it.
+
+    That rear limit matters now. While the aperture was 30.900 wide against a
+    33.800 skirt it sat well inside the skirt and an over-run below the
+    seating plane touched nothing. With the side wall flush the two share the
+    same 32.900 width, and the aperture's R0.80 rear corners bulge outside the
+    skirt's R1.75 inner corners - so any over-run bites the top of the wall at
+    all four corners. It showed up as 0.84 mm2 of ring area missing at
+    z = 2.95 while z = 0.45 and 1.60 measured correctly.
     """
-    z0 = d["z_panel_front"] - over
+    z0 = d["z_panel_front"]
     z1 = d["z_bezel_front"] + over
     hh0 = d["ap_rear_h"] / 2.0 + d["ap_slope"] * (z0 - d["z_panel_front"])
     hh1 = d["ap_rear_h"] / 2.0 + d["ap_slope"] * (z1 - d["z_panel_front"])
     hw = d["ap_rear_w"] / 2.0
 
-    p0 = _rrect_sketch(comp, z0, hw, hh0, P["bezel_window_r"], "ap_rear")
-    p1 = _rrect_sketch(comp, z1, hw, hh1, P["bezel_window_r"], "ap_front")
+    p0 = _rrect_sketch(comp, z0, hw, hh0, d["ap_rear_r"], "ap_rear")
+    p1 = _rrect_sketch(comp, z1, hw, hh1, d["ap_front_r"], "ap_front")
 
     lofts = comp.features.loftFeatures
     li = lofts.createInput(
@@ -617,7 +676,7 @@ def build_coupon(b, P, d):
     out = P["coupon_pad_out"]
     for i, interf in enumerate(COUPON_INTERFERENCE):
         ow2 = (P["panel_open_w"] + 2 * interf) / 2.0
-        iw2 = ow2 - P["bezel_lip_wall"]
+        iw2 = ow2 - d["bezel_lip_wall_x"]
         # the complete inset wall at this interference, clipped to the +X end
         seg = b.ring(ow2, d["loh2"], iw2, d["lih2"],
                      d["z_lip_rear"], d["z_panel_front"],
@@ -710,11 +769,16 @@ def _write_params(design, P, d):
         "DERIVED  horizontal INTERFERENCE per side")
     put("bezel_lip_clear_y", "(panel_open_h - bezel_lip_outer_h) / 2",
         "DERIVED  vertical clearance per side")
-    put("bezel_lip_inner_w", "bezel_lip_outer_w - 2 * bezel_lip_wall", "DERIVED")
-    put("bezel_lip_inner_h", "bezel_lip_outer_h - 2 * bezel_lip_wall", "DERIVED")
-    put("bezel_lip_inner_r", "bezel_lip_corner_r - bezel_lip_wall", "DERIVED")
-    put("wall_loops", "bezel_lip_wall / extrusion_width",
-        "DERIVED  must be exactly 2")
+    put("bezel_lip_wall_x", "(bezel_lip_outer_w - bezel_window_w) / 2",
+        "DERIVED  side wall, set by the FLUSH requirement")
+    put("bezel_lip_inner_w", "bezel_lip_outer_w - 2 * bezel_lip_wall_x",
+        "DERIVED  == bezel_window_w, i.e. flush")
+    put("bezel_lip_inner_h", "bezel_lip_outer_h - 2 * bezel_lip_wall_y", "DERIVED")
+    put("bezel_lip_inner_r", "bezel_lip_corner_r - bezel_lip_wall_x", "DERIVED")
+    put("wall_loops_x", "bezel_lip_wall_x / extrusion_width",
+        "DERIVED  at least 2")
+    put("wall_loops_y", "bezel_lip_wall_y / extrusion_width",
+        "DERIVED  at least 2")
     put("aperture_rear_h", "bezel_lip_inner_h",
         "DERIVED  the lip controls the clear height")
     put("bezel_face_t", "bezel_t - bezel_lip_depth", "DERIVED")
@@ -1024,6 +1088,26 @@ def max_panel_r(P, d, R_lip, need=0.0):
     return lo
 
 
+def _corner_wall_range(d, n=2001):
+    """Wall thickness right round one corner arc, min and max, in mm.
+
+    With the split wall the corner is where 1.25 has to become 0.80, so this
+    is the one place the thickness is neither of the entered values. Measured
+    as the distance from each point on the INNER corner arc out to the outer
+    profile, which is exact for a rounded rectangle."""
+    Ao, Bo = d["low2"], d["loh2"]
+    Ro, Ri = d["lip_corner_r"], d["bezel_lip_inner_r"]
+    ai, bi = d["liw2"] - Ri, d["lih2"] - Ri
+    lo, hi = 1.0e9, -1.0e9
+    for i in range(n):
+        th = 0.5 * math.pi * i / (n - 1)
+        x = ai + Ri * math.cos(th)
+        y = bi + Ri * math.sin(th)
+        t = -_sdf_rrect(x, y, Ao, Bo, Ro)
+        lo, hi = min(lo, t), max(hi, t)
+    return lo, hi
+
+
 def penetration(P, d, R_lip, R_panel, n=1440):
     """Deepest penetration of the lip OUTER surface into the Perspex, and the
     largest gap, for an assumed opening corner radius.
@@ -1053,8 +1137,11 @@ def fit_study(P=P):
     print("lip inner  %.2f x %.2f mm   R%.2f inner corners  (derived)"
           % (d["bezel_lip_inner_w"], d["bezel_lip_inner_h"],
              d["bezel_lip_inner_r"]))
-    print("wall       %.2f mm = %.0f x %.2f mm extrusion loops"
-          % (P["bezel_lip_wall"], d["wall_loops"], P["extrusion_width"]))
+    print("wall       SIDES %.2f mm (%.3f loops)   TOP/BOTTOM %.2f mm (%.3f loops)"
+          % (d["bezel_lip_wall_x"], d["wall_loops_x"],
+             d["bezel_lip_wall_y"], d["wall_loops_y"]))
+    print("           corners sweep between the two, never below %.2f mm"
+          % d["bezel_lip_wall_y"])
     print("")
     print("DECLARED FIT")
     print("   horizontal  %+.3f mm per side   INTERFERENCE - the lip is wider"
@@ -1089,19 +1176,25 @@ def fit_study(P=P):
     print("   plausible opening corner radius: the flanks set it, not the")
     print("   corners.")
     print("")
-    print("INSERTION - THIS IS THE NEW OPEN RISK")
-    prev_wall = 0.40
-    ratio = (P["bezel_lip_wall"] / prev_wall) ** 3
-    print("   The wall went %.2f -> %.2f mm to get the second loop."
-          % (prev_wall, P["bezel_lip_wall"]))
-    print("   Bending stiffness scales with thickness CUBED, so the lip is")
-    print("   about %.1fx stiffer than the %.2f mm wall it replaces." % (ratio, prev_wall))
-    print("   The same %.2f mm per side of interference is therefore resisted"
-          % d["bezel_lip_interf_x"])
-    print("   roughly %.0fx harder. Brief 3.8 requires the LIP to take the" % ratio)
-    print("   deflection and the Perspex to be left unstressed; with an 8x")
-    print("   stiffer lip that split is no longer obvious, and CAD cannot")
-    print("   settle it. Print the fit gauge before the bezel.")
+    print("INSERTION - THE OPEN RISK, AND IT HAS GROWN")
+    wx = d["bezel_lip_wall_x"]
+    print("   The interference is HORIZONTAL, so it is resisted by the SIDE")
+    print("   wall - and that is the wall that just went to %.2f mm to make" % wx)
+    print("   the aperture flush.")
+    print("")
+    print("   Bending stiffness scales with thickness CUBED:")
+    for prev in (0.40, 0.80):
+        print("      vs a %.2f mm wall   %5.1fx stiffer" % (prev, (wx / prev) ** 3))
+    print("")
+    print("   So the same %.2f mm per side is now resisted roughly %.0fx harder"
+          % (d["bezel_lip_interf_x"], (wx / 0.40) ** 3))
+    print("   than at the original 0.40 mm wall, and about %.1fx harder than at"
+          % ((wx / 0.80) ** 3))
+    print("   the 0.80 mm wall it replaced on the sides. Brief 3.8 requires the")
+    print("   PRINTED WALL to take the deflection and the Perspex to be left")
+    print("   unspread and unstressed. At %.2f mm that is a much harder ask, and" % wx)
+    print("   CAD cannot settle it. PRINT THE FIT GAUGE BEFORE THE BEZEL - and")
+    print("   be ready to reduce bezel_lip_outer_w if 0.10 mm proves too much.")
     print("=" * 74)
 
 
@@ -1283,19 +1376,30 @@ def validate(P=P):
     zs = [d["z_lip_rear"] + P["bezel_lip_lead"] + 0.05,
           (d["z_lip_rear"] + d["z_panel_front"]) / 2.0,
           d["z_panel_front"] - 0.05]
-    ax = d["low2"] - P["bezel_lip_corner_r"]     # 15.70
-    ay = d["loh2"] - P["bezel_lip_corner_r"]     #  5.60
-    w = P["bezel_lip_wall"]
+    ax = d["low2"] - P["bezel_lip_corner_r"]     # 14.70
+    ay = d["loh2"] - P["bezel_lip_corner_r"]     #  4.60
+    wx, wy = d["bezel_lip_wall_x"], d["bezel_lip_wall_y"]
     Ro, Ri = P["bezel_lip_corner_r"], d["bezel_lip_inner_r"]
     big = 60.0
+    # The straight runs are clean rectangles in these windows. In X both
+    # profiles turn at the same station (outer_half - Ro == inner_half - Ri,
+    # because Ri is derived from the X wall), so the top and bottom windows
+    # cut exactly across the straight runs of both.
     regions = [
-        ("top", (-ax, ax, ay, big), w * 2 * ax),
-        ("bottom", (-ax, ax, -big, -ay), w * 2 * ax),
-        ("right", (ax, big, -ay, ay), w * 2 * ay),
-        ("left", (-big, -ax, -ay, ay), w * 2 * ay),
+        ("top", (-ax, ax, ay, big), wy * 2 * ax),
+        ("bottom", (-ax, ax, -big, -ay), wy * 2 * ax),
+        ("right", (ax, big, -ay, ay), wx * 2 * ay),
+        ("left", (-big, -ax, -ay, ay), wx * 2 * ay),
     ]
-    corner_exact = math.pi * (Ro ** 2 - Ri ** 2)
-    ring_exact = sum(r[2] for r in regions) + corner_exact
+    # With a split wall the ring is no longer a uniform offset, so the corner
+    # area is not pi*(Ro^2 - Ri^2) any more. Take the whole ring analytically -
+    # outer rounded rect minus inner rounded rect - and let the corners be the
+    # remainder.
+    def _rrect_area(hw, hh, r):
+        return (2 * hw) * (2 * hh) - (4.0 - math.pi) * r * r
+    ring_exact = (_rrect_area(d["low2"], d["loh2"], Ro)
+                  - _rrect_area(d["liw2"], d["lih2"], Ri))
+    corner_exact = ring_exact - sum(r[2] for r in regions)
     for z in zs:
         got = _slab_area(b, body, z)
         _gate(abs(got - ring_exact) < 5.0e-3,
@@ -1311,8 +1415,8 @@ def validate(P=P):
               "%.4f mm2" % got)
     got_corners = _slab_area(b, body, zmid) - part_sum
     _gate(abs(got_corners - corner_exact) < 5.0e-3,
-          "lip continuous - corners  area %.4f mm2 (4 quarter-annuli)"
-          % corner_exact, "%.4f mm2" % got_corners)
+          "lip continuous - corners  area %.4f mm2" % corner_exact,
+          "%.4f mm2" % got_corners)
     _report("why area and not point sampling",
             "any gap, thin spot or break anywhere in the ring removes area; "
             "an exact area match leaves nowhere for one to hide")
@@ -1329,28 +1433,50 @@ def validate(P=P):
           "%.4f x %.4f" % ((lip_bb[1] * 2, lip_bb[3] * 2) if lip_bb
                            else (-1, -1)))
 
-    # --- corner geometry, now specified rather than unresolved -------------
+    # --- the split wall and its corners ------------------------------------
+    _gate(abs(d["bezel_lip_wall_x"]
+              - (P["bezel_lip_outer_w"] - P["bezel_window_w"]) / 2.0) < 1e-9,
+          "side wall %.3f mm is DERIVED from the flush requirement"
+          % d["bezel_lip_wall_x"],
+          "(%.2f - %.2f)/2" % (P["bezel_lip_outer_w"], P["bezel_window_w"]))
+    _gate(abs(d["bezel_lip_inner_w"] - P["bezel_window_w"]) < 1e-9,
+          "FLUSH: skirt inner width == face opening, no set-back at the sides",
+          "%.4f vs %.4f" % (d["bezel_lip_inner_w"], P["bezel_window_w"]))
     _gate(abs(d["bezel_lip_inner_r"]
-              - (P["bezel_lip_corner_r"] - P["bezel_lip_wall"])) < 1e-9,
-          "inner corner R%.2f = outer R%.2f - wall %.2f"
+              - (P["bezel_lip_corner_r"] - d["bezel_lip_wall_x"])) < 1e-9,
+          "inner corner R%.2f = outer R%.2f - side wall %.2f"
           % (d["bezel_lip_inner_r"], P["bezel_lip_corner_r"],
-             P["bezel_lip_wall"]),
+             d["bezel_lip_wall_x"]),
           "%.4f" % d["bezel_lip_inner_r"])
-    # The corner area is the sharpest test of a constant wall through the
-    # corners: pi*(Ro^2 - Ri^2) only comes out right if BOTH radii are right,
-    # i.e. only if the wall really is constant all the way round the arc.
-    _gate(abs(got_corners - corner_exact) < 5.0e-3,
-          "wall stays %.2f mm THROUGH THE R%.2f CORNERS"
-          % (w, P["bezel_lip_corner_r"]),
-          "corner area %.4f vs pi*(%.2f^2-%.2f^2) = %.4f"
-          % (got_corners, Ro, Ri, corner_exact))
+    # With a split wall the corner is where the two thicknesses have to meet.
+    # Measure the wall right round the corner arc and demand it never drops
+    # below the thinner of the two - i.e. never below two full loops.
+    cmin, cmax = _corner_wall_range(d)
+    _gate(cmin >= d["bezel_lip_wall_y"] - 1.0e-4,
+          "wall through the R%.2f corners never thins below the %.2f mm "
+          "top/bottom wall" % (P["bezel_lip_corner_r"], d["bezel_lip_wall_y"]),
+          "min %.4f  max %.4f mm" % (cmin, cmax))
+    _gate(cmax <= d["bezel_lip_wall_x"] + 1.0e-4,
+          "and never exceeds the %.2f mm side wall through the arc"
+          % d["bezel_lip_wall_x"], "%.4f mm" % cmax)
+    _report("corner wall sweep",
+            "%.4f -> %.4f mm across the arc; the full %.2f mm is carried "
+            "on the straight side runs, outside the arc"
+            % (cmin, cmax, d["bezel_lip_wall_x"]))
 
-    # --- the two-loop requirement ------------------------------------------
+    # --- the loop rule: AT LEAST two, per side ------------------------------
     ew = P["extrusion_width"]
-    _gate(abs(d["wall_loops"] - 2.0) < 1e-9,
-          "wall is EXACTLY two %.2f mm extrusion loops" % ew,
-          "%.3f mm / %.2f mm = %.4f" % (P["bezel_lip_wall"], ew,
-                                        d["wall_loops"]))
+    _gate(d["wall_loops_x"] >= 2.0 - 1e-9,
+          "side wall is at least two %.2f mm loops" % ew,
+          "%.3f / %.2f = %.3f loops" % (d["bezel_lip_wall_x"], ew,
+                                        d["wall_loops_x"]))
+    _gate(d["wall_loops_y"] >= 2.0 - 1e-9,
+          "top/bottom wall is at least two %.2f mm loops" % ew,
+          "%.3f / %.2f = %.3f loops" % (d["bezel_lip_wall_y"], ew,
+                                        d["wall_loops_y"]))
+    _gate(cmin / ew >= 2.0 - 1.0e-3,
+          "and the corners never fall below two loops either",
+          "%.3f loops at the thinnest" % (cmin / ew))
     # the two loop centrelines are offsets of the outer surface by 0.20 and
     # 0.60; both must stay closed and non-degenerate right through the
     # corners, or the slicer merges them or drops one
@@ -1363,8 +1489,9 @@ def validate(P=P):
           "loop centrelines stay exactly one extrusion apart",
           "%.4f mm" % (r1 - r2))
     _gate(abs(ring_exact - _slab_area(b, body, zmid)) < 5.0e-3,
-          "no thin spot anywhere - every section is a full two extrusions",
-          "measured ring area matches a constant %.2f mm wall exactly" % w)
+          "no thin spot anywhere - every section is at least two extrusions",
+          "measured ring area matches the %.2f/%.2f split wall exactly"
+          % (d["bezel_lip_wall_x"], d["bezel_lip_wall_y"]))
     _report("SLICER PREVIEW IS STILL A PHYSICAL GATE",
             "the geometry admits two loops; only the production slicer can "
             "prove that it lays them")
@@ -1503,10 +1630,15 @@ def validate(P=P):
     _report("aperture taper",
             "%.2f deg from vertical in Y, self-supporting front-face-down"
             % d["ap_taper_deg"])
-    _gate(abs(d["optical_w"] - 30.90) < 1e-9
-          and abs(d["optical_h"] - 13.60) < 1e-9,
-          "EFFECTIVE optical opening = 30.90 x 13.60 as the brief predicts",
+    _gate(abs(d["optical_w"] - P["bezel_window_w"]) < 1e-9
+          and abs(d["optical_h"] - d["bezel_lip_inner_h"]) < 1e-9,
+          "EFFECTIVE optical opening = %.2f x %.2f"
+          % (P["bezel_window_w"], d["bezel_lip_inner_h"]),
           "%.3f x %.3f" % (d["optical_w"], d["optical_h"]))
+    _report("versus the figure brief 4 predicts",
+            "30.90 x 13.60 - the height matches exactly; the width is %+.2f mm "
+            "because the owner opened the face by 1.00 mm per side"
+            % (d["optical_w"] - 30.90))
     _report("controlled by",
             "width by the %.2f mm face opening, HEIGHT BY THE %.2f mm LIP "
             "INNER ENVELOPE" % (d["bezel_window_w"], d["bezel_lip_inner_h"]))

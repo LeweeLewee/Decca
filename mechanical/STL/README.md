@@ -17,7 +17,7 @@ Print-ready meshes exported from the CAD sources.
 | File | Print notes |
 |---|---|
 | `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side**. Each is the complete right-hand end of the real Rev Q wall — full 15.20 mm height, both R3.00 corners, the real 0.80 mm two-loop wall, the real 2.80 mm depth — so it engages the interference exactly as the bezel will. ≈1.53 cm³ ≈ 2 g for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6304 cm³ ≈ 0.80 g. The 0.80 mm continuous inset wall must slice as **exactly two 0.40 mm loops** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6276 cm³ ≈ 0.80 g. The 0.80 mm continuous inset wall must slice as **exactly two 0.40 mm loops** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
 > ### Rev Q print gate 1 — TWO CONTINUOUS WALL LOOPS
 >
@@ -28,9 +28,9 @@ Print-ready meshes exported from the CAD sources.
 > |---|---|
 > | Nozzle / extrusion width | **0.40 mm** — the wall *is* two of these |
 > | Layer height | 0.15–0.20 mm |
-> | Perimeters in the wall | **2** — not "auto", not variable-width |
+> | Perimeters in the wall | **at least 2 on every side** — the sides take 3 (1.25 mm), the top and bottom 2 (0.80 mm) |
 > | Thin-wall / gap fill | **OFF** if the slicer allows; a full 0.80 mm needs none |
-> | Arachne / variable width | **prefer classic** — Arachne may merge 0.80 into ONE 0.8 mm-wide extrusion, which is a single loop and **fails** |
+> | Arachne / variable width | **now helpful** — the two wall thicknesses differ, so a variable-width generator handles the 1.25 mm sides cleanly. Still confirm it lays ≥2 loops everywhere and does not merge either wall into one wide extrusion |
 > | External perimeter speed | **≤ 25 mm/s** through the wall |
 > | Cooling | 100 % |
 > | Supports | **none** |
@@ -51,8 +51,8 @@ Print-ready meshes exported from the CAD sources.
 > ### Rev Q print gate 2 — THE INTERFERENCE FIT
 >
 > The wall is **0.10 mm per horizontal side WIDER than the hole** by design,
-> and at 0.80 mm it is about **8× stiffer in bending** than the 0.40 mm wall it
-> replaces — so it resists that interference roughly 8× harder. Brief §3.8
+> and the wall resisting it is the **1.25 mm side** wall — about **31× stiffer
+> in bending** than the original 0.40 mm, and 3.8× stiffer than 0.80 mm. Brief §3.8
 > requires the printed wall to take the deflection and the original Perspex to
 > be left unspread and unstressed. **CAD cannot settle that.** Print the fit
 > gauge first, find the largest interference that seats by hand and releases
@@ -61,7 +61,7 @@ Print-ready meshes exported from the CAD sources.
 
 > ### What this print costs optically
 >
-> The clear opening is **30.90 × 13.60 mm** — width by the face opening, height
+> The clear opening is **32.90 × 13.60 mm** — width by the face opening, height
 > by the wall — and the visible lit band drops from 8.100 to **7.450 mm**, all
 > of it at the top. Only the powered test can say whether that is acceptable.
 >
@@ -74,6 +74,13 @@ Print-ready meshes exported from the CAD sources.
 > unbroken seating face. Retention is by the interference fit alone; if
 > adhesive is still wanted it goes on the flat face. **Re-check removability**
 > on the prototype.
+>
+> The aperture is now **flush on the left and right** — the face opening went
+> out 1.00 mm per side to 32.90 and the side wall thickened to **1.25 mm** to
+> meet it, so the old 1.45 mm set-back is gone. Top and bottom stay 0.80 mm,
+> so the clear height and the lit band are unchanged. **The interference is
+> now resisted by that 1.25 mm side wall, about 31x stiffer in bending than
+> the original 0.40 mm — print the fit gauge, do not skip it.**
 >
 > The inset-wall outer corner is **R3.00, up 50% from the brief's R2.00**,
 > because R2.00 did not match the real opening corner. It makes slicing the

@@ -6,14 +6,15 @@ Date: 2026-08-30
 Controlled requirements: `Decca_OLED_Display_Bezel_CAD_Brief_revQ.md` at commit
 `7b107f2389b2ce128c18bef2f5195ef5ab468890` ("require two-loop inset wall"),
 which supersedes `ebfa277` via `edab34b` ("define Rev Q interference fit"),
-plus **two owner changes made on the model, recorded in §3.5**
+plus **three owner changes made on the model, recorded in §3.5 and §3.6**
 Specification: `Decca_OLED_Display_Mount_Spec_v1.0.md` v1.2, §2 and §4
 Carrier: **Rev P.5, RELEASED and FROZEN — unchanged, and proved unchanged (§9)**
 
 > **The first Rev Q print is an integration prototype, not a release part.**
 > Two things it must settle, and CAD cannot: whether a **0.10 mm per side
 > horizontal interference** seats without stressing the original Perspex now
-> that the wall is **8× stiffer in bending**, and whether the production
+> that the wall resisting it is **1.25 mm, ≈31× stiffer in bending** than the
+> original 0.40 mm, and whether the production
 > slicer really lays **two continuous 0.40 mm loops** all the way round.
 > Nothing in this report is a claim about appearance.
 
@@ -48,16 +49,16 @@ adhesive is still wanted it goes on the flat seating face.
 
 | | first issue (`ebfa277`) | as built now (`7b107f2`) |
 |---|---:|---:|
-| Bezel face opening | 30.40 × 14.90 | **30.90 × 15.35** |
+| Bezel face opening | 30.40 × 14.90 | **32.90 × 15.35** |
 | Inset-wall outer envelope | 34.90 × 15.00 | **35.40 × 15.20** |
 | Horizontal fit | 0.15 clearance/side | **0.10 INTERFERENCE/side** |
 | Vertical fit | 0.15 clearance/side | **0.05 clearance/side** |
-| Wall | 0.40 (one loop) | **0.80 (two loops)** |
+| Wall | 0.40 (one loop) | **1.25 sides / 0.80 top+bottom** |
 | Outer corner radius | R0.60, UNRESOLVED | **R3.00** (brief 2.00, owner +50%) |
-| Inner corner radius | R0.20 | **R2.20** (derived) |
+| Inner corner radius | R0.20 | **R1.75** (derived from the side wall) |
 | Recessed adhesive pads | two, preserved | **deleted** (owner) |
-| Wall inner envelope | 34.10 × 14.20 | **33.80 × 13.60** |
-| Effective optical opening | 30.40 × 14.20 | **30.90 × 13.60** |
+| Wall inner envelope | 34.10 × 14.20 | **32.90 × 13.60** (flush) |
+| Effective optical opening | 30.40 × 14.20 | **32.90 × 13.60** |
 | Depth | 2.80 | 2.80 (unchanged) |
 
 The corner radius has moved from being *the* open risk to being a specified
@@ -154,7 +155,7 @@ Source of truth is the `P` dict in
 | `bezel_w` / `bezel_h` / `bezel_t` | 40.00 / 20.30 / 4.00 mm | PRESERVED | Rev N |
 | `bezel_outer_r` | 2.00 mm | PRESERVED | Rev N external corner |
 | `bezel_edge_break` | 0.40 mm | PRESERVED | front face break |
-| `bezel_window_w` | **30.90 mm** | AMENDED | Rev N 30.40 + 0.50 |
+| `bezel_window_w` | **32.90 mm** | **OWNER** | was 30.90, +1.00 per side — §3.6 |
 | `bezel_window_h` | **15.35 mm** | AMENDED | face opening, **at the front face** |
 | `bezel_window_r` | 0.80 mm | PRESERVED | window corner radius |
 | `pads_enabled` | **False** | **OWNER** | the two recessed adhesive pads are DELETED — §3.5 |
@@ -162,7 +163,8 @@ Source of truth is the `P` dict in
 | **`bezel_lip_outer_w`** | **35.40 mm** | AMENDED | Rev N 34.90 + 2 × 0.25 |
 | **`bezel_lip_outer_h`** | **15.20 mm** | AMENDED | Rev N 15.00 + 2 × 0.10 |
 | **`bezel_lip_depth`** | **2.80 mm** | PROVEN | Rev N engagement depth |
-| **`bezel_lip_wall`** | **0.80 mm** | AMENDED | two 0.40 mm loops |
+| **`bezel_lip_wall_y`** | **0.80 mm** | **OWNER** | top/bottom, 2 loops, holds the 13.60 clear height |
+| **`bezel_lip_wall_x`** | **1.25 mm** | **DERIVED** | sides — set by the flush requirement, 3.125 loops |
 | **`bezel_lip_corner_r`** | **3.00 mm** | **OWNER** | outer corner radius; brief says 2.00, raised 50% — §3.5 |
 | **`bezel_lip_lead`** | **0.20 mm** | PROVISIONAL | minimum entry lead-in |
 | **`extrusion_width`** | **0.40 mm** | PRODUCTION | the wall *is* two of these |
@@ -174,11 +176,12 @@ Source of truth is the `P` dict in
 |---|---|---:|
 | `bezel_lip_interf_x` | `(bezel_lip_outer_w − panel_open_w) / 2` | **+0.100 mm** (interference) |
 | `bezel_lip_clear_y` | `(panel_open_h − bezel_lip_outer_h) / 2` | **+0.050 mm** (clearance) |
-| `bezel_lip_inner_w` | `bezel_lip_outer_w − 2 × bezel_lip_wall` | **33.800 mm** |
-| `bezel_lip_inner_h` | `bezel_lip_outer_h − 2 × bezel_lip_wall` | **13.600 mm** |
-| `bezel_lip_inner_r` | `bezel_lip_corner_r − bezel_lip_wall` | **2.200 mm** |
-| `wall_loops` | `bezel_lip_wall / extrusion_width` | **2.000** |
-| `aperture_rear_h` | `bezel_lip_inner_h + 2 × ap_root_relief` | 13.640 mm |
+| `bezel_lip_wall_x` | `(bezel_lip_outer_w − bezel_window_w) / 2` | **1.250 mm** |
+| `bezel_lip_inner_w` | `bezel_lip_outer_w − 2 × bezel_lip_wall_x` | **32.900 mm** = the face opening, i.e. flush |
+| `bezel_lip_inner_h` | `bezel_lip_outer_h − 2 × bezel_lip_wall_y` | **13.600 mm** |
+| `bezel_lip_inner_r` | `bezel_lip_corner_r − bezel_lip_wall_x` | **1.750 mm** |
+| `wall_loops_x` / `wall_loops_y` | `wall / extrusion_width` | **3.125** / **2.000** |
+| `aperture_rear_h` | `bezel_lip_inner_h` | 13.600 mm |
 | `bezel_face_t` | `bezel_t − bezel_lip_depth` | 1.200 mm |
 | `z_lip_rear` | `z_panel_front − bezel_lip_depth` | +0.200 mm |
 
@@ -217,29 +220,32 @@ at the front face.
 
 | | value |
 |---|---:|
-| Aperture at the seating plane (z = +3.000) | 30.900 × 13.640 |
-| Aperture at the front face (z = +4.200) | **30.900 × 15.350** |
-| Taper angle from vertical | **35.47°** — self-supporting |
-| Wall root landing on solid face material | 0.760 of the 0.800 mm |
+| Aperture at the seating plane (z = +3.000) | 32.900 × 13.600, R1.750 |
+| Aperture at the front face (z = +4.200) | **32.900 × 15.350**, R0.800 |
+| Taper angle from vertical | **36.10°** — self-supporting |
+| Wall root landing on solid face material | the full 0.800 mm |
 
 Every published number survives: the bezel face opening is 30.90 × 15.35 at the
-front face, the wall inner envelope is 33.80 × 13.60, and the effective optical
-opening is 30.90 × 13.60 — with the **height controlled by the wall**, exactly
-as brief §4 predicts. Spec v1.2 §4 asks for a flared aperture in any case, "to
+front face, the wall inner envelope is 32.90 × 13.60, and the effective optical
+opening is 32.90 × 13.60 — with the **height controlled by the wall**, exactly
+as brief §4 predicts. (The width is 2.00 mm wider than the 30.90 the brief
+predicted, because the owner later opened the face by 1.00 mm per side — §3.6.) Spec v1.2 §4 asks for a flared aperture in any case, "to
 reduce tunnel effect through the 3 mm Perspex".
 
 ### 3.4 Two small modelling measures, both declared
 
-**`ap_root_relief` = 0.02 mm.** The aperture stops 0.02 mm per side *outside*
-the wall inner opening rather than exactly on it. Landing it exactly on
+**`ap_root_relief` — introduced at 0.02 mm, now back to 0.00.** It made the
+aperture stop 0.02 mm per side *outside* the wall inner opening rather than
+exactly on it. Landing it exactly on
 y = ±6.800 makes the tapered wall tangent to the wall's inner face along a line
 at z = 3.000, and the tessellator answers that with a seam of zero-area
 triangles — **52 of them in the first export, all at exactly z = 3.0000**.
-Backing the aperture off turns that tangency into an ordinary transverse
-intersection and the degenerate triangles disappear entirely (verified: minimum
-triangle area went from 0.000 to 6.297 × 10⁻⁴ mm²). The **wall still controls
-the clear height at 13.600 mm**, because the aperture is now the wider of the
-two.
+Backing the aperture off cured it at the time. The **real** cause was that the
+two profiles coincided along the straight runs but differed at the corners; now
+that the aperture's rear section carries the skirt's own corner radius (§3.6)
+the profiles match exactly, there is no mismatch left to relieve, and the
+relief is back to **0.00** with no degenerate triangles (minimum triangle area
+3.484 × 10⁻³ mm²).
 
 **The window edge break is a chamfer, not a fillet.** The outer envelope keeps
 the Rev N R0.40 *fillet* exactly. The window edge cannot: the tapered aperture
@@ -295,12 +301,81 @@ it does not:
 | Deepest penetration, any plausible opening corner | 0.100 up to R_panel 2.05 | **0.100 across the whole range** |
 | Tightest wall-loop radius at the corner | 1.400 | **2.400** — easier to slice |
 | Unmasked corner gap, sharp opening | 0.562 | **0.836** |
-| Ring cross-section area | 76.2025 mm² | 74.8290 mm² |
+| Ring cross-section area | 76.2025 mm² | 74.8290 mm² (85.5432 after §3.6) |
 
 A corner that is too **square** jams before the bezel seats; a corner that is
 too **round** merely leaves a little cut edge visible at each corner. The change
 trades the first failure mode for the second, which is the safer direction while
 the opening corner remains unmeasured. §8.3 has the full table.
+
+---
+
+### 3.6 Third owner change — the flush aperture and the split wall
+
+Directed after inspecting the model: *"increase the horizontal opening by 1 mm
+each side, expand the thickness of the perspex insert wall to make it flush
+with the opening, no change to the outer dimension"* — and, on the meaning of
+flush, *"not set back as in the current design on the left and right side."*
+
+That set-back was real. The face opening was 30.90 and the skirt inner was
+33.80, so looking in through the window the skirt stood **1.45 mm outboard**
+on each side — a visible rearward ledge.
+
+**The three constraints solve uniquely, and they collided with the loop rule.**
+Opening 32.90 and a fixed 35.40 outer envelope force a wall of
+`(35.40 − 32.90)/2 = 1.25 mm`. At a 0.40 mm extrusion that is **3.125 loops** —
+not a whole number. Worse, applying 1.25 mm uniformly would have dragged the
+vertical clear opening from 13.60 to 12.70 and cost another 0.45 mm of lit
+band, which the owner ruled out.
+
+**The owner then clarified the rule itself:** it is **at least** two loops, and
+**the sides and the top/bottom need not carry the same number**. That releases
+the wall from having to be uniform, and all three constraints can be met at
+once:
+
+| | value | loops | why |
+|---|---:|---:|---|
+| Side wall (X) | **1.250 mm** | 3.125 | **derived** from the flush requirement |
+| Top/bottom wall (Y) | **0.800 mm** | 2.000 | entered — holds the 13.600 clear height |
+| Through the corners | 0.800 → 1.193 mm | ≥ 2.000 | sweeps between the two |
+
+The inner corner radius follows the **thicker** wall,
+`R1.75 = R3.00 − 1.25`. That is not a free choice: it puts the inner corner arc
+centre on the same x as the outer arc centre, so the wall sweeps smoothly and
+reaches its minimum exactly at the top/bottom tangent. **Any smaller inner
+radius squares the corner off and thins the wall below 0.800** — at R0 it
+collapses to 0.189 mm. R1.75 is the smallest value that keeps two full loops
+all the way round, and `validate()` re-measures it rather than trusting the
+derivation.
+
+**What it costs: nothing vertically.** The clear opening goes
+30.90 × 13.60 → **32.90 × 13.60**. The height is untouched, so the visible lit
+band stays at **7.450 mm**. The aperture gains 2.00 mm of width and loses the
+side ledge entirely.
+
+**What it costs: insertion force.** The interference is horizontal, so it is
+resisted by the *side* wall — the one that just went to 1.25 mm. Bending
+stiffness scales with thickness cubed, so that wall is **≈31× stiffer than the
+original 0.40 mm** and **≈3.8× stiffer than the 0.80 mm** it replaced on the
+sides. Brief §3.8 wants the printed wall to take the deflection and the Perspex
+to be left unstressed; at 1.25 mm that is a materially harder ask. **This makes
+the fit gauge mandatory rather than advisable** — see §8.1.
+
+**Two knock-on model fixes**, both found by the validator and both fixed at the
+root rather than waived:
+
+* the aperture's rear section used to over-run 0.05 mm below the seating plane.
+  Harmless while the aperture was 30.90 wide inside a 33.80 skirt; with the
+  side flush the two share a width, and the over-run bit the top of the wall at
+  all four corners — **0.84 mm² of ring area missing at z = 2.95** while
+  z = 0.45 and 1.60 measured correctly. The rear section now stops exactly on
+  the seating plane.
+* the aperture's rear corner radius was the window's R0.80 against the skirt's
+  R1.75, so it bulged outside the skirt corner and left a crescent-shaped 90°
+  ledge hanging over the aperture — **3.40 mm² of unsupported overhang** across
+  the four corners. The rear section now carries the skirt's own R1.75. With
+  the profiles matching exactly, `ap_root_relief` is back to **0.00** — the
+  0.02 mm anti-tangency dodge existed only to paper over that mismatch.
 
 ---
 
@@ -315,15 +390,15 @@ the opening corner remains unmeasured. §8.3 has the full table.
 | Front edge break, window | 0.400 × 45° chamfer (§3.4) |
 | Seating plane (Perspex front) | z = +3.000 |
 | Bezel front face | z = +4.200 |
-| **Bezel face opening, at the front face** | **30.900 × 15.350**, R0.800 |
-| Aperture at the seating plane | 30.900 × 13.640 |
-| Aperture taper | 35.47° from vertical, Y only |
+| **Bezel face opening, at the front face** | **32.900 × 15.350**, R0.800 |
+| Aperture at the seating plane | 32.900 × 13.600, R1.750 |
+| Aperture taper | 36.10° from vertical, Y only |
 | **Inset-wall outer envelope** | **35.400 × 15.200** |
-| **Inset-wall inner envelope** | **33.800 × 13.600** |
-| **Wall thickness** | **0.800 everywhere, including through the corners** |
+| **Inset-wall inner envelope** | **32.900 × 13.600** — flush with the face opening |
+| **Wall thickness** | **1.250 sides / 0.800 top and bottom**; corners sweep between, never below 0.800 |
 | **Wall depth** | **2.800** (z +3.000 → +0.200) |
 | Outer corner radius | **R3.000** |
-| Inner corner radius | **R2.200** |
+| Inner corner radius | **R1.750** |
 | Entry lead-in | 0.200 × 45°, outer rear edge only |
 | **Horizontal fit** | **0.100 INTERFERENCE per side** |
 | **Vertical fit** | **0.050 clearance per side** |
@@ -331,11 +406,11 @@ the opening corner remains unmeasured. §8.3 has the full table.
 | Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
 | Clearance to OLED glass front face | **0.500** — the released Rev N/P value |
 | Minimum distance to the Rev P.5 carrier | **0.939** |
-| **Effective optical opening** | **30.900 × 13.600**, R0.800 |
+| **Effective optical opening** | **32.900 × 13.600**, R1.750 |
 | Seating face | one unbroken annulus, **278.212 mm²** (no adhesive pads) |
-| Solid volume | 0.6304 cm³ (mesh 630.46 mm³) |
+| Solid volume | 0.6276 cm³ (mesh 627.6 mm³) |
 | Mass in PETG @ 1.27 g/cm³ | ≈ **0.80 g** |
-| Mesh | 7138 triangles, 3569 vertices, closed, manifold, no degenerates |
+| Mesh | 3844 triangles, 1922 vertices, closed, manifold, no degenerates |
 
 ---
 
@@ -345,7 +420,7 @@ the opening corner remains unmeasured. §8.3 has the full table.
 
 | | Rev N | Rev Q | change |
 |---|---:|---:|---:|
-| Clear opening width | 30.400 | **30.900** | **+0.500** |
+| Clear opening width | 30.400 | **32.900** | **+2.500** |
 | Clear opening height | 14.900 | **13.600** | **−1.300 total, −0.650 per side** |
 | Corner radius | R0.800 | R0.800 | 0 |
 
@@ -383,7 +458,7 @@ opening at all. Rev Q takes a further 0.65 mm off the top of that.
 
 > **CAD does not get a vote on whether this is acceptable.** It reports the
 > geometry. Whether the intended screen content is still readable through a
-> 30.90 × 13.60 mm aperture is settled by the powered test in §10, and by
+> 32.90 × 13.60 mm aperture is settled by the powered test in §10, and by
 > nothing else.
 
 ---
@@ -392,17 +467,18 @@ opening at all. Rev Q takes a further 0.65 mm off the top of that.
 
 Two independent tools. Neither check was altered, relaxed or removed.
 
-### 6.1 In Fusion — `validate()` — **46/46 PASS**
+### 6.1 In Fusion — `validate()` — **51/51 PASS**
 
 | Group | Result |
 |---|---|
 | Solid integrity | one body, closed solid, **1 shell, 1 lump**, 0 sliver faces < 0.001 mm², 0 sliver edges < 0.005 mm |
 | Envelope | 40.00000 × 20.30000 × 4.00000; front face +4.20000; rearmost +0.20000 |
-| **Wall continuity, by AREA** | full ring **74.8290 mm²** at z = 0.45, 1.60 and 2.95 — matching the analytic value to four decimals |
-| Continuity by region | top **23.5200**, bottom **23.5200**, right **7.3600**, left **7.3600**, corners **13.0690 mm²** — every one exact |
-| Wall through the R3.00 corners | corner area **13.0690** vs `π(3.00² − 2.20²) = 13.0690` |
+| **Wall continuity, by AREA** | full ring **85.5432 mm²** at z = 0.45, 1.60 and 2.95 — matching the analytic value to four decimals |
+| Continuity by region | top **23.5200**, bottom **23.5200**, right **11.5000**, left **11.5000**, corners **15.5032 mm²** — every one exact |
+| Wall through the R3.00 corners | sweeps **0.8000 → 1.1931 mm**, never below the 0.80 top/bottom wall, never above the 1.25 side wall |
+| Flush | skirt inner width **32.9000** == face opening **32.9000** |
 | Outer envelope | exactly 35.4000 × 15.2000 |
-| Two-loop wall | 0.800 / 0.40 = **2.0000** loops; corner loop radii **2.800** and **2.400**, no cusp; centrelines exactly **0.4000** apart |
+| Loop rule, per side | sides **3.125** loops, top/bottom **2.000** loops, corners never below **2.000**; corner loop radii **2.800** and **2.400**, no cusp; centrelines exactly **0.4000** apart |
 | **Interference present** | **5.4186 mm³** of overlap |
 | Interference located | only outboard of the opening wall, \|x\| = 17.7000 vs 17.6000; \|y\| max 5.3681 vs 7.6500; z 0.3000…3.0000 |
 | Interference bounded | deepest **0.1000 mm** — exactly the declared value |
@@ -410,7 +486,7 @@ Two independent tools. Neither check was altered, relaxed or removed.
 | Behind the Perspex rear face | **0.000000 mm³** |
 | OLED glass | 0.000000 mm³; clearance 0.5000 mm |
 | **Rev P.5 carrier** | **0.000000 mm³**; minimum distance **0.9394 mm** |
-| Optical opening, plug test | a 30.86 × 13.56 plug passes clean through (0.000000 mm³); a 30.94 × 13.64 plug does not |
+| Optical opening, plug test | a 32.86 × 13.56 plug passes clean through (0.000000 mm³); a 32.94 × 13.64 plug does not |
 | Print orientation | wall worst overhang **0.000°**; 0.0000 mm² of >45° overhang outside the bed-adjacent break |
 
 Continuity is proved by **cross-section area**, not by point sampling.
@@ -421,7 +497,7 @@ as void. Area, taken by boolean intersection with a thin slab, is exact — and
 it is the **stronger** proof, because any break, thin spot or gap anywhere in
 the ring removes area and an exact match leaves nowhere for one to hide.
 
-### 6.2 Offline from the mesh — `Decca_Display_Bezel_revQ_verify.py` — **42/42 PASS**
+### 6.2 Offline from the mesh — `Decca_Display_Bezel_revQ_verify.py` — **44/44 PASS**
 
 Reads only `../STL/Front_Bezel_revQ.stl`, numpy only, exits non-zero on
 failure. It re-derives every claim from triangles and compares against figures
@@ -443,16 +519,16 @@ from the generator.
                        measured wall mean 0.8000  min 0.8000  max 0.8000
                        through the R3.00 corners: 368 stations, 0.8000 flat
 5b. TWO-LOOP WALL      exactly 2 x 0.40 loops; corner loop radii 2.80 / 2.40,
-                       no cusp; centrelines 0.4000 apart; inner corner R2.20
-6. ENVELOPE + FIT      inner 33.8000 x 13.6000; depth 2.8000;
+                       no cusp; centrelines 0.4000 apart; inner corner R1.75
+6. ENVELOPE + FIT      inner 32.9000 x 13.6000; depth 2.8000;
                        INTERFERENCE +0.1000/side; clearance +0.0500/side
 7. FACE + OPTICAL      aperture 13.9250 @ z=3.20 and 14.6375 @ z=3.70,
-                       extrapolating to 13.6400 at the seating plane and
+                       extrapolating to 13.6000 at the seating plane and
                        15.3500 at the front face; taper 35.47 deg;
-                       face width 30.9000; EFFECTIVE 30.9000 x 13.6000
+                       face width 32.9000; EFFECTIVE 32.9000 x 13.6000
 8. LEAD-IN             tip 35.0020 (expected 35.0000); full section restored
                        by z = +0.400
-RESULT: 42/42 PASS
+RESULT: 44/44 PASS
 ```
 
 ### 6.3 Sprung-post and module corridors
@@ -490,26 +566,29 @@ overhang over it.
 
 ### 7.1 The two-loop wall — this is the whole point of the amendment
 
-`bezel_lip_wall = 0.80 mm` is **exactly two 0.40 mm extrusion loops**. The
-first issue's 0.40 mm wall resolved as a single loop, which is what this
-amendment exists to fix.
+The loop rule is **at least two 0.40 mm loops, applied per side** — the sides
+and the top/bottom are free to carry different numbers. The first issue's
+0.40 mm wall resolved as a single loop, which is what the amendment fixed;
+the sides then went to 1.25 mm to make the aperture flush (§3.6), so they
+carry three.
 
 What CAD can prove, and does:
 
 | Property | Value |
 |---|---|
 | Wall / extrusion width | **0.800 / 0.400 = 2.000 exactly** |
-| Measured wall, 720 stations | min **0.8000**, max **0.8000** |
-| Measured wall through the corners | 368 stations, **0.8000** flat |
+| Measured wall, 720 stations | min **0.8000** (top/bottom), max **1.2500** (sides) |
+| Measured wall through the corners | 368 stations, **0.8000 → 1.1931**, never below two loops |
 | Outer loop centreline radius at the corner | 3.00 − 0.20 = **2.800** |
 | Inner loop centreline radius at the corner | 3.00 − 0.60 = **2.400** |
+| Side wall / top-bottom wall | **1.250** (3.125 loops) / **0.800** (2.000 loops) |
+| Corner wall sweep | **0.8000 → 1.1931 mm**, never below two loops |
 | Loop centreline separation | **0.400** — one extrusion, everywhere |
 | Smallest offset radius | **1.400** — no cusp, no self-intersection |
 
-Because the wall is a constant 0.80 mm offset with an R3.00 outer and R2.20
-inner corner, both loop centrelines remain smooth closed curves the whole way
-round, and neither collapses or merges at the corners. The larger corner makes
-this easier, not harder: the tightest loop radius rises from 1.400 to 2.400 mm.
+With an R3.00 outer and R1.75 inner corner both loop centrelines remain smooth
+closed curves the whole way round, and neither collapses or merges at the
+corners. The tightest loop radius is 2.400 mm.
 
 > **CAD cannot prove what the slicer does.** It proves the geometry *admits*
 > two continuous loops. The production slicer preview is a separate, physical
@@ -519,7 +598,7 @@ this easier, not harder: the tightest loop radius rises from 1.400 to 2.400 mm.
 |---|---|---|
 | Nozzle / extrusion width | **0.40 mm** | the wall *is* two of these |
 | Layer height | 0.15–0.20 mm | 14–19 layers up the wall |
-| Perimeters | **2** in the wall | not "auto", not variable-width |
+| Perimeters | **at least 2** in every wall | the sides take 3, the top and bottom 2 — a variable-width generator such as Arachne is now HELPFUL, not a hazard, because the two thicknesses differ |
 | Thin-wall / gap fill | **OFF** if it can be | a full 0.80 mm needs no gap fill; if the slicer inserts any, the setting is wrong |
 | Arachne / variable width | **prefer classic** | Arachne may merge 0.80 into one 0.8 mm-wide extrusion — that is a single loop and **fails** the requirement |
 | External perimeter speed | ≤ 25 mm/s in the wall | a 2.80 mm tall standing ring |
@@ -541,9 +620,9 @@ this easier, not harder: the tightest loop radius rises from 1.400 to 2.400 mm.
 ### 8.1 The interference fit — the primary risk now
 
 The wall went 0.40 → 0.80 mm to get the second loop. **Bending stiffness scales
-with thickness cubed, so the wall is about 8× stiffer than the one it
-replaces**, and the same 0.10 mm per side of interference is resisted roughly
-8× harder.
+with thickness cubed**. The interference is horizontal, so it is resisted by
+the **side** wall — now 1.25 mm after §3.6, which is **≈31× stiffer than the
+original 0.40 mm** and **≈3.8× stiffer than the 0.80 mm** it replaced there.
 
 Brief §3.8 requires the *printed wall* to take the deflection and the original
 Perspex to be left unspread and unstressed. At a 0.40 mm wall that split was
@@ -746,7 +825,7 @@ Print in **PETG, matt or satin black**, front face down, no supports, per §7.
 18. Power the OLED with the intended content and photograph the visible active
     area edges.
 19. Confirm the required information is still readable through the
-    **30.90 × 13.60 mm** aperture. The lit band is **7.450 mm** tall, 0.650 mm
+    **32.90 × 13.60 mm** aperture. The lit band is **7.450 mm** tall, 0.650 mm
     less than Rev N.
 20. Check specifically for anything the wall could have introduced: a new edge
     shadow, a reflection off the inner face of the wall, or light leaking
@@ -774,7 +853,7 @@ The brief's six stop conditions, honestly assessed:
 |---|---|
 | The wall corners (now R3.00) or the declared interference cannot seat without damaging or visibly stressing the Perspex | **OPEN — the primary prototype gate.** CAD confirms the geometry is exactly as declared, and that at R3.00 penetration stays at 0.100 mm across the whole plausible range of opening corner radii. Whether an 8× stiffer wall takes that deflection instead of the Perspex is a physical question. Fit gauge first. §8.1 |
 | Continuous wall needs more than 0.10 mm per horizontal side, or masks unacceptably | **NOT triggered geometrically** — interference is exactly 0.100 mm, bounded and located, and the wall is continuous. Whether the masking is acceptable is deferred to the powered test. |
-| Slicer cannot maintain two continuous loops at 0.80 mm | **NOT triggered, but NOT closed.** The geometry is exactly two 0.40 mm loops with no thin spot and no corner cusp. Only the production slicer preview can close it. §10 Stage 0b |
+| Slicer cannot maintain at least two continuous loops | **NOT triggered, but NOT closed.** The sides carry 3.125 loops and the top/bottom 2.000, with no thin spot and no corner cusp; the corners never fall below two. Only the production slicer preview can close it. §10 Stage 0b |
 | Wall reduces OLED visibility beyond the accepted presentation | **REPORTED, not judged.** Lit band 8.100 → 7.450 mm, all at the top. A powered-test decision. §5.1 |
 | Rev P.5 carrier or its released files would need to change | **NOT triggered.** All six frozen files byte-identical; zero interference with the carrier; 0.939 mm minimum distance. §9 |
 | Fusion cannot produce and verify a stable, parametric single solid | **NOT triggered.** One shell, one lump, closed solid, zero slivers; mesh manifold, single-component, no degenerate triangles. Two build obstacles were met and resolved in the open: the window-edge fillet (→ chamfer, §3.4) and a tangency seam of zero-area triangles (→ `ap_root_relief`, §3.4). |

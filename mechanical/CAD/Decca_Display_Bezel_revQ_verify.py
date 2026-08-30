@@ -40,17 +40,19 @@ Z_FRONT = 4.20                                       # bezel front face
 Z_SEAT = 3.00                                        # Perspex front / seating
 Z_TIP = 0.20                                         # lip rear tip
 LIP_OUT_W, LIP_OUT_H = 35.40, 15.20                  # inset-wall outer envelope
-LIP_IN_W, LIP_IN_H = 33.80, 13.60                    # derived: outer - 2*wall
-LIP_WALL = 0.80                                      # two 0.40 loops
+LIP_IN_W, LIP_IN_H = 32.90, 13.60                    # derived, split wall
+LIP_WALL_X = 1.25                    # sides, flush with the face opening
+LIP_WALL_Y = 0.80                    # top/bottom, holds the 13.60 height
+LIP_WALL_MIN = LIP_WALL_Y            # the corners never go below this
 LIP_DEPTH = 2.80
 LIP_CORNER_R = 3.00                                  # owner +50%, was 2.00
-LIP_INNER_R = 2.20                                   # derived: 3.00 - 0.80
+LIP_INNER_R = 1.75                                   # derived: 3.00 - 1.25
 LIP_LEAD = 0.20
 EXTRUSION_W = 0.40                                   # production extrusion
-WALL_LOOPS = 2                                       # the whole point of Rev Q
-FACE_OPEN_W, FACE_OPEN_H = 30.90, 15.35              # bezel face opening
-OPTICAL_W, OPTICAL_H = 30.90, 13.60                  # effective clear opening
-AP_ROOT_RELIEF = 0.02                                # anti-tangency relief
+MIN_LOOPS = 2                        # AT LEAST two, applied PER SIDE
+FACE_OPEN_W, FACE_OPEN_H = 32.90, 15.35              # bezel face opening
+OPTICAL_W, OPTICAL_H = 32.90, 13.60                  # effective clear opening
+AP_ROOT_RELIEF = 0.00                                # no longer needed
 AP_REAR_H = OPTICAL_H + 2 * AP_ROOT_RELIEF           # aperture at the seat
 PANEL_OPEN_W, PANEL_OPEN_H = 35.20, 15.30            # MEASURED
 PANEL_T = 3.00
@@ -335,7 +337,7 @@ def main():
     voids = 0
     walls = []
     for (px, py, nx, ny) in path_pts:
-        mx, my = px + nx * LIP_WALL / 2.0, py + ny * LIP_WALL / 2.0
+        mx, my = px + nx * LIP_WALL_MIN / 2.0, py + ny * LIP_WALL_MIN / 2.0
         hits = ray_hits(tris, mx, my)
         present_all = True
         for z in zs:
@@ -376,37 +378,42 @@ def main():
     if walls:
         w = np.array(walls)
         wall_arr = w
-        gate(abs(w.mean() - LIP_WALL) < 0.02
-             and abs(w.min() - LIP_WALL) < 0.03
-             and abs(w.max() - LIP_WALL) < 0.03,
-             "measured lip wall = %.2f mm everywhere" % LIP_WALL,
-             "mean %.4f  min %.4f  max %.4f" % (w.mean(), w.min(), w.max()))
+        gate(abs(w.min() - LIP_WALL_Y) < 0.03
+             and abs(w.max() - LIP_WALL_X) < 0.03,
+             "measured wall spans %.2f (top/bottom) to %.2f (sides) mm"
+             % (LIP_WALL_Y, LIP_WALL_X),
+             "min %.4f  max %.4f  mean %.4f"
+             % (w.min(), w.max(), w.mean()))
         # the corner stations on their own - a constant wall through an
         # R2.00 outer / R1.20 inner corner is the hardest part to get right
         cw = [walls[i] for i, (px, py, _n, _m) in enumerate(path_pts[:len(walls)])
               if abs(px) > ax - 1e-9 and abs(py) > ay - 1e-9]
         if cw:
             c = np.array(cw)
-            gate(abs(c.min() - LIP_WALL) < 0.03
-                 and abs(c.max() - LIP_WALL) < 0.03,
-                 "wall stays %.2f mm THROUGH THE R%.2f CORNERS"
-                 % (LIP_WALL, LIP_CORNER_R),
+            gate(c.min() >= LIP_WALL_MIN - 0.03
+                 and c.max() <= LIP_WALL_X + 0.03,
+                 "wall through the R%.2f CORNERS never drops below %.2f mm"
+                 % (LIP_CORNER_R, LIP_WALL_MIN),
                  "%d corner stations, min %.4f max %.4f"
                  % (len(cw), c.min(), c.max()))
 
     print("")
-    print("5b. THE TWO-LOOP WALL - the point of the 0.80 mm amendment")
-    gate(abs(LIP_WALL / EXTRUSION_W - WALL_LOOPS) < 1e-9,
-         "wall is EXACTLY %d x %.2f mm extrusion loops"
-         % (WALL_LOOPS, EXTRUSION_W),
-         "%.2f / %.2f = %.4f" % (LIP_WALL, EXTRUSION_W,
-                                 LIP_WALL / EXTRUSION_W))
+    print("5b. THE WALL LOOPS - at least two, per side, sides and top/bottom free")
+    gate(LIP_WALL_X / EXTRUSION_W >= MIN_LOOPS - 1e-9,
+         "side wall is at least %d x %.2f mm loops" % (MIN_LOOPS, EXTRUSION_W),
+         "%.2f / %.2f = %.3f loops" % (LIP_WALL_X, EXTRUSION_W,
+                                       LIP_WALL_X / EXTRUSION_W))
+    gate(LIP_WALL_Y / EXTRUSION_W >= MIN_LOOPS - 1e-9,
+         "top/bottom wall is at least %d x %.2f mm loops"
+         % (MIN_LOOPS, EXTRUSION_W),
+         "%.2f / %.2f = %.3f loops" % (LIP_WALL_Y, EXTRUSION_W,
+                                       LIP_WALL_Y / EXTRUSION_W))
     if wall_arr is not None:
-        gate(wall_arr.min() >= WALL_LOOPS * EXTRUSION_W - 0.03,
-             "no measured station thinner than %d extrusions - nowhere for "
-             "the slicer to substitute gap fill" % WALL_LOOPS,
+        gate(wall_arr.min() >= MIN_LOOPS * EXTRUSION_W - 0.03,
+             "no measured station thinner than %d extrusions, anywhere"
+             % MIN_LOOPS,
              "thinnest measured %.4f mm vs %.2f mm required"
-             % (wall_arr.min(), WALL_LOOPS * EXTRUSION_W))
+             % (wall_arr.min(), MIN_LOOPS * EXTRUSION_W))
     # the two loop centrelines are inward offsets of the outer surface by
     # 0.20 and 0.60. Both must survive the corners without cusping or
     # merging, or the slicer drops one or fuses them.
@@ -419,9 +426,12 @@ def main():
          "loop centrelines stay exactly one extrusion apart",
          "%.4f mm" % (r1 - r2))
     gate(LIP_INNER_R >= 0.0
-         and abs(LIP_INNER_R - (LIP_CORNER_R - LIP_WALL)) < 1e-9,
-         "inner corner R%.2f = outer R%.2f - wall %.2f"
-         % (LIP_INNER_R, LIP_CORNER_R, LIP_WALL), "%.4f" % LIP_INNER_R)
+         and abs(LIP_INNER_R - (LIP_CORNER_R - LIP_WALL_X)) < 1e-9,
+         "inner corner R%.2f = outer R%.2f - SIDE wall %.2f"
+         % (LIP_INNER_R, LIP_CORNER_R, LIP_WALL_X), "%.4f" % LIP_INNER_R)
+    gate(abs(LIP_IN_W - FACE_OPEN_W) < 1e-9,
+         "FLUSH: skirt inner width == face opening, no set-back at the sides",
+         "%.4f vs %.4f" % (LIP_IN_W, FACE_OPEN_W))
     note("still a physical gate",
          "this proves the GEOMETRY admits two continuous loops; only the "
          "production slicer preview can prove it lays them")
@@ -476,8 +486,12 @@ def main():
     gate(abs(cy - CLEAR_Y) < 1e-9,
          "vertical clearance %.3f mm per side" % CLEAR_Y, "%+.4f mm" % cy)
     note("the lip is WIDER than the hole by design",
-         "brief 3.7/3.8: the thin printed lip takes the deflection, the "
-         "Perspex is not to be spread or stressed - a PHYSICAL gate")
+         "brief 3.7/3.8: the printed wall takes the deflection, the Perspex "
+         "is not to be spread or stressed - a PHYSICAL gate")
+    note("and the wall resisting it is now %.2f mm" % LIP_WALL_X,
+         "%.0fx stiffer in bending than the original 0.40 mm wall, %.1fx "
+         "stiffer than 0.80 - print the fit gauge first"
+         % ((LIP_WALL_X / 0.40) ** 3, (LIP_WALL_X / 0.80) ** 3))
 
     print("")
     print("7. THE FACE OPENING AND THE EFFECTIVE OPTICAL OPENING")
@@ -520,7 +534,7 @@ def main():
          "width by the %.2f mm face opening, HEIGHT BY THE %.2f mm LIP INNER"
          % (FACE_OPEN_W, LIP_IN_H))
     note("versus Rev N (30.40 x 14.90)",
-         "width +0.500, height -1.300 total, -0.650 per side")
+         "width +2.500, height -1.300 total (-0.650 per side)")
 
     print("")
     print("8. THE LEAD-IN MUST NOT EAT THE COVERAGE")
@@ -552,8 +566,8 @@ def main():
           % (CHECKS, CHECKS))
     print("")
     print("This proves geometry only. It does NOT prove the bezel FITS. The")
-    print("0.10 mm per side horizontal INTERFERENCE is now resisted by a wall")
-    print("8x stiffer in bending than the 0.40 mm one it replaces, and the")
+    print("0.10 mm per side horizontal INTERFERENCE is now resisted by a 1.25 mm")
+    print("side wall, 30x stiffer in bending than the original 0.40 mm one, and")
     print("opening corner radius has never been measured. No CAD or mesh check")
     print("in this repository can settle either. Print Bezel_Fit_Gauge_revQ")
     print("first, and see the Rev Q build report.")

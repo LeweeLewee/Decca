@@ -42,11 +42,11 @@ Key dimensions, each verified by two independent tools:
 
 | | mm |
 |---|---:|
-| Bezel face opening, at the front face | **30.900 × 15.350**, R0.800 |
+| Bezel face opening, at the front face | **32.900 × 15.350**, R0.800 |
 | Inset-wall outer envelope | **35.400 × 15.200** |
-| Inset-wall inner envelope (derived) | 33.800 × 13.600 |
-| Wall | **0.800** = exactly two 0.400 mm loops |
-| Outer / inner corner radius | **R3.000** / R2.200 (derived) |
+| Inset-wall inner envelope (derived) | 32.900 × 13.600 — **flush with the face opening** |
+| Wall | **1.250 sides** (3.125 loops) / **0.800 top+bottom** (2.000 loops) |
+| Outer / inner corner radius | **R3.000** / R1.750 (derived from the side wall) |
 | Wall depth | **2.800** into the 3.00 mm Perspex |
 | Horizontal fit | **0.100 INTERFERENCE per side** |
 | Vertical fit | 0.050 clearance per side |
@@ -54,11 +54,11 @@ Key dimensions, each verified by two independent tools:
 | Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
 | Clearance to the OLED glass | **0.500** — the released Rev N/P value |
 | Minimum distance to the Rev P.5 carrier | 0.939 |
-| Effective clear optical opening | **30.900 × 13.600**, R0.800 |
+| Effective clear optical opening | **32.900 × 13.600**, R1.750 |
 | Seating face | one unbroken annulus, 278.212 mm² (adhesive pads deleted) |
-| Volume | 0.6304 cm³ ≈ 0.80 g in PETG |
+| Volume | 0.6276 cm³ ≈ 0.80 g in PETG |
 
-**46/46 gates PASS** in Fusion; **42/42 PASS** offline from the mesh. One shell,
+**51/51 gates PASS** in Fusion; **44/44 PASS** offline from the mesh. One shell,
 one lump, zero slivers, no degenerate triangles; the wall's cross-section area
 matches the analytic value to four decimals at three depths and in every region
 including the corners; interference is exactly 0.100 mm per side, located only
@@ -68,8 +68,8 @@ Perspex rear face.
 
 > **The interference is the open risk now.** The wall went 0.40 → 0.80 mm to
 > get the second loop, and **bending stiffness scales with thickness cubed**,
-> so it is about **8× stiffer** and resists the same 0.10 mm per side roughly
-> 8× harder. Brief §3.8 requires the printed wall to take the deflection and
+> and the interference is resisted by the **side** wall, now 1.25 mm after the
+> flush change — about **31× stiffer** than the original 0.40 mm. Brief §3.8 requires the printed wall to take the deflection and
 > the Perspex to be left unstressed; at 0.80 mm that split is no longer
 > obvious and CAD cannot settle it. **Print `Bezel_Fit_Gauge_revQ` first** —
 > five tabs at 0.00/0.05/0.10/0.15/0.20 mm interference, each carrying the real
@@ -91,15 +91,26 @@ Perspex rear face.
 > radii, at the cost of a larger unmasked corner gap. Build report §3.5.
 
 > **The wall costs 0.650 mm of lit screen height.** The clear opening is
-> 30.90 × 13.60 — width by the face opening, **height by the wall** — and the
+> 32.90 × 13.60 — width by the face opening, **height by the wall** — and the
 > visible active band drops 8.100 → **7.450 mm**, all of it at the top. Only
 > the powered test can say whether that is acceptable. Build report §5.
+
+> **Third owner change: the aperture is now FLUSH and the wall is SPLIT.**
+> The face opening went out 1.00 mm per side to 32.90 and the side wall
+> thickened to **1.250 mm** so its inner face lands on it — the 1.45 mm
+> set-back on the left and right is gone. The top and bottom stay at
+> **0.800 mm**, so the clear height and the lit band are untouched. The loop
+> rule is **at least** two per side, not exactly two, and the sides and the
+> top/bottom are free to differ: 3.125 and 2.000 loops respectively, never
+> below 2.000 through the corners. **The interference is now resisted by a
+> 1.25 mm wall, ≈31× stiffer than the original 0.40 mm — the fit gauge is
+> mandatory, not advisable.** Build report §3.6.
 
 > **One forced modelling decision, fully declared.** The amended face opening
 > (15.35) is *taller than the whole wall* (15.20), so a straight-walled
 > aperture would leave the top and bottom wall runs **detached** from the bezel
-> face. The aperture therefore **tapers in Y**, 13.640 at the seating plane to
-> 15.350 at the front face, at 35.47° — self-supporting, every published number
+> face. The aperture therefore **tapers in Y**, 13.600 at the seating plane to
+> 15.350 at the front face, at 36.10° — self-supporting, every published number
 > preserved. The window edge break is a 0.40 chamfer rather than the Rev N
 > R0.40 fillet, because Fusion refuses a fillet on the tapered aperture edge at
 > every radius. Build report §3.3 and §3.4.
