@@ -18,15 +18,22 @@ Source (editable, parametric) mechanical design files.
 Rev Q replaces the two Rev N side locating rails with **one continuous inset
 masking wall** around the complete inside perimeter of the Perspex opening —
 left, right, top, bottom and all four corners. The wall conceals the visible
-cut edge and locates the bezel on a **controlled 0.10 mm per side horizontal
-interference**, with 0.05 mm vertical clearance. It is not a snap, not a clamp
-and carries no load. The two Rev N recessed adhesive pads are DELETED at owner
-instruction, so retention is now by the interference fit alone; if adhesive is
-still wanted it goes on the flat seating face.
+cut edge and locates the bezel on an **interference fit on both axes**. It is
+not a snap, not a clamp and carries no load. The two Rev N recessed adhesive
+pads are DELETED at owner instruction, so retention is by the fit alone; if
+adhesive is still wanted it goes on the flat seating face.
 
-Built to brief commit `7b107f2` ("require two-loop inset wall"): the wall is
-**0.80 mm**, exactly **two 0.40 mm extrusion loops**, because the first issue's
-0.40 mm wall resolved as only one loop in the slicer.
+Built to brief commit `7b107f2` ("require two-loop inset wall"), then moved on
+by four owner changes made on the model. Every wall carries **at least two
+0.40 mm extrusion loops** — a minimum applied per side, not a fixed count.
+
+> **READ THIS BEFORE PRINTING A BEZEL.** After the owner's interference-fit
+> refinement the inset wall measures **36.20 × 17.20 mm** against a MEASURED
+> Perspex opening of **35.20 × 15.30 mm** — 1.00 mm oversize across and
+> **1.90 mm oversize up**. As modelled the part cannot enter the opening at
+> all. Either `panel_open_h` is stale and the real opening needs re-measuring,
+> or the vertical move overshoots. The geometry is exactly as instructed and
+> fully validated; the fit is not. Build report §3.7 and §8.1.
 
 | File | Role |
 |---|---|
@@ -42,78 +49,77 @@ Key dimensions, each verified by two independent tools:
 
 | | mm |
 |---|---:|
-| Bezel face opening, at the front face | **32.900 × 15.350**, R0.800 |
-| Inset-wall outer envelope | **35.400 × 15.200** |
-| Inset-wall inner envelope (derived) | 32.900 × 13.600 — **flush with the face opening** |
-| Wall | **1.250 sides** (3.125 loops) / **0.800 top+bottom** (2.000 loops) |
-| Outer / inner corner radius | **R3.000** / R1.750 (derived from the side wall) |
+| Bezel face opening, at the front face | **32.900 × 15.600**, R1.750 |
+| Aperture | a **straight bore** — identical at the front face and the seating plane, taper 0.00° |
+| Inset-wall outer envelope | **36.200 × 17.200** |
+| Inset-wall inner envelope (derived) | 32.900 × 15.600 — **flush with the face opening on all four sides** |
+| Wall | **1.650 sides** (4.125 loops) / **0.800 top+bottom** (2.000 loops) |
+| Outer / inner corner radius | **R3.400** / R1.750 (derived from the side wall) |
 | Wall depth | **2.800** into the 3.00 mm Perspex |
-| Horizontal fit | **0.100 INTERFERENCE per side** |
-| Vertical fit | 0.050 clearance per side |
+| Horizontal fit | **0.500 INTERFERENCE per side** |
+| Vertical fit | **0.950 INTERFERENCE per side** |
 | Entry lead-in | 0.200 × 45°, outer rear edge only |
 | Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
 | Clearance to the OLED glass | **0.500** — the released Rev N/P value |
-| Minimum distance to the Rev P.5 carrier | 0.939 |
-| Effective clear optical opening | **32.900 × 13.600**, R1.750 |
-| Seating face | one unbroken annulus, 278.212 mm² (adhesive pads deleted) |
-| Volume | 0.6276 cm³ ≈ 0.80 g in PETG |
+| Minimum distance to the Rev P.5 carrier | 0.602 |
+| Effective clear optical opening | **32.900 × 15.600**, R1.750 |
+| Seating face | one unbroken annulus, 195.850 mm² (adhesive pads deleted) |
+| Volume | 0.6300 cm³ ≈ 0.80 g in PETG |
 
-**51/51 gates PASS** in Fusion; **44/44 PASS** offline from the mesh. One shell,
+**52/52 gates PASS** in Fusion; **46/46 PASS** offline from the mesh. One shell,
 one lump, zero slivers, no degenerate triangles; the wall's cross-section area
 matches the analytic value to four decimals at three depths and in every region
-including the corners; interference is exactly 0.100 mm per side, located only
-on the horizontal flanks and vanishing when the declared relief is applied;
+including the corners; the interference is exactly 0.500 mm per side across and
+0.950 mm up, nowhere more, and vanishes when the declared relief is applied;
 zero interference with the OLED glass or the carrier; nothing behind the
 Perspex rear face.
 
-> **The interference is the open risk now.** The wall went 0.40 → 0.80 mm to
-> get the second loop, and **bending stiffness scales with thickness cubed**,
-> and the interference is resisted by the **side** wall, now 1.25 mm after the
-> flush change — about **31× stiffer** than the original 0.40 mm. Brief §3.8 requires the printed wall to take the deflection and
-> the Perspex to be left unstressed; at 0.80 mm that split is no longer
-> obvious and CAD cannot settle it. **Print `Bezel_Fit_Gauge_revQ` first** —
-> five tabs at 0.00/0.05/0.10/0.15/0.20 mm interference, each carrying the real
-> wall section. Build report §8.1.
+> **The fit is the open risk, and it is no longer a question of force.** The
+> skirt is larger than the hole on both axes — see the warning above. If it
+> does enter, insertion force is next: the horizontal interference is resisted
+> by the **1.65 mm side** wall, about **70× stiffer in bending** than the
+> original 0.40 mm and 8.8× stiffer than 0.80 mm, while the vertical is
+> resisted by the far more compliant 0.80 mm top and bottom walls carrying
+> nearly twice the interference. Brief §3.8 requires the printed wall to take
+> the deflection and the Perspex to be left unstressed; CAD cannot settle it.
+> **Print `Bezel_Fit_Gauge_revQ` first** — five tabs at
+> 0.00/0.05/0.10/0.15/0.20 mm interference, each carrying the real wall
+> section and the full 17.20 mm height. Build report §8.1.
 
-> **Two continuous loops is a PRODUCTION gate, not a CAD one.** CAD proves the
-> geometry admits them: 0.800/0.400 = 2.000 exactly, wall 0.8000 min and max
-> over 720 stations including 368 corner stations, loop centrelines 0.400 apart
-> with corner radii 2.800 and 2.400 and no cusp. Only the slicer preview can
-> prove it lays them. Build report §7.1 and §10 Stage 0b.
+> **The loop rule is a PRODUCTION gate, not a CAD one.** CAD proves the
+> geometry admits the loops: sides 1.650/0.400 = 4.125, top and bottom
+> 0.800/0.400 = 2.000 exactly, measured at all 720 stations (min 0.7950, max
+> 1.6450) including 368 corner stations, loop centrelines 0.400 apart with
+> corner radii 3.200 and 2.800 and no cusp. Only the slicer preview can prove
+> it lays them. Build report §7.1 and §10 Stage 0b.
 
-> **Two owner changes on top of the brief, both single parameters and both
-> reversible.** The two recessed adhesive pads are **deleted**
-> (`pads_enabled = False`) — brief §3.1 asks for them preserved, but the
-> interference fit makes bonded pads redundant, and the seating face is now one
-> unbroken annulus. And the inset-wall outer corner is raised 50%, **R2.00 →
-> R3.00**, because R2.00 did not match the real opening corner; penetration now
-> holds at exactly 0.100 mm across the whole plausible range of opening corner
-> radii, at the cost of a larger unmasked corner gap. Build report §3.5.
+> **Four owner changes on top of the brief, each recorded and each reversible.**
+> (1) The two recessed adhesive pads are **deleted** (`pads_enabled = False`).
+> (2) The inset-wall outer corner went **R2.00 → R3.00**, because R2.00 did not
+> match the real opening corner. (3) The aperture was made **flush** on the left
+> and right — the face opening out 1.00 mm per side to 32.90 and the side wall
+> derived from it — and the loop rule was clarified to **at least** two per
+> side, with the sides and the top/bottom free to differ. (4) The
+> **interference-fit refinement**: one extra 0.40 mm loop added outward on each
+> side face, and the top and bottom walls moved 1.00 mm out each. Build report
+> §3.5, §3.6 and §3.7.
 
-> **The wall costs 0.650 mm of lit screen height.** The clear opening is
-> 32.90 × 13.60 — width by the face opening, **height by the wall** — and the
-> visible active band drops 8.100 → **7.450 mm**, all of it at the top. Only
-> the powered test can say whether that is acceptable. Build report §5.
+> **The wall now GIVES BACK lit screen height.** The clear opening is
+> 32.90 × 15.60, controlled by the skirt on all four sides with the face
+> opening flush to it, and the visible active band goes 8.100 → **8.450 mm** —
+> 0.350 mm *more* than Rev N, where every earlier issue lost height. Check the
+> extra unlit board now visible below the active area in the powered test.
+> Build report §5.
 
-> **Third owner change: the aperture is now FLUSH and the wall is SPLIT.**
-> The face opening went out 1.00 mm per side to 32.90 and the side wall
-> thickened to **1.250 mm** so its inner face lands on it — the 1.45 mm
-> set-back on the left and right is gone. The top and bottom stay at
-> **0.800 mm**, so the clear height and the lit band are untouched. The loop
-> rule is **at least** two per side, not exactly two, and the sides and the
-> top/bottom are free to differ: 3.125 and 2.000 loops respectively, never
-> below 2.000 through the corners. **The interference is now resisted by a
-> 1.25 mm wall, ≈31× stiffer than the original 0.40 mm — the fit gauge is
-> mandatory, not advisable.** Build report §3.6.
-
-> **One forced modelling decision, fully declared.** The amended face opening
-> (15.35) is *taller than the whole wall* (15.20), so a straight-walled
-> aperture would leave the top and bottom wall runs **detached** from the bezel
-> face. The aperture therefore **tapers in Y**, 13.600 at the seating plane to
-> 15.350 at the front face, at 36.10° — self-supporting, every published number
-> preserved. The window edge break is a 0.40 chamfer rather than the Rev N
-> R0.40 fillet, because Fusion refuses a fillet on the tapered aperture edge at
-> every radius. Build report §3.3 and §3.4.
+> **The aperture no longer tapers.** With the face opening flush to the skirt
+> on all four sides there is nothing to blend, so the bore is straight from the
+> front face through to the wall tip — no ledge, no set-back, no corner
+> crescent. The forced Y taper that earlier issues carried (36.10°, to stop the
+> top and bottom wall runs standing detached from the bezel face) is designed
+> out, and the generator now **refuses to build** if the face opening drifts
+> away from the skirt inner envelope. The window edge break is a 0.40 chamfer
+> rather than the Rev N R0.40 fillet, because Fusion refuses a fillet on that
+> edge at every radius. Build report §3.3 and §3.4.
 
 ### Rebuilding Rev Q
 

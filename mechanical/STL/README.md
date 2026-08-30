@@ -16,81 +16,98 @@ Print-ready meshes exported from the CAD sources.
 
 | File | Print notes |
 |---|---|
-| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side**. Each is the complete right-hand end of the real Rev Q wall — full 15.20 mm height, both R3.00 corners, the real 0.80 mm two-loop wall, the real 2.80 mm depth — so it engages the interference exactly as the bezel will. ≈1.53 cm³ ≈ 2 g for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6276 cm³ ≈ 0.80 g. The 0.80 mm continuous inset wall must slice as **exactly two 0.40 mm loops** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side**. Each is the complete right-hand end of the real Rev Q wall — full **17.20 mm** height, both **R3.40** corners, the real **1.65 mm** side wall, the real 2.80 mm depth — so it engages the interference exactly as the bezel will. ≈1.71 cm³ ≈ 2 g for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6300 cm³ ≈ 0.80 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
-> ### Rev Q print gate 1 — TWO CONTINUOUS WALL LOOPS
+> ### STOP — READ BEFORE PRINTING A BEZEL
 >
-> This is why the wall is 0.80 mm. At 0.40 mm the slicer resolved it as a
-> single loop, which is what the owner correction rejects.
+> After the owner's interference-fit refinement the inset wall measures
+> **36.20 × 17.20 mm**. The MEASURED Perspex opening is **35.20 × 15.30 mm**.
+> That is 1.00 mm oversize across and **1.90 mm oversize up** — as modelled the
+> part cannot enter the opening at all. Either the recorded opening height is
+> stale and the real Perspex needs re-measuring, or the vertical move
+> overshoots.
+>
+> **Print the fit gauge, measure the real opening, and settle this before
+> committing a bezel print.** The tabs carry the full 17.20 mm height, so a tab
+> that will not go in vertically is the answer in your hand. Build report
+> §3.7 and §8.1.
+
+> ### Rev Q print gate 1 — AT LEAST TWO CONTINUOUS WALL LOOPS
+>
+> At 0.40 mm the slicer resolved the wall as a single loop, which is what the
+> owner correction rejected. The rule is a **minimum of two, applied per side**;
+> the sides and the top/bottom need not carry the same number, and they do not.
 >
 > | Setting | Value |
 > |---|---|
-> | Nozzle / extrusion width | **0.40 mm** — the wall *is* two of these |
+> | Nozzle / extrusion width | **0.40 mm** |
 > | Layer height | 0.15–0.20 mm |
-> | Perimeters in the wall | **at least 2 on every side** — the sides take 3 (1.25 mm), the top and bottom 2 (0.80 mm) |
-> | Thin-wall / gap fill | **OFF** if the slicer allows; a full 0.80 mm needs none |
-> | Arachne / variable width | **now helpful** — the two wall thicknesses differ, so a variable-width generator handles the 1.25 mm sides cleanly. Still confirm it lays ≥2 loops everywhere and does not merge either wall into one wide extrusion |
+> | Perimeters in the wall | **at least 2 on every side** — the sides take 4 (1.65 mm), the top and bottom 2 (0.80 mm) |
+> | Thin-wall / gap fill | **OFF** if the slicer allows; 0.80 is a whole multiple and needs none |
+> | Arachne / variable width | **acceptable and often helpful** — the two wall thicknesses differ, so a variable-width generator handles the 1.65 mm sides cleanly. Still confirm it lays ≥ 2 loops everywhere and does not merge either wall into one wide extrusion |
 > | External perimeter speed | **≤ 25 mm/s** through the wall |
 > | Cooling | 100 % |
-> | Supports | **none** |
+> | Supports | **none** — the aperture is a straight bore and the wall is vertical |
 >
 > **Step through every layer of the wall in the slicer preview before
-> printing.** Confirm two continuous 0.40 mm loops around the complete
-> perimeter — both straight runs, both ends, **and all four R3.00 corners**.
-> **Reject** the profile on any of: a single variable-width wall, a missing
-> second loop, gap fill substituted for a loop, or the two loops locally merged
-> into one wide extrusion. Fix the slicer — do not thicken `bezel_lip_wall` to
-> work around it without recording why.
+> printing.** Confirm at least two continuous 0.40 mm loops around the complete
+> perimeter — four on the side runs, two on the top and bottom, and never fewer
+> than two through **all four R3.40 corners**. **Reject** the profile on any of:
+> a single variable-width wall, a missing second loop, gap fill substituted for
+> a loop, or two loops locally merged into one wide extrusion. Fix the slicer —
+> do not thicken `bezel_lip_wall_y` to work around it without recording why.
 >
-> **If your extrusion width is not 0.40 mm**, set `bezel_lip_wall` to **two**
-> *actual* extrusion widths and regenerate; the inner envelope, corner radii,
-> aperture and optical opening are all derived and follow. The generator
-> refuses to build a wall that is not a whole multiple of `extrusion_width`.
+> **If your extrusion width is not 0.40 mm**, set `bezel_lip_wall_y` to at least
+> **two** *actual* extrusion widths and regenerate; the side wall is derived
+> from the flush requirement and is not yours to set. The inner envelope, corner
+> radii, aperture and optical opening all follow, and the generator refuses to
+> build any wall carrying fewer than two loops.
 
 > ### Rev Q print gate 2 — THE INTERFERENCE FIT
 >
-> The wall is **0.10 mm per horizontal side WIDER than the hole** by design,
-> and the wall resisting it is the **1.25 mm side** wall — about **31× stiffer
-> in bending** than the original 0.40 mm, and 3.8× stiffer than 0.80 mm. Brief §3.8
+> The wall is **0.500 mm per horizontal side and 0.950 mm per vertical side
+> WIDER than the hole**. The horizontal figure is resisted by the **1.65 mm
+> side** wall — about **70× stiffer in bending** than the original 0.40 mm and
+> 8.8× stiffer than 0.80 mm; the vertical is resisted by the far more compliant
+> 0.80 mm top and bottom walls, carrying nearly twice as much. Brief §3.8
 > requires the printed wall to take the deflection and the original Perspex to
 > be left unspread and unstressed. **CAD cannot settle that.** Print the fit
 > gauge first, find the largest interference that seats by hand and releases
-> without marking or whitening the Perspex, and set `bezel_lip_outer_w` from
-> the physical result before printing a bezel.
+> without marking or whitening the Perspex, and set `bezel_lip_outer_w` and
+> `bezel_lip_outer_h` from the physical result before printing a bezel.
 
-> ### What this print costs optically
+> ### What this print does optically
 >
-> The clear opening is **32.90 × 13.60 mm** — width by the face opening, height
-> by the wall — and the visible lit band drops from 8.100 to **7.450 mm**, all
-> of it at the top. Only the powered test can say whether that is acceptable.
+> The clear opening is **32.90 × 15.60 mm**, controlled by the skirt on all four
+> sides with the bezel face opening flush to it. The visible lit band goes
+> 8.100 → **8.450 mm** — 0.350 mm *more* than Rev N, the first issue where the
+> aperture grew rather than shrank. Check the extra unlit board now visible
+> below the active area as well as the lit content.
 >
 > Full detail, the fit study and the test procedure:
 > `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
 
-> ### Two owner changes since the brief
+> ### Four owner changes since the brief
 >
-> The two **recessed adhesive pads are deleted** - the underside is now one
-> unbroken seating face. Retention is by the interference fit alone; if
-> adhesive is still wanted it goes on the flat face. **Re-check removability**
-> on the prototype.
->
-> The aperture is now **flush on the left and right** — the face opening went
-> out 1.00 mm per side to 32.90 and the side wall thickened to **1.25 mm** to
-> meet it, so the old 1.45 mm set-back is gone. Top and bottom stay 0.80 mm,
-> so the clear height and the lit band are unchanged. **The interference is
-> now resisted by that 1.25 mm side wall, about 31x stiffer in bending than
-> the original 0.40 mm — print the fit gauge, do not skip it.**
->
-> The inset-wall outer corner is **R3.00, up 50% from the brief's R2.00**,
-> because R2.00 did not match the real opening corner. It makes slicing the
-> corners easier (tightest loop radius 1.400 -> 2.400 mm) and holds penetration
-> at 0.100 mm across the whole plausible range of opening corner radii, at the
-> cost of a larger unmasked corner gap. Build report section 3.5.
+> 1. The two **recessed adhesive pads are deleted** — the underside is one
+>    unbroken seating face. Retention is by the fit alone; if adhesive is still
+>    wanted it goes on the flat face. **Re-check removability** on the prototype.
+> 2. The inset-wall outer corner went **R2.00 → R3.00**, because R2.00 did not
+>    match the real opening corner.
+> 3. The aperture was made **flush on the left and right** — the face opening out
+>    1.00 mm per side to 32.90, the side wall derived from it — and the loop rule
+>    was clarified to **at least** two per side.
+> 4. **The interference-fit refinement**: one extra 0.40 mm loop added outward on
+>    each side face (outer 35.40 → 36.20, side wall 1.25 → 1.65, outer corner
+>    R3.00 → R3.40 so the opening corner stays R1.75), and the top and bottom
+>    walls moved **1.00 mm out each** (outer 15.20 → 17.20, clear opening
+>    13.60 → 15.60). The bezel face opening followed to 15.60 × R1.75 so the
+>    aperture stays flush on all four sides. Build report §3.5, §3.6 and §3.7.
 
 `Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
 unchanged. The first issue's `Bezel_Corner_Gauge_revQ_*` meshes are deleted —
-the corner radius is now set by the owner at R3.00, so the fit gauge
+the corner radius is now set by the owner at R3.40, so the fit gauge
 replaces the corner gauge.
 
 ---

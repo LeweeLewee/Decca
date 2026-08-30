@@ -39,26 +39,28 @@ BEZEL_W, BEZEL_H, BEZEL_T = 40.00, 20.30, 4.00      # Rev N envelope, PRESERVED
 Z_FRONT = 4.20                                       # bezel front face
 Z_SEAT = 3.00                                        # Perspex front / seating
 Z_TIP = 0.20                                         # lip rear tip
-LIP_OUT_W, LIP_OUT_H = 35.40, 15.20                  # inset-wall outer envelope
-LIP_IN_W, LIP_IN_H = 32.90, 13.60                    # derived, split wall
-LIP_WALL_X = 1.25                    # sides, flush with the face opening
-LIP_WALL_Y = 0.80                    # top/bottom, holds the 13.60 height
+LIP_OUT_W, LIP_OUT_H = 36.20, 17.20                  # inset-wall outer envelope
+LIP_IN_W, LIP_IN_H = 32.90, 15.60                    # derived, split wall
+LIP_WALL_X = 1.65                    # sides, flush with the face opening
+LIP_WALL_Y = 0.80                    # top/bottom, unchanged by the refinement
 LIP_WALL_MIN = LIP_WALL_Y            # the corners never go below this
 LIP_DEPTH = 2.80
-LIP_CORNER_R = 3.00                                  # owner +50%, was 2.00
-LIP_INNER_R = 1.75                                   # derived: 3.00 - 1.25
+LIP_CORNER_R = 3.40                                  # 3.00 + the outward loop
+LIP_INNER_R = 1.75                                   # derived: 3.40 - 1.65
 LIP_LEAD = 0.20
 EXTRUSION_W = 0.40                                   # production extrusion
 MIN_LOOPS = 2                        # AT LEAST two, applied PER SIDE
-FACE_OPEN_W, FACE_OPEN_H = 32.90, 15.35              # bezel face opening
-OPTICAL_W, OPTICAL_H = 32.90, 13.60                  # effective clear opening
+FACE_OPEN_W, FACE_OPEN_H = 32.90, 15.60              # bezel face opening
+FACE_OPEN_R = 1.75                                   # flush with the skirt
+OPTICAL_W, OPTICAL_H = 32.90, 15.60                  # effective clear opening
 AP_ROOT_RELIEF = 0.00                                # no longer needed
 AP_REAR_H = OPTICAL_H + 2 * AP_ROOT_RELIEF           # aperture at the seat
 PANEL_OPEN_W, PANEL_OPEN_H = 35.20, 15.30            # MEASURED
 PANEL_T = 3.00
 GLASS_FRONT_Z = -0.30
-INTERF_X = 0.10                                      # per side, INTERFERENCE
-CLEAR_Y = 0.05                                       # per side, clearance
+INTERF_X = 0.50                                      # per side, INTERFERENCE
+INTERF_Y = 0.95                                      # per side, INTERFERENCE
+CLEAR_Y = -INTERF_Y                  # the old name, now honestly negative
 
 TOL = 0.02          # mesh/chord tolerance, mm
 
@@ -191,15 +193,37 @@ def section_bbox(tris, z):
     return (p[:, 0].min(), p[:, 0].max(), p[:, 1].min(), p[:, 1].max())
 
 
+def dedupe_hits(hits, eps=1.0e-6):
+    """Collapse crossings that coincide, which a ray landing on a seam gives.
+
+    A watertight mesh answers a ray that passes exactly along an edge shared
+    by two triangles with TWO crossings at the same height. Even-odd counting
+    then flips and the point reads as outside. Fusion tessellates the 0.40 mm
+    window chamfer with a seam at z = 4.000, so every probe at y = 8.000 - and
+    the wall walk steps in exact multiples of 0.005 from 8.600, so it lands
+    there every single time - hit it. Collapsing exact coincidences to one
+    crossing is the correct reading: the surface is crossed once there.
+    """
+    if len(hits) < 2:
+        return hits
+    h = np.sort(np.asarray(hits))
+    keep = np.concatenate(([True], np.diff(h) > eps))
+    return h[keep]
+
+
+def inside_at(tris, x, y, z):
+    """Even-odd inside test at height z, seam-safe."""
+    return (np.sum(dedupe_hits(ray_hits(tris, x, y)) > z) % 2) == 1
+
+
 def inside_xy(tris, x, y, zlo, zhi):
     """Is the vertical line at (x, y) inside the solid between zlo and zhi?
 
     Counts triangle crossings of the upward ray from (x, y, zlo) and keeps the
-    crossings that fall in the band. Robust enough here because every probe is
-    placed off the mesh's own vertices.
+    crossings that fall in the band.
     """
     hits = ray_hits(tris, x, y)
-    inside_lo = (np.sum(hits > zlo) % 2) == 1
+    inside_lo = (np.sum(dedupe_hits(hits) > zlo) % 2) == 1
     return inside_lo, hits
 
 
@@ -338,7 +362,7 @@ def main():
     walls = []
     for (px, py, nx, ny) in path_pts:
         mx, my = px + nx * LIP_WALL_MIN / 2.0, py + ny * LIP_WALL_MIN / 2.0
-        hits = ray_hits(tris, mx, my)
+        hits = dedupe_hits(ray_hits(tris, mx, my))
         present_all = True
         for z in zs:
             if (np.sum(hits > z) % 2) != 1:
@@ -354,13 +378,19 @@ def main():
             sides[key][1] += 1
         else:
             voids += 1
-        # wall thickness along the inward normal at z = 1.60
+        # Wall thickness along the inward normal at z = 1.60.
+        #
+        # The walk has to reach past the THICKEST wall or it finds no exit,
+        # drops the station, and - if that happens at every station - leaves
+        # `walls` empty and the three gates below never get created at all.
+        # That is not the same as passing. It stopped at 0.600 mm until
+        # 2026-08-30, which is under even the 0.80 mm top wall.
         t_in, t_out = None, None
-        for k in range(1, 121):
+        steps = int(round((2.0 * max(LIP_WALL_X, LIP_WALL_Y)) / 0.005))
+        for k in range(1, steps + 1):
             t = k * 0.005
             hx, hy = px + nx * t, py + ny * t
-            h = ray_hits(tris, hx, hy)
-            ins = (np.sum(h > 1.60) % 2) == 1
+            ins = inside_at(tris, hx, hy, 1.60)
             if ins and t_in is None:
                 t_in = t
             if t_in is not None and not ins:
@@ -378,6 +408,11 @@ def main():
     if walls:
         w = np.array(walls)
         wall_arr = w
+        gate(len(walls) == len(path_pts),
+             "the wall was actually MEASURED at all %d stations, not "
+             "quietly skipped" % len(path_pts),
+             "%d of %d stations returned a thickness"
+             % (len(walls), len(path_pts)))
         gate(abs(w.min() - LIP_WALL_Y) < 0.03
              and abs(w.max() - LIP_WALL_X) < 0.03,
              "measured wall spans %.2f (top/bottom) to %.2f (sides) mm"
@@ -452,7 +487,7 @@ def main():
     # steps smaller than the thinnest wall, then refine the first crossing.
     def _in(z, axis, t):
         x, y = (t, 0.0) if axis == "x" else (0.0, t)
-        return (np.sum(ray_hits(tris, x, y) > z) % 2) == 1
+        return inside_at(tris, x, y, z)
 
     def opening_at(z, axis, limit=21.0, step=0.02):
         prev = 0.0
@@ -479,15 +514,23 @@ def main():
     gate(abs((Z_SEAT - Z_TIP) - LIP_DEPTH) < 1e-9, "lip depth 2.800 mm",
          "%.4f" % (Z_SEAT - Z_TIP))
     ix = (LIP_OUT_W - PANEL_OPEN_W) / 2.0          # positive = interference
-    cy = (PANEL_OPEN_H - LIP_OUT_H) / 2.0          # positive = clearance
+    iy = (LIP_OUT_H - PANEL_OPEN_H) / 2.0          # positive = interference
     gate(abs(ix - INTERF_X) < 1e-9,
          "horizontal INTERFERENCE %.3f mm per side" % INTERF_X,
          "%+.4f mm" % ix)
-    gate(abs(cy - CLEAR_Y) < 1e-9,
-         "vertical clearance %.3f mm per side" % CLEAR_Y, "%+.4f mm" % cy)
-    note("the lip is WIDER than the hole by design",
+    gate(abs(iy - INTERF_Y) < 1e-9,
+         "vertical INTERFERENCE %.3f mm per side" % INTERF_Y,
+         "%+.4f mm" % iy)
+    note("the lip is WIDER than the hole ON BOTH AXES by design",
          "brief 3.7/3.8: the printed wall takes the deflection, the Perspex "
          "is not to be spread or stressed - a PHYSICAL gate")
+    note("AND AS MODELLED IT CANNOT ENTER",
+         "%.2f x %.2f into a %.2f x %.2f hole is %.2f mm oversize across "
+         "and %.2f mm oversize up. Either the MEASURED panel opening height "
+         "is stale or the vertical move overshoots - owner-directed, and no "
+         "mesh check can settle which"
+         % (LIP_OUT_W, LIP_OUT_H, PANEL_OPEN_W, PANEL_OPEN_H,
+            2 * ix, 2 * iy))
     note("and the wall resisting it is now %.2f mm" % LIP_WALL_X,
          "%.0fx stiffer in bending than the original 0.40 mm wall, %.1fx "
          "stiffer than 0.80 - print the fit gauge first"
@@ -495,46 +538,44 @@ def main():
 
     print("")
     print("7. THE FACE OPENING AND THE EFFECTIVE OPTICAL OPENING")
-    # The aperture is tapered in Y, so its height is a linear function of z.
-    # Measure it at two heights clear of both the 0.40 front break and the
-    # seating plane, fit the line, and read off both ends. That verifies the
-    # taper AND the two published numbers without trusting either.
-    z_a, z_b = 3.20, 3.70
-    h_a, h_b = 2 * opening_at(z_a, "y"), 2 * opening_at(z_b, "y")
-    slope = (h_b - h_a) / (z_b - z_a)
-    h_seat = h_a + slope * (Z_SEAT - z_a)
-    h_front = h_a + slope * (Z_FRONT - z_a)
-    ang = math.degrees(math.atan2(slope / 2.0, 1.0))
-    note("aperture height at z = %.2f and %.2f" % (z_a, z_b),
-         "%.4f and %.4f mm" % (h_a, h_b))
-    gate(abs(h_seat - AP_REAR_H) < 0.03,
-         "extrapolates to %.3f mm at the seating plane" % AP_REAR_H,
-         "%.4f" % h_seat)
-    gate(h_seat > OPTICAL_H + 1e-9,
-         "aperture stops OUTSIDE the lip inner, so the LIP controls the "
-         "clear height",
-         "aperture %.3f vs lip inner %.3f, relief %.3f per side"
-         % (h_seat, OPTICAL_H, (h_seat - OPTICAL_H) / 2.0))
-    gate(abs(h_front - FACE_OPEN_H) < 0.03,
-         "extrapolates to %.2f mm at the front face (the face opening)"
-         % FACE_OPEN_H, "%.4f" % h_front)
-    gate(ang <= 45.0,
-         "aperture taper %.2f deg from vertical - self-supporting" % ang,
-         "%.2f deg" % ang)
-    ow = 2 * opening_at(3.60, "x")
-    gate(abs(ow - FACE_OPEN_W) < 0.02,
-         "face opening width %.2f mm, constant through the taper" % FACE_OPEN_W,
-         "%.4f" % ow)
-    eff_w = min(ow, iw)
-    eff_h = min(h_seat, ih)
+    # The aperture is a STRAIGHT bore now. The face opening is flush with
+    # the skirt inner envelope on all four sides - extents and corner radius
+    # alike - so there is no taper left to fit a line to. Measure it at
+    # three heights instead: two inside the 1.20 mm face plate, clear of the
+    # 0.40 front break and of the seating plane, and one down inside the
+    # skirt. Every one must give the same number, and any set-back or ledge
+    # anywhere in the bore would show up as a difference between them.
+    zs7 = (3.70, 3.20, 1.60)
+    hs7 = [2 * opening_at(z, "y") for z in zs7]
+    ws7 = [2 * opening_at(z, "x") for z in zs7]
+    note("aperture height at z = %s"
+         % ", ".join("%.2f" % z for z in zs7),
+         ", ".join("%.4f" % h for h in hs7))
+    note("aperture width at the same three",
+         ", ".join("%.4f" % w for w in ws7))
+    gate(max(abs(h - FACE_OPEN_H) for h in hs7) < 0.03,
+         "aperture height is %.2f mm at every station - one straight bore, "
+         "no taper and no ledge" % FACE_OPEN_H,
+         "spread %.4f mm" % (max(hs7) - min(hs7)))
+    gate(max(abs(w - FACE_OPEN_W) for w in ws7) < 0.02,
+         "aperture width is %.2f mm at every station" % FACE_OPEN_W,
+         "spread %.4f mm" % (max(ws7) - min(ws7)))
+    ang = math.degrees(math.atan2(((hs7[0] - hs7[2]) / 2.0)
+                                  / (zs7[0] - zs7[2]), 1.0))
+    gate(abs(ang) <= 1.0,
+         "measured taper %.3f deg from vertical - flush, self-supporting"
+         % ang, "%.3f deg" % ang)
+    eff_w = min(min(ws7), iw)
+    eff_h = min(min(hs7), ih)
     gate(abs(eff_w - OPTICAL_W) < 0.02 and abs(eff_h - OPTICAL_H) < 0.03,
          "EFFECTIVE optical opening %.2f x %.2f mm" % (OPTICAL_W, OPTICAL_H),
          "%.4f x %.4f" % (eff_w, eff_h))
     note("controlled by",
-         "width by the %.2f mm face opening, HEIGHT BY THE %.2f mm LIP INNER"
-         % (FACE_OPEN_W, LIP_IN_H))
+         "the skirt inner envelope on ALL FOUR sides - the face opening is "
+         "flush with it at %.2f x %.2f R%.2f, so neither one masks the other"
+         % (FACE_OPEN_W, FACE_OPEN_H, FACE_OPEN_R))
     note("versus Rev N (30.40 x 14.90)",
-         "width +2.500, height -1.300 total (-0.650 per side)")
+         "width +2.500, height +0.700 total (+0.350 per side)")
 
     print("")
     print("8. THE LEAD-IN MUST NOT EAT THE COVERAGE")
@@ -548,11 +589,13 @@ def main():
          "full envelope restored by z = +0.400, so 2.600 mm of the 3.000 mm "
          "Perspex is covered at full section",
          "%.4f" % (bbf[1] - bbf[0]))
-    note("the lead-in also starts the interference fit",
-         "the tip is %.2f mm UNDER the %.2f mm opening, so entry is free for "
-         "the first %.2f mm and the %.2f mm per side engages after that"
-         % (PANEL_OPEN_W - (LIP_OUT_W - 2 * LIP_LEAD), PANEL_OPEN_W,
-            LIP_LEAD, INTERF_X))
+    note("the lead-in NO LONGER buys free entry",
+         "at %.2f mm the tip is still %.2f mm OVER the %.2f mm opening, so "
+         "the %.2f mm per side is being resisted from the first contact - "
+         "the lead-in only softens the start of it"
+         % (LIP_OUT_W - 2 * LIP_LEAD,
+            (LIP_OUT_W - 2 * LIP_LEAD) - PANEL_OPEN_W, PANEL_OPEN_W,
+            INTERF_X))
 
     print("")
     print("=" * 74)
@@ -565,12 +608,14 @@ def main():
     print("RESULT: %d/%d PASS - the exported mesh matches the Rev Q claims"
           % (CHECKS, CHECKS))
     print("")
-    print("This proves geometry only. It does NOT prove the bezel FITS. The")
-    print("0.10 mm per side horizontal INTERFERENCE is now resisted by a 1.25 mm")
-    print("side wall, 30x stiffer in bending than the original 0.40 mm one, and")
-    print("opening corner radius has never been measured. No CAD or mesh check")
-    print("in this repository can settle either. Print Bezel_Fit_Gauge_revQ")
-    print("first, and see the Rev Q build report.")
+    print("This proves geometry only. It does NOT prove the bezel FITS, and")
+    print("on the MEASURED opening it plainly does not: %.2f x %.2f into"
+          % (LIP_OUT_W, LIP_OUT_H))
+    print("%.2f x %.2f is %.2f mm oversize across and %.2f mm oversize up."
+          % (PANEL_OPEN_W, PANEL_OPEN_H,
+             LIP_OUT_W - PANEL_OPEN_W, LIP_OUT_H - PANEL_OPEN_H))
+    print("Re-measure the Perspex opening before printing a bezel. Print")
+    print("Bezel_Fit_Gauge_revQ first either way, and see the build report.")
     print("=" * 74)
     return 0
 

@@ -124,9 +124,26 @@ P = {
     "bezel_t": 4.00,                # PRESERVED
     "bezel_outer_r": 2.00,          # PRESERVED   external corner radius
     "bezel_edge_break": 0.40,       # PRESERVED   front face edge fillet
-    "bezel_window_w": 32.90,        # OWNER       was 30.90, +1.00 per side
-    "bezel_window_h": 15.35,        # AMENDED     face opening, AT THE FRONT FACE
-    "bezel_window_r": 0.80,         # PRESERVED   window corner radius
+    # THE FACE OPENING IS NOW FLUSH WITH THE SKIRT ON ALL FOUR SIDES.
+    # X was made flush by the owner's earlier change; Y follows here.
+    # Moving the skirt walls out to a 15.60 inner opening would otherwise
+    # leave the 15.35 face opening as the new limiter and deliver +1.83 mm
+    # of vertical opening instead of the +2.00 mm asked for, so the face
+    # opening goes to 15.60 with it. The owner chose this explicitly.
+    #
+    # The corner radius follows for a different reason. At R0.80 the face
+    # corner is FULLER than the skirt's R1.75, so once the two share the
+    # same extents the face corner becomes the visible one and the clear
+    # opening would sharpen from R1.75 to R0.80. R1.75 leaves what the eye
+    # actually sees exactly as it is today, and makes the aperture a
+    # single straight bore instead of a taper. derive() refuses to build
+    # if either value drifts away from the skirt inner envelope.
+    #
+    # DECLARED DEVIATION from brief 2/4 (face opening 30.90 x 15.35,
+    # R0.80) - the third, after the owner's width and corner changes.
+    "bezel_window_w": 32.90,        # OWNER       was 30.90, = skirt inner
+    "bezel_window_h": 15.60,        # OWNER       was 15.35, = skirt inner
+    "bezel_window_r": 1.75,         # OWNER       was 0.80,  = skirt inner R
     # -- recessed adhesive pads - DELETED at owner instruction -------------
     # Rev N has two: 24.00 x 2.00 mm, 0.30 mm deep into the seating face at
     # y +/-7.85..9.85. The owner inspected the model, identified them as the
@@ -152,8 +169,27 @@ P = {
     # INTERFERENCE fit, R2.00 outer corners, and an 0.80 mm wall so the
     # established 0.40 mm extrusion configuration resolves as TWO continuous
     # wall loops instead of the single loop the 0.40 mm wall produced.
-    "bezel_lip_outer_w": 35.40,     # AMENDED     Rev N 34.90 + 2 x 0.25
-    "bezel_lip_outer_h": 15.20,     # AMENDED     Rev N 15.00 + 2 x 0.10
+    # OWNER 2026-08-30 - the interference-fit refinement, in two moves.
+    #
+    #   1. ONE extra 0.40 mm wall loop on the LEFT and RIGHT outer faces,
+    #      added OUTWARD so the horizontal opening is not touched:
+    #          35.40 -> 36.20
+    #      It is applied at the corners as a true outward offset, which
+    #      is what keeps the OPENING corner at R1.75 - see
+    #      bezel_lip_corner_r. The top and bottom faces do NOT get the
+    #      extra loop; the owner scoped the loop to the sides.
+    #
+    #   2. the top and bottom walls then move 1.00 mm out each, which
+    #      opens the vertical aperture by 2.00 mm:
+    #          15.20 -> 17.20 outer,   13.60 -> 15.60 inner
+    #
+    # Both moves push material OUTWARD into the Perspex opening, and
+    # derive() reports what that does to the fit: horizontal interference
+    # 0.100 -> 0.500 mm per side, vertical from a 0.050 mm CLEARANCE to
+    # 0.950 mm of INTERFERENCE. The panel_open_* figures above are
+    # MEASURED Rev C values and are deliberately NOT adjusted to suit.
+    "bezel_lip_outer_w": 36.20,     # OWNER       35.40 + 2 x 0.40, one loop
+    "bezel_lip_outer_h": 17.20,     # OWNER       15.20 + 2 x 1.00
     "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
 
     # THE WALL IS NO LONGER UNIFORM, at owner instruction 2026-08-30.
@@ -168,20 +204,26 @@ P = {
     # loop rule is AT LEAST two loops and that the side and the top/bottom
     # walls need not carry the same number.
     #
-    # So the wall is split. Y stays at the proven 0.80 (two loops) and holds
-    # the 13.60 clear height; X is DERIVED from the flush requirement and
-    # comes out at 1.25 (three loops). Through the corners the wall tapers
-    # smoothly between them and never drops below 0.80 - see derive().
-    "bezel_lip_wall_y": 0.80,       # OWNER       top/bottom, 2 loops, holds 13.60
+    # So the wall is split. Y stays at the proven 0.80 (two loops); X is
+    # DERIVED from the flush requirement and, after the extra outward loop
+    # on the sides, comes out at 1.65 (4.125 loops). Through the corners
+    # the wall tapers smoothly between them and never drops below 0.80 -
+    # see derive().
+    "bezel_lip_wall_y": 0.80,       # OWNER       top/bottom, 2 loops
     #                                 X wall is DERIVED - see derive()
     # Owner refinement 2026-08-30: R2.00 did not match the real Perspex
-    # opening corner, so the outer corner radius is increased by 50% to
-    # R3.00. The inner corner radius follows from it and the X wall
-    # (3.00 - 1.25 = 1.75) and is not entered separately. Brief 7 explicitly
-    # allows the named corner parameters to be changed when the fit needs it;
-    # the brief's stated 2.00 is therefore superseded by observation, and this
-    # is recorded as a deviation from brief 2/4.
-    "bezel_lip_corner_r": 3.00,     # OWNER       was 2.00, +50% 2026-08-30
+    # opening corner, so the outer corner radius went up 50% to R3.00, and
+    # it then took the extra outward loop with the rest of the side
+    # profile, 3.00 -> 3.40. That +0.40 is not decoration. The inner corner
+    # radius is (corner_r - wall_x), so holding the outer at 3.00 while the
+    # wall went 1.25 -> 1.65 would have dragged the OPENING corner
+    # 1.75 -> 1.35. The instruction was to leave the horizontal opening
+    # alone, so the outer corner absorbs the loop and the opening corner
+    # stays at R1.75. Brief 7 explicitly allows the named corner parameters
+    # to be changed when the fit needs it; the brief's stated 2.00 is
+    # therefore superseded by observation, and this is recorded as a
+    # deviation from brief 2/4.
+    "bezel_lip_corner_r": 3.40,     # OWNER       3.00 + the outward loop
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
 
     # The established production extrusion width. Every wall must be at least
@@ -261,13 +303,22 @@ def derive(P):
                 % (axis, w, w / ew, ew))
 
     # Fit against the MEASURED opening --------------------------------------
-    # Horizontal is a deliberate INTERFERENCE, vertical stays a clearance.
-    # Sign convention: interference positive means the lip is WIDER than the
-    # hole and the lip must flex to enter.
+    # BOTH axes are now an INTERFERENCE. Sign convention unchanged:
+    # interference positive means the lip is WIDER than the hole and has to
+    # flex to enter. bezel_lip_clear_y keeps its old meaning, so it now
+    # reads NEGATIVE - which is the honest answer, not a bug.
+    #
+    # These are the numbers to look at before printing anything. At
+    # 36.20 x 17.20 into a 35.20 x 15.30 hole the skirt is 1.00 mm oversize
+    # across and 1.90 mm oversize up. That is not a press fit in PETG; as
+    # modelled the part cannot enter the opening at all. Owner-directed,
+    # and it is not resolvable in CAD - either the MEASURED panel_open_h is
+    # stale or the vertical move overshoots.
     d["bezel_lip_interf_x"] = (P["bezel_lip_outer_w"]
-                               - P["panel_open_w"]) / 2.0            # +0.100
-    d["bezel_lip_clear_y"] = (P["panel_open_h"]
-                              - P["bezel_lip_outer_h"]) / 2.0        # +0.050
+                               - P["panel_open_w"]) / 2.0            # +0.500
+    d["bezel_lip_interf_y"] = (P["bezel_lip_outer_h"]
+                               - P["panel_open_h"]) / 2.0            # +0.950
+    d["bezel_lip_clear_y"] = -d["bezel_lip_interf_y"]                # -0.950
 
     d["bezel_lip_inner_w"] = (P["bezel_lip_outer_w"]
                               - 2 * d["bezel_lip_wall_x"])           # 32.900
@@ -276,7 +327,7 @@ def derive(P):
 
     # The inner corner radius follows the THICKER (X) wall. That choice is not
     # arbitrary: it puts the inner corner arc centre on the same x as the outer
-    # arc centre, so the wall sweeps smoothly from 1.250 at the side to 0.800
+    # arc centre, so the wall sweeps smoothly from 1.650 at the side to 0.800
     # at the top and bottom and reaches its minimum exactly at the top/bottom
     # tangent. Any smaller inner radius squares the corner off, drags it toward
     # the outer arc and thins the wall BELOW 0.800 - at R0 it collapses to
@@ -290,6 +341,21 @@ def derive(P):
     d["bezel_lip_inner_r"] = (P["bezel_lip_corner_r"]
                               - d["bezel_lip_wall_x"])               # 1.750
     d["lip_corner_r"] = P["bezel_lip_corner_r"]
+
+    # FLUSH ON ALL FOUR SIDES. The face opening must equal the skirt inner
+    # envelope exactly - extents AND corner radius - or one of them becomes
+    # a ledge in front of the other. X has been flush since the owner's
+    # earlier change; Y and the corner joined it with the vertical move.
+    # Refuse to build rather than silently produce a set-back.
+    for nm, want, got in (("bezel_window_h", d["bezel_lip_inner_h"],
+                           P["bezel_window_h"]),
+                          ("bezel_window_r", d["bezel_lip_inner_r"],
+                           P["bezel_window_r"])):
+        if abs(want - got) > 1e-9:
+            raise ValueError(
+                "%s is %.4f but the skirt inner envelope derives %.4f; the "
+                "aperture would not be flush. Change the driver, not this."
+                % (nm, got, want))
     d["wall_min"] = min(d["bezel_lip_wall_x"], d["bezel_lip_wall_y"])
     d["wall_max"] = max(d["bezel_lip_wall_x"], d["bezel_lip_wall_y"])
 
@@ -345,15 +411,15 @@ def derive(P):
     d["ap_root_relief"] = P["ap_root_relief"]
     d["ap_rear_w"] = d["bezel_lip_inner_w"]                          # 32.900
     d["ap_rear_h"] = (d["bezel_lip_inner_h"]
-                      + 2 * d["ap_root_relief"])                     # 13.600
+                      + 2 * d["ap_root_relief"])                     # 15.600
     d["ap_front_w"] = d["bezel_window_w"]                            # 32.900
-    d["ap_front_h"] = d["bezel_window_h"]                            # 15.350
+    d["ap_front_h"] = d["bezel_window_h"]                            # 15.600
     # The rear section carries the SKIRT inner corner radius, not the window
     # one. Anything smaller bulges outside the skirt corner and leaves a
     # crescent-shaped 90-degree ledge hanging over the aperture - it measured
     # 3.40 mm2 of unsupported overhang across the four corners at R0.80.
     d["ap_rear_r"] = d["bezel_lip_inner_r"]                          #  1.750
-    d["ap_front_r"] = P["bezel_window_r"]                            #  0.800
+    d["ap_front_r"] = P["bezel_window_r"]                            #  1.750
     d["ap_taper_dy"] = (d["ap_front_h"] - d["ap_rear_h"]) / 2.0      #  0.875
     d["ap_taper_deg"] = math.degrees(math.atan2(d["ap_taper_dy"],
                                                 d["bezel_face_t"]))  # 36.10
@@ -365,11 +431,12 @@ def derive(P):
 
     # Effective optical opening --------------------------------------------
     # The through-hole is the narrowest cross-section of the whole aperture.
-    # In X that is the face opening, constant at 30.900. In Y it is the
-    # aperture at the seating plane, which is the lip inner opening, 13.600.
-    # Exactly what brief section 4 predicts.
-    d["optical_w"] = min(d["bezel_window_w"], d["bezel_lip_inner_w"])  # 30.900
-    d["optical_h"] = min(d["ap_rear_h"], d["bezel_lip_inner_h"])       # 13.600
+    # Every candidate is now the same number, because the face opening and
+    # the skirt inner envelope are flush on all four sides - so take the
+    # true minimum of all three rather than assuming which one wins.
+    d["optical_w"] = min(d["bezel_window_w"], d["bezel_lip_inner_w"])  # 32.900
+    d["optical_h"] = min(d["bezel_window_h"], d["ap_rear_h"],
+                         d["bezel_lip_inner_h"])                       # 15.600
     d["lip_root_supported"] = d["bezel_lip_wall_y"] - d["ap_root_relief"]
     # the clear opening corner is the SKIRT inner corner - it cuts in
     # further than the window corner does
@@ -593,7 +660,7 @@ def build_aperture(comp, P, d, over=0.05):
     return d["ap_taper_deg"]
 
 
-def build_panel(b, P, d, relief_x=0.0):
+def build_panel(b, P, d, relief_x=0.0, relief_y=0.0):
     """REF_Decca_Panel - the original fascia Perspex. Reference only.
 
     The opening is modelled EXACTLY as the released Rev P generator models it,
@@ -601,16 +668,17 @@ def build_panel(b, P, d, relief_x=0.0):
     panel_open_corner_r is exposed so corner sensitivity can be explored
     without pretending a measurement exists.
 
-    relief_x widens the opening horizontally by that much per side. It is used
-    only by the validator, to state the interference claim the other way
-    round: relieve the opening by exactly the declared interference and the
-    overlap must vanish completely. Nothing about the real panel changes.
+    relief_x and relief_y widen the opening by that much per side. They are
+    used only by the validator, to state the interference claim the other
+    way round: relieve the opening by exactly the declared interference and
+    the overlap must vanish completely. Rev Q now interferes on BOTH axes,
+    so both reliefs are needed. Nothing about the real panel changes.
     """
     s = b.box(-P["panel_ref_w"] / 2.0, P["panel_ref_w"] / 2.0,
               -P["panel_ref_h"] / 2.0, P["panel_ref_h"] / 2.0,
               d["z_panel_rear"], d["z_panel_front"])
     b.sub(s, b.rprism(-d["po_w2"] - relief_x, d["po_w2"] + relief_x,
-                      -d["po_h2"], d["po_h2"],
+                      -d["po_h2"] - relief_y, d["po_h2"] + relief_y,
                       d["z_panel_rear"] - 1.0, d["z_panel_front"] + 1.0,
                       P["panel_open_corner_r"]))
     m2x = P["panel_fix_pitch"] / 2.0
@@ -767,8 +835,10 @@ def _write_params(design, P, d):
     # derived - written as formulas so changing a driver updates them
     put("bezel_lip_interf_x", "(bezel_lip_outer_w - panel_open_w) / 2",
         "DERIVED  horizontal INTERFERENCE per side")
+    put("bezel_lip_interf_y", "(bezel_lip_outer_h - panel_open_h) / 2",
+        "DERIVED  vertical INTERFERENCE per side")
     put("bezel_lip_clear_y", "(panel_open_h - bezel_lip_outer_h) / 2",
-        "DERIVED  vertical clearance per side")
+        "DERIVED  vertical clearance - NEGATIVE, it is an interference")
     put("bezel_lip_wall_x", "(bezel_lip_outer_w - bezel_window_w) / 2",
         "DERIVED  side wall, set by the FLUSH requirement")
     put("bezel_lip_inner_w", "bezel_lip_outer_w - 2 * bezel_lip_wall_x",
@@ -781,6 +851,8 @@ def _write_params(design, P, d):
         "DERIVED  at least 2")
     put("aperture_rear_h", "bezel_lip_inner_h",
         "DERIVED  the lip controls the clear height")
+    put("optical_h", "bezel_lip_inner_h",
+        "DERIVED  face opening is flush with it, so they are equal")
     put("bezel_face_t", "bezel_t - bezel_lip_depth", "DERIVED")
     put("z_panel_front", "panel_t", "DERIVED seating plane")
     put("z_bezel_front", "z_panel_front + bezel_face_t", "DERIVED")
@@ -1128,7 +1200,7 @@ def fit_study(P=P):
     d = derive(P)
     R = P["bezel_lip_corner_r"]
     print("=" * 74)
-    print("REV Q FIT STUDY - horizontal INTERFERENCE, vertical clearance")
+    print("REV Q FIT STUDY - INTERFERENCE ON BOTH AXES")
     print("=" * 74)
     print("opening    %.2f x %.2f mm   (MEASURED; corner radius NOT RECORDED)"
           % (P["panel_open_w"], P["panel_open_h"]))
@@ -1147,8 +1219,19 @@ def fit_study(P=P):
     print("   horizontal  %+.3f mm per side   INTERFERENCE - the lip is wider"
           % d["bezel_lip_interf_x"])
     print("               than the hole and must flex to enter")
-    print("   vertical    %+.3f mm per side   clearance"
-          % d["bezel_lip_clear_y"])
+    print("   vertical    %+.3f mm per side   INTERFERENCE - so is the lip"
+          % d["bezel_lip_interf_y"])
+    print("")
+    print("AND AS MODELLED IT CANNOT ENTER")
+    print("   The skirt is %.2f x %.2f into a %.2f x %.2f hole: %.2f mm"
+          % (P["bezel_lip_outer_w"], P["bezel_lip_outer_h"],
+             P["panel_open_w"], P["panel_open_h"],
+             2 * d["bezel_lip_interf_x"]))
+    print("   oversize across and %.2f mm oversize up. PETG will not give"
+          % (2 * d["bezel_lip_interf_y"]))
+    print("   that up. Either the MEASURED panel_open_h is stale or the")
+    print("   vertical move overshoots - owner-directed, and no CAD check")
+    print("   in this repository can settle which.")
     print("")
     print("WHAT THE R%.2f CORNERS DO ABOUT THE UNMEASURED OPENING CORNER" % R)
     print("   The R%.2f outer corner pulls the lip well away from the corner," % R)
@@ -1162,17 +1245,18 @@ def fit_study(P=P):
     print("   column above is cut edge left visible at each corner.")
     print("")
     print("   R_panel   deepest penetration   largest gap   verdict")
+    dmax = max(d["bezel_lip_interf_x"], d["bezel_lip_interf_y"])
     for rp in (0.00, 0.25, 0.50, 0.75, 1.00, 1.50, 2.00, 2.50, 3.00):
         pen, gap = penetration(P, d, R, rp)
-        if pen > d["bezel_lip_interf_x"] + 1e-4:
+        if pen > dmax + 1e-4:
             verdict = "EXCEEDS the declared interference"
         else:
-            verdict = "within the declared %.2f mm" % d["bezel_lip_interf_x"]
+            verdict = "within the declared %.2f mm" % dmax
         print("   %5.2f        %+7.3f            %+7.3f      %s"
               % (rp, pen, gap, verdict))
     print("")
     print("   deepest penetration stays at the declared %.3f mm for every"
-          % d["bezel_lip_interf_x"])
+          % dmax)
     print("   plausible opening corner radius: the flanks set it, not the")
     print("   corners.")
     print("")
@@ -1194,7 +1278,7 @@ def fit_study(P=P):
     print("   PRINTED WALL to take the deflection and the Perspex to be left")
     print("   unspread and unstressed. At %.2f mm that is a much harder ask, and" % wx)
     print("   CAD cannot settle it. PRINT THE FIT GAUGE BEFORE THE BEZEL - and")
-    print("   be ready to reduce bezel_lip_outer_w if 0.10 mm proves too much.")
+    print("   be ready to reduce bezel_lip_outer_w AND bezel_lip_outer_h.")
     print("=" * 74)
 
 
@@ -1442,6 +1526,13 @@ def validate(P=P):
     _gate(abs(d["bezel_lip_inner_w"] - P["bezel_window_w"]) < 1e-9,
           "FLUSH: skirt inner width == face opening, no set-back at the sides",
           "%.4f vs %.4f" % (d["bezel_lip_inner_w"], P["bezel_window_w"]))
+    _gate(abs(d["bezel_lip_inner_h"] - P["bezel_window_h"]) < 1e-9,
+          "FLUSH: skirt inner height == face opening, no ledge top or bottom",
+          "%.4f vs %.4f" % (d["bezel_lip_inner_h"], P["bezel_window_h"]))
+    _gate(abs(d["bezel_lip_inner_r"] - P["bezel_window_r"]) < 1e-9,
+          "FLUSH: skirt inner corner == face opening corner, so neither "
+          "one cuts inside the other",
+          "R%.4f vs R%.4f" % (d["bezel_lip_inner_r"], P["bezel_window_r"]))
     _gate(abs(d["bezel_lip_inner_r"]
               - (P["bezel_lip_corner_r"] - d["bezel_lip_wall_x"])) < 1e-9,
           "inner corner R%.2f = outer R%.2f - side wall %.2f"
@@ -1502,12 +1593,29 @@ def validate(P=P):
     _gate(abs((d["z_panel_front"] - d["z_lip_rear"]) - P["bezel_lip_depth"])
           < 1e-9, "lip depth = 2.800 mm",
           "%.5f" % (d["z_panel_front"] - d["z_lip_rear"]))
-    _gate(abs(d["bezel_lip_interf_x"] - 0.10) < 1e-9,
-          "horizontal INTERFERENCE 0.100 mm per side",
-          "%+.4f mm" % d["bezel_lip_interf_x"])
-    _gate(abs(d["bezel_lip_clear_y"] - 0.05) < 1e-9,
-          "vertical clearance 0.050 mm per side",
-          "%+.4f mm" % d["bezel_lip_clear_y"])
+    _gate(abs(d["bezel_lip_interf_x"]
+              - (P["bezel_lip_outer_w"] - P["panel_open_w"]) / 2.0) < 1e-9,
+          "horizontal INTERFERENCE %.3f mm per side"
+          % d["bezel_lip_interf_x"],
+          "(%.2f - %.2f)/2 = %+.4f mm"
+          % (P["bezel_lip_outer_w"], P["panel_open_w"],
+             d["bezel_lip_interf_x"]))
+    _gate(abs(d["bezel_lip_interf_y"]
+              - (P["bezel_lip_outer_h"] - P["panel_open_h"]) / 2.0) < 1e-9,
+          "vertical INTERFERENCE %.3f mm per side"
+          % d["bezel_lip_interf_y"],
+          "(%.2f - %.2f)/2 = %+.4f mm"
+          % (P["bezel_lip_outer_h"], P["panel_open_h"],
+             d["bezel_lip_interf_y"]))
+    _report("BOTH AXES ARE NOW AN INTERFERENCE - AND IT WILL NOT ENTER",
+            "a %.2f x %.2f skirt into a %.2f x %.2f hole is %.2f mm "
+            "oversize across and %.2f mm oversize up. As modelled the part "
+            "cannot be assembled. OWNER-DIRECTED; either the MEASURED "
+            "panel_open_h is stale or the vertical move overshoots, and no "
+            "check in this file can settle which."
+            % (P["bezel_lip_outer_w"], P["bezel_lip_outer_h"],
+               P["panel_open_w"], P["panel_open_h"],
+               2 * d["bezel_lip_interf_x"], 2 * d["bezel_lip_interf_y"]))
 
     print("")
     print("4. THE ORIGINAL PERSPEX - the declared interference, and nothing else")
@@ -1523,27 +1631,28 @@ def validate(P=P):
     hit_bb = _hit_bbox(b, body, panel)
     if hit_bb:
         (hx0, hx1, hy0, hy1, hz0, hz1) = hit_bb
-        _gate(min(abs(hx0), abs(hx1)) >= d["po_w2"] - 1.0e-4,
-              "overlap lies only OUTBOARD of the opening wall in X",
-              "|x| %.4f .. %.4f  vs opening %.4f"
-              % (min(abs(hx0), abs(hx1)), max(abs(hx0), abs(hx1)), d["po_w2"]))
-        _gate(max(abs(hy0), abs(hy1)) <= d["po_h2"] + 1.0e-4,
-              "overlap never reaches the top or bottom of the opening",
-              "|y| max %.4f  vs opening %.4f"
-              % (max(abs(hy0), abs(hy1)), d["po_h2"]))
         _gate(hz0 >= d["z_lip_rear"] - 1.0e-4
               and hz1 <= d["z_panel_front"] + 1.0e-4,
               "overlap is confined to the lip depth",
               "z %.4f .. %.4f" % (hz0, hz1))
         _gate((max(abs(hx0), abs(hx1)) - d["po_w2"])
               <= d["bezel_lip_interf_x"] + 1.0e-4,
-              "overlap never exceeds the declared 0.100 mm per side",
+              "overlap never exceeds the declared %.3f mm per side in X"
+              % d["bezel_lip_interf_x"],
               "deepest %.4f mm"
               % (max(abs(hx0), abs(hx1)) - d["po_w2"]))
+        _gate((max(abs(hy0), abs(hy1)) - d["po_h2"])
+              <= d["bezel_lip_interf_y"] + 1.0e-4,
+              "overlap never exceeds the declared %.3f mm per side in Y"
+              % d["bezel_lip_interf_y"],
+              "deepest %.4f mm"
+              % (max(abs(hy0), abs(hy1)) - d["po_h2"]))
 
     # An independent statement of the same thing: relieve the opening by the
-    # declared interference in X only, and NOTHING may touch it any more.
-    relieved = build_panel(b, P, d, relief_x=d["bezel_lip_interf_x"])
+    # declared interference on BOTH axes now, and NOTHING may touch it any
+    # more.
+    relieved = build_panel(b, P, d, relief_x=d["bezel_lip_interf_x"],
+                           relief_y=d["bezel_lip_interf_y"])
     vr = _hit_mm3(b, body, relieved)
     _gate(vr < 1.0e-6,
           "with the declared relief applied, interference falls to zero",
@@ -1628,39 +1737,49 @@ def validate(P=P):
             "%.3f x %.3f mm - the specified bezel face opening"
             % (d["ap_front_w"], d["ap_front_h"]))
     _report("aperture taper",
-            "%.2f deg from vertical in Y, self-supporting front-face-down"
-            % d["ap_taper_deg"])
+            "%.2f deg - the aperture is a STRAIGHT bore now, flush with "
+            "the skirt on all four sides, so there is no taper left to "
+            "support" % d["ap_taper_deg"])
     _gate(abs(d["optical_w"] - P["bezel_window_w"]) < 1e-9
           and abs(d["optical_h"] - d["bezel_lip_inner_h"]) < 1e-9,
           "EFFECTIVE optical opening = %.2f x %.2f"
           % (P["bezel_window_w"], d["bezel_lip_inner_h"]),
           "%.3f x %.3f" % (d["optical_w"], d["optical_h"]))
     _report("versus the figure brief 4 predicts",
-            "30.90 x 13.60 - the height matches exactly; the width is %+.2f mm "
-            "because the owner opened the face by 1.00 mm per side"
-            % (d["optical_w"] - 30.90))
+            "30.90 x 13.60 - now %+.2f mm wider and %+.2f mm taller, both "
+            "owner-directed: the face opened 1.00 mm per side, then the "
+            "skirt walls moved out 1.00 mm each"
+            % (d["optical_w"] - 30.90, d["optical_h"] - 13.60))
     _report("controlled by",
-            "width by the %.2f mm face opening, HEIGHT BY THE %.2f mm LIP "
-            "INNER ENVELOPE" % (d["bezel_window_w"], d["bezel_lip_inner_h"]))
+            "the skirt inner envelope on ALL FOUR sides - the face opening "
+            "is flush with it at %.2f x %.2f R%.2f, so neither one masks "
+            "the other" % (d["bezel_window_w"], d["bezel_window_h"],
+                           P["bezel_window_r"]))
     _report("Rev N clear opening",
             "%.3f W x %.3f H mm (R%.2f)"
             % (d["revN_window_w"], d["revN_window_h"], P["bezel_window_r"]))
     _report("Rev Q clear opening",
             "%.3f W x %.3f H mm (R%.2f)"
             % (d["optical_w"], d["optical_h"], d["optical_r"]))
-    _report("change introduced by the lip",
-            "width unchanged, height %.3f -> %.3f, i.e. -%.3f mm total "
-            "(-%.3f per side)"
-            % (d["revN_window_h"], d["optical_h"],
-               d["revN_window_h"] - d["optical_h"],
-               (d["revN_window_h"] - d["optical_h"]) / 2.0))
-    _report("controlled by", "the TOP and BOTTOM lip, not the bezel face")
+    _report("change versus Rev N",
+            "width %.3f -> %.3f (%+.3f), height %.3f -> %.3f (%+.3f mm "
+            "total, %+.3f per side). The lip no longer COSTS opening - "
+            "after the owner moves it gives some back."
+            % (d["revN_window_w"], d["optical_w"],
+               d["optical_w"] - d["revN_window_w"],
+               d["revN_window_h"], d["optical_h"],
+               d["optical_h"] - d["revN_window_h"],
+               (d["optical_h"] - d["revN_window_h"]) / 2.0))
+    _report("controlled by",
+            "the lip and the bezel face together - they are flush, so "
+            "neither is the limiter on its own")
     _report("visible OLED active area, Rev N",
             "%.3f W x %.3f H mm" % (d["vis_w"], d["vis_n_h"]))
     _report("visible OLED active area, Rev Q",
             "%.3f W x %.3f H mm" % (d["vis_w"], d["vis_q_h"]))
-    _report("active height lost to the lip",
-            "%.3f mm, all of it at the TOP edge" % d["active_loss_vs_revN"])
+    _report("active height versus Rev N",
+            "%+.3f mm, all of it at the TOP edge"
+            % (-d["active_loss_vs_revN"]))
     _report("unlit board visible below the active area",
             "Rev N %.3f -> Rev Q %.3f mm"
             % (d["unlit_below_n"], d["unlit_below_q"]))
