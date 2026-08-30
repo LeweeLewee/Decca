@@ -89,7 +89,7 @@ COMP_BEZEL = "Front_Bezel_revQ"
 COMP_PANEL = "REF_Decca_Panel"
 COMP_GLASS = "REF_OLED_Glass"
 COMP_CARRIER = "REF_Carrier_revP"
-COMP_COUPON = "Bezel_Corner_Gauge_revQ"
+COMP_COUPON = "Bezel_Fit_Gauge_revQ"
 COMP_ACTIVE = "REF_OLED_Active"
 
 # ---------------------------------------------------------------------------
@@ -124,20 +124,35 @@ P = {
     "bezel_t": 4.00,                # PRESERVED
     "bezel_outer_r": 2.00,          # PRESERVED   external corner radius
     "bezel_edge_break": 0.40,       # PRESERVED   front face edge fillet
-    "bezel_window_w": 30.40,        # PRESERVED   visible window width
+    "bezel_window_w": 30.90,        # AMENDED     Rev N 30.40 + 0.50
+    "bezel_window_h": 15.35,        # AMENDED     face opening, AT THE FRONT FACE
     "bezel_window_r": 0.80,         # PRESERVED   window corner radius
     "pad_x_half": 12.00,            # PRESERVED   adhesive pad half length
     "pad_y0": 7.85,                 # PRESERVED
     "pad_y1": 9.85,                 # PRESERVED
     "pad_depth": 0.30,              # PRESERVED   recess into the seating face
 
-    # -- Rev Q: the continuous masking lip ---------------------------------
-    "bezel_lip_outer_w": 34.90,     # PROVISIONAL proven in X by the Rev N rails
-    "bezel_lip_outer_h": 15.00,     # PROVISIONAL never physically proven in Y
+    # -- Rev Q: the continuous inset masking wall --------------------------
+    # Owner amendment, brief commit 7b107f2: a controlled horizontal
+    # INTERFERENCE fit, R2.00 outer corners, and an 0.80 mm wall so the
+    # established 0.40 mm extrusion configuration resolves as TWO continuous
+    # wall loops instead of the single loop the 0.40 mm wall produced.
+    "bezel_lip_outer_w": 35.40,     # AMENDED     Rev N 34.90 + 2 x 0.25
+    "bezel_lip_outer_h": 15.20,     # AMENDED     Rev N 15.00 + 2 x 0.10
     "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
-    "bezel_lip_wall": 0.40,         # PROVISIONAL one 0.40 mm extrusion width
-    "bezel_lip_corner_r": 0.60,     # UNRESOLVED  Rev N rail-end relief R0.60
+    "bezel_lip_wall": 0.80,         # AMENDED     two 0.40 mm wall loops
+    "bezel_lip_corner_r": 2.00,     # SPECIFIED   outer corner radius
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
+
+    # The established production extrusion width. bezel_lip_wall must be an
+    # exact whole multiple of it, and that multiple must be 2.
+    "extrusion_width": 0.40,        # PRODUCTION  nozzle / extrusion width
+
+    # How far the tapered aperture stops OUTSIDE the lip inner opening at the
+    # seating plane, so the two surfaces meet transversally instead of
+    # tangentially. Purely a meshing measure - see derive(). The lip still
+    # controls the clear height.
+    "ap_root_relief": 0.02,         # MODELLING   anti-tangency relief
 
     # -- OLED reference, for the optical report only -----------------------
     # From the RELEASED Rev P.5 model. oled_glass_* remains an UNMEASURED
@@ -150,21 +165,20 @@ P = {
     "oled_glass_front_z": -0.30,    # RELEASED    glass front face
     "oled_glass_rear_z": -1.10,     # PCB front face
 
-    # -- corner-radius gauge coupon ----------------------------------------
-    "coupon_leg_x": 6.00,
-    "coupon_leg_y": 4.00,
-    "coupon_pad_out": 3.60,
-    "coupon_pitch": 26.00,
+    # -- interference fit gauge coupon -------------------------------------
+    "coupon_keep_x": 12.00,         # clip the ring at |x| >= this
+    "coupon_pad_out": 3.20,
+    "coupon_pitch": 24.00,
 }
 
-# Candidate lip corner radii carried by the gauge coupon, ascending.
+# Horizontal interference per side carried by the fit gauge, ascending.
 #
-# A uniform wall forces bezel_lip_corner_r >= bezel_lip_wall, because the lip
-# INNER corner radius is (corner_r - wall) and cannot go negative. With the
-# 0.40 mm wall the smallest buildable outer corner radius is therefore 0.40,
-# and that is where the coupon starts. Between them these five span opening
-# corner radii from 0.91 mm to 3.01 mm - see corner_study().
-COUPON_RADII = [0.40, 0.60, 1.00, 1.60, 2.50]
+# The corner radius is no longer the open question - the owner has specified
+# R2.00. The open question is now the INTERFERENCE: 0.10 mm per horizontal
+# side, resisted by a wall that is 8x stiffer in bending than the 0.40 mm one
+# it replaces. These five bracket the declared value so the fit can be chosen
+# from a physical part instead of argued from CAD.
+COUPON_INTERFERENCE = [0.00, 0.05, 0.10, 0.15, 0.20]
 
 
 def derive(P):
@@ -178,9 +192,30 @@ def derive(P):
     d["z_bezel_front"] = d["z_panel_front"] + d["bezel_face_t"]      # +4.200
     d["z_lip_rear"] = d["z_panel_front"] - P["bezel_lip_depth"]      # +0.200
 
-    # Lip, derived from the outer envelope and the wall ---------------------
-    d["bezel_lip_clear_x"] = (P["panel_open_w"] - P["bezel_lip_outer_w"]) / 2.0
-    d["bezel_lip_clear_y"] = (P["panel_open_h"] - P["bezel_lip_outer_h"]) / 2.0
+    # Wall loops - the whole point of the 0.80 mm amendment ------------------
+    d["wall_loops"] = P["bezel_lip_wall"] / P["extrusion_width"]      # 2.000
+    if abs(d["wall_loops"] - round(d["wall_loops"])) > 1e-9:
+        raise ValueError(
+            "bezel_lip_wall (%.3f) is not a whole multiple of extrusion_width "
+            "(%.3f): the slicer cannot resolve it as complete wall loops and "
+            "will substitute gap fill or a variable-width wall"
+            % (P["bezel_lip_wall"], P["extrusion_width"]))
+    if round(d["wall_loops"]) < 2:
+        raise ValueError(
+            "bezel_lip_wall (%.3f) gives only %d loop(s) at a %.3f mm "
+            "extrusion width; the Rev Q amendment requires TWO"
+            % (P["bezel_lip_wall"], round(d["wall_loops"]),
+               P["extrusion_width"]))
+
+    # Fit against the MEASURED opening --------------------------------------
+    # Horizontal is now a deliberate INTERFERENCE, vertical stays a clearance.
+    # Sign convention: interference positive means the lip is WIDER than the
+    # hole and the lip must flex to enter.
+    d["bezel_lip_interf_x"] = (P["bezel_lip_outer_w"]
+                               - P["panel_open_w"]) / 2.0            # +0.100
+    d["bezel_lip_clear_y"] = (P["panel_open_h"]
+                              - P["bezel_lip_outer_h"]) / 2.0        # +0.050
+
     d["bezel_lip_inner_w"] = P["bezel_lip_outer_w"] - 2 * P["bezel_lip_wall"]
     d["bezel_lip_inner_h"] = P["bezel_lip_outer_h"] - 2 * P["bezel_lip_wall"]
     # A uniform wall makes the inner corner radius (corner_r - wall), so the
@@ -192,24 +227,9 @@ def derive(P):
             "than its wall" % (P["bezel_lip_corner_r"], P["bezel_lip_wall"]))
     d["bezel_lip_inner_r"] = P["bezel_lip_corner_r"] - P["bezel_lip_wall"]
 
-    # The window HEIGHT is DERIVED, not independently dimensioned.
-    #
-    # Rev N's window was 14.900 high. The Rev Q lip inner opening is 14.200.
-    # If the window stayed at 14.900 the lip's 0.400 mm wall would meet the
-    # bezel face over only 0.050 mm of its width at the top and the bottom -
-    # a knife-edge root, a sliver, and unprintable as a standing wall.
-    # Driving the window height from the lip inner opening lands the full
-    # 0.400 mm wall on solid face material and makes the lip a true skirt
-    # continuing rearward from the window edge, which is the required
-    # cross-section.
-    #
-    # It costs NOTHING optically: the clear opening is 14.200 either way,
-    # because the lip already controls it. Brief section 3.4 requires exactly
-    # this - "the wall and the opening it creates must be derived".
-    d["bezel_window_h"] = d["bezel_lip_inner_h"]                     # 14.200
-    d["bezel_window_w"] = P["bezel_window_w"]                        # 30.400
-
     # Half extents ---------------------------------------------------------
+    d["bezel_window_w"] = P["bezel_window_w"]                        # 30.900
+    d["bezel_window_h"] = P["bezel_window_h"]                        # 15.350
     d["bw2"] = P["bezel_w"] / 2.0
     d["bh2"] = P["bezel_h"] / 2.0
     d["ww2"] = d["bezel_window_w"] / 2.0
@@ -221,18 +241,65 @@ def derive(P):
     d["po_w2"] = P["panel_open_w"] / 2.0
     d["po_h2"] = P["panel_open_h"] / 2.0
 
+    # THE APERTURE IS TAPERED IN Y, AND IT HAS TO BE.
+    #
+    # The amended face opening is 15.350 high. The whole inset wall is only
+    # 15.200 high. So the face opening is 0.075 mm TALLER PER SIDE than the
+    # outside of the lip, and at the top and bottom the lip footprint
+    # (|y| 6.800..7.600) falls entirely inside it. A straight-walled face
+    # opening would therefore leave the top and bottom lip runs DETACHED from
+    # the bezel face - floating ~31 mm cantilevers joined only near the
+    # corners, unprintable without support, and not one sound solid.
+    #
+    # In X there is no such problem: the face opening (half 15.450) is
+    # NARROWER than the lip inner (half 16.900), so the left and right runs
+    # land on solid face material with 1.450 mm to spare.
+    #
+    # Resolution: the aperture is 30.900 wide throughout and TAPERS in Y from
+    # the lip inner opening at the seating plane to the specified face opening
+    # at the front face. Every published number survives - face opening
+    # 30.90 x 15.35 at the front face, lip inner 33.80 x 13.60, effective
+    # optical opening 30.90 x 13.60 - the full 0.80 mm wall lands on solid
+    # material, and the taper is self-supporting printed front-face-down.
+    # Spec v1.2 section 4 asks for a flared aperture anyway, "to reduce tunnel
+    # effect through the 3 mm Perspex".
+    #
+    # The aperture stops a hair OUTSIDE the lip inner opening rather than
+    # exactly on it. Landing it exactly on y = +/-6.800 makes the tapered wall
+    # tangent to the lip inner face along a line at z = 3.000, and the
+    # tessellator answers that with a seam of zero-area triangles - 52 of them
+    # in the first export, all at exactly z = 3.0000. Backing the aperture off
+    # by ap_root_relief turns that tangency into an ordinary transverse
+    # intersection and the degenerate triangles vanish.
+    #
+    # It costs nothing that matters: the LIP still controls the clear height
+    # at 13.600, exactly as brief section 4 requires, because the aperture is
+    # now the wider of the two. The lip keeps 0.760 of its 0.800 mm wall
+    # rooted on solid face material.
+    d["ap_root_relief"] = P["ap_root_relief"]
+    d["ap_rear_w"] = d["bezel_window_w"]                             # 30.900
+    d["ap_rear_h"] = (d["bezel_lip_inner_h"]
+                      + 2 * d["ap_root_relief"])                     # 13.640
+    d["ap_front_w"] = d["bezel_window_w"]                            # 30.900
+    d["ap_front_h"] = d["bezel_window_h"]                            # 15.350
+    d["ap_taper_dy"] = (d["ap_front_h"] - d["ap_rear_h"]) / 2.0      #  0.875
+    d["ap_taper_deg"] = math.degrees(math.atan2(d["ap_taper_dy"],
+                                                d["bezel_face_t"]))  # 36.10
+    d["ap_slope"] = d["ap_taper_dy"] / d["bezel_face_t"]
+
     # Clearances the released design already proved -------------------------
     d["clear_to_panel_rear"] = d["z_lip_rear"] - d["z_panel_rear"]   # 0.200
     d["clear_to_glass"] = d["z_lip_rear"] - P["oled_glass_front_z"]  # 0.500
 
     # Effective optical opening --------------------------------------------
-    # The through-hole is the intersection of the face window and the lip
-    # inner opening. Because the window height is now derived from the lip the
-    # two coincide in Y, and the window is far narrower than the lip in X, so
-    # the result is simply the window.
-    d["optical_w"] = d["bezel_window_w"]                             # 30.400
-    d["optical_h"] = d["bezel_window_h"]                             # 14.200
-    d["optical_r"] = P["bezel_window_r"]                             #  0.800
+    # The through-hole is the narrowest cross-section of the whole aperture.
+    # In X that is the face opening, constant at 30.900. In Y it is the
+    # aperture at the seating plane, which is the lip inner opening, 13.600.
+    # Exactly what brief section 4 predicts.
+    d["optical_w"] = min(d["bezel_window_w"], d["bezel_lip_inner_w"])  # 30.900
+    d["optical_h"] = min(d["ap_rear_h"], d["bezel_lip_inner_h"])       # 13.600
+    d["lip_root_supported"] = P["bezel_lip_wall"] - d["ap_root_relief"]
+    d["optical_r"] = P["bezel_window_r"]                               #  0.800
 
     # what Rev N showed, for the honest before/after
     d["revN_window_w"] = 30.40
@@ -242,8 +309,10 @@ def derive(P):
     a0 = P["oled_active_cy"] - P["oled_active_h"] / 2.0              # -0.650
     a1 = P["oled_active_cy"] + P["oled_active_h"] / 2.0              # +14.050
     d["active_y0"], d["active_y1"] = a0, a1
-    d["vis_q_y0"] = max(a0, -d["wh2"])
-    d["vis_q_y1"] = min(a1, +d["wh2"])
+    # the CONTROLLING aperture half-height is the lip, not the face opening
+    oh2 = d["optical_h"] / 2.0
+    d["vis_q_y0"] = max(a0, -oh2)
+    d["vis_q_y1"] = min(a1, +oh2)
     d["vis_q_h"] = max(0.0, d["vis_q_y1"] - d["vis_q_y0"])
     d["vis_n_y0"] = max(a0, -d["revN_window_h"] / 2.0)
     d["vis_n_y1"] = min(a1, +d["revN_window_h"] / 2.0)
@@ -255,7 +324,7 @@ def derive(P):
     d["vis_w"] = min(P["oled_active_w"], d["optical_w"])
 
     # unlit board visible below the active area
-    d["unlit_below_q"] = max(0.0, a0 - (-d["wh2"]))
+    d["unlit_below_q"] = max(0.0, a0 - (-oh2))
     d["unlit_below_n"] = max(0.0, a0 - (-d["revN_window_h"] / 2.0))
 
     return d
@@ -336,30 +405,26 @@ class B(object):
 # Bodies
 # ---------------------------------------------------------------------------
 def build_bezel(b, P, d):
-    """The Rev Q bezel, as ONE connected solid.
+    """The Rev Q bezel massing, as ONE connected solid.
 
-    Order matters: the window is cut from the face slab BEFORE the lip is
-    unioned on, so no boolean ever has to resolve a coincident face at
-    z = +3.000.
+    The tapered aperture is NOT cut here - it is a real Fusion loft feature
+    applied afterwards by main(), so the taper stays parametric and editable.
+    What this returns is the solid face slab with its adhesive pads, plus the
+    continuous inset wall unioned onto its underside.
     """
-    # 1. face slab - Rev N envelope and external corner radius
+    # 1. face slab - Rev N envelope and external corner radius, PRESERVED
     face = b.rprism(-d["bw2"], d["bw2"], -d["bh2"], d["bh2"],
                     d["z_panel_front"], d["z_bezel_front"], P["bezel_outer_r"])
 
-    # 2. the visible window - width PRESERVED from Rev N, height DERIVED
-    win = b.rprism(-d["ww2"], d["ww2"], -d["wh2"], d["wh2"],
-                   d["z_panel_front"] - 1.0, d["z_bezel_front"] + 1.0,
-                   P["bezel_window_r"])
-    b.sub(face, win)
-
-    # 3. the two recessed adhesive pads - PRESERVED from Rev N
+    # 2. the two recessed adhesive pads - PRESERVED from Rev N
     for sy in (1, -1):
         y0, y1 = sorted((sy * P["pad_y0"], sy * P["pad_y1"]))
         b.sub(face, b.box(-P["pad_x_half"], P["pad_x_half"], y0, y1,
                           d["z_panel_front"] - 0.5,
                           d["z_panel_front"] + P["pad_depth"]))
 
-    # 4. THE REV Q FEATURE - one continuous lip, all four sides and corners
+    # 3. THE REV Q FEATURE - one continuous inset wall, all four sides and
+    #    all four corners, constant 0.80 mm through the R2.00 corners.
     lip = b.ring(d["low2"], d["loh2"], d["liw2"], d["lih2"],
                  d["z_lip_rear"], d["z_panel_front"],
                  P["bezel_lip_corner_r"], d["bezel_lip_inner_r"])
@@ -368,18 +433,101 @@ def build_bezel(b, P, d):
     return face
 
 
-def build_panel(b, P, d):
+def _rrect_sketch(comp, z, hw, hh, r, name):
+    """A closed rounded-rectangle sketch profile on a plane at height z."""
+    planes = comp.constructionPlanes
+    pi = planes.createInput()
+    pi.setByOffset(comp.xYConstructionPlane,
+                   adsk.core.ValueInput.createByReal(mm(z)))
+    pl = planes.add(pi)
+    pl.name = name + "_plane"
+    sk = comp.sketches.add(pl)
+    sk.name = name
+    sk.isComputeDeferred = True
+    lines = sk.sketchCurves.sketchLines
+    arcs = sk.sketchCurves.sketchArcs
+
+    def p2(x, y):
+        return adsk.core.Point3D.create(mm(x), mm(y), 0.0)
+
+    a, bb = hw - r, hh - r
+    # four straight runs
+    lines.addByTwoPoints(p2(hw, -bb), p2(hw, bb))
+    lines.addByTwoPoints(p2(-a, hh), p2(a, hh))
+    lines.addByTwoPoints(p2(-hw, bb), p2(-hw, -bb))
+    lines.addByTwoPoints(p2(a, -hh), p2(-a, -hh))
+    # four corner arcs, each sweeping 90 degrees anticlockwise
+    arcs.addByCenterStartSweep(p2(a, bb), p2(hw, bb), math.pi / 2)
+    arcs.addByCenterStartSweep(p2(-a, bb), p2(-a, hh), math.pi / 2)
+    arcs.addByCenterStartSweep(p2(-a, -bb), p2(-hw, -bb), math.pi / 2)
+    arcs.addByCenterStartSweep(p2(a, -bb), p2(a, -hh), math.pi / 2)
+    sk.isComputeDeferred = False
+    if sk.profiles.count < 1:
+        raise RuntimeError("%s did not close into a profile" % name)
+    return sk.profiles.item(0)
+
+
+def build_aperture(comp, P, d, over=0.05):
+    """The tapered aperture, as a real Fusion LOFT between two rounded-rect
+    profiles, then combined out of the bezel.
+
+    Constant 30.900 wide; in Y it runs from the lip inner opening at the
+    seating plane to the specified face opening at the front face. Both
+    sections are pushed `over` beyond their planes, along the same straight
+    taper, so the cut breaks cleanly through both faces without any coincident
+    boolean and without touching the lip - at the rear the extrapolated
+    section is strictly smaller than the lip inner opening, so it removes no
+    lip material.
+    """
+    z0 = d["z_panel_front"] - over
+    z1 = d["z_bezel_front"] + over
+    hh0 = d["ap_rear_h"] / 2.0 + d["ap_slope"] * (z0 - d["z_panel_front"])
+    hh1 = d["ap_rear_h"] / 2.0 + d["ap_slope"] * (z1 - d["z_panel_front"])
+    hw = d["ap_rear_w"] / 2.0
+
+    p0 = _rrect_sketch(comp, z0, hw, hh0, P["bezel_window_r"], "ap_rear")
+    p1 = _rrect_sketch(comp, z1, hw, hh1, P["bezel_window_r"], "ap_front")
+
+    lofts = comp.features.loftFeatures
+    li = lofts.createInput(
+        adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
+    li.loftSections.add(p0)
+    li.loftSections.add(p1)
+    li.isSolid = True
+    loft = lofts.add(li)
+    loft.name = "aperture_taper"
+
+    tool = loft.bodies.item(0)
+    tool.name = "APERTURE_TOOL"
+    target = comp.bRepBodies.itemByName("BEZEL")
+    oc = adsk.core.ObjectCollection.create()
+    oc.add(tool)
+    ci = comp.features.combineFeatures.createInput(target, oc)
+    ci.operation = adsk.fusion.FeatureOperations.CutFeatureOperation
+    ci.isKeepToolBodies = False
+    cut = comp.features.combineFeatures.add(ci)
+    cut.name = "aperture_cut"
+    return d["ap_taper_deg"]
+
+
+def build_panel(b, P, d, relief_x=0.0):
     """REF_Decca_Panel - the original fascia Perspex. Reference only.
 
     The opening is modelled EXACTLY as the released Rev P generator models it,
     a sharp-cornered box, because that is the controlled representation.
     panel_open_corner_r is exposed so corner sensitivity can be explored
     without pretending a measurement exists.
+
+    relief_x widens the opening horizontally by that much per side. It is used
+    only by the validator, to state the interference claim the other way
+    round: relieve the opening by exactly the declared interference and the
+    overlap must vanish completely. Nothing about the real panel changes.
     """
     s = b.box(-P["panel_ref_w"] / 2.0, P["panel_ref_w"] / 2.0,
               -P["panel_ref_h"] / 2.0, P["panel_ref_h"] / 2.0,
               d["z_panel_rear"], d["z_panel_front"])
-    b.sub(s, b.rprism(-d["po_w2"], d["po_w2"], -d["po_h2"], d["po_h2"],
+    b.sub(s, b.rprism(-d["po_w2"] - relief_x, d["po_w2"] + relief_x,
+                      -d["po_h2"], d["po_h2"],
                       d["z_panel_rear"] - 1.0, d["z_panel_front"] + 1.0,
                       P["panel_open_corner_r"]))
     m2x = P["panel_fix_pitch"] / 2.0
@@ -425,45 +573,50 @@ def build_behind_panel(b, P, d):
 
 
 def build_coupon(b, P, d):
-    """Corner-radius gauge. Five loose L-tabs, one per candidate lip corner
-    radius, notch-numbered 1..5 in ascending radius.
+    """INTERFERENCE FIT GAUGE. Five loose end-tabs, notch-numbered 1..5 in
+    ascending horizontal interference.
 
-    Each tab carries a REAL section of the Rev Q lip at that radius - the same
-    0.40 mm wall, the same 2.80 mm depth, the same 34.90 x 15.00 outer
-    envelope - so offering it into a corner of the REAL opening answers the
-    one question CAD cannot: what is the Perspex corner radius.
+    The corner radius is no longer the open question - the owner has specified
+    R2.00. The open question is the fit: 0.10 mm per horizontal side of
+    interference, now resisted by a wall 8x stiffer in bending than the
+    0.40 mm one it replaces.
+
+    Each tab is the complete RIGHT-HAND END of the real Rev Q inset wall at
+    one candidate interference - full 15.20 mm height, both R2.00 corners, the
+    real 0.80 mm two-loop wall and the real 2.80 mm depth - so it engages the
+    interference exactly as the bezel will. Offering each into the end of the
+    real opening answers, on a physical part, the question CAD cannot: which
+    interference is snug but removable, and leaves the Perspex unstressed.
     """
     tabs = []
-    lx, ly = P["coupon_leg_x"], P["coupon_leg_y"]
+    keep = P["coupon_keep_x"]
     out = P["coupon_pad_out"]
-    x_in = d["low2"] - lx
-    y_in = d["loh2"] - ly
-    for i, r in enumerate(COUPON_RADII):
-        ri = r - P["bezel_lip_wall"]
-        if ri < 0.0:
-            raise ValueError("coupon radius %.2f is below the wall" % r)
-        # a full lip ring at this radius, clipped to the +X +Y corner
-        seg = b.ring(d["low2"], d["loh2"], d["liw2"], d["lih2"],
-                     d["z_lip_rear"], d["z_panel_front"], r, ri)
-        b.inter(seg, b.box(x_in, d["low2"] + 10.0, y_in, d["loh2"] + 10.0,
+    for i, interf in enumerate(COUPON_INTERFERENCE):
+        ow2 = (P["panel_open_w"] + 2 * interf) / 2.0
+        iw2 = ow2 - P["bezel_lip_wall"]
+        # the complete inset wall at this interference, clipped to the +X end
+        seg = b.ring(ow2, d["loh2"], iw2, d["lih2"],
+                     d["z_lip_rear"], d["z_panel_front"],
+                     P["bezel_lip_corner_r"], d["bezel_lip_inner_r"])
+        b.inter(seg, b.box(keep, ow2 + 10.0, -d["loh2"] - 10.0,
+                           d["loh2"] + 10.0,
                            d["z_lip_rear"] - 1.0, d["z_panel_front"] + 1.0))
-        # the face pad that lands on the Perspex front face
-        pad = b.box(x_in - 1.0, d["low2"] + out, y_in - 1.0, d["loh2"] + out,
+        # the face pad that lands on the Perspex front face around the opening
+        pad = b.box(keep - 1.0, ow2 + out, -d["po_h2"] - out, d["po_h2"] + out,
                     d["z_panel_front"], d["z_bezel_front"])
         b.uni(pad, seg)
         # notch code - i+1 notches cut into the outboard edge
         for n in range(i + 1):
-            cy = y_in - 0.4 + 1.2 * n
-            b.sub(pad, b.box(d["low2"] + out - 0.9, d["low2"] + out + 1.0,
-                             cy - 0.30, cy + 0.30,
+            cy = -3.0 + 1.5 * n
+            b.sub(pad, b.box(ow2 + out - 0.9, ow2 + out + 1.0,
+                             cy - 0.35, cy + 0.35,
                              d["z_panel_front"] - 1.0,
                              d["z_bezel_front"] + 1.0))
         # lay the five tabs out in a row for printing
         mtx = adsk.core.Matrix3D.create()
-        mtx.translation = v3(mm((i - 2) * P["coupon_pitch"] - d["low2"]),
-                             mm(-y_in), 0.0)
+        mtx.translation = v3(mm((i - 2) * P["coupon_pitch"] - ow2), 0.0, 0.0)
         b.t.transform(pad, mtx)
-        tabs.append((pad, "COUPON_R%03d" % int(round(r * 100))))
+        tabs.append((pad, "GAUGE_I%03d" % int(round(interf * 100))))
     return tabs
 
 
@@ -529,12 +682,17 @@ def _write_params(design, P, d):
             put(k, "%.5f mm" % v, "Rev Q generator")
 
     # derived - written as formulas so changing a driver updates them
-    put("bezel_lip_clear_x", "(panel_open_w - bezel_lip_outer_w) / 2", "DERIVED")
-    put("bezel_lip_clear_y", "(panel_open_h - bezel_lip_outer_h) / 2", "DERIVED")
+    put("bezel_lip_interf_x", "(bezel_lip_outer_w - panel_open_w) / 2",
+        "DERIVED  horizontal INTERFERENCE per side")
+    put("bezel_lip_clear_y", "(panel_open_h - bezel_lip_outer_h) / 2",
+        "DERIVED  vertical clearance per side")
     put("bezel_lip_inner_w", "bezel_lip_outer_w - 2 * bezel_lip_wall", "DERIVED")
     put("bezel_lip_inner_h", "bezel_lip_outer_h - 2 * bezel_lip_wall", "DERIVED")
     put("bezel_lip_inner_r", "bezel_lip_corner_r - bezel_lip_wall", "DERIVED")
-    put("bezel_window_h", "bezel_lip_inner_h", "DERIVED from the lip")
+    put("wall_loops", "bezel_lip_wall / extrusion_width",
+        "DERIVED  must be exactly 2")
+    put("aperture_rear_h", "bezel_lip_inner_h",
+        "DERIVED  the lip controls the clear height")
     put("bezel_face_t", "bezel_t - bezel_lip_depth", "DERIVED")
     put("z_panel_front", "panel_t", "DERIVED seating plane")
     put("z_bezel_front", "z_panel_front + bezel_face_t", "DERIVED")
@@ -664,11 +822,58 @@ def main(new_document=True):
     print("after base feature : bodies=%d solid=%s faces=%d"
           % (comp.bRepBodies.count, body.isSolid, body.faces.count))
 
-    # ---- front face edge break R0.40 - PRESERVED from Rev N --------------
+    # ---- the tapered aperture, as a parametric loft ----------------------
+    ang = build_aperture(comp, P, d)
+    body = comp.bRepBodies.itemByName("BEZEL")
+    print("aperture taper     : %.2f deg from vertical, %s"
+          % (ang, "self-supporting" if ang <= 45.0 else "NEEDS SUPPORT"))
+    print("                     %.3f x %.3f at the seating plane -> "
+          "%.3f x %.3f at the front face"
+          % (d["ap_rear_w"], d["ap_rear_h"],
+             d["ap_front_w"], d["ap_front_h"]))
+    print("after aperture cut : bodies=%d solid=%s faces=%d"
+          % (comp.bRepBodies.count, body.isSolid, body.faces.count))
+
+    # ---- front face edge breaks, 0.40 - PRESERVED from Rev N -------------
+    #
+    # The OUTER envelope keeps the Rev N R0.40 fillet exactly.
+    #
+    # The WINDOW edge cannot: the tapered aperture is one NURBS surface, and
+    # its front edge is a single closed NURBS curve whose dihedral varies
+    # around the loop - 90 degrees down the vertical left and right walls,
+    # 53.9 degrees where the top and bottom lean back, sweeping between the
+    # two through the corners. Fusion refuses a fillet there at every radius
+    # tried (0.40, 0.30, 0.20, 0.10 - all ASM_BL_UNFIN_SHEET), whole-loop and
+    # per-edge alike. A chamfer of the same 0.40 succeeds cleanly.
+    #
+    # So the window break is realised as a 0.40 x 45 degree CHAMFER rather
+    # than an R0.40 fillet. It is a declared deviation from Rev N and the only
+    # one in the visible face detail. At 0.40 mm on a matt black part the two
+    # are indistinguishable by eye, and the window was already re-dimensioned
+    # and flared by the owner amendment, so its section could not have been
+    # carried over unchanged in any case.
+    body = comp.bRepBodies.itemByName("BEZEL")
     ff = _planar_face(body, d["z_bezel_front"], +1)
-    ok1, msg1 = _fillet(comp, list(ff.edges) if ff else [],
-                        P["bezel_edge_break"], "front_edge_break")
-    print("front edge break R%.2f : %s %s" % (P["bezel_edge_break"], ok1, msg1))
+    outer_e, win_e = [], []
+    if ff:
+        for lp in ff.loops:
+            (outer_e if lp.isOuter else win_e).extend(list(lp.edges))
+    okA, msgA = _fillet(comp, outer_e, P["bezel_edge_break"],
+                        "front_edge_break_outer")
+    print("front break, outer envelope  R%.2f fillet  : %s %s"
+          % (P["bezel_edge_break"], okA, msgA))
+
+    body = comp.bRepBodies.itemByName("BEZEL")
+    ff = _planar_face(body, d["z_bezel_front"], +1)
+    win_e = []
+    if ff:
+        for lp in ff.loops:
+            if not lp.isOuter:
+                win_e = list(lp.edges)
+    okB, msgB = _chamfer(comp, win_e, P["bezel_edge_break"],
+                         "front_edge_break_window")
+    print("front break, window          %.2f chamfer : %s %s"
+          % (P["bezel_edge_break"], okB, msgB))
 
     # ---- lip entry lead-in, OUTER loop of the rear tip face only ----------
     body = comp.bRepBodies.itemByName("BEZEL")
@@ -795,62 +1000,86 @@ def max_panel_r(P, d, R_lip, need=0.0):
     return lo
 
 
-def corner_study(P=P):
+def penetration(P, d, R_lip, R_panel, n=1440):
+    """Deepest penetration of the lip OUTER surface into the Perspex, and the
+    largest gap, for an assumed opening corner radius.
+
+    Positive penetration means material overlap - which for Rev Q is now
+    DELIBERATE on the horizontal flanks and must equal the declared value."""
+    A, Bh = d["po_w2"], d["po_h2"]
+    worst_pen, worst_gap = -1e9, -1e9
+    for (px, py, _nx, _ny) in _rrect_path(d["low2"], d["loh2"], R_lip, n):
+        s = _sdf_rrect(px, py, A, Bh, R_panel)   # >0 = outside the opening
+        worst_pen = max(worst_pen, s)
+        worst_gap = max(worst_gap, -s)
+    return worst_pen, worst_gap
+
+
+def fit_study(P=P):
+    """The Rev Q interference fit, and what it does at the corners."""
     d = derive(P)
+    R = P["bezel_lip_corner_r"]
     print("=" * 74)
-    print("REV Q CORNER-FIT STUDY")
+    print("REV Q FIT STUDY - horizontal INTERFERENCE, vertical clearance")
     print("=" * 74)
-    print("The Perspex opening corner radius is NOT RECORDED anywhere in this")
-    print("project. The Rev N side rails sat at y +/-4.000, clear of every")
-    print("corner, so they prove nothing about it, and the released Rev P")
-    print("reference models the opening with SHARP corners.")
-    print("")
-    print("opening      %.2f x %.2f mm, corner radius R_panel = UNKNOWN"
+    print("opening    %.2f x %.2f mm   (MEASURED; corner radius NOT RECORDED)"
           % (P["panel_open_w"], P["panel_open_h"]))
-    print("lip outer    %.2f x %.2f mm, corner radius R_lip = %.2f mm (set)"
-          % (P["bezel_lip_outer_w"], P["bezel_lip_outer_h"],
-             P["bezel_lip_corner_r"]))
+    print("lip outer  %.2f x %.2f mm   R%.2f outer corners"
+          % (P["bezel_lip_outer_w"], P["bezel_lip_outer_h"], R))
+    print("lip inner  %.2f x %.2f mm   R%.2f inner corners  (derived)"
+          % (d["bezel_lip_inner_w"], d["bezel_lip_inner_h"],
+             d["bezel_lip_inner_r"]))
+    print("wall       %.2f mm = %.0f x %.2f mm extrusion loops"
+          % (P["bezel_lip_wall"], d["wall_loops"], P["extrusion_width"]))
     print("")
-    print("Largest tolerable opening corner radius, by lip corner radius:")
-    print("   R_lip    seats if R_panel <=    with >=0.05 clear")
-    for rl in (0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.60, 2.00, 2.50):
-        m0 = max_panel_r(P, d, rl, 0.0)
-        m5 = max_panel_r(P, d, rl, 0.05)
-        print("   %5.2f          %6.3f               %6.3f"
-              % (rl, m0 if m0 else -1, m5 if m5 else -1))
+    print("DECLARED FIT")
+    print("   horizontal  %+.3f mm per side   INTERFERENCE - the lip is wider"
+          % d["bezel_lip_interf_x"])
+    print("               than the hole and must flex to enter")
+    print("   vertical    %+.3f mm per side   clearance"
+          % d["bezel_lip_clear_y"])
     print("")
-    print("   Rule of thumb from the table:  R_panel_max  ~=  R_lip + 0.51 mm")
+    print("WHAT THE R%.2f CORNERS DO ABOUT THE UNMEASURED OPENING CORNER" % R)
+    print("   The R2.00 outer corner pulls the lip well away from the corner,")
+    print("   so an unmeasured opening corner radius no longer decides whether")
+    print("   the part seats - it only decides how much corner is left")
+    print("   unmasked. That was the open risk at the 0.40 mm wall; it is not")
+    print("   the open risk now. The interference is.")
     print("")
-    print("Unmasked corner gap on the 45 degree bisector (mm):")
-    hdr = "   R_lip \\ R_panel"
-    cols = (0.00, 0.25, 0.50, 0.75, 1.00, 1.50, 2.00)
-    print(hdr + "".join("%8.2f" % c for c in cols))
-    for rl in (0.20, 0.60, 1.00, 1.60, 2.50):
-        row = "   R %4.2f         " % rl
-        for rp in cols:
-            row += "%8.3f" % corner_gap_at_bisector(P, d, rl, rp)
-        print(row)
+    print("   R_panel   deepest penetration   largest gap   verdict")
+    for rp in (0.00, 0.25, 0.50, 0.75, 1.00, 1.50, 2.00, 2.50, 3.00):
+        pen, gap = penetration(P, d, R, rp)
+        if pen > d["bezel_lip_interf_x"] + 1e-4:
+            verdict = "EXCEEDS the declared interference"
+        else:
+            verdict = "within the declared %.2f mm" % d["bezel_lip_interf_x"]
+        print("   %5.2f        %+7.3f            %+7.3f      %s"
+              % (rp, pen, gap, verdict))
     print("")
-    print("   negative = the lip fouls the corner and the bezel will NOT seat")
+    print("   deepest penetration stays at the declared %.3f mm for every"
+          % d["bezel_lip_interf_x"])
+    print("   plausible opening corner radius: the flanks set it, not the")
+    print("   corners.")
     print("")
-    cur = P["bezel_lip_corner_r"]
-    mp = max_panel_r(P, d, cur, 0.0)
-    print("AT THE SET VALUE R_lip = %.2f mm:" % cur)
-    print("   seats for any opening corner radius up to  %.3f mm" % mp)
-    print("   corner gap if the opening is sharp (R=0)   %.3f mm"
-          % corner_gap_at_bisector(P, d, cur, 0.0))
-    print("   corner gap if the opening is R0.50         %.3f mm"
-          % corner_gap_at_bisector(P, d, cur, 0.5))
-    print("   flat-run clearance, all four sides         %.3f mm"
-          % d["bezel_lip_clear_x"])
-    print("")
-    print("FAILURE MODE IS SAFE AND OBVIOUS. Too small an R_lip does not")
-    print("damage anything - the four corners simply bottom on the Perspex")
-    print("corner fillets and the bezel stands proud of the fascia, which is")
-    print("immediately visible. The fix is to raise bezel_lip_corner_r and")
-    print("reprint. Too large an R_lip seats but leaves the gap tabulated")
-    print("above unmasked at each corner.")
+    print("INSERTION - THIS IS THE NEW OPEN RISK")
+    prev_wall = 0.40
+    ratio = (P["bezel_lip_wall"] / prev_wall) ** 3
+    print("   The wall went %.2f -> %.2f mm to get the second loop."
+          % (prev_wall, P["bezel_lip_wall"]))
+    print("   Bending stiffness scales with thickness CUBED, so the lip is")
+    print("   about %.1fx stiffer than the %.2f mm wall it replaces." % (ratio, prev_wall))
+    print("   The same %.2f mm per side of interference is therefore resisted"
+          % d["bezel_lip_interf_x"])
+    print("   roughly %.0fx harder. Brief 3.8 requires the LIP to take the" % ratio)
+    print("   deflection and the Perspex to be left unstressed; with an 8x")
+    print("   stiffer lip that split is no longer obvious, and CAD cannot")
+    print("   settle it. Print the fit gauge before the bezel.")
     print("=" * 74)
+
+
+# kept under the old name so existing notes and links still resolve
+def corner_study(P=P):
+    fit_study(P)
 
 
 # ---------------------------------------------------------------------------
@@ -892,6 +1121,69 @@ def _hit_mm3(b, a1, a2):
         return _vol_mm3(c1)
     except Exception:
         return 0.0
+
+
+def _slab_area(b, body, z, thick=0.01, region=None):
+    """Cross-section area of a solid at height z, in mm2, by intersecting a
+    thin slab and dividing the volume by its thickness. Optionally restricted
+    to a region box (x0, x1, y0, y1)."""
+    big = 60.0
+    x0, x1, y0, y1 = region if region else (-big, big, -big, big)
+    slab = b.box(x0, x1, y0, y1, z - thick / 2.0, z + thick / 2.0)
+    return _hit_mm3(b, body, slab) / thick
+
+
+def _aperture_at(body, d, z, limit=20.0, step=0.01):
+    """Clear aperture width and height at height z, found by marching out
+    along each axis from the centre to the first solid material.
+
+    Marched, not bisected: walking outward the ray goes void -> material ->
+    air, which is not monotone, and bisection steps straight over a thin
+    band."""
+    out = []
+    for axis in (0, 1):
+        t, prev = step, 0.0
+        hit = None
+        while t < limit:
+            x, y = (t, 0.0) if axis == 0 else (0.0, t)
+            if _inside(body, x, y, z):
+                lo, hi = prev, t
+                for _ in range(30):
+                    mid = (lo + hi) / 2.0
+                    xx, yy = (mid, 0.0) if axis == 0 else (0.0, mid)
+                    if _inside(body, xx, yy, z):
+                        hi = mid
+                    else:
+                        lo = mid
+                hit = (lo + hi) / 2.0
+                break
+            prev = t
+            t += step
+        if hit is None:
+            return None
+        out.append(2.0 * hit)
+    return (out[0], out[1])
+
+
+def _hit_bbox(b, a1, a2):
+    """Bounding box of the intersection of two solids, in mm, or None."""
+    c1, c2 = b.copy(a1), b.copy(a2)
+    try:
+        ok = b.t.booleanOperation(
+            c1, c2, adsk.fusion.BooleanTypes.IntersectionBooleanType)
+    except Exception:
+        return None
+    if not ok:
+        return None
+    try:
+        if _vol_mm3(c1) <= 1.0e-9:
+            return None
+        bb = c1.boundingBox
+        return (bb.minPoint.x * 10, bb.maxPoint.x * 10,
+                bb.minPoint.y * 10, bb.maxPoint.y * 10,
+                bb.minPoint.z * 10, bb.maxPoint.z * 10)
+    except Exception:
+        return None
 
 
 def _inside(body, x, y, z):
@@ -951,73 +1243,103 @@ def validate(P=P):
           "rearmost material at z = +0.200", "%.5f" % (bb.minPoint.z * 10))
 
     print("")
-    print("3. THE CONTINUOUS LIP")
-    # --- continuity: walk the full perimeter at three depths ---------------
-    zs = [d["z_lip_rear"] + 0.05, (d["z_lip_rear"] + d["z_panel_front"]) / 2.0,
+    print("3. THE CONTINUOUS LIP - by measured cross-section AREA")
+    #
+    # NOT by point sampling. BRepBody.pointContainment is not trustworthy on
+    # this body: with the tapered aperture the face wall is a single NURBS
+    # surface, and containment then reports the middle of the open aperture as
+    # solid and scattered points inside the lip as void. Cross-section area,
+    # taken by boolean intersection with a thin slab, is exact and cannot
+    # drift - and it is a STRONGER continuity proof than sampling, because any
+    # break anywhere in the ring shows up as missing area.
+    zs = [d["z_lip_rear"] + P["bezel_lip_lead"] + 0.05,
+          (d["z_lip_rear"] + d["z_panel_front"]) / 2.0,
           d["z_panel_front"] - 0.05]
-    mid_off = P["bezel_lip_wall"] / 2.0
-    path = _rrect_path(d["low2"], d["loh2"], P["bezel_lip_corner_r"], 1440)
-    gaps = []
-    for (px, py, nx, ny) in path:
-        mx, my = px + nx * mid_off, py + ny * mid_off
-        for z in zs:
-            if not _inside(body, mx, my, z):
-                gaps.append((round(mx, 3), round(my, 3), round(z, 3)))
-    _gate(len(gaps) == 0,
-          "lip present at all 1440 perimeter stations x 3 depths",
-          "%d void station(s)" % len(gaps))
+    ax = d["low2"] - P["bezel_lip_corner_r"]     # 15.70
+    ay = d["loh2"] - P["bezel_lip_corner_r"]     #  5.60
+    w = P["bezel_lip_wall"]
+    Ro, Ri = P["bezel_lip_corner_r"], d["bezel_lip_inner_r"]
+    big = 60.0
+    regions = [
+        ("top", (-ax, ax, ay, big), w * 2 * ax),
+        ("bottom", (-ax, ax, -big, -ay), w * 2 * ax),
+        ("right", (ax, big, -ay, ay), w * 2 * ay),
+        ("left", (-big, -ax, -ay, ay), w * 2 * ay),
+    ]
+    corner_exact = math.pi * (Ro ** 2 - Ri ** 2)
+    ring_exact = sum(r[2] for r in regions) + corner_exact
+    for z in zs:
+        got = _slab_area(b, body, z)
+        _gate(abs(got - ring_exact) < 5.0e-3,
+              "z = %.2f  full ring area = %.4f mm2" % (z, ring_exact),
+              "%.4f mm2" % got)
+    zmid = zs[1]
+    part_sum = 0.0
+    for name, (x0, x1, y0, y1), exact in regions:
+        got = _slab_area(b, body, zmid, region=(x0, x1, y0, y1))
+        part_sum += got
+        _gate(abs(got - exact) < 5.0e-3,
+              "lip continuous - %-6s  area %.4f mm2" % (name, exact),
+              "%.4f mm2" % got)
+    got_corners = _slab_area(b, body, zmid) - part_sum
+    _gate(abs(got_corners - corner_exact) < 5.0e-3,
+          "lip continuous - corners  area %.4f mm2 (4 quarter-annuli)"
+          % corner_exact, "%.4f mm2" % got_corners)
+    _report("why area and not point sampling",
+            "any gap, thin spot or break anywhere in the ring removes area; "
+            "an exact area match leaves nowhere for one to hide")
 
-    # per-side and per-corner continuity, stated separately
-    sides = {"left": 0, "right": 0, "top": 0, "bottom": 0, "corners": 0}
-    hits = dict((k, 0) for k in sides)
-    ax = d["low2"] - P["bezel_lip_corner_r"]
-    ay = d["loh2"] - P["bezel_lip_corner_r"]
-    for (px, py, nx, ny) in path:
-        if abs(px) <= ax and abs(py) <= ay:
-            key = "corners"
-        elif abs(px) > ax and abs(py) > ay:
-            key = "corners"
-        elif abs(py) >= ay and abs(px) <= ax:
-            key = "top" if py > 0 else "bottom"
-        else:
-            key = "right" if px > 0 else "left"
-        sides[key] += 1
-        mx, my = px + nx * mid_off, py + ny * mid_off
-        if _inside(body, mx, my, zs[1]):
-            hits[key] += 1
-    for k in ("left", "right", "top", "bottom", "corners"):
-        _gate(sides[k] > 0 and hits[k] == sides[k],
-              "lip continuous - %s" % k,
-              "%d/%d stations" % (hits[k], sides[k]))
+    # --- outer envelope ----------------------------------------------------
+    lip_bb = _hit_bbox(b, body, b.box(-big, big, -big, big,
+                                      d["z_lip_rear"] + 0.001,
+                                      d["z_panel_front"] - 0.001))
+    _gate(lip_bb is not None
+          and abs(lip_bb[1] - d["low2"]) < 1.0e-4
+          and abs(lip_bb[3] - d["loh2"]) < 1.0e-4,
+          "lip outer envelope is exactly %.2f x %.2f"
+          % (P["bezel_lip_outer_w"], P["bezel_lip_outer_h"]),
+          "%.4f x %.4f" % ((lip_bb[1] * 2, lip_bb[3] * 2) if lip_bb
+                           else (-1, -1)))
 
-    # --- outer envelope, wall thickness, depth -----------------------------
-    walls, outers = [], []
-    for (px, py, nx, ny) in path[::4]:
-        z = zs[1]
-        # the outer surface must be exactly on the envelope
-        if _inside(body, px - nx * 0.01, py - ny * 0.01, z):
-            outers.append(-1.0)
-        else:
-            outers.append(0.0)
-        lo, hi = 0.002, 2.0
-        if not _inside(body, px + nx * lo, py + ny * lo, z):
-            walls.append(0.0)
-            continue
-        for _ in range(40):
-            mid = (lo + hi) / 2.0
-            if _inside(body, px + nx * mid, py + ny * mid, z):
-                lo = mid
-            else:
-                hi = mid
-        walls.append((lo + hi) / 2.0)
-    _gate(all(o == 0.0 for o in outers),
-          "no material outside the 34.90 x 15.00 outer envelope",
-          "%d breach(es)" % sum(1 for o in outers if o < 0))
-    wmin, wmax = min(walls), max(walls)
-    _gate(abs(wmin - P["bezel_lip_wall"]) < 5.0e-4
-          and abs(wmax - P["bezel_lip_wall"]) < 5.0e-4,
-          "lip wall = 0.400 mm everywhere",
-          "min %.4f  max %.4f" % (wmin, wmax))
+    # --- corner geometry, now specified rather than unresolved -------------
+    _gate(abs(d["bezel_lip_inner_r"]
+              - (P["bezel_lip_corner_r"] - P["bezel_lip_wall"])) < 1e-9,
+          "inner corner R%.2f = outer R%.2f - wall %.2f"
+          % (d["bezel_lip_inner_r"], P["bezel_lip_corner_r"],
+             P["bezel_lip_wall"]),
+          "%.4f" % d["bezel_lip_inner_r"])
+    # The corner area is the sharpest test of a constant wall through the
+    # corners: pi*(Ro^2 - Ri^2) only comes out right if BOTH radii are right,
+    # i.e. only if the wall really is constant all the way round the arc.
+    _gate(abs(got_corners - corner_exact) < 5.0e-3,
+          "wall stays %.2f mm THROUGH THE R%.2f CORNERS"
+          % (w, P["bezel_lip_corner_r"]),
+          "corner area %.4f vs pi*(%.2f^2-%.2f^2) = %.4f"
+          % (got_corners, Ro, Ri, corner_exact))
+
+    # --- the two-loop requirement ------------------------------------------
+    ew = P["extrusion_width"]
+    _gate(abs(d["wall_loops"] - 2.0) < 1e-9,
+          "wall is EXACTLY two %.2f mm extrusion loops" % ew,
+          "%.3f mm / %.2f mm = %.4f" % (P["bezel_lip_wall"], ew,
+                                        d["wall_loops"]))
+    # the two loop centrelines are offsets of the outer surface by 0.20 and
+    # 0.60; both must stay closed and non-degenerate right through the
+    # corners, or the slicer merges them or drops one
+    r1 = P["bezel_lip_corner_r"] - ew / 2.0
+    r2 = P["bezel_lip_corner_r"] - ew - ew / 2.0
+    _gate(r2 > 0.0,
+          "outer loop R%.3f and inner loop R%.3f at the corners, no cusp"
+          % (r1, r2), "smallest offset radius %.3f mm" % r2)
+    _gate(abs((r1 - r2) - ew) < 1e-9,
+          "loop centrelines stay exactly one extrusion apart",
+          "%.4f mm" % (r1 - r2))
+    _gate(abs(ring_exact - _slab_area(b, body, zmid)) < 5.0e-3,
+          "no thin spot anywhere - every section is a full two extrusions",
+          "measured ring area matches a constant %.2f mm wall exactly" % w)
+    _report("SLICER PREVIEW IS STILL A PHYSICAL GATE",
+            "the geometry admits two loops; only the production slicer can "
+            "prove that it lays them")
 
     tip = _planar_face(body, d["z_lip_rear"])
     _gate(tip is not None, "lip rear tip face exists at z = +0.200",
@@ -1025,18 +1347,53 @@ def validate(P=P):
     _gate(abs((d["z_panel_front"] - d["z_lip_rear"]) - P["bezel_lip_depth"])
           < 1e-9, "lip depth = 2.800 mm",
           "%.5f" % (d["z_panel_front"] - d["z_lip_rear"]))
-    _gate(abs(d["bezel_lip_clear_x"] - 0.15) < 1e-9
-          and abs(d["bezel_lip_clear_y"] - 0.15) < 1e-9,
-          "nominal clearance 0.150 mm per side, all four sides",
-          "x %.4f  y %.4f" % (d["bezel_lip_clear_x"], d["bezel_lip_clear_y"]))
+    _gate(abs(d["bezel_lip_interf_x"] - 0.10) < 1e-9,
+          "horizontal INTERFERENCE 0.100 mm per side",
+          "%+.4f mm" % d["bezel_lip_interf_x"])
+    _gate(abs(d["bezel_lip_clear_y"] - 0.05) < 1e-9,
+          "vertical clearance 0.050 mm per side",
+          "%+.4f mm" % d["bezel_lip_clear_y"])
 
     print("")
-    print("4. THE ORIGINAL PERSPEX")
+    print("4. THE ORIGINAL PERSPEX - the declared interference, and nothing else")
     panel_occ = _find_occ(COMP_PANEL)
     panel = panel_occ.bRepBodies.item(0)
     v = _hit_mm3(b, body, panel)
-    _gate(v < 1.0e-6, "no interference with the measured Perspex solid",
-          "%.6f mm3" % v)
+    _gate(v > 1.0e-6,
+          "the declared horizontal interference IS present",
+          "%.4f mm3 of overlap" % v)
+
+    # Where is it? The overlap must live only on the two horizontal flanks,
+    # outboard of the opening wall, and nowhere else.
+    hit_bb = _hit_bbox(b, body, panel)
+    if hit_bb:
+        (hx0, hx1, hy0, hy1, hz0, hz1) = hit_bb
+        _gate(min(abs(hx0), abs(hx1)) >= d["po_w2"] - 1.0e-4,
+              "overlap lies only OUTBOARD of the opening wall in X",
+              "|x| %.4f .. %.4f  vs opening %.4f"
+              % (min(abs(hx0), abs(hx1)), max(abs(hx0), abs(hx1)), d["po_w2"]))
+        _gate(max(abs(hy0), abs(hy1)) <= d["po_h2"] + 1.0e-4,
+              "overlap never reaches the top or bottom of the opening",
+              "|y| max %.4f  vs opening %.4f"
+              % (max(abs(hy0), abs(hy1)), d["po_h2"]))
+        _gate(hz0 >= d["z_lip_rear"] - 1.0e-4
+              and hz1 <= d["z_panel_front"] + 1.0e-4,
+              "overlap is confined to the lip depth",
+              "z %.4f .. %.4f" % (hz0, hz1))
+        _gate((max(abs(hx0), abs(hx1)) - d["po_w2"])
+              <= d["bezel_lip_interf_x"] + 1.0e-4,
+              "overlap never exceeds the declared 0.100 mm per side",
+              "deepest %.4f mm"
+              % (max(abs(hx0), abs(hx1)) - d["po_w2"]))
+
+    # An independent statement of the same thing: relieve the opening by the
+    # declared interference in X only, and NOTHING may touch it any more.
+    relieved = build_panel(b, P, d, relief_x=d["bezel_lip_interf_x"])
+    vr = _hit_mm3(b, body, relieved)
+    _gate(vr < 1.0e-6,
+          "with the declared relief applied, interference falls to zero",
+          "%.6f mm3" % vr)
+
     behind = build_behind_panel(b, P, d)
     v2 = _hit_mm3(b, body, behind)
     _gate(v2 < 1.0e-6,
@@ -1085,7 +1442,46 @@ def validate(P=P):
             "does not reach z = 0")
 
     print("")
-    print("7. EFFECTIVE OPTICAL OPENING")
+    print("7. THE FACE OPENING AND THE EFFECTIVE OPTICAL OPENING")
+    # The clear opening is bracketed with two solid "plugs" pushed through the
+    # whole part. A plug of the declared size must pass without touching
+    # anything; a plug 0.04 mm larger must hit. That pins the opening from
+    # both sides using booleans only.
+    eps = 0.02
+    plug = b.rprism(-d["optical_w"] / 2.0 + eps, d["optical_w"] / 2.0 - eps,
+                    -d["optical_h"] / 2.0 + eps, d["optical_h"] / 2.0 - eps,
+                    d["z_lip_rear"] - 0.5, d["z_bezel_front"] + 0.5,
+                    d["optical_r"])
+    vplug = _hit_mm3(b, body, plug)
+    _gate(vplug < 1.0e-6,
+          "a %.2f x %.2f plug passes clean through - nothing intrudes"
+          % (d["optical_w"] - 2 * eps, d["optical_h"] - 2 * eps),
+          "%.6f mm3" % vplug)
+    plug2 = b.rprism(-d["optical_w"] / 2.0 - eps, d["optical_w"] / 2.0 + eps,
+                     -d["optical_h"] / 2.0 - eps, d["optical_h"] / 2.0 + eps,
+                     d["z_lip_rear"] - 0.5, d["z_bezel_front"] + 0.5,
+                     d["optical_r"])
+    vplug2 = _hit_mm3(b, body, plug2)
+    _gate(vplug2 > 1.0e-6,
+          "a %.2f x %.2f plug does NOT - the opening is no larger"
+          % (d["optical_w"] + 2 * eps, d["optical_h"] + 2 * eps),
+          "%.4f mm3 of contact" % vplug2)
+    _report("aperture at the seating plane",
+            "%.3f x %.3f mm - set by the lip inner envelope"
+            % (d["ap_rear_w"], d["ap_rear_h"]))
+    _report("aperture at the front face, before the 0.40 break",
+            "%.3f x %.3f mm - the specified bezel face opening"
+            % (d["ap_front_w"], d["ap_front_h"]))
+    _report("aperture taper",
+            "%.2f deg from vertical in Y, self-supporting front-face-down"
+            % d["ap_taper_deg"])
+    _gate(abs(d["optical_w"] - 30.90) < 1e-9
+          and abs(d["optical_h"] - 13.60) < 1e-9,
+          "EFFECTIVE optical opening = 30.90 x 13.60 as the brief predicts",
+          "%.3f x %.3f" % (d["optical_w"], d["optical_h"]))
+    _report("controlled by",
+            "width by the %.2f mm face opening, HEIGHT BY THE %.2f mm LIP "
+            "INNER ENVELOPE" % (d["bezel_window_w"], d["bezel_lip_inner_h"]))
     _report("Rev N clear opening",
             "%.3f W x %.3f H mm (R%.2f)"
             % (d["revN_window_w"], d["revN_window_h"], P["bezel_window_r"]))
@@ -1282,7 +1678,7 @@ def coupon():
         tot += bd.physicalProperties.volume
         print("  %-16s solid=%s  vol=%.4f cm3"
               % (bd.name, bd.isSolid, bd.physicalProperties.volume))
-    print("corner gauge coupon: %d tabs, %.4f cm3 total"
+    print("interference fit gauge: %d tabs, %.4f cm3 total"
           % (occ.component.bRepBodies.count, tot))
     return occ
 
@@ -1337,13 +1733,13 @@ def export(what="bezel"):
     if what in ("coupon", "all"):
         occ = _find_occ(COMP_COUPON)
         if occ:
-            p = _guard(os.path.join(cad, "Bezel_Corner_Gauge_revQ.step"))
+            p = _guard(os.path.join(cad, "Bezel_Fit_Gauge_revQ.step"))
             em.execute(em.createSTEPExportOptions(p, occ.component))
             written.append(p)
             # one mesh carrying all five tabs
             for bd in occ.component.bRepBodies:
                 pp = _guard(os.path.join(
-                    stl, "Bezel_Corner_Gauge_revQ_%s.stl" % bd.name))
+                    stl, "Bezel_Fit_Gauge_revQ_%s.stl" % bd.name))
                 o = em.createSTLExportOptions(bd, pp)
                 o.meshRefinement = \
                     adsk.fusion.MeshRefinementSettings.MeshRefinementHigh

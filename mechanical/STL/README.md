@@ -16,58 +16,62 @@ Print-ready meshes exported from the CAD sources.
 
 | File | Print notes |
 |---|---|
-| `Bezel_Corner_Gauge_revQ_COUPON_R{040,060,100,160,250}.stl` | **Print these FIRST.** PETG, front face flat on the bed, no supports. Five L-tabs, notch-numbered 1…5, each carrying a real section of the Rev Q lip — same 0.40 mm wall, same 2.80 mm depth — at R0.40, R0.60, R1.00, R1.60 and R2.50. Offer each into a corner of the real opening; the smallest that seats flush sets `bezel_lip_corner_r`. Together they cover opening corner radii 0.91–3.01 mm. ≈0.59 cm³ for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, lip pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.5243 cm³ ≈ 0.67 g. The 0.40 mm continuous lip is **exactly one extrusion width** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side**. Each is the complete right-hand end of the real Rev Q wall — full 15.20 mm height, both R2.00 corners, the real 0.80 mm two-loop wall, the real 2.80 mm depth — so it engages the interference exactly as the bezel will. ≈1.54 cm³ ≈ 2 g for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6056 cm³ ≈ 0.77 g. The 0.80 mm continuous inset wall must slice as **exactly two 0.40 mm loops** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
-> ### Rev Q print gate — the single-width wall
+> ### Rev Q print gate 1 — TWO CONTINUOUS WALL LOOPS
 >
-> The whole revision hangs on a 0.40 mm wall standing 2.80 mm tall, right
-> around the opening. Orientation is what makes it printable: **front face
-> down**, so the lip is a **vertical wall** (measured worst overhang across all
-> 26 lip faces is **0.000°**), printed last, standing on the already-solid
-> bezel face for its whole height, with the 0.20 mm lead-in at the top tapering
-> inward and therefore self-supporting. Bed contact is 295.4 mm² of flat
-> cosmetic face. Rear-face-down is wrong — the lip would print first as an
-> unsupported free ring under a 90° overhang.
+> This is why the wall is 0.80 mm. At 0.40 mm the slicer resolved it as a
+> single loop, which is what the owner correction rejects.
 >
 > | Setting | Value |
 > |---|---|
-> | Nozzle / extrusion width | **0.40 mm** — the wall *is* one extrusion |
+> | Nozzle / extrusion width | **0.40 mm** — the wall *is* two of these |
 > | Layer height | 0.15–0.20 mm |
-> | Perimeters in the lip | let the slicer lay **one**; two will not fit |
-> | Thin wall / gap fill | **ON** (or Arachne) — classic slicers silently delete a 0.40 mm wall |
-> | External perimeter speed | **≤ 25 mm/s** through the lip |
-> | Cooling | 100 % — tiny loop, very short layer time |
+> | Perimeters in the wall | **2** — not "auto", not variable-width |
+> | Thin-wall / gap fill | **OFF** if the slicer allows; a full 0.80 mm needs none |
+> | Arachne / variable width | **prefer classic** — Arachne may merge 0.80 into ONE 0.8 mm-wide extrusion, which is a single loop and **fails** |
+> | External perimeter speed | **≤ 25 mm/s** through the wall |
+> | Cooling | 100 % |
 > | Supports | **none** |
 >
-> **Slice it and check the preview before printing.** Confirm the lip appears
-> as a continuous single-extrusion loop on every one of its layers, all the way
-> round including the corners. If the slicer dropped, thinned or broke it, fix
-> the slicer — do not thicken `bezel_lip_wall` to paper over it.
+> **Step through every layer of the wall in the slicer preview before
+> printing.** Confirm two continuous 0.40 mm loops around the complete
+> perimeter — both straight runs, both ends, **and all four R2.00 corners**.
+> **Reject** the profile on any of: a single variable-width wall, a missing
+> second loop, gap fill substituted for a loop, or the two loops locally merged
+> into one wide extrusion. Fix the slicer — do not thicken `bezel_lip_wall` to
+> work around it without recording why.
 >
-> **If your extrusion width is not 0.40 mm**, set `bezel_lip_wall` to one
-> *actual* extrusion width and regenerate. `bezel_lip_inner_w/h`,
-> `bezel_window_h` and the optical opening are all derived and will follow.
-> Same rule as `rear_light_shield_t` on the carrier.
+> **If your extrusion width is not 0.40 mm**, set `bezel_lip_wall` to **two**
+> *actual* extrusion widths and regenerate; the inner envelope, corner radii,
+> aperture and optical opening are all derived and follow. The generator
+> refuses to build a wall that is not a whole multiple of `extrusion_width`.
 
-> ### Two things this print exists to settle
+> ### Rev Q print gate 2 — THE INTERFERENCE FIT
 >
-> 1. **The Perspex opening corner radius has never been measured.** The Rev N
->    side rails sat at y ±4.00 and never went near a corner.
->    `bezel_lip_corner_r` is **UNRESOLVED**, set to the proven Rev N rail-end
->    relief R0.60, which seats for any opening corner radius up to **1.112 mm**.
->    If the real corners are rounder the bezel stands proud — visible, harmless,
->    and fixed with one parameter and a reprint. Print the gauge coupon first.
-> 2. **The lip costs 0.350 mm of lit screen height** — clear opening
->    30.40 × 14.90 → **30.40 × 14.20 mm**, visible active band 8.100 →
->    **7.750 mm**, all of it at the top. Only the powered test can say whether
->    that is acceptable.
+> The wall is **0.10 mm per horizontal side WIDER than the hole** by design,
+> and at 0.80 mm it is about **8× stiffer in bending** than the 0.40 mm wall it
+> replaces — so it resists that interference roughly 8× harder. Brief §3.8
+> requires the printed wall to take the deflection and the original Perspex to
+> be left unspread and unstressed. **CAD cannot settle that.** Print the fit
+> gauge first, find the largest interference that seats by hand and releases
+> without marking or whitening the Perspex, and set `bezel_lip_outer_w` from
+> the physical result before printing a bezel.
+
+> ### What this print costs optically
 >
-> Full detail, the corner tolerance study and the test procedure:
+> The clear opening is **30.90 × 13.60 mm** — width by the face opening, height
+> by the wall — and the visible lit band drops from 8.100 to **7.450 mm**, all
+> of it at the top. Only the powered test can say whether that is acceptable.
+>
+> Full detail, the fit study and the test procedure:
 > `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
 
 `Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
-unchanged.
+unchanged. The first issue's `Bezel_Corner_Gauge_revQ_*` meshes are deleted —
+the corner radius is now specified at R2.00, so the fit gauge replaces the
+corner gauge.
 
 ---
 

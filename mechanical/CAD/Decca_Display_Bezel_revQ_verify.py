@@ -22,6 +22,7 @@ perimeter of the Perspex opening at every depth of the lip.
 from __future__ import print_function
 
 import os
+import math
 import struct
 import sys
 
@@ -38,17 +39,24 @@ BEZEL_W, BEZEL_H, BEZEL_T = 40.00, 20.30, 4.00      # Rev N envelope, PRESERVED
 Z_FRONT = 4.20                                       # bezel front face
 Z_SEAT = 3.00                                        # Perspex front / seating
 Z_TIP = 0.20                                         # lip rear tip
-LIP_OUT_W, LIP_OUT_H = 34.90, 15.00                  # lip outer envelope
-LIP_IN_W, LIP_IN_H = 34.10, 14.20                    # derived: outer - 2*wall
-LIP_WALL = 0.40
+LIP_OUT_W, LIP_OUT_H = 35.40, 15.20                  # inset-wall outer envelope
+LIP_IN_W, LIP_IN_H = 33.80, 13.60                    # derived: outer - 2*wall
+LIP_WALL = 0.80                                      # two 0.40 loops
 LIP_DEPTH = 2.80
-LIP_CORNER_R = 0.60
+LIP_CORNER_R = 2.00                                  # specified outer corner
+LIP_INNER_R = 1.20                                   # derived: 2.00 - 0.80
 LIP_LEAD = 0.20
-WINDOW_W, WINDOW_H = 30.40, 14.20                    # Rev Q clear opening
+EXTRUSION_W = 0.40                                   # production extrusion
+WALL_LOOPS = 2                                       # the whole point of Rev Q
+FACE_OPEN_W, FACE_OPEN_H = 30.90, 15.35              # bezel face opening
+OPTICAL_W, OPTICAL_H = 30.90, 13.60                  # effective clear opening
+AP_ROOT_RELIEF = 0.02                                # anti-tangency relief
+AP_REAR_H = OPTICAL_H + 2 * AP_ROOT_RELIEF           # aperture at the seat
 PANEL_OPEN_W, PANEL_OPEN_H = 35.20, 15.30            # MEASURED
 PANEL_T = 3.00
 GLASS_FRONT_Z = -0.30
-CLEAR_PER_SIDE = 0.15
+INTERF_X = 0.10                                      # per side, INTERFERENCE
+CLEAR_Y = 0.05                                       # per side, clearance
 
 TOL = 0.02          # mesh/chord tolerance, mm
 
@@ -364,19 +372,67 @@ def main():
         tot, hit = sides[k]
         gate(tot > 0 and hit == tot, "lip continuous - %s" % k,
              "%d/%d" % (hit, tot))
+    wall_arr = None
     if walls:
         w = np.array(walls)
-        gate(abs(w.mean() - LIP_WALL) < 0.02,
-             "measured lip wall = 0.400 mm",
+        wall_arr = w
+        gate(abs(w.mean() - LIP_WALL) < 0.02
+             and abs(w.min() - LIP_WALL) < 0.03
+             and abs(w.max() - LIP_WALL) < 0.03,
+             "measured lip wall = %.2f mm everywhere" % LIP_WALL,
              "mean %.4f  min %.4f  max %.4f" % (w.mean(), w.min(), w.max()))
+        # the corner stations on their own - a constant wall through an
+        # R2.00 outer / R1.20 inner corner is the hardest part to get right
+        cw = [walls[i] for i, (px, py, _n, _m) in enumerate(path_pts[:len(walls)])
+              if abs(px) > ax - 1e-9 and abs(py) > ay - 1e-9]
+        if cw:
+            c = np.array(cw)
+            gate(abs(c.min() - LIP_WALL) < 0.03
+                 and abs(c.max() - LIP_WALL) < 0.03,
+                 "wall stays %.2f mm THROUGH THE R%.2f CORNERS"
+                 % (LIP_WALL, LIP_CORNER_R),
+                 "%d corner stations, min %.4f max %.4f"
+                 % (len(cw), c.min(), c.max()))
 
     print("")
-    print("6. LIP ENVELOPE, DEPTH AND CLEARANCE")
+    print("5b. THE TWO-LOOP WALL - the point of the 0.80 mm amendment")
+    gate(abs(LIP_WALL / EXTRUSION_W - WALL_LOOPS) < 1e-9,
+         "wall is EXACTLY %d x %.2f mm extrusion loops"
+         % (WALL_LOOPS, EXTRUSION_W),
+         "%.2f / %.2f = %.4f" % (LIP_WALL, EXTRUSION_W,
+                                 LIP_WALL / EXTRUSION_W))
+    if wall_arr is not None:
+        gate(wall_arr.min() >= WALL_LOOPS * EXTRUSION_W - 0.03,
+             "no measured station thinner than %d extrusions - nowhere for "
+             "the slicer to substitute gap fill" % WALL_LOOPS,
+             "thinnest measured %.4f mm vs %.2f mm required"
+             % (wall_arr.min(), WALL_LOOPS * EXTRUSION_W))
+    # the two loop centrelines are inward offsets of the outer surface by
+    # 0.20 and 0.60. Both must survive the corners without cusping or
+    # merging, or the slicer drops one or fuses them.
+    r1 = LIP_CORNER_R - EXTRUSION_W / 2.0
+    r2 = LIP_CORNER_R - EXTRUSION_W - EXTRUSION_W / 2.0
+    gate(r2 > 0.0,
+         "loop radii at the R%.2f corner: outer %.2f, inner %.2f - no cusp"
+         % (LIP_CORNER_R, r1, r2), "smallest offset radius %.3f mm" % r2)
+    gate(abs((r1 - r2) - EXTRUSION_W) < 1e-9,
+         "loop centrelines stay exactly one extrusion apart",
+         "%.4f mm" % (r1 - r2))
+    gate(LIP_INNER_R >= 0.0
+         and abs(LIP_INNER_R - (LIP_CORNER_R - LIP_WALL)) < 1e-9,
+         "inner corner R%.2f = outer R%.2f - wall %.2f"
+         % (LIP_INNER_R, LIP_CORNER_R, LIP_WALL), "%.4f" % LIP_INNER_R)
+    note("still a physical gate",
+         "this proves the GEOMETRY admits two continuous loops; only the "
+         "production slicer preview can prove it lays them")
+
+    print("")
+    print("6. LIP ENVELOPE, DEPTH AND FIT")
     bb = section_bbox(tris, 1.60)
     gate(abs((bb[1] - bb[0]) - LIP_OUT_W) < TOL,
-         "lip outer width  34.90 mm", "%.4f" % (bb[1] - bb[0]))
+         "lip outer width  %.2f mm" % LIP_OUT_W, "%.4f" % (bb[1] - bb[0]))
     gate(abs((bb[3] - bb[2]) - LIP_OUT_H) < TOL,
-         "lip outer height 15.00 mm", "%.4f" % (bb[3] - bb[2]))
+         "lip outer height %.2f mm" % LIP_OUT_H, "%.4f" % (bb[3] - bb[2]))
     # Inner opening at a given height, probing outward along an axis.
     #
     # Straight bisection is WRONG here and silently returns the outer edge of
@@ -406,46 +462,83 @@ def main():
         return float("nan")
     iw = 2 * opening_at(1.60, "x")
     ih = 2 * opening_at(1.60, "y")
-    gate(abs(iw - LIP_IN_W) < 0.02, "lip inner width  34.10 mm", "%.4f" % iw)
-    gate(abs(ih - LIP_IN_H) < 0.02, "lip inner height 14.20 mm", "%.4f" % ih)
+    gate(abs(iw - LIP_IN_W) < 0.02, "lip inner width  %.2f mm" % LIP_IN_W,
+         "%.4f" % iw)
+    gate(abs(ih - LIP_IN_H) < 0.02, "lip inner height %.2f mm" % LIP_IN_H,
+         "%.4f" % ih)
     gate(abs((Z_SEAT - Z_TIP) - LIP_DEPTH) < 1e-9, "lip depth 2.800 mm",
          "%.4f" % (Z_SEAT - Z_TIP))
-    cx = (PANEL_OPEN_W - LIP_OUT_W) / 2.0
-    cy = (PANEL_OPEN_H - LIP_OUT_H) / 2.0
-    gate(abs(cx - CLEAR_PER_SIDE) < 1e-9 and abs(cy - CLEAR_PER_SIDE) < 1e-9,
-         "clearance into the measured opening 0.150 mm per side",
-         "x %.4f  y %.4f" % (cx, cy))
+    ix = (LIP_OUT_W - PANEL_OPEN_W) / 2.0          # positive = interference
+    cy = (PANEL_OPEN_H - LIP_OUT_H) / 2.0          # positive = clearance
+    gate(abs(ix - INTERF_X) < 1e-9,
+         "horizontal INTERFERENCE %.3f mm per side" % INTERF_X,
+         "%+.4f mm" % ix)
+    gate(abs(cy - CLEAR_Y) < 1e-9,
+         "vertical clearance %.3f mm per side" % CLEAR_Y, "%+.4f mm" % cy)
+    note("the lip is WIDER than the hole by design",
+         "brief 3.7/3.8: the thin printed lip takes the deflection, the "
+         "Perspex is not to be spread or stressed - a PHYSICAL gate")
 
     print("")
-    print("7. THE VISIBLE WINDOW AND THE EFFECTIVE OPTICAL OPENING")
+    print("7. THE FACE OPENING AND THE EFFECTIVE OPTICAL OPENING")
+    # The aperture is tapered in Y, so its height is a linear function of z.
+    # Measure it at two heights clear of both the 0.40 front break and the
+    # seating plane, fit the line, and read off both ends. That verifies the
+    # taper AND the two published numbers without trusting either.
+    z_a, z_b = 3.20, 3.70
+    h_a, h_b = 2 * opening_at(z_a, "y"), 2 * opening_at(z_b, "y")
+    slope = (h_b - h_a) / (z_b - z_a)
+    h_seat = h_a + slope * (Z_SEAT - z_a)
+    h_front = h_a + slope * (Z_FRONT - z_a)
+    ang = math.degrees(math.atan2(slope / 2.0, 1.0))
+    note("aperture height at z = %.2f and %.2f" % (z_a, z_b),
+         "%.4f and %.4f mm" % (h_a, h_b))
+    gate(abs(h_seat - AP_REAR_H) < 0.03,
+         "extrapolates to %.3f mm at the seating plane" % AP_REAR_H,
+         "%.4f" % h_seat)
+    gate(h_seat > OPTICAL_H + 1e-9,
+         "aperture stops OUTSIDE the lip inner, so the LIP controls the "
+         "clear height",
+         "aperture %.3f vs lip inner %.3f, relief %.3f per side"
+         % (h_seat, OPTICAL_H, (h_seat - OPTICAL_H) / 2.0))
+    gate(abs(h_front - FACE_OPEN_H) < 0.03,
+         "extrapolates to %.2f mm at the front face (the face opening)"
+         % FACE_OPEN_H, "%.4f" % h_front)
+    gate(ang <= 45.0,
+         "aperture taper %.2f deg from vertical - self-supporting" % ang,
+         "%.2f deg" % ang)
     ow = 2 * opening_at(3.60, "x")
-    oh = 2 * opening_at(3.60, "y")
-    gate(abs(ow - WINDOW_W) < 0.02, "window width  30.40 mm (Rev N, preserved)",
+    gate(abs(ow - FACE_OPEN_W) < 0.02,
+         "face opening width %.2f mm, constant through the taper" % FACE_OPEN_W,
          "%.4f" % ow)
-    gate(abs(oh - WINDOW_H) < 0.02, "window height 14.20 mm (DERIVED from lip)",
-         "%.4f" % oh)
     eff_w = min(ow, iw)
-    eff_h = min(oh, ih)
-    gate(abs(eff_w - WINDOW_W) < 0.02 and abs(eff_h - LIP_IN_H) < 0.02,
-         "EFFECTIVE optical opening 30.40 x 14.20 mm",
+    eff_h = min(h_seat, ih)
+    gate(abs(eff_w - OPTICAL_W) < 0.02 and abs(eff_h - OPTICAL_H) < 0.03,
+         "EFFECTIVE optical opening %.2f x %.2f mm" % (OPTICAL_W, OPTICAL_H),
          "%.4f x %.4f" % (eff_w, eff_h))
     note("controlled by",
-         "width by the bezel window, HEIGHT BY THE NEW LIP")
+         "width by the %.2f mm face opening, HEIGHT BY THE %.2f mm LIP INNER"
+         % (FACE_OPEN_W, LIP_IN_H))
     note("versus Rev N (30.40 x 14.90)",
-         "height -0.700 mm total, -0.350 mm per side")
+         "width +0.500, height -1.300 total, -0.650 per side")
 
     print("")
     print("8. THE LEAD-IN MUST NOT EAT THE COVERAGE")
     bb_tip = section_bbox(tris, Z_TIP + 0.001)
     tip_w = bb_tip[1] - bb_tip[0]
     gate(abs(tip_w - (LIP_OUT_W - 2 * LIP_LEAD)) < 0.05,
-         "lead-in present: tip is 0.200 mm inboard of the envelope",
+         "lead-in present: tip is %.2f mm inboard of the envelope" % LIP_LEAD,
          "%.4f vs %.4f" % (tip_w, LIP_OUT_W - 2 * LIP_LEAD))
     bbf = section_bbox(tris, Z_TIP + LIP_LEAD + 0.02)
     gate(abs((bbf[1] - bbf[0]) - LIP_OUT_W) < TOL,
          "full envelope restored by z = +0.400, so 2.600 mm of the 3.000 mm "
-         "Perspex is covered at full clearance",
+         "Perspex is covered at full section",
          "%.4f" % (bbf[1] - bbf[0]))
+    note("the lead-in also starts the interference fit",
+         "the tip is %.2f mm UNDER the %.2f mm opening, so entry is free for "
+         "the first %.2f mm and the %.2f mm per side engages after that"
+         % (PANEL_OPEN_W - (LIP_OUT_W - 2 * LIP_LEAD), PANEL_OPEN_W,
+            LIP_LEAD, INTERF_X))
 
     print("")
     print("=" * 74)
@@ -458,10 +551,12 @@ def main():
     print("RESULT: %d/%d PASS - the exported mesh matches the Rev Q claims"
           % (CHECKS, CHECKS))
     print("")
-    print("This proves geometry only. It does NOT prove the bezel fits the")
-    print("real Perspex: the opening corner radius has never been measured,")
-    print("and no CAD or mesh check in this repository can settle it. See the")
-    print("Rev Q build report, and print the corner gauge coupon first.")
+    print("This proves geometry only. It does NOT prove the bezel FITS. The")
+    print("0.10 mm per side horizontal INTERFERENCE is now resisted by a wall")
+    print("8x stiffer in bending than the 0.40 mm one it replaces, and the")
+    print("opening corner radius has never been measured. No CAD or mesh check")
+    print("in this repository can settle either. Print Bezel_Fit_Gauge_revQ")
+    print("first, and see the Rev Q build report.")
     print("=" * 74)
     return 0
 

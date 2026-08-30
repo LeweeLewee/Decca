@@ -15,85 +15,96 @@ Source (editable, parametric) mechanical design files.
 
 **Rev Q is bezel-only. The released Rev P.5 carrier is FROZEN and unchanged.**
 
-Rev Q replaces the two Rev N side locating rails with **one continuous masking
-lip** around the complete inside perimeter of the Perspex opening — left, right,
-top, bottom and all four corners. The lip conceals the visible cut edge of the
-Perspex and locates the bezel. It works on clearance, not interference: it is
-not a snap, not a clamp and not a press fit, and it carries no load. Retention
-remains removable adhesive on the unchanged recessed pads.
+Rev Q replaces the two Rev N side locating rails with **one continuous inset
+masking wall** around the complete inside perimeter of the Perspex opening —
+left, right, top, bottom and all four corners. The wall conceals the visible
+cut edge and locates the bezel on a **controlled 0.10 mm per side horizontal
+interference**, with 0.05 mm vertical clearance. It is not a snap, not a clamp
+and carries no load. Retention remains removable adhesive on the unchanged
+recessed pads.
 
-Everything else about the Rev N bezel is carried over untouched — the
-40.00 × 20.30 × 4.00 envelope, the R2.00 external corners, the R0.40 front edge
-break, the 30.40 mm visible window width, the R0.80 window corners, the seating
-face and both adhesive pads.
+Built to brief commit `7b107f2` ("require two-loop inset wall"): the wall is
+**0.80 mm**, exactly **two 0.40 mm extrusion loops**, because the first issue's
+0.40 mm wall resolved as only one loop in the slicer.
 
 | File | Role |
 |---|---|
 | `Decca_Display_Bezel_revQ_fusion.py` | **the generator — single source of truth for every Rev Q dimension** |
 | `Decca_Display_Bezel_revQ_verify.py` | independent offline verification of the exported STL (numpy only) |
-| `Decca_Display_Bezel_revQ_frozen_check.py` | proves the six frozen Rev P.5 files still match the Rev Q brief — run before and after any Rev Q work. Hashes text files as-is, forced LF and forced CRLF, so a Windows/Linux line-ending difference cannot masquerade as tampering |
+| `Decca_Display_Bezel_revQ_frozen_check.py` | proves the six frozen Rev P.5 files still match the Rev Q brief — run before and after any Rev Q work. Hashes text files as-is, forced LF and forced CRLF, so a line-ending difference cannot masquerade as tampering |
 | `Decca_Display_Bezel_revQ.f3d` | **editable source** — named parameters, derived values written as real formulas |
 | `Front_Bezel_revQ.step` | the bezel alone |
 | `Decca_Display_Bezel_revQ_assembly.step` | bezel + measured Perspex + OLED glass proxy + the **unchanged Rev P.5 carrier**. Does **not** overwrite `Decca_Display_Mount_revP_assembly.step` |
-| `Bezel_Corner_Gauge_revQ.step` | five-tab corner-radius gauge — **print this before the bezel** |
+| `Bezel_Fit_Gauge_revQ.step` | five-tab interference fit gauge — **print this before the bezel** |
 
 Key dimensions, each verified by two independent tools:
 
 | | mm |
 |---|---:|
-| Lip outer envelope | **34.900 × 15.000** |
-| Lip inner envelope (derived) | 34.100 × 14.200 |
-| Lip wall | **0.400** — one controlled extrusion width |
-| Lip depth | **2.800** into the 3.00 mm Perspex |
-| Lip outer corner radius | R0.600 — **UNRESOLVED**, see below |
+| Bezel face opening, at the front face | **30.900 × 15.350**, R0.800 |
+| Inset-wall outer envelope | **35.400 × 15.200** |
+| Inset-wall inner envelope (derived) | 33.800 × 13.600 |
+| Wall | **0.800** = exactly two 0.400 mm loops |
+| Outer / inner corner radius | **R2.000** / R1.200 (derived) |
+| Wall depth | **2.800** into the 3.00 mm Perspex |
+| Horizontal fit | **0.100 INTERFERENCE per side** |
+| Vertical fit | 0.050 clearance per side |
 | Entry lead-in | 0.200 × 45°, outer rear edge only |
-| Clearance into the measured opening | **0.150 per side, all four sides** |
 | Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
 | Clearance to the OLED glass | **0.500** — the released Rev N/P value |
-| Minimum distance to the Rev P.5 carrier | 1.171 |
-| Effective clear optical opening | **30.400 × 14.200**, R0.800 |
-| Volume | 0.5243 cm³ ≈ 0.67 g in PETG |
+| Minimum distance to the Rev P.5 carrier | 0.939 |
+| Effective clear optical opening | **30.900 × 13.600**, R0.800 |
+| Volume | 0.6056 cm³ ≈ 0.77 g in PETG |
 
-**30/30 gates PASS** in Fusion; **35/35 PASS** offline from the mesh. One shell,
-one lump, zero slivers; the lip is continuous at 1440/1440 perimeter stations at
-three depths; wall 0.4000 min and max; zero interference with the Perspex, the
-glass or the carrier; nothing behind the Perspex rear face.
+**46/46 gates PASS** in Fusion; **42/42 PASS** offline from the mesh. One shell,
+one lump, zero slivers, no degenerate triangles; the wall's cross-section area
+matches the analytic value to four decimals at three depths and in every region
+including the corners; interference is exactly 0.100 mm per side, located only
+on the horizontal flanks and vanishing when the declared relief is applied;
+zero interference with the OLED glass or the carrier; nothing behind the
+Perspex rear face.
 
-> **The opening corner radius has never been measured.** It could not be
-> recovered from Rev N — those rails ran only y −4.00…+4.00 and never approached
-> a corner, which is precisely why that architecture was chosen. So
-> `bezel_lip_corner_r` is a named **UNRESOLVED** parameter, set to the proven
-> Rev N rail-end relief R0.60. That seats for any opening corner radius up to
-> **1.112 mm** (the rule is `R_panel_max ≈ R_lip + 0.51`). If the real corners
-> are rounder, the bezel stands proud of the fascia — obvious, harmless, and
-> fixed by raising one parameter and reprinting. **Print
-> `Bezel_Corner_Gauge_revQ` first** and measure it. Build report §8.
+> **The interference is the open risk now.** The wall went 0.40 → 0.80 mm to
+> get the second loop, and **bending stiffness scales with thickness cubed**,
+> so it is about **8× stiffer** and resists the same 0.10 mm per side roughly
+> 8× harder. Brief §3.8 requires the printed wall to take the deflection and
+> the Perspex to be left unstressed; at 0.80 mm that split is no longer
+> obvious and CAD cannot settle it. **Print `Bezel_Fit_Gauge_revQ` first** —
+> five tabs at 0.00/0.05/0.10/0.15/0.20 mm interference, each carrying the real
+> wall section. Build report §8.1.
 
-> **The lip costs 0.350 mm of lit screen height.** The clear opening goes from
-> 30.40 × 14.90 (Rev N) to 30.40 × 14.20, now controlled by the top and bottom
-> lip rather than by the bezel face, and the visible active band drops 8.100 →
-> **7.750 mm**, all of it at the top. The bottom loses nothing and in fact hides
-> 0.35 mm more unlit board. **CAD reports this; only the powered test can say
-> whether it is acceptable.** Build report §5.
+> **Two continuous loops is a PRODUCTION gate, not a CAD one.** CAD proves the
+> geometry admits them: 0.800/0.400 = 2.000 exactly, wall 0.8000 min and max
+> over 720 stations including 368 corner stations, loop centrelines 0.400 apart
+> with corner radii 1.800 and 1.400 and no cusp. Only the slicer preview can
+> prove it lays them. Build report §7.1 and §10 Stage 0b.
 
-> **One deliberate deviation from Rev N**, and only one: the window **height**
-> is now derived from the lip at 14.200 mm instead of the Rev N 14.900 mm. At
-> 14.900 the lip's 0.400 mm wall would have met the bezel face over just
-> 0.050 mm at the top and bottom — a knife-edge root and a sliver. It costs
-> nothing optically, because the lip already controlled the clear height. The
-> window **width** is untouched. Build report §3.3.
+> **The wall costs 0.650 mm of lit screen height.** The clear opening is
+> 30.90 × 13.60 — width by the face opening, **height by the wall** — and the
+> visible active band drops 8.100 → **7.450 mm**, all of it at the top. Only
+> the powered test can say whether that is acceptable. Build report §5.
+
+> **One forced modelling decision, fully declared.** The amended face opening
+> (15.35) is *taller than the whole wall* (15.20), so a straight-walled
+> aperture would leave the top and bottom wall runs **detached** from the bezel
+> face. The aperture therefore **tapers in Y**, 13.640 at the seating plane to
+> 15.350 at the front face, at 35.47° — self-supporting, every published number
+> preserved. The window edge break is a 0.40 chamfer rather than the Rev N
+> R0.40 fillet, because Fusion refuses a fillet on the tapered aperture edge at
+> every radius. Build report §3.3 and §3.4.
 
 ### Rebuilding Rev Q
 
 Inside Fusion (Utilities → Add-Ins → Scripts), point `OUT_DIR` at this clone's
 `mechanical` folder and run `main()`, `import_carrier()`, `coupon()`,
-`corner_study()`, `validate()`, `export()` and `snapshots()`. `main()` creates
-its own new document and never opens, modifies or saves the Rev N, Rev O or
-Rev P documents; `export()` refuses, in code, to write any path whose basename
+`fit_study()`, `validate()`, `export()` and `snapshots()`. `main()` creates its
+own new document and never opens, modifies or saves the Rev N, Rev O or Rev P
+documents; `export()` refuses, in code, to write any path whose basename
 contains `revN`, `revO` or `revP`. Then, offline:
 
 ```bash
 python mechanical/CAD/Decca_Display_Bezel_revQ_verify.py
+python mechanical/CAD/Decca_Display_Bezel_revQ_frozen_check.py
 ```
 
 `Front_Bezel_revN.step` remains the last **released** bezel and is untouched.
