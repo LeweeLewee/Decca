@@ -135,16 +135,17 @@ P = {
     # sides also makes the aperture a single straight bore instead of a
     # taper, which is what removed the last unsupported overhang.
     #
-    # The fifth change moves the skirt inner envelope again, so these
-    # follow it: 15.60 -> 13.85 and R1.75 -> R3.00. The height tracks the
-    # 1.75 mm the owner took off the skirt; the corner is
-    # (bezel_lip_corner_r - bezel_lip_wall_x) = 4.25 - 1.25.
+    # The fifth change moved the skirt inner envelope again, so the height
+    # followed it to 13.85, tracking the 1.75 mm the owner took off the skirt.
+    # The corner briefly went to R3.00 with it and the owner rejected that on
+    # sight - see bezel_lip_corner_r - so it is back to
+    # (bezel_lip_corner_r - bezel_lip_wall_x) = 3.00 - 1.25 = 1.75.
     #
     # DECLARED DEVIATION from brief 2/4 (face opening 30.90 x 15.35,
     # R0.80). The brief's figures are superseded by owner instruction.
     "bezel_window_w": 32.90,        # OWNER       was 30.90, = skirt inner
     "bezel_window_h": 13.85,        # OWNER       was 15.60, = skirt inner
-    "bezel_window_r": 3.00,         # OWNER       was 1.75,  = skirt inner R
+    "bezel_window_r": 1.75,         # OWNER       reverted, = skirt inner R
     # -- recessed adhesive pads - DELETED at owner instruction -------------
     # Rev N has two: 24.00 x 2.00 mm, 0.30 mm deep into the seating face at
     # y +/-7.85..9.85. The owner inspected the model, identified them as the
@@ -229,27 +230,39 @@ P = {
     "bezel_lip_wall_y": 0.80,       # OWNER       top/bottom, 2 loops
     #                                 X wall is DERIVED - see derive()
     # The outer corner is the one interface that mates with the Perspex
-    # opening corner, and its history is a sequence of owner corrections:
-    # R2.00 (brief) -> R3.00 (+50%, "does not match the perspex opening")
-    # -> R3.40 (it took the outward loop with the rest of the side profile)
-    # -> R4.25 (+25%, the fifth change).
+    # opening corner. Its history:
+    #   R2.00 (brief)
+    #   R3.00 (+50%, owner: "does not match the perspex opening")
+    #   R3.40 (it took the outward loop with the rest of the side profile)
+    #   R4.25 (+25%, the fifth change)
+    #   R3.00 (REVERTED, the sixth change - see below)
     #
-    # WHY IT ONLY EVER GOES UP. The failure modes are asymmetric. An insert
-    # corner SQUARER than the opening corner touches before the flanks do,
-    # so the part jams and never seats - a hard failure. An insert corner
-    # ROUNDER than the opening merely leaves a crescent of cut edge visible
-    # at each corner apex - cosmetic. So every unit of uncertainty in the
-    # opening corner should be spent on the round side, and it has been.
+    # THE SIXTH CHANGE REVERTS IT. R4.25 put the VISIBLE aperture corner at
+    # R3.00, since the inner radius is (corner_r - wall_x) and the flush rule
+    # makes the face opening carry it. On a 13.85 mm tall opening that leaves
+    # only 7.85 mm of straight run, and the owner rejected the look on sight
+    # from the front view, without needing a print. Both radii therefore go
+    # back to the pair they last held with a 1.25 mm side wall: outer R3.00,
+    # visible corner R1.75. That is consistent rather than arbitrary - the
+    # R3.40 only ever existed as R3.00 plus the outward loop, and the fifth
+    # change removed that loop when it took 0.80 mm off the width.
     #
-    # At R4.25 the flanks set the fit for any opening corner up to R4.00,
-    # which covers the whole plausible range. panel_open_corner_r remains
-    # UNRESOLVED - a drill-shank estimate exists but has not been confirmed,
-    # so nothing in this model depends on it.
+    # WHAT IT COSTS, and it is a real cost. The failure modes are asymmetric:
+    # an insert corner SQUARER than the opening corner touches before the
+    # flanks do, so the part jams and never seats - a HARD failure. One that
+    # is ROUNDER only leaves a crescent of cut edge visible at each corner
+    # apex - cosmetic. At R4.25 the flanks set the fit for any opening corner
+    # up to R4.00. At R3.00 they set it only up to about R2.50, and beyond
+    # that the corner takes over: R3.00 opening -> 0.125 mm, R3.50 -> 0.331,
+    # R4.00 -> 0.538. panel_open_corner_r is still UNRESOLVED - a drill-shank
+    # estimate was offered and withdrawn - so this is now the tightest
+    # unmeasured margin in the part, and the fit gauge is the way to close it.
+    # It buys back the appearance the owner wants and tighter corner masking.
     #
     # Brief 7 explicitly allows the named corner parameters to be changed
     # when the fit needs it; the brief's stated 2.00 is therefore superseded
     # by observation, and this is recorded as a deviation from brief 2/4.
-    "bezel_lip_corner_r": 4.25,     # OWNER       3.40 + 25%
+    "bezel_lip_corner_r": 3.00,     # OWNER       REVERTED from 4.25
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
 
     # The established production extrusion width. Every wall must be at least
@@ -1784,7 +1797,7 @@ def validate(P=P):
           "%.3f x %.3f" % (d["optical_w"], d["optical_h"]))
     _report("versus the figure brief 4 predicts",
             "30.90 x 13.60 - now %+.2f mm wider and %+.2f mm taller, all of "
-            "it owner-directed across five changes made on the model"
+            "it owner-directed across six changes made on the model"
             % (d["optical_w"] - 30.90, d["optical_h"] - 13.60))
     _report("controlled by",
             "the skirt inner envelope on ALL FOUR sides - the face opening "

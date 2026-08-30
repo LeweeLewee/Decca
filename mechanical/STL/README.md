@@ -16,8 +16,8 @@ Print-ready meshes exported from the CAD sources.
 
 | File | Print notes |
 |---|---|
-| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side** — which brackets the declared 0.100 mm two either side. Each is the complete right-hand end of the real Rev Q wall — full **15.45 mm** height, both **R4.25** corners, the real **1.25 mm** side wall, the real 2.80 mm depth — so one tab answers three questions at once: does the interference seat, does the vertical fit, and is the insert corner rounder than the opening corner. ≈1.59 cm³ ≈ 2 g for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6618 cm³ ≈ 0.84 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side** — which brackets the declared 0.100 mm two either side. Each is the complete right-hand end of the real Rev Q wall — full **15.45 mm** height, both **R3.00** corners, the real **1.25 mm** side wall, the real 2.80 mm depth — so one tab answers three questions at once: does the interference seat, does the vertical fit, and is the insert corner rounder than the opening corner. ≈1.61 cm³ ≈ 2 g for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6549 cm³ ≈ 0.83 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
 > ### The fit, in one line
 >
@@ -47,7 +47,7 @@ Print-ready meshes exported from the CAD sources.
 > **Step through every layer of the wall in the slicer preview before
 > printing.** Confirm at least two continuous 0.40 mm loops around the complete
 > perimeter — three on the side runs, two on the top and bottom, and never fewer
-> than two through **all four R4.25 corners**. **Reject** the profile on any of:
+> than two through **all four R3.00 corners**. **Reject** the profile on any of:
 > a single variable-width wall, a missing second loop, gap fill substituted for
 > a loop, or two loops locally merged into one wide extrusion. Fix the slicer —
 > do not thicken `bezel_lip_wall_y` to work around it without recording why.
@@ -77,28 +77,31 @@ Print-ready meshes exported from the CAD sources.
 
 > ### Rev Q print gate 3 — THE OPENING CORNER
 >
-> The Perspex opening's corner radius has **never been confirmed**. The insert
-> corner is R4.25, chosen to cover the range rather than to match a measurement:
-> an insert corner **squarer** than the opening jams the part outright, while one
-> that is **rounder** only leaves a crescent of cut edge visible at each corner.
-> The flanks set the fit for any opening corner up to R4.00.
+> The Perspex opening's corner radius has **never been confirmed**, and this is
+> now the **tightest unmeasured margin in the part**. An insert corner
+> **squarer** than the opening jams it outright; one that is **rounder** only
+> leaves a crescent of cut edge visible at each corner. The insert corner was
+> briefly R4.25, covering opening corners to R4.00, and the owner reverted it to
+> **R3.00** on appearance — which covers them only to about **R2.50**.
 >
-> The gauge tabs carry the real R4.25 corner. Offer one in: if it beds on the
-> flanks with a light gap at the corner apex, you are on the safe side. If it
-> rocks on the corner and will not seat, raise `bezel_lip_corner_r`.
+> **Check this first.** The gauge tabs carry the real R3.00 corner. Offer one in:
+> if it beds on the flanks with a light gap at the corner apex, you are on the
+> safe side. If it rocks on the corner and will not seat, the opening corner is
+> larger than R3.00 and `bezel_lip_corner_r` has to go back up.
 
 > ### What this print does optically
 >
 > The clear opening is **32.90 × 13.85 mm**, controlled by the skirt on all four
 > sides with the bezel face opening flush to it. The visible lit band goes
 > 8.100 → **7.575 mm**, 0.525 mm less than Rev N, all of it off the top. The
-> aperture corner also opens to **R3.00** where Rev N had R0.80 — a consequence
-> of the corner margin above, not a styling choice.
+> aperture corner is **R1.75**, reverted from R3.00 at owner instruction — at
+> R3.00 only 7.85 mm of the 13.85 mm height was straight and it read as a
+> rounded slot rather than a rectangle.
 >
 > Full detail, the fit study and the test procedure:
 > `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
 
-> ### Five owner changes since the brief
+> ### Six owner changes since the brief
 >
 > 1. The two **recessed adhesive pads are deleted** — the underside is one
 >    unbroken seating face. **Re-check removability** on the prototype.
@@ -110,11 +113,13 @@ Print-ready meshes exported from the CAD sources.
 >    moved the top and bottom walls 1.00 mm out each. It overshot: 36.20 × 17.20
 >    could not enter a 35.20 × 15.30 opening.
 > 5. The **pull-back**: width −0.80, height −1.75, outer corner +25% to R4.25,
->    giving the 35.40 × 15.45 built here. Build report §3.5 to §3.8.
+>    giving the 35.40 × 15.45 built here.
+> 6. The corner **reverted to R3.00** on sight of the front view, taking the
+>    visible aperture corner back to R1.75. Build report §3.5 to §3.9.
 
 `Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
 unchanged. The first issue's `Bezel_Corner_Gauge_revQ_*` meshes are deleted —
-the corner radius is now set by the owner at R4.25, so the fit gauge
+the corner radius is now set by the owner at R3.00, so the fit gauge
 replaces the corner gauge.
 
 ---

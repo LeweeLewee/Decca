@@ -85,14 +85,14 @@ Validation: **52/52 gates PASS** in Fusion and **47/47 PASS** in the independent
 offline mesh verifier. One shell, one lump, zero slivers, no degenerate
 triangles. Continuity is proved by **cross-section area**, which matches the
 analytic value to four decimals at three depths and in every region including
-the four R4.25 corners — a stronger proof than point sampling, since any gap or
+the four R3.00 corners — a stronger proof than point sampling, since any gap or
 thin spot anywhere removes area.
 
 | | mm |
 |---|---:|
-| Bezel face opening, at the front face | **32.900 × 13.850**, R3.000 |
+| Bezel face opening, at the front face | **32.900 × 13.850**, R1.750 |
 | Inset-wall outer / inner envelope | **35.400 × 15.450** / 32.900 × 13.850 (flush, all four sides) |
-| Wall / corner radii | **1.250 sides / 0.800 top+bottom** / R4.250 outer, R3.000 inner |
+| Wall / corner radii | **1.250 sides / 0.800 top+bottom** / R3.000 outer, R1.750 inner |
 | Depth | 2.800 |
 | Aperture | a straight bore — taper 0.00° |
 | Fit | **0.100 interference** per horizontal side, **0.075 interference** per vertical side |
@@ -105,13 +105,16 @@ thin spot anywhere removes area.
 >    stiffer in bending** than the original 0.40 mm, and **print tolerance is the
 >    same size as the fit**. Print `Bezel_Fit_Gauge_revQ` first; it is mandatory,
 >    not advisable. Build report §8.1.
-> 2. **The opening corner**, which has never been confirmed. R4.25 is sized to
->    cover the range — too square jams the part outright, too round only leaves a
->    visible crescent — and a single gauge tab settles which way round they are.
->    Build report §8.3.
+> 2. **The opening corner**, which has never been confirmed and is now the
+>    tightest unmeasured margin in the part. Too square jams the part outright;
+>    too round only leaves a visible crescent. R4.25 covered opening corners to
+>    R4.00 and was reverted to **R3.00** on appearance, which covers them only to
+>    about R2.50. A single gauge tab settles which way round they are, and it is
+>    the first thing to check. Build report §8.3.
 > 3. **The optical result.** The clear opening is 32.90 × 13.85, the lit band
->    goes 8.100 → **7.575 mm** all off the top, and the aperture corner opens to
->    R3.00 where Rev N had R0.80. A powered-test decision. Build report §5.
+>    goes 8.100 → **7.575 mm**, all off the top. The aperture corner is R1.75,
+>    settled by the owner from the front view. A powered-test decision. Build
+>    report §5.
 
 > **A forced modelling decision, since designed out.** While the face opening
 > was taller than the whole wall, a straight-walled aperture would have left the
@@ -120,12 +123,13 @@ thin spot anywhere removes area.
 > the condition: the aperture is now a straight bore, and the generator refuses
 > to build if the two drift apart. Build report §3.3.
 
-> **Five owner changes on top of the brief, each recorded and each reversible.**
+> **Six owner changes on top of the brief, each recorded and each reversible.**
 > The adhesive pads **deleted**; the outer corner **R2.00 → R3.00**; the aperture
 > made **flush on the left and right** with the loop rule clarified to **at
 > least** two per side; the **interference-fit refinement**, which overshot and
-> could not enter; and the **pull-back** to 35.40 × 15.45 with the corner at
-> R4.25. Build report §3.5 to §3.8.
+> could not enter; the **pull-back** to 35.40 × 15.45 with the corner at R4.25;
+> and the corner **reverted to R3.00** on sight of the front view. Build report
+> §3.5 to §3.9.
 
 ## Display mount
 
