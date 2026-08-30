@@ -1,9 +1,30 @@
-# Decca OLED Display Mount Specification v1.0
+# Decca OLED Display Mount Specification v1.1
 
-Status: **Approved design specification**  
-Date: 2026-08-27  
+Status: **Approved design specification** · Mechanical implementation
+**Rev P.5 — RELEASED**, prototype built and physically validated 2026-08-30  
+Date: 2026-08-27 (v1.0) · 2026-08-28 (v1.1)  
 Manufacturing method: **FDM 3D print**  
 CAD platform: **Autodesk Fusion 360**
+
+*This file keeps its original `_v1.0` filename so existing links stay valid; the document version is the one in the title above.*
+
+## Revision record
+
+| Version | Date | Change |
+|---|---|---|
+| 1.0 | 2026-08-27 | Initial approved specification. |
+| — | 2026-08-30 | **Mechanical Rev P.5 released.** The carrier has been manufactured, installed and physically tested, and every test passed: Perspex fit and tolerances, OLED front insertion and removal, four sprung retaining posts, no collision with the original Decca lighting unit, bottom/open connector-side clearance, the 6.00 mm carrier thickness, the enlarged 14.00 × 4.19 mm four-pin opening, the rear closure and light-blocking features, the original fasteners and captive nuts, 49.00 mm horizontal pitch, the mounting points 7.00 mm lower giving the required OLED position, and installed fit, screen position, stiffness, retention, clearance and powered operation. **No value in this specification changes.** §2 remains the measured fascia authority; the as-built mechanical design is defined by `Decca_OLED_Display_Mount_CAD_Build_revP.md`. |
+| **1.1** | **2026-08-28** | **Locked the measured Decca interface geometry in §2, §4, §5 and §10.** The v1.0 figures for the display opening and the M2 fixing pitch were pre-measurement estimates and were superseded by physical measurement at Rev C, print-confirmed at Rev D and re-confirmed by the project owner on 2026-08-28. Fixing pitch **48.00 → 49.00 mm**; display opening **35.50 × 15.80 → 35.20 × 15.30 mm**; hole centre from the opening edge **7.90 → 7.65 mm**. No other value is changed. |
+
+**Change control.** Where this document and a physical measurement disagree, the
+measurement wins and this document is updated explicitly — that is what v1.1 is.
+The same rule closed Rev P.5: the checks CAD could not settle were settled by
+the built part, not by editing a check or a number.
+Design-intent values elsewhere in this specification (bezel lip depth, retention
+concept, wall thicknesses) have also been superseded by later mechanical
+revisions; for those, the CAD build reviews in this folder and
+`docs/Revision History.md` are authoritative. §2 is the only section that
+defines the **original fascia**, and it is now measured, not estimated.
 
 ## 1. Purpose
 
@@ -16,19 +37,28 @@ The design comprises:
 
 No additional drilling or cutting of the original Decca fascia is permitted.
 
-## 2. Locked Decca interface geometry
+## 2. Locked Decca interface geometry — MEASURED
 
-| Parameter | Dimension |
-|---|---:|
-| Existing display opening | 35.50 mm W × 15.80 mm H |
-| Perspex thickness | 3.00 mm |
-| Existing fixing-hole type | M2 clearance |
-| Existing fixing-hole pitch | 48.00 mm horizontal centres |
-| Hole vertical position | Exactly centred on display opening |
-| Hole centre from opening top/bottom | 7.90 mm |
-| Additional panel modification | None |
+Every dimension in this table is taken from the physical fascia. None is an
+estimate. Do not substitute a value from any earlier document.
+
+| Parameter | Dimension | Source |
+|---|---:|---|
+| Existing display opening | **35.20 mm W × 15.30 mm H** | measured, Rev C |
+| Perspex thickness | **3.00 mm** | measured |
+| Existing fixing-hole type | M2 clearance (Ø2.40 modelled) | measured |
+| **Existing fixing-hole pitch** | **49.00 mm horizontal centres** | measured Rev C; **print-confirmed Rev D**; owner-confirmed 2026-08-28 |
+| Hole vertical position | Exactly centred on the display opening | measured |
+| Hole centre from opening top/bottom | 7.65 mm | derived from the measured opening height |
+| Additional panel modification | None | — |
 
 The display-opening centre is the primary datum for optical alignment.
+
+> **⚠ The pitch is not recoverable by clearance.** An M2 screw in a Ø2.40 mm
+> clearance hole has only 0.20 mm of radial play. Building at the superseded
+> 48.00 mm would put each screw 0.50 mm off its hole and the carrier would not
+> bolt on. The Rev O redesign brief inadvertently re-quoted the v1.0 figures and
+> had to be corrected during the Rev O build; v1.1 exists so that cannot recur.
 
 ## 3. OLED reference geometry
 
@@ -51,7 +81,7 @@ Critical alignment rule: **OLED active-area centre must coincide with the Decca 
 
 ## 4. Front bezel
 
-The bezel is cosmetic only. It must surround the existing 35.5 × 15.8 mm opening and must **not** extend to, cover or incorporate the existing M2 fixing holes.
+The bezel is cosmetic only. It must surround the existing 35.20 × 15.30 mm opening and must **not** extend to, cover or incorporate the existing M2 fixing holes.
 
 Design intent:
 
@@ -83,7 +113,7 @@ The rear carrier is the sole structural component.
 Functions:
 
 1. clamp against the rear of the original 3 mm Perspex;
-2. accept the two existing front-entering M2 bolts at 48.00 mm horizontal centres;
+2. accept the two existing front-entering M2 bolts at **49.00 mm** horizontal centres;
 3. position the OLED active area centrally behind the original opening;
 4. retain the OLED PCB without loading the OLED glass;
 5. establish OLED-to-Perspex depth independently of screw torque;
@@ -151,9 +181,9 @@ The model should expose at least the following named user parameters:
 ```text
 // Original Decca
 panel_t              = 3.00 mm
-panel_open_w         = 35.50 mm
-panel_open_h         = 15.80 mm
-panel_fix_pitch      = 48.00 mm
+panel_open_w         = 35.20 mm   // measured, Rev C
+panel_open_h         = 15.30 mm   // measured, Rev C
+panel_fix_pitch      = 49.00 mm   // measured Rev C, print-confirmed Rev D
 panel_fix_y          = 0.00 mm
 
 // OLED reference
