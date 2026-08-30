@@ -19,6 +19,11 @@ controlled horizontal interference fit. Increase the visible opening by
 0.25 mm on each horizontal side and 0.10 mm on each vertical side; add R2.00 mm
 outer corners to the inset walls.
 
+Owner correction, 2026-08-30: the slicer currently resolves the 0.40 mm inset
+wall as only one wall loop. Increase the nominal wall to **0.80 mm** so the
+established 0.40 mm extrusion configuration produces **two continuous wall
+loops** around the complete inset lip.
+
 ## 2. Controlled baseline
 
 Verified physical/interface facts:
@@ -46,7 +51,7 @@ Frozen Rev P.5 file hashes at the Rev Q baseline:
 
 Rev Q amended targets requiring test-print confirmation:
 
-- full-perimeter lip wall: **0.40 mm nominal**;
+- full-perimeter lip wall: **0.80 mm nominal**, targeting two 0.40 mm loops;
 - visible bezel opening: **30.90 × 15.35 mm**;
 - Perspex inset-wall outer envelope: **35.40 × 15.20 mm**;
 - horizontal fit: **0.10 mm nominal interference per side**;
@@ -61,10 +66,10 @@ Rev Q amended targets requiring test-print confirmation:
    masking skirt around the left, right, top, bottom and all four corners.
 3. Increase the skirt outer envelope from the Rev N baseline to
    **35.40 × 15.20 mm** and keep its rearward depth at **2.80 mm**.
-4. Start with a **0.40 mm** wall measured inward from that outer envelope. The
+4. Use a **0.80 mm** wall measured inward from that outer envelope. The
    wall and opening it creates must be derived, not independently dimensioned.
 5. Apply **R2.00 mm** to all four outer inset-wall corners. Offset the inner
-   corners from the outer profile so the nominal 0.40 mm wall remains constant.
+   corners from the outer profile so the nominal 0.80 mm wall remains constant.
 6. Add only the minimum lead-in needed to prevent the thin lip catching on the
    Perspex edge. A lead-in must not reduce cut-edge coverage at the seated
    position.
@@ -95,21 +100,21 @@ bezel_lip_outer_h    = 15.20 mm   // Rev N 15.00 + 2 x 0.10
 bezel_lip_interf_x   = 0.10 mm    // derived per horizontal side
 bezel_lip_clear_y    = 0.05 mm    // derived per vertical side
 bezel_lip_depth      = 2.80 mm    // proven Rev N depth
-bezel_lip_wall       = 0.40 mm    // provisional test-print value
+bezel_lip_wall       = 0.80 mm    // two 0.40 mm wall loops
 bezel_lip_corner_r   = 2.00 mm    // outer corner radius
-bezel_lip_inner_w    = 34.60 mm   // derived: outer width - 2 x wall
-bezel_lip_inner_h    = 14.40 mm   // derived: outer height - 2 x wall
-bezel_lip_inner_r    = 1.60 mm    // derived: outer radius - wall
+bezel_lip_inner_w    = 33.80 mm   // derived: outer width - 2 x wall
+bezel_lip_inner_h    = 13.60 mm   // derived: outer height - 2 x wall
+bezel_lip_inner_r    = 1.20 mm    // derived: outer radius - wall
 bezel_lip_lead       = provisional, minimum printable value
 ```
 
 Do not bury fit values in sketches. Changing the interference/clearance, wall,
 corner radius or lead-in must regenerate a valid single solid.
 
-At the initial 0.40 mm wall, the lip—not the bezel face—limits the vertical
+At the 0.80 mm wall, the lip—not the bezel face—limits the vertical
 clear opening. The expected coaxial effective opening is therefore
-**30.90 × 14.40 mm**: width controlled by the 30.90 mm face opening and height
-controlled by the 14.40 mm lip inner envelope. CAD shall measure and report the
+**30.90 × 13.60 mm**: width controlled by the 30.90 mm face opening and height
+controlled by the 13.60 mm lip inner envelope. CAD shall measure and report the
 actual result.
 
 ## 5. File and revision control
@@ -135,9 +140,9 @@ CAD must demonstrate:
 - 35.40 × 15.20 mm outer lip envelope and 2.80 mm depth;
 - 0.10 mm horizontal interference per side and 0.05 mm vertical clearance per
   side against the measured opening;
-- R2.00 mm outer corners and constant 0.40 mm wall through the corners;
-- 34.60 × 14.40 mm derived lip inner envelope with R1.60 mm inner corners;
-- exact wall thickness and the expected 30.90 × 14.40 mm effective optical
+- R2.00 mm outer corners and constant 0.80 mm wall through the corners;
+- 33.80 × 13.60 mm derived lip inner envelope with R1.20 mm inner corners;
+- exact wall thickness and the expected 30.90 × 13.60 mm effective optical
   opening;
 - no intersection with the measured Perspex solid except the declared
   horizontal interference envelope, with deformation assigned to the thin lip;
@@ -147,6 +152,11 @@ CAD must demonstrate:
   corridors;
 - a support-free print orientation suitable for the thin continuous lip; and
 - comparable front, rear and section views showing how the cut edge is masked.
+
+The production slicer preview must additionally demonstrate exactly two
+continuous 0.40 mm wall loops around every straight and curved section of the
+lip. A single variable-width wall, missing loop, gap-fill substitution or
+locally merged loops does not satisfy this requirement.
 
 The first print is an **integration prototype**, not a release part.
 
@@ -164,6 +174,8 @@ With the original Perspex and the released carrier installed:
 5. The powered OLED retains the required visible content and has no new edge
    shadow, reflection or light leak.
 6. The bezel remains independent of the mounting bolts and carrier load path.
+7. The sliced and printed lip remains continuous at two-wall-loop thickness,
+   including through all four R2.00 outer corners.
 
 If fit needs adjustment, change the named clearance/corner parameters and
 print another Rev Q prototype. Do not modify the Perspex or Rev P.5 carrier to
@@ -177,6 +189,8 @@ Stop and report rather than improvise if:
   or visibly stressing the Perspex;
 - the continuous lip requires more interference than the declared 0.10 mm per
   horizontal side or creates unacceptable masking;
+- the selected production slicer cannot maintain two continuous wall loops
+  through the complete lip at 0.80 mm nominal thickness;
 - the lip would reduce OLED visibility beyond the owner's accepted powered
   presentation;
 - the Rev P.5 carrier or its released files would need to change; or

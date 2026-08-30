@@ -1,11 +1,11 @@
-# Decca OLED Display Mount Specification v1.3
+# Decca OLED Display Mount Specification v1.4
 
 Status: **Approved design specification** · Mechanical implementation
 **Rev P.5 carrier — RELEASED**, prototype built and physically validated 2026-08-30
 
 **Rev Q bezel-only amendment — OPEN**, prototype fit and appearance testing required
 
-Date: 2026-08-27 (v1.0) · 2026-08-28 (v1.1) · 2026-08-30 (v1.2/v1.3)
+Date: 2026-08-27 (v1.0) · 2026-08-28 (v1.1) · 2026-08-30 (v1.2–v1.4)
 Manufacturing method: **FDM 3D print**  
 CAD platform: **Autodesk Fusion 360**
 
@@ -20,6 +20,7 @@ CAD platform: **Autodesk Fusion 360**
 | **1.1** | **2026-08-28** | **Locked the measured Decca interface geometry in §2, §4, §5 and §10.** The v1.0 figures for the display opening and the M2 fixing pitch were pre-measurement estimates and were superseded by physical measurement at Rev C, print-confirmed at Rev D and re-confirmed by the project owner on 2026-08-28. Fixing pitch **48.00 → 49.00 mm**; display opening **35.50 × 15.80 → 35.20 × 15.30 mm**; hole centre from the opening edge **7.90 → 7.65 mm**. No other value is changed. |
 | **1.2** | **2026-08-30** | Opens **Rev Q as a bezel-only amendment**. Replace the Rev N pair of locating side rails with a thin, continuous masking lip around the full inside perimeter of the measured Perspex opening. The lip must sit snugly but without interference, conceal the visible cut edge and remain parametric for test-print refinement. The released Rev P.5 display carrier is frozen and must not change. |
 | **1.3** | **2026-08-30** | Supersedes the Rev Q clearance-fit starting point with a controlled fit amendment: increase the visible bezel opening by **0.50 mm horizontally** and **0.25 mm vertically** to 30.90 × 15.35 mm; move the Perspex inset walls outward by **0.25 mm per horizontal side** and **0.10 mm per vertical side**, producing a 35.40 × 15.20 mm wall envelope; and apply **R2.00 mm** outer corners to the inset walls. This creates 0.10 mm nominal horizontal interference per side and retains 0.05 mm nominal vertical clearance per side. Physical test printing remains mandatory. |
+| **1.4** | **2026-08-30** | Increases the Rev Q Perspex inset-wall thickness from **0.40 to 0.80 mm** after the owner reported that the slicer produced only one wall loop. The target is two continuous 0.40 mm wall loops around the complete inset lip. The outer fit envelope remains 35.40 × 15.20 mm, so the interference is unchanged; the derived inner envelope becomes 33.80 × 13.60 mm with R1.20 inner corners. Slicer preview, fit force and powered visibility require prototype confirmation. |
 
 **Change control.** Where this document and a physical measurement disagree, the
 measurement wins and this document is updated explicitly — that is what v1.1 is.
@@ -120,11 +121,12 @@ changes only the locating/masking feature.
 - Preserve the **2.80 mm** nominal engagement depth. No bezel material may pass
   behind the 3.00 mm Perspex or reduce the released 0.50 mm clearance to the
   OLED glass.
-- Start with a **0.40 mm nominal lip wall**, equivalent to one controlled
-  extrusion width for the established print configuration. This is a
-  provisional test-print value, not a released fit result.
+- Use a **0.80 mm nominal lip wall**, equivalent to two 0.40 mm wall loops for
+  the established print configuration. Slicer preview must show two continuous
+  loops around the complete lip without reverting to a single variable-width
+  wall or gap fill.
 - Apply **R2.00 mm outer corner radii** to all four Perspex inset walls. Derive
-  the inner corner radius from the 0.40 mm wall so the wall thickness remains
+  the inner corner radius from the 0.80 mm wall so the wall thickness remains
   constant through each corner.
 - The bezel face must remain snug against the front of the Perspex without
   rocking or visible gaps. The thin printed lip, not the original Perspex,
@@ -235,11 +237,11 @@ bezel_window_h       = 15.35 mm
 bezel_lip_outer_w    = 35.40 mm   // 0.10 mm interference per horizontal side
 bezel_lip_outer_h    = 15.20 mm   // 0.05 mm clearance per vertical side
 bezel_lip_depth      = 2.80 mm    // proven Rev N engagement depth
-bezel_lip_wall       = 0.40 mm    // provisional test-print value
+bezel_lip_wall       = 0.80 mm    // two 0.40 mm wall loops
 bezel_lip_corner_r   = 2.00 mm    // outer corner radius
-bezel_lip_inner_w    = 34.60 mm   // derived: outer width - 2 x wall
-bezel_lip_inner_h    = 14.40 mm   // derived: outer height - 2 x wall
-bezel_lip_inner_r    = 1.60 mm    // derived: outer radius - wall
+bezel_lip_inner_w    = 33.80 mm   // derived: outer width - 2 x wall
+bezel_lip_inner_h    = 13.60 mm   // derived: outer height - 2 x wall
+bezel_lip_inner_r    = 1.20 mm    // derived: outer radius - wall
 screen_panel_gap     = 0.30 mm
 pcb_clearance        = 0.25 mm
 locating_pin_d       = 2.70 mm
