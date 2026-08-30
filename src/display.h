@@ -31,6 +31,10 @@ constexpr uint8_t kViewportHeight = 52;
 constexpr uint8_t kContentTop = 24;
 constexpr uint8_t kContentBottom = 60;
 constexpr uint8_t kPanelContrast = 0x80;
+constexpr uint8_t kDimmedContrast = 0x20;
+constexpr uint32_t kDimAfterMs = 60'000;
+constexpr uint32_t kSleepAfterMs = 300'000;
+constexpr uint32_t kStandbySleepAfterMs = 10'000;
 constexpr uint16_t kControlMax = 1000;
 constexpr uint32_t kStartupDurationMs = 1000;
 constexpr uint8_t kStartupFrameCount = 5;
@@ -90,6 +94,13 @@ enum class FrameKind : uint8_t {
     Calibration,
 };
 
+/** @brief Current OLED protection state. */
+enum class PanelPowerState : uint8_t {
+    Awake,
+    Dimmed,
+    Sleeping,
+};
+
 /**
  * @brief Initialise the purchased SH1106 panel and render the startup frame.
  * @pre   hardware::init() has run and configured I2C on GPIO21/GPIO22.
@@ -104,6 +115,12 @@ void update();
 
 /** @brief Return whether the SH1106 acknowledged and initialised. */
 bool ready();
+
+/** @brief Return the current contrast/display-off protection state. */
+PanelPowerState panelPowerState();
+
+/** @brief Wake the OLED and restart its inactivity timers. */
+void noteActivity();
 
 /** @brief Supply a complete display snapshot; pointed-to text is copied. */
 void setState(const ViewState& state);

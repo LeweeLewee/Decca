@@ -22,10 +22,10 @@ messages and old revision-history entries may describe superseded hardware.
 
 ## Current firmware state
 
-The production `src/main.cpp` is intentionally a **safe bootstrap runtime**.
-It initialises safe board pins and continuously services authenticated ArduinoOTA.
-It does **not yet** orchestrate settings, buttons, pots, display, lighting, power
-or WiiM control during normal operation.
+The production `src/main.cpp` now initialises the safe board state, buttons,
+logical power, display and authenticated ArduinoOTA. It continuously services
+the original on/off switch, display and OTA without blocking. Full settings,
+pots, source, lighting and WiiM coordination is not yet implemented.
 
 Implemented modules:
 
@@ -35,12 +35,12 @@ Implemented modules:
 | `settings` | NVS persistence implemented, schema version 2 |
 | `buttons` | On/off plus sole Gram contact, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
-| `display` | Fitted-Perspex SH1106 UI physically accepted; 180-degree rotation, calibrated safe band and play/pause metadata views |
+| `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
 | `lighting` | Safe-off non-blocking PWM fades |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
-| `power` | Planned, not implemented |
+| `power` | GPIO-independent logical on/standby state implemented and tested |
 | WiiM interface | Phase 2, not implemented |
-| Main orchestration | Not implemented beyond the OTA bootstrap |
+| Main orchestration | GPIO19 power/display/OTA slice implemented; remaining Phase 1 coordination open |
 
 The ESP32 is control/UI only. It never carries or processes audio.
 
@@ -70,7 +70,7 @@ function. A replacement button panel is deferred.
 | Gram | GPIO23/D23 | Bench-verified contact |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO19/D19 | Proposed, physical test pending |
+| On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
 | Dial-light PWM | GPIO25/D25 | Proposed, load test pending |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
@@ -96,16 +96,20 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
   service diagnostic.
 - Gram GPIO23 contact was physically verified before the firmware was simplified
   to its final two-state model.
+- GPIO19/D19 was physically verified with the retained H2 Red/Green switch.
+  Closed selects logical ON and open selects STANDBY; both transitions were
+  accepted on the production firmware.
 - Revised button logic passed strict host compilation and its nine-case harness.
 - Lighting logic passed strict host compilation and its seven-case harness.
 - OTA logic passed strict host compilation and its five-case harness.
 - USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
   `esp32dev-ota` upload succeeded and the rebooted ESP32 reported
   `[OTA] ready at 192.168.1.79 (decca.local)`.
-- The final fitted-display `esp32dev` release build passed and all seven
-  on-target suites passed 45/45 tests on 2026-08-30 (buttons 9, display 12,
-  hardware 3, lighting 7, OTA 5, pots 6 and settings 3). Production firmware
-  was restored afterward and OTA readiness was reconfirmed.
+- The power/display-protection `esp32dev` release build passed and all eight
+  on-target suites passed 52/52 tests on 2026-08-30 (buttons 9, display 14,
+  hardware 3, lighting 7, OTA 5, pots 6, power 5 and settings 3). Production
+  firmware was restored by USB; serial reported `[POWER] state=ON` and
+  `[OTA] ready at 192.168.1.79 (decca.local)`.
 - Display mount Rev P.5 is released and physically validated.
 - Root documentation and the final OLED loom colours were reconciled at chat
   close-out.
@@ -163,13 +167,14 @@ the user's Wi-Fi or OTA passwords.
 
 1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
 2. **Complete (2026-08-30):** full PlatformIO `esp32dev` release build and all
-   seven on-target suites; latest accepted run passed 45/45 tests.
+   eight on-target suites; latest accepted run passed 52/52 tests.
 3. **Complete (2026-08-30):** fitted-Perspex display calibration, visual design
    cycle and physical acceptance.
-4. **Current:** implement the planned `power` module and bench-test GPIO19.
-5. Reconcile `main.cpp` from safe bootstrap into the non-blocking Phase 1
-   scheduler, initialising and coordinating all existing modules while
-   continuously servicing OTA.
+4. **Complete (2026-08-30):** implement the logical `power` module, bench-test
+   GPIO19 and integrate on/standby display coordination in production.
+5. **Current:** extend `main.cpp` into the complete non-blocking Phase 1
+   scheduler, coordinating pots, Gram source and lighting while continuously
+   servicing OTA.
 6. Bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade behaviour.
 7. Commission normal and standby lighting levels.
 8. **Deferred control reuse:** wire and implement the original Stereo/Mono switch
@@ -219,14 +224,16 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: implement the planned `power` module and bench-test GPIO19,
-one step at a time. The preceding gates passed on 2026-08-30: authenticated
-USB-to-OTA physical acceptance, the full PlatformIO build/test gate, and fitted-
-Perspex display calibration plus visual acceptance. Production firmware starts
-the accepted display in standby while continuously servicing OTA.
+Immediate priority: extend the production coordinator with the remaining Phase
+1 pots, Gram source and lighting behaviour, one step at a time. The preceding
+gates passed on 2026-08-30: authenticated USB-to-OTA acceptance, fitted-Perspex
+display acceptance, GPIO19 on/off acceptance and all 52 on-target tests.
+Production coordinates logical power/display state while continuously servicing
+OTA; its OLED dims after 60 s, turns pixels off after 5 min, and blanks standby
+after 10 s, waking immediately on activity.
 
-After power/GPIO19 verification, continue with non-blocking Phase 1 main-loop
-orchestration, then GPIO25 lighting commissioning. Keep the deferred Stereo/Mono
+Continue with non-blocking Phase 1 main-loop orchestration, then GPIO25 lighting
+commissioning. Keep the deferred Stereo/Mono
 lighting mapping on the later development list: Stereo = lights on; Mono = lights
 off. Preserve the locked Gram-only
 source logic: Gram closed = Vinyl/Line-In; Gram open = Digital Streamer controlled

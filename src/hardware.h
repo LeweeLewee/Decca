@@ -8,8 +8,8 @@
 
 namespace decca::hardware {
 
-// GPIO32–35, Gram GPIO23 and display GPIO21/22 are bench-verified.
-// The retained on/off input and lighting PWM remain proposed.
+// GPIO32–35, Gram GPIO23, display GPIO21/22 and on/off GPIO19 are bench-verified.
+// Lighting PWM GPIO25 remains proposed.
 constexpr uint8_t kPotVolume = 32;
 constexpr uint8_t kPotBass = 33;
 constexpr uint8_t kPotTreble = 34;

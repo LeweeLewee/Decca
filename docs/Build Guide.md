@@ -228,7 +228,35 @@ The former LW solder repair is no longer required. If the Gram contact itself
 later becomes unreliable, the deferred fallback is a purpose-built replacement
 button panel.
 
-### 7.3 OLED bench verification
+### 7.3 Original on/off switch verification
+
+This procedure passed on 2026-08-30, confirming GPIO19/D19 and the retained H2
+Red/Green cable. Keep the Decca disconnected from mains and power only the
+low-voltage ESP32 controller by USB.
+
+1. Connect H2 Red to GPIO19 / board label D19 and H2 Green to GND. GPIO19 uses
+   the ESP32 internal pull-up; do not connect either conductor to 3.3 V or 5 V.
+2. Run:
+
+   ```powershell
+   pio test -e esp32dev -f test_buttons
+   pio test -e esp32dev -f test_power
+   ```
+
+3. Restore the production firmware, open the 115200-baud serial monitor and move
+   the retained switch through both positions.
+
+Pass criteria:
+
+- closed reports `[POWER] state=ON` and shows the normal on-state display;
+- open reports `[POWER] state=STANDBY` and shows the standby confirmation;
+- returning to closed wakes the display immediately;
+- all button and power tests pass without using the switch for mains voltage.
+
+Recorded result: both switch directions were physically accepted. GPIO19 is no
+longer proposed and no logical inversion is required.
+
+### 7.4 OLED bench verification
 
 This procedure passed on 2026-08-25, confirming GPIO21 and GPIO22. Keep it as
 the commissioning method after any display, harness or controller replacement.
@@ -267,7 +295,12 @@ Pass criteria:
 - all five startup frames and the dashboard are upright, complete and not
   offset;
 - white pixels are clear with no persistent noise or clipped columns;
-- all ten display tests pass.
+- all fourteen display tests pass, including inactivity dim, pixel-off sleep and
+  immediate wake behaviour.
+
+Production protection policy: contrast 0x80 while active, contrast 0x20 after
+60 seconds without activity, pixels off after five minutes, and standby pixels
+off after ten seconds. Relevant state/control/status activity wakes the panel.
 
 Recorded result (2026-08-25): the purchased SH1106 panel was detected at 0x3C,
 all ten `test_display` cases passed, and the animated startup and revised
@@ -290,7 +323,7 @@ service diagnostic but is not shown during normal startup.
 If the panel is blank, disconnect USB before checking VCC/GND order and the
 SDA/SCL labels.
 
-### 7.4 Dial-lighting bench verification
+### 7.5 Dial-lighting bench verification
 
 GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
 from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
@@ -323,7 +356,7 @@ Pass criteria:
 - the MOSFET and wiring remain cool;
 - all seven behavioural tests pass.
 
-### 7.5 Remaining commissioning
+### 7.6 Remaining commissioning
 
 - Selecting the final normal and standby dial brightness
-- Verifying the on/off control
+- Bench-verifying GPIO25 and the installed three-lamp MOSFET load

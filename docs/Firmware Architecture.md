@@ -26,15 +26,14 @@ AI-assisted editing.
 | `settings` | Persisted config + shared runtime state (NVS)    | —                     |
 | `buttons`  | Debounced on/off switch + sole Gram two-state selector | `hardware`  |
 | `pots`     | Filtered ADC1 reads of the four position pots (Balance, Treble, Bass, Volume) | `hardware` |
-| `display`  | OLED rendering behind the dial glass              | `hardware`, `settings`|
+| `display`  | OLED rendering and idle pixel protection          | `hardware`, `settings`|
 | `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|
-| `power`    | On/off state handling *(planned)*                | `hardware`, `settings`|
+| `power`    | Pure logical on/standby state handling           | —                     |
 | WiiM iface | WiiM Pro local-API control *(Phase 2)*           | `settings`, Wi-Fi     |
 | `ota`      | Authenticated Wi-Fi firmware update service      | Wi-Fi                 |
 
-> `power` and the WiiM interface are documented here as intended modules; they
-> are added in later phases and are not yet present in `src/`. The `ota` module
-> is active in the safe bootstrap runtime.
+> The WiiM interface remains a later Phase 2 module. `power` and `ota` are
+> implemented in `src/` and active in the production runtime.
 
 ### Module notes (confirmed Phase 1 build)
 
@@ -70,8 +69,15 @@ AI-assisted editing.
   presents one priority at a time: identity/standby, a control value and bar,
   source confirmation, status, or title/artist metadata. A small bottom-right
   triangle or two-bar glyph communicates playing or paused without repeating a
-  text label. The non-blocking full-canvas calibration frame remains available
-  as a service diagnostic.
+  text label. To limit OLED uneven ageing, activity runs at contrast 0x80, the
+  panel dims to 0x20 after 60 seconds, and its pixels turn off after five minutes
+  without activity. Standby is shown for ten seconds before pixels turn off.
+  State, control, status and metadata activity wake it immediately. The
+  non-blocking full-canvas calibration frame remains available as a service
+  diagnostic and is subject to the same protection timer.
+- **`power`** owns only the requested logical state. It converts the debounced
+  on/off request supplied by `main` into On or Standby and reports transitions;
+  it owns no GPIO and does not call display, lighting or network modules.
 
 ## Data Flow
 

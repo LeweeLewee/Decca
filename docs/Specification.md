@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA acceptance, full `esp32dev` verification and the fitted-Perspex display visual cycle are complete. The accepted UI uses 180-degree rotation, a conservative calibrated content band, reduced contrast and focused play/pause-aware views. Interrupted-transfer acceptance, control orchestration and WiiM integration remain outstanding. |
-| Version  | 0.21                                              |
+| Status   | Draft. USB-to-OTA, fitted-display and GPIO19 logical-power acceptance are complete. Eight on-target suites pass 52/52. The OLED uses accepted fitted-aperture views plus automatic dim/display-off protection. Remaining Phase 1 orchestration, GPIO25 commissioning and WiiM integration remain outstanding. |
+| Version  | 0.22                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -110,6 +110,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
 | FR-DSP-06 | Startup shall show a short, non-blocking monochrome Decca-logo animation lasting approximately 1 s. | 1 |
 | FR-DSP-07 | The display shall identify the mapped logical function prominently. Legacy fascia button labels shall not consume space in normal, now-playing or function-confirmation views. | 2 |
+| FR-DSP-08 | The OLED shall reduce uneven ageing by dimming after inactivity, turning pixels off after extended inactivity and while logically off, and waking immediately on relevant activity. | 1 |
 
 ### 5.5 Lighting
 
@@ -218,12 +219,12 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ## 11. Acceptance Criteria
 
 ### Phase 1 — Local Control
-- FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06, FR-LGT, FR-SET satisfied.
+- FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06/08, FR-LGT, FR-SET satisfied.
 - Local controls and vinyl selection remain available without a network; digital content selection requires the WiiM app/network.
-- **Confirmed 2026-08-30:** all seven `esp32dev` on-target suites passed, 45/45 tests after fitted-display refinement.
+- **Confirmed 2026-08-30:** all eight `esp32dev` on-target suites passed, 52/52 tests after power integration and OLED protection.
 - **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.1.79 (decca.local)`.
 - Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
-- **Confirmed 2026-08-30:** the final `esp32dev` release build passed cleanly (RAM 49,728 bytes / 15.2%; flash 832,205 bytes / 63.5%).
+- **Confirmed 2026-08-30:** the final `esp32dev` release build passed cleanly (RAM 49,760 bytes / 15.2%; flash 833,321 bytes / 63.6%).
 
 ### Phase 2 — WiiM Integration
 - FR-WIM-01..04 and FR-DSP-03/07 satisfied.

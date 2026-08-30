@@ -12,12 +12,13 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - Only the original Gram contact is used as a source input:
   closed = Vinyl, open = Digital Streamer.
-- The display, buttons, pots, settings and lighting modules are implemented and
-  independently tested.
-- The current production `main.cpp` is still the safe OTA bootstrap, not the
-  complete Phase 1 control scheduler.
-- USB-to-OTA physical acceptance, GPIO19 on/off verification and GPIO25 lighting
-  commissioning remain open.
+- The display, buttons, pots, settings, lighting and logical power modules are
+  implemented and independently tested.
+- Production now coordinates the original on/off switch with the accepted OLED
+  standby/on state while continuously servicing authenticated OTA. Full pot,
+  source and lighting orchestration remains the next firmware step.
+- USB-to-OTA physical acceptance and GPIO19 on/off verification are complete;
+  GPIO25 lighting commissioning remains open.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work.
@@ -33,7 +34,7 @@ firmware work.
 | Gram | GPIO23/D23 | Bench-verified |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO19/D19 | Proposed |
+| On/off | GPIO19/D19 | Bench-verified |
 | Dial lighting PWM | GPIO25/D25 | Proposed |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.

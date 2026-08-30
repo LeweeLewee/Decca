@@ -7,8 +7,8 @@
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
 (see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole Gram
-source input and OLED I²C GPIO21/22 are bench-verified; all other assigned pins
-remain proposed.
+source input, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified; all other
+assigned pins remain proposed.
 
 ## Wiring Colour Standard
 
@@ -61,7 +61,7 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Bass pot wiper        | GPIO33 (bench-verified) | **D33** | ADC1        | H1      | ADC1 required                            |
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
-| On/off switch (Red)   | GPIO19 (proposed) | D19 | Digital in  | H2      | Internal pull-up; low-voltage logic only |
+| On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
 | Source selector: Gram | GPIO23 (bench-verified) | D23 | Digital in | H3 | Closed = Vinyl; open = Digital Streamer |
 | VHF / SW / MW / LW    | — | — | Unwired | H3 | Mechanical only; may release Gram |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
@@ -129,10 +129,11 @@ The original Decca on/off switch is retained, including its **original solder
 joints and original cable**. It is a simple open/close switch.
 
 - Active conductors (confirmed): **Red** and **Green**.
-- Interface (proposed): **Red → ESP32 GPIO19 / board label D19** input with **internal pull-up
-  enabled**; **Green → GND**.
+- Interface (bench-verified): **Red → ESP32 GPIO19 / board label D19** input
+  with **internal pull-up enabled**; **Green → GND**.
 - This is a **low-voltage logic input only**. It does **not** switch 230 V mains.
-- Logical inversion may be applied in firmware after bench testing.
+- Confirmed logic: closed/active-low = ON; open = STANDBY. Both directions were
+  physically accepted with production firmware on 2026-08-30.
 - The switch is a **system-state command**. ON causes the ESP32 to assert the ZA3
   trigger, illuminate the dial and enable the OLED; OFF reverses those actions
   and allows the WiiM Pro to use its own automatic standby behaviour.

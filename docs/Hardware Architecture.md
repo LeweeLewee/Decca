@@ -2,8 +2,8 @@
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
-> sole Gram input GPIO23 and OLED I²C GPIO21/22 are bench-verified. On/off GPIO19
-> and lighting GPIO25 remain **(proposed)**; other pins are unassigned. See
+> sole Gram input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
+> Lighting GPIO25 remains **(proposed)**; other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
 > amplifier and power-control decisions.
@@ -174,9 +174,10 @@ clockwise on 2026-08-24, so the default 0–4095 calibration remains applicable.
 ### On/off switch (H2)
 Retained original switch and cable, active conductors **Red** and **Green**. A
 simple open/close contact read as a **low-voltage digital input** with the ESP32
-**internal pull-up** enabled (proposed GPIO19, board label **D19**). **Not a mains switch.** Optional
-firmware inversion after bench testing. Its logical state drives the locked
-system-power sequence documented above.
+**internal pull-up** enabled on bench-verified GPIO19, board label **D19**.
+**Not a mains switch.** Closed = logical ON; open = logical STANDBY. Both
+directions were physically accepted on 2026-08-30. Its logical state drives the
+locked system-power sequence documented above.
 
 ### Source button bank (H3)
 The original selector PCB and interlocked mechanism are retained as the
@@ -197,6 +198,11 @@ Purchased Pi Hut 1.3-inch white 128×64 SH1106 I²C panel (SKU 105630), powered
 from 3.3 V at address 0x3C. SDA GPIO21 / board label **D21** and SCL GPIO22 /
 board label **D22** were bench-verified on 2026-08-25 with the on-target display
 suite and a visual layout inspection.
+
+The fitted panel uses firmware protection against uneven OLED ageing: normal
+contrast dims after 60 seconds without activity, pixels turn off after five
+minutes, and the standby confirmation turns off after ten seconds. Activity
+wakes the panel immediately; this does not remove power from the ESP32.
 
 ### Dial lighting (H5)
 The purchased lamp set is **ShuoHui ASIN B0CFTLZFGT**: ten E10 miniature

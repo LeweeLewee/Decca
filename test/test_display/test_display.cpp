@@ -12,6 +12,7 @@
 
 using decca::display::Control;
 using decca::display::FrameKind;
+using decca::display::PanelPowerState;
 using decca::display::PowerState;
 using decca::display::ViewState;
 
@@ -360,6 +361,51 @@ void test_display_begin_failure_is_safe() {
     TEST_ASSERT_EQUAL_UINT16(0, g_frameCount);
 }
 
+void test_display_dims_sleeps_and_wakes_after_inactivity() {
+    startInjected();
+    ViewState state;
+    state.power = PowerState::On;
+    decca::display::setState(state);
+    finishStartup();
+    decca::display::noteActivity();
+
+    g_nowMs += decca::display::kDimAfterMs - 1U;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
+    ++g_nowMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Dimmed),
+                      static_cast<int>(decca::display::panelPowerState()));
+
+    g_nowMs += decca::display::kSleepAfterMs -
+               decca::display::kDimAfterMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Sleeping),
+                      static_cast<int>(decca::display::panelPowerState()));
+
+    decca::display::noteActivity();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
+}
+
+void test_display_standby_blanks_quickly_and_state_change_wakes() {
+    startInjected();
+    finishStartup();
+    decca::display::noteActivity();
+
+    g_nowMs += decca::display::kStandbySleepAfterMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Sleeping),
+                      static_cast<int>(decca::display::panelPowerState()));
+
+    ViewState state;
+    state.power = PowerState::On;
+    decca::display::setState(state);
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
+}
+
 void runAll() {
     RUN_TEST(test_display_physical_sh1106_snapshot);
     RUN_TEST(test_display_holds_and_leaves_calibration_pattern);
@@ -373,4 +419,6 @@ void runAll() {
     RUN_TEST(test_display_status_expires_back_to_dashboard);
     RUN_TEST(test_display_renders_diagnostics_and_sw_unavailable);
     RUN_TEST(test_display_begin_failure_is_safe);
+    RUN_TEST(test_display_dims_sleeps_and_wakes_after_inactivity);
+    RUN_TEST(test_display_standby_blanks_quickly_and_state_change_wakes);
 }

@@ -14,7 +14,9 @@ test/
 ├── test_buttons/           active-low debounce, state + event queue
 ├── test_pots/              ADC mapping, smoothing, calibration + deadband
 ├── test_display/           SH1106 frames, timing, refresh + physical bring-up
-└── test_lighting/          PWM safe-off, target and fade behaviour
+├── test_lighting/          PWM safe-off, target and fade behaviour
+├── test_power/             pure logical on/standby transitions
+└── test_ota/               non-blocking authenticated OTA lifecycle
 ```
 
 ## Running
@@ -54,7 +56,9 @@ copied now-playing metadata and fallback, all four control values, two-second
 control overlays, function confirmation, change-only refresh, diagnostics,
 SW-unavailable presentation and safe initialisation failure. It also performs a
 real SH1106 address/frame snapshot for H4 bench verification and covers the
-persistent 180-degree fitted-aperture calibration frame. Keeping one suite
+persistent 180-degree fitted-aperture calibration frame, inactivity dimming,
+pixel-off sleep and activity wake. The power suite covers initial state and
+one-shot transitions independently of GPIO ownership. Keeping one suite
 per module reinforces the low-coupling design in
 `docs/Firmware Architecture.md`.
 
@@ -89,3 +93,12 @@ serviced. The final release build passed and the complete physical run passed
 45/45: buttons 9/9, display 12/12, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6
 and settings 3/3. Production was restored by USB and serial reconfirmed
 `[OTA] ready at 192.168.1.79 (decca.local)`.
+
+Power/protection increment (2026-08-30): GPIO19 was physically accepted in both
+positions and the production coordinator now maps the debounced switch to ON or
+STANDBY display state. The OLED dims after 60 seconds, turns pixels off after
+five minutes, and blanks standby after ten seconds; relevant activity wakes it.
+The release build passed and all eight physical suites passed 52/52: buttons
+9/9, display 14/14, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6, power 5/5 and
+settings 3/3. Production was restored over COM3; serial reported
+`[POWER] state=ON` and `[OTA] ready at 192.168.1.79 (decca.local)`.

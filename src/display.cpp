@@ -33,6 +33,8 @@ Control g_transientControl = Control::Volume;
 uint16_t g_transientControlValue = 0;
 char g_message[kMessageCapacity + 1]{};
 uint32_t g_transientExpiresMs = 0;
+PanelPowerState g_panelPowerState = PanelPowerState::Awake;
+uint32_t g_lastActivityMs = 0;
 
 #ifdef PIO_UNIT_TESTING
 testing::TimeProvider g_timeProvider = nullptr;
@@ -99,6 +101,42 @@ uint8_t percent(uint16_t value) {
 
 uint16_t clampedControl(uint16_t value) {
     return value > kControlMax ? kControlMax : value;
+}
+
+void setPanelPowerState(PanelPowerState state) {
+    if (state == g_panelPowerState) {
+        return;
+    }
+#ifndef PIO_UNIT_TESTING
+    if (state == PanelPowerState::Sleeping) {
+        g_panel.oled_command(SH110X_DISPLAYOFF);
+    } else {
+        if (g_panelPowerState == PanelPowerState::Sleeping) {
+            g_panel.oled_command(SH110X_DISPLAYON);
+        }
+        g_panel.setContrast(state == PanelPowerState::Dimmed
+                                ? kDimmedContrast
+                                : kPanelContrast);
+    }
+#endif
+    g_panelPowerState = state;
+}
+
+void wakePanel() {
+    g_lastActivityMs = nowMs();
+    setPanelPowerState(PanelPowerState::Awake);
+}
+
+void updatePanelProtection(uint32_t now) {
+    const uint32_t elapsed = now - g_lastActivityMs;
+    const uint32_t sleepAfter = g_state.power == PowerState::Standby
+                                    ? kStandbySleepAfterMs
+                                    : kSleepAfterMs;
+    if (elapsed >= sleepAfter) {
+        setPanelPowerState(PanelPowerState::Sleeping);
+    } else if (g_state.power == PowerState::On && elapsed >= kDimAfterMs) {
+        setPanelPowerState(PanelPowerState::Dimmed);
+    }
 }
 
 int16_t centredViewportX(int16_t width) {
@@ -387,6 +425,7 @@ void copyState(const ViewState& state) {
 }
 
 void startTransient(FrameKind kind, uint32_t durationMs) {
+    wakePanel();
     g_transientKind = kind;
     g_transientExpiresMs = nowMs() + durationMs;
     g_transientActive = true;
@@ -418,6 +457,8 @@ void init() {
     g_transientActive = false;
     g_message[0] = '\0';
     g_transientExpiresMs = 0;
+    g_panelPowerState = PanelPowerState::Awake;
+    g_lastActivityMs = nowMs();
     g_ready = beginPanel();
     if (!g_ready) {
         Serial.println("DISPLAY_ERROR SH1106 not found at 0x3C");
@@ -438,6 +479,10 @@ void update() {
     }
 
     const uint32_t now = nowMs();
+    updatePanelProtection(now);
+    if (g_panelPowerState == PanelPowerState::Sleeping) {
+        return;
+    }
     if (g_calibrationActive) {
         if (g_dirty) {
             writeFrame(FrameKind::Calibration);
@@ -486,10 +531,23 @@ bool ready() {
     return g_ready;
 }
 
+PanelPowerState panelPowerState() {
+    return g_panelPowerState;
+}
+
+void noteActivity() {
+    if (!g_ready) {
+        return;
+    }
+    wakePanel();
+    g_dirty = true;
+}
+
 void setState(const ViewState& state) {
     if (statesEqual(state)) {
         return;
     }
+    wakePanel();
     copyState(state);
     g_dirty = true;
 }
@@ -522,6 +580,7 @@ void showCalibrationPattern() {
     if (!g_ready) {
         return;
     }
+    wakePanel();
     g_calibrationActive = true;
     g_startupActive = false;
     g_transientActive = false;
@@ -533,6 +592,7 @@ void hideCalibrationPattern() {
     if (!g_calibrationActive) {
         return;
     }
+    wakePanel();
     g_calibrationActive = false;
     g_dirty = true;
 }
