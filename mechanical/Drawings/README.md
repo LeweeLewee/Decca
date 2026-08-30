@@ -33,11 +33,18 @@ The same Rev P.5 amendment converts the two remaining plain locating posts to
 sprung retaining posts, giving four sprung posts subject to measured glass
 clearance, combined-force, PCB-bow and deliberate-release validation.
 
+The released Rev P.5 carrier is now frozen. The active follow-on work is the
+**Rev Q bezel-only amendment** in
+`Decca_OLED_Display_Bezel_CAD_Brief_revQ.md`: replace the Rev N side-only
+locating rails with a thin continuous masking lip around the complete Perspex
+opening. Rev Q must not change the carrier.
+
 ## Display mount
 
 | File | Role |
 |---|---|
-| `Decca_OLED_Display_Mount_Spec_v1.0.md` | approved specification, **now at v1.1** (the filename keeps `v1.0` for link stability). §2 holds the **measured and locked** Decca interface geometry: opening 35.20 × 15.30, M2 pitch **49.00 mm**. Other design-intent values in it are superseded by later revisions — the build reviews are authoritative there. |
+| `Decca_OLED_Display_Mount_Spec_v1.0.md` | approved specification, **now at v1.2** (the filename keeps `v1.0` for link stability). §2 holds the **measured and locked** Decca interface geometry: opening 35.20 × 15.30, fixing pitch **49.00 mm**. §4 opens the Rev Q bezel-only amendment. |
+| `Decca_OLED_Display_Bezel_CAD_Brief_revQ.md` | **governing Rev Q bezel brief** — continuous thin masking lip around the complete Perspex opening; Rev P.5 carrier frozen |
 | `Decca_OLED_Display_Mount_CAD_Review_revN.md` | last front-loaded build (Rev N) |
 | `Decca_OLED_Display_Mount_CAD_Review_revO.md` | **the governing brief**, as amended 2026-08-29 by the Rev P physical-retention correction |
 | `Decca_OLED_Display_Mount_Topology_revP.md` | Rev P pre-CAD topology gate. **Rev P.2 corrected topology** — flush-side insertion, fixed rear datum pads, positive stops in both axial directions; §13 the Rev P.4 rear light shield; §14–§16 the Rev P.5 four-post conversion, 180° datum and 6.00 mm depth |
