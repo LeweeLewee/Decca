@@ -97,6 +97,9 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
   `esp32dev-ota` upload succeeded and the rebooted ESP32 reported
   `[OTA] ready at 192.168.1.79 (decca.local)`.
+- The full `esp32dev` release build passed and all seven on-target suites passed
+  43/43 tests on 2026-08-30. Production firmware was restored afterward and
+  OTA readiness was reconfirmed.
 - Display mount Rev P.5 is released and physically validated.
 - Root documentation and the final OLED loom colours were reconciled at chat
   close-out.
@@ -153,9 +156,9 @@ the user's Wi-Fi or OTA passwords.
 ## Recommended firmware sequence
 
 1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
-2. **Current:** run the full PlatformIO `esp32dev` build and all suites on the
-   actual toolchain.
-3. Implement the planned `power` module and bench-test GPIO19.
+2. **Complete (2026-08-30):** full PlatformIO `esp32dev` release build and all
+   seven on-target suites, 43/43 tests passed.
+3. **Current:** implement the planned `power` module and bench-test GPIO19.
 4. Reconcile `main.cpp` from safe bootstrap into the non-blocking Phase 1
    scheduler, initialising and coordinating all existing modules while
    continuously servicing OTA.
@@ -204,15 +207,13 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: run the full `esp32dev` PlatformIO build and all test
-suites on the actual toolchain, recording the exact result before moving on.
-USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
-`esp32dev-ota` upload succeeded and the rebooted ESP32 reported
-`[OTA] ready at 192.168.1.79 (decca.local)`. Do not repeat that acceptance unless
-the controller, credentials or network environment changes.
+Immediate priority: implement the planned `power` module and bench-test GPIO19,
+one step at a time. The preceding gates passed on 2026-08-30: authenticated
+USB-to-OTA physical acceptance, a clean `esp32dev` release build and all seven
+on-target suites (43/43 tests). Production firmware was restored afterward and
+serial reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
 
-After the full build/tests, continue the documented firmware sequence:
-power-module and GPIO19 verification, non-blocking Phase 1 main-loop
+After power/GPIO19 verification, continue with non-blocking Phase 1 main-loop
 orchestration, then GPIO25 lighting commissioning. Preserve the locked Gram-only
 source logic: Gram closed = Vinyl/Line-In; Gram open = Digital Streamer controlled
 by phone; GPIO16/17/18 remain unused. Preserve the final OLED loom: Brown GND,

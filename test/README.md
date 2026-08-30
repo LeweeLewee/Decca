@@ -71,3 +71,9 @@ USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
 `esp32dev-ota` upload succeeded and, after reboot, serial reported
 `[OTA] ready at 192.168.1.79 (decca.local)`. Interrupted-transfer acceptance
 remains a separate outstanding check.
+
+Full on-target result (2026-08-30): the `esp32dev` release build passed cleanly
+and all seven suites passed on the physical ESP32 — buttons 9/9, display 10/10,
+hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6 and settings 3/3 (43/43 total).
+The production safe-bootstrap image was restored by USB after testing and serial
+reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
