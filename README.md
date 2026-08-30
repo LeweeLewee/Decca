@@ -10,15 +10,14 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
-- Only the original Gram contact is used as a source input:
-  closed = Vinyl, open = Digital Streamer.
+- The reliable VHF contact is the sole source input:
+  VHF latched = Digital Streamer; every other selector position = Vinyl.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
-- Production now coordinates the original on/off switch with the accepted OLED
-  standby/on state while continuously servicing authenticated OTA. Full pot,
-  source and lighting orchestration remains the next firmware step.
-- USB-to-OTA physical acceptance and GPIO19 on/off verification are complete;
-  GPIO25 lighting commissioning remains open.
+- Production coordinates power, all four pots, the VHF-derived source state and
+  the accepted OLED views while continuously servicing authenticated OTA.
+- USB-to-OTA, GPIO19 power, controls, source selection and fitted-display
+  acceptance are complete; GPIO25 lighting commissioning remains open.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work.
@@ -31,7 +30,7 @@ firmware work.
 | Bass | GPIO33/D33 | Bench-verified |
 | Treble | GPIO34/D34 | Bench-verified |
 | Balance | GPIO35/D35 | Bench-verified |
-| Gram | GPIO23/D23 | Bench-verified |
+| VHF source contact | GPIO23/D23 | Physically accepted |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified |

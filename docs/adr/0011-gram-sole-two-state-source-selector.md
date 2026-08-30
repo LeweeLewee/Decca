@@ -1,7 +1,7 @@
 # ADR-0011: Use Gram as the sole two-state source selector
 
 ## Status
-Accepted
+Superseded by ADR-0013
 
 ## Date
 2026-08-29

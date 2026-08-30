@@ -406,6 +406,46 @@ void test_display_standby_blanks_quickly_and_state_change_wakes() {
                       static_cast<int>(decca::display::panelPowerState()));
 }
 
+void test_display_formats_unipolar_and_centred_controls() {
+    char value[6]{};
+
+    decca::display::testing::formatControlValue(
+        Control::Volume, 0, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0%", value);
+    decca::display::testing::formatControlValue(
+        Control::Volume, 1000, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("100%", value);
+
+    decca::display::testing::formatControlValue(
+        Control::Bass, 0, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("-50", value);
+    decca::display::testing::formatControlValue(
+        Control::Bass, 500, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0", value);
+    decca::display::testing::formatControlValue(
+        Control::Treble, 750, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("+25", value);
+    decca::display::testing::formatControlValue(
+        Control::Treble, 1000, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("+50", value);
+
+    decca::display::testing::formatControlValue(
+        Control::Balance, 0, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("L 50", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 500, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 504, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 750, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("R 25", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 1000, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("R 50", value);
+}
+
 void runAll() {
     RUN_TEST(test_display_physical_sh1106_snapshot);
     RUN_TEST(test_display_holds_and_leaves_calibration_pattern);
@@ -421,4 +461,5 @@ void runAll() {
     RUN_TEST(test_display_begin_failure_is_safe);
     RUN_TEST(test_display_dims_sleeps_and_wakes_after_inactivity);
     RUN_TEST(test_display_standby_blanks_quickly_and_state_change_wakes);
+    RUN_TEST(test_display_formats_unipolar_and_centred_controls);
 }

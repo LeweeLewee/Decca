@@ -1,6 +1,6 @@
 /**
  * @file    buttons.cpp
- * @brief   Debounced on/off and two-state Gram source-selection input.
+ * @brief   Debounced on/off and two-state VHF source-selection input.
  */
 #include "buttons.h"
 
@@ -16,12 +16,12 @@ constexpr uint8_t kEventQueueCapacity = 4;
 
 constexpr Button kButtons[kButtonCount] = {
     Button::OnOff,
-    Button::Gram,
+    Button::Vhf,
 };
 
 constexpr uint8_t kPins[kButtonCount] = {
     hardware::kSwitchOnOff,
-    hardware::kButtonGram,
+    hardware::kButtonVhf,
 };
 
 struct ButtonState {
@@ -125,8 +125,8 @@ bool isPressed(Button button) {
 }
 
 SourceMode sourceMode() {
-    return isPressed(Button::Gram) ? SourceMode::Vinyl
-                                   : SourceMode::DigitalStreamer;
+    return isPressed(Button::Vhf) ? SourceMode::DigitalStreamer
+                                  : SourceMode::Vinyl;
 }
 
 #ifdef PIO_UNIT_TESTING

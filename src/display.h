@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 #include "settings.h"
@@ -171,6 +172,12 @@ struct Frame {
 using TimeProvider = uint32_t (*)();
 using PanelBegin = bool (*)();
 using FrameWriter = void (*)(const Frame& frame);
+
+/** Format the visible value used by a control transient. */
+void formatControlValue(Control control,
+                        uint16_t value,
+                        char* output,
+                        size_t capacity);
 
 /** Replace millis() with a deterministic provider. */
 void setTimeProvider(TimeProvider provider);

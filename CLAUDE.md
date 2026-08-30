@@ -49,14 +49,14 @@ current physical evidence, immediate OTA acceptance gate and open work.
 ## Status
 
 Phase 1 module implementation is in progress. `hardware`, `settings`, `pots`,
-`buttons`, `lighting`, `display` and authenticated `ota` exist. Pot
-GPIO32–35, sole Gram input GPIO23 and OLED GPIO21/22 are bench-verified. The
-on/off input GPIO19 and lighting PWM GPIO25 remain proposed pending their
-documented physical tests.
+`buttons`, `lighting`, `display`, `power` and authenticated `ota` exist. Pot
+GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
+physically verified. Lighting PWM GPIO25 remains proposed pending its
+documented physical test.
 
-Source selection is Gram-only under ADR-0011: closed Gram = Vinyl; open Gram =
-Digital Streamer. GPIO16/17/18 are released and VHF/SW/MW/LW have no individual
-electronic function.
+Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
+every other selector position = Vinyl. GPIO16/17/18 are released and the sole
+source input remains GPIO23.
 
 The current `main.cpp` is deliberately a safe hardware-plus-OTA bootstrap. It
 does not yet initialise or orchestrate the other Phase 1 modules. USB-to-OTA

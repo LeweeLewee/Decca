@@ -33,31 +33,32 @@ Implemented modules:
 |---|---|
 | `hardware` | Pin map and safe initialisation implemented |
 | `settings` | NVS persistence implemented, schema version 2 |
-| `buttons` | On/off plus sole Gram contact, 25 ms non-blocking debounce |
+| `buttons` | On/off plus sole VHF contact, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
 | `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
 | `lighting` | Safe-off non-blocking PWM fades |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
 | WiiM interface | Phase 2, not implemented |
-| Main orchestration | GPIO19 power/display/OTA slice implemented; remaining Phase 1 coordination open |
+| Main orchestration | Power, pots, VHF source, fitted display and OTA integrated; lighting commissioning open |
 
 The ESP32 is control/UI only. It never carries or processes audio.
 
-## Locked source logic
+## Accepted source logic
 
-The original selector PCB remains as a mechanical carrier, but only the Gram
-contact is used electrically:
+The original selector PCB remains as a mechanical carrier, but only the VHF
+state is reliable electrically:
 
-| Gram contact | Logical source | Future WiiM action |
+| VHF contact | Logical source | Future WiiM action |
 |---|---|---|
-| Closed / latched | Vinyl | Select Line-In |
-| Open / released | Digital Streamer | Restore phone-controlled digital playback |
+| Closed / latched | Digital Streamer | Restore phone-controlled digital playback |
+| Open / released | Vinyl | Select Line-In |
 
-GPIO23/D23 is the only source input. The verified Gram pair is Green to GPIO23
-and Yellow to GND, although the two dry-contact wires may be swapped. GPIO16,
-GPIO17 and GPIO18 are released. VHF, SW, MW and LW have no individual firmware
-function. A replacement button panel is deferred.
+GPIO23/D23 is the only source input. The accepted VHF-derived pair is Green to
+GPIO23 and Yellow to GND, although the two dry-contact wires may be swapped.
+GPIO16, GPIO17 and GPIO18 are released. SW, MW, LW and Gram have no individual
+firmware function; their interlocked release of VHF selects Vinyl. A replacement
+button panel is deferred.
 
 ## Confirmed controller wiring
 
@@ -67,7 +68,7 @@ function. A replacement button panel is deferred.
 | Bass | GPIO33/D33 | Bench-verified, 0 / about 2047 / 4095 |
 | Treble | GPIO34/D34 | Bench-verified, 0 / about 2047 / 4095 |
 | Balance | GPIO35/D35 | Bench-verified, 0 / about 2047 / 4095 |
-| Gram | GPIO23/D23 | Bench-verified contact |
+| VHF source contact | GPIO23/D23 | Physically accepted |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
@@ -94,8 +95,8 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
   focused identity, control, source, metadata, play/pause and standby layouts
   were accepted from physical photographs. The calibration pattern remains a
   service diagnostic.
-- Gram GPIO23 contact was physically verified before the firmware was simplified
-  to its final two-state model.
+- VHF on GPIO23 was physically accepted as the only reliable active selector;
+  every other interlocked position releases it and selects Vinyl.
 - GPIO19/D19 was physically verified with the retained H2 Red/Green switch.
   Closed selects logical ON and open selects STANDBY; both transitions were
   accepted on the production firmware.
@@ -105,8 +106,8 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
   `esp32dev-ota` upload succeeded and the rebooted ESP32 reported
   `[OTA] ready at 192.168.1.79 (decca.local)`.
-- The power/display-protection `esp32dev` release build passed and all eight
-  on-target suites passed 52/52 tests on 2026-08-30 (buttons 9, display 14,
+- The accepted controls/source/display `esp32dev` release build passed and all
+  eight on-target suites passed 53/53 tests on 2026-08-30 (buttons 9, display 15,
   hardware 3, lighting 7, OTA 5, pots 6, power 5 and settings 3). Production
   firmware was restored by USB; serial reported `[POWER] state=ON` and
   `[OTA] ready at 192.168.1.79 (decca.local)`.
@@ -167,15 +168,15 @@ the user's Wi-Fi or OTA passwords.
 
 1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
 2. **Complete (2026-08-30):** full PlatformIO `esp32dev` release build and all
-   eight on-target suites; latest accepted run passed 52/52 tests.
+   eight on-target suites; latest accepted run passed 53/53 tests.
 3. **Complete (2026-08-30):** fitted-Perspex display calibration, visual design
    cycle and physical acceptance.
 4. **Complete (2026-08-30):** implement the logical `power` module, bench-test
    GPIO19 and integrate on/standby display coordination in production.
-5. **Current:** extend `main.cpp` into the complete non-blocking Phase 1
-   scheduler, coordinating pots, Gram source and lighting while continuously
-   servicing OTA.
-6. Bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade behaviour.
+5. **Complete:** production coordinates pots, persistent VHF-derived source,
+   logical power, fitted display and OTA in one non-blocking loop.
+6. **Current:** bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade
+   behaviour.
 7. Commission normal and standby lighting levels.
 8. **Deferred control reuse:** wire and implement the original Stereo/Mono switch
    so Stereo commands the dial lights on and Mono commands them off. It remains
@@ -224,20 +225,18 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: extend the production coordinator with the remaining Phase
-1 pots, Gram source and lighting behaviour, one step at a time. The preceding
-gates passed on 2026-08-30: authenticated USB-to-OTA acceptance, fitted-Perspex
-display acceptance, GPIO19 on/off acceptance and all 52 on-target tests.
-Production coordinates logical power/display state while continuously servicing
-OTA; its OLED dims after 60 s, turns pixels off after 5 min, and blanks standby
-after 10 s, waking immediately on activity.
+Immediate priority: commission GPIO25 and the dial-lighting load. Production now
+coordinates all four pots, VHF-derived source, logical power and display while
+continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
+5 min, and blanks standby after 10 s, waking immediately on activity. The
+accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
+L50..0..R50 with centred bars and monochrome icons.
 
 Continue with non-blocking Phase 1 main-loop orchestration, then GPIO25 lighting
 commissioning. Keep the deferred Stereo/Mono
 lighting mapping on the later development list: Stereo = lights on; Mono = lights
-off. Preserve the locked Gram-only
-source logic: Gram closed = Vinyl/Line-In; Gram open = Digital Streamer controlled
-by phone; GPIO16/17/18 remain unused. Preserve the final OLED loom: Brown GND,
+off. Preserve the accepted VHF-only source logic: VHF closed = Digital Streamer;
+VHF open = Vinyl/Line-In; GPIO16/17/18 remain unused. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
 Keep the ESP32 control/UI-only, preserve module independence, update all affected

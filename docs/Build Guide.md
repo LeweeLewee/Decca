@@ -192,15 +192,15 @@ All six `test_pots` cases passed. Midpoint variation is expected because the
 controls have no centre detent. The default 0–4095 calibration is retained with
 no inversion.
 
-### 7.2 Gram two-state source verification
+### 7.2 VHF two-state source verification
 
-Only the verified right-hand Gram Green/Yellow pair is used. Keep the Decca
+Only the reliable VHF-derived Green/Yellow pair is used. Keep the Decca
 disconnected from mains and power only the ESP32 by USB.
 
-1. Connect one conductor of the right-hand Gram pair to GPIO23 / board label
+1. Connect one conductor of the VHF-derived pair to GPIO23 / board label
    D23 and the other to GND. Current termination is Green → GPIO23 and
    Yellow → GND; the dry-contact pair may be swapped.
-2. Leave VHF, SW, MW and LW conductors disconnected and individually insulated.
+2. Leave SW, MW, LW and Gram conductors disconnected and individually insulated.
    Do not connect them to GPIO16, GPIO17 or GPIO18.
 3. Run:
 
@@ -208,23 +208,23 @@ disconnected from mains and power only the ESP32 by USB.
    pio test -e esp32dev -f test_buttons
    ```
 
-4. With Gram latched, expect:
+4. With VHF latched, expect:
 
    ```text
-   BUTTON_SNAPSHOT pressed onoff=<0-or-1> gram=1 source=vinyl
+   BUTTON_SNAPSHOT pressed onoff=<0-or-1> vhf=1 source=digital
    ```
 
-5. Press any other fascia source button to release Gram and rerun. Expect
-   `gram=0 source=digital`.
+5. Press any other fascia source button to release VHF and rerun. Expect
+   `vhf=0 source=vinyl`.
 
 Pass criteria:
 
-- Gram closed reports Vinyl;
-- Gram open reports Digital Streamer;
+- VHF closed reports Digital Streamer;
+- VHF open reports Vinyl;
 - all nine behavioural tests pass;
-- VHF, SW, MW and LW have no individual reported input.
+- SW, MW, LW and Gram have no individual reported input.
 
-The former LW solder repair is no longer required. If the Gram contact itself
+The former LW solder repair is no longer required. If the VHF contact itself
 later becomes unreliable, the deferred fallback is a purpose-built replacement
 button panel.
 

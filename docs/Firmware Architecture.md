@@ -24,7 +24,7 @@ AI-assisted editing.
 |------------|--------------------------------------------------|-----------------------|
 | `hardware` | Pin map and board-level init                     | —                     |
 | `settings` | Persisted config + shared runtime state (NVS)    | —                     |
-| `buttons`  | Debounced on/off switch + sole Gram two-state selector | `hardware`  |
+| `buttons`  | Debounced on/off switch + sole VHF two-state selector | `hardware`  |
 | `pots`     | Filtered ADC1 reads of the four position pots (Balance, Treble, Bass, Volume) | `hardware` |
 | `display`  | OLED rendering and idle pixel protection          | `hardware`, `settings`|
 | `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|
@@ -37,10 +37,11 @@ AI-assisted editing.
 
 ### Module notes (confirmed Phase 1 build)
 
-- **`buttons`** reads the retained on/off switch and sole active-low Gram contact
-  with 25 ms software debounce. It exposes the stable Gram-derived source mode:
-  closed = Vinyl; open = Digital Streamer. Press events do not repeat while held.
-  VHF, SW, MW and LW are not GPIO inputs (ADR-0011).
+- **`buttons`** reads the retained on/off switch and sole active-low VHF contact
+  with 25 ms software debounce. It exposes the stable VHF-derived source mode:
+  closed = Digital Streamer; open = Vinyl. Press events do not repeat while held.
+  The other interlocked positions release VHF and therefore select Vinyl
+  (ADR-0013).
 - **`pots`** treats the four pots as **position sensors only** (not in the audio
   path). It applies calibration, smoothing, deadband, and optional inversion, and
   emits values suitable for stable display updates (FR-POT-01..05). Sampling is
@@ -55,7 +56,11 @@ AI-assisted editing.
 - **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C
   address 0x3C. Its presentation contract is defined by ADR-0007: a short
   non-blocking monochrome Decca-logo startup animation; standby; transient
-  control views; diagnostics; and an explicit SW unavailable message. In Phase
+  control views; diagnostics; and an explicit SW unavailable message. The
+  production coordinator supplies all four pot values and persistent source
+  state. Volume is presented as 0–100%; Bass/Treble use centred −50..0..+50;
+  Balance uses L50..0..R50; each transient includes a compact monochrome icon.
+  In Phase
   2 the default on-state view prioritises now-playing metadata, falls back to
   the mapped logical function, and omits legacy fascia labels from user-facing
   views under ADR-0009. The display consumes coherent state supplied by `main`;
@@ -115,8 +120,8 @@ Modules add a small number of typed accessors (e.g. `buttons::nextEvent()`,
 
 - **Phase 1 (Local control):** `hardware`, `settings`, `buttons`, `pots`,
   `display`, `lighting`; authenticated `ota` is brought forward before enclosure.
-- **Phase 2 (WiiM):** add the WiiM interface module; Gram selects Line-In,
-  released Gram restores digital playback, and the phone controls digital
+- **Phase 2 (WiiM):** add the WiiM interface module; VHF selects digital playback,
+  released VHF selects Line-In for Vinyl, and the phone controls digital
   content. Volume and metadata route through `settings`.
 - **Phase 3 (Advanced):** configuration menus, automatic post-boot OTA rollback
   validation, richer UI and additional legacy controls.

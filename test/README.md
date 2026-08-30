@@ -50,8 +50,8 @@ verification. The lighting suite exercises a real low-duty fade for physical
 bring-up and injects its clock and PWM writer for deterministic safe-off,
 fade-up, fade-down, target-clamping and invalid-zone coverage. The display suite
 injects its clock, panel initialiser and semantic frame writer to exercise the
-five-frame startup animation, standby/local dashboards, mapped function and
-source identity retained in state but omitted from the user-facing layout,
+five-frame startup animation, standby/source dashboards, persistent mapped
+function identity,
 copied now-playing metadata and fallback, all four control values, two-second
 control overlays, function confirmation, change-only refresh, diagnostics,
 SW-unavailable presentation and safe initialisation failure. It also performs a
@@ -102,3 +102,13 @@ The release build passed and all eight physical suites passed 52/52: buttons
 9/9, display 14/14, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6, power 5/5 and
 settings 3/3. Production was restored over COM3; serial reported
 `[POWER] state=ON` and `[OTA] ready at 192.168.1.79 (decca.local)`.
+
+Controls/source refinement (2026-08-30): production now samples all four pots
+and the sole VHF state. VHF closed maps to Digital Streamer; VHF open maps to
+Vinyl. The mapped source remains on the normal dashboard until metadata takes
+priority. Control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and
+Balance L50..0..R50 with centred bars and monochrome icons; balance readings
+that round to centre display plain `0`. Physical interaction and fitted-screen
+appearance were accepted. The release build passed and all eight suites passed
+53/53: buttons 9/9, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
+power 5/5 and settings 3/3. Production was restored over COM3.

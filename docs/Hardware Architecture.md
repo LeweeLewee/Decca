@@ -2,7 +2,7 @@
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
-> sole Gram input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
+> sole VHF input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
 > Lighting GPIO25 remains **(proposed)**; other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
@@ -27,7 +27,7 @@ audio signal path is separate from the controller.
        ADC1 (H1) │       │ H2    │ H3     │ H4    │ H5 (PWM)
         4× 10k   │       │ on/off│ source │ I²C   │ MOSFET gate
      ┌───────────┴──┐ ┌──┴───┐ ┌─┴─────┐ ┌┴─────┐ ┌┴──────────┐
-     │ Balance/Treble│ │orig. │ │ Gram  │ │ OLED │ │ 3× 5V     │
+     │ Balance/Treble│ │orig. │ │ VHF   │ │ OLED │ │ 3× 5V     │
      │ Bass/Volume   │ │switch│ │contact│ │128x64│ │ E10 LEDs  │
      │ (position)    │ │Red/Grn│ │2-state│ │ SH1106│ │ (N-ch FET)│
      └───────────────┘ └──────┘ └───────┘ └──────┘ └───────────┘
@@ -184,12 +184,11 @@ The original selector PCB and interlocked mechanism are retained as the
 mechanical carrier (ADR-0001), but unreliable soldering/contact behaviour makes
 multi-button electrical reuse unsuitable.
 
-Only the verified right-hand Gram Green/Yellow dry-contact pair is connected to
-GPIO23 / D23 with the internal pull-up and software debounce. Closed Gram selects
-Vinyl; open Gram selects Digital Streamer. VHF, SW, MW and LW are mechanically
-retained but unwired at the ESP32; pressing them may release Gram through the
-interlock. GPIO16, GPIO17 and GPIO18 are released. A new button panel is a
-deferred fallback (ADR-0011). Stereo/Mono remains unwired (ADR-0005).
+Only the reliable VHF-derived dry-contact state is connected to GPIO23 / D23
+with the internal pull-up and software debounce. Closed/latched VHF selects
+Digital Streamer; every other interlocked position releases VHF and selects
+Vinyl. GPIO16, GPIO17 and GPIO18 are released. A new button panel remains a
+deferred fallback (ADR-0013). Stereo/Mono remains unwired (ADR-0005).
 
 ## Outputs
 

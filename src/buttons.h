@@ -1,10 +1,10 @@
 /**
  * @file    buttons.h
- * @brief   Debounced retained on/off switch and sole Gram source contact.
+ * @brief   Debounced retained on/off switch and sole VHF source contact.
  *
  * The original selector PCB is unreliable for multi-button electrical use.
- * Only the verified Gram contact is read. Its stable state is authoritative:
- * latched/closed selects Vinyl; released/open selects Digital Streamer.
+ * Only the reliable VHF contact is read. Its stable state is authoritative:
+ * latched/closed selects Digital Streamer; released/open selects Vinyl.
  */
 #pragma once
 
@@ -15,7 +15,7 @@ namespace decca::buttons {
 enum class Button : uint8_t {
     None,
     OnOff,
-    Gram,
+    Vhf,
 };
 
 enum class SourceMode : uint8_t {
@@ -31,8 +31,8 @@ Button nextEvent();
 bool isPressed(Button button);
 
 /**
- * @return Vinyl while the debounced Gram contact is closed; otherwise
- *         DigitalStreamer. Call after update() in the main loop.
+ * @return DigitalStreamer while the debounced VHF contact is closed;
+ *         otherwise Vinyl. Call after update() in the main loop.
  */
 SourceMode sourceMode();
 

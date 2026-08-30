@@ -6,7 +6,7 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole Gram
+(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole VHF
 source input, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified; all other
 assigned pins remain proposed.
 
@@ -31,7 +31,7 @@ uses **Orange for SCL** and **Yellow for SDA**. These are signal conductors in H
 and must **never** be connected to the 5 V rail. H4 retains Red for 3.3 V and
 Brown for GND. This final orientation was physically confirmed on 2026-08-30. See the OLED section.
 
-H3 now uses only the verified right-hand Gram dry-contact pair. It has its own
+H3 now uses only the reliable VHF-derived dry-contact pair. It has its own
 return and no common-return conductor. All other selector conductors are left
 disconnected and individually insulated at the controller end.
 
@@ -62,8 +62,8 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
 | On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
-| Source selector: Gram | GPIO23 (bench-verified) | D23 | Digital in | H3 | Closed = Vinyl; open = Digital Streamer |
-| VHF / SW / MW / LW    | — | — | Unwired | H3 | Mechanical only; may release Gram |
+| Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
+| SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (proposed) | D25 | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
@@ -142,12 +142,12 @@ joints and original cable**. It is a simple open/close switch.
 
 The original PCB and interlocked selector mechanism are retained mechanically
 (ADR-0001). Repeated soldering and contact tests showed that multi-button
-electrical reuse is not reliable. ADR-0011 therefore supersedes ADR-0004.
+electrical reuse is not reliable. ADR-0013 supersedes ADR-0011 and ADR-0004.
 
-Only the already verified **right-hand Gram Green/Yellow dry-contact pair** is
+Only the physically accepted **VHF-derived Green/Yellow dry-contact pair** is
 connected:
 
-| Gram pair | ESP32 termination | Status |
+| VHF-derived pair | ESP32 termination | Status |
 |-----------|-------------------|--------|
 | Green | GPIO23 / board label D23 | Bench-verified input |
 | Yellow | GND | Bench-verified return |
@@ -158,15 +158,15 @@ either conductor to 3.3 V or 5 V.
 
 Authoritative source logic:
 
-| Debounced Gram state | Logical source | Phase 2 WiiM action |
+| Debounced VHF state | Logical source | Phase 2 WiiM action |
 |----------------------|----------------|----------------------|
-| Closed / latched | Vinyl | Select Line-In |
-| Open / released | Digital Streamer | Restore phone-controlled digital playback |
+| Closed / latched | Digital Streamer | Restore phone-controlled digital playback |
+| Open / released | Vinyl | Select Line-In |
 
-Pressing VHF, SW, MW or LW may mechanically release Gram through the retained
-interlock, but those four positions have no individual ESP32 input or software
-mapping. Their former conductors are disconnected and individually insulated at
-the controller end. GPIO16, GPIO17 and GPIO18 are no longer assigned.
+Pressing SW, MW, LW or Gram releases VHF through the retained interlock. Those
+positions have no individual ESP32 input; the open VHF state authoritatively
+selects Vinyl. Their former conductors are disconnected and individually
+insulated at the controller end. GPIO16, GPIO17 and GPIO18 are no longer assigned.
 
 A purpose-built replacement button panel is a deferred fallback if the two-state
 scheme later proves insufficient. No LW solder repair is required for the

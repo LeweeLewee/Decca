@@ -103,6 +103,104 @@ uint16_t clampedControl(uint16_t value) {
     return value > kControlMax ? kControlMax : value;
 }
 
+int16_t bipolarOffset(uint16_t value) {
+    return static_cast<int16_t>(clampedControl(value)) -
+           static_cast<int16_t>(kControlMax / 2U);
+}
+
+uint8_t bipolarScale50(uint16_t value) {
+    const int16_t offset = bipolarOffset(value);
+    const uint16_t magnitude = static_cast<uint16_t>(
+        offset < 0 ? -offset : offset);
+    return static_cast<uint8_t>(
+        ((static_cast<uint32_t>(magnitude) * 50U) + 250U) / 500U);
+}
+
+int8_t toneStep(uint16_t value) {
+    const int16_t offset = bipolarOffset(value);
+    const uint16_t magnitude = static_cast<uint16_t>(
+        offset < 0 ? -offset : offset);
+    const int8_t step = static_cast<int8_t>(
+        ((static_cast<uint32_t>(magnitude) * 50U) + 250U) / 500U);
+    return offset < 0 ? -step : step;
+}
+
+void formatControlValue(Control control,
+                        uint16_t value,
+                        char* output,
+                        size_t capacity) {
+    if (capacity == 0U) {
+        return;
+    }
+
+    if (control == Control::Volume) {
+        std::snprintf(output,
+                      capacity,
+                      "%u%%",
+                      static_cast<unsigned>(percent(clampedControl(value))));
+        return;
+    }
+
+    if (control == Control::Balance) {
+        const int16_t offset = bipolarOffset(value);
+        const uint8_t magnitude = bipolarScale50(value);
+        if (magnitude == 0) {
+            std::snprintf(output, capacity, "0");
+        } else {
+            std::snprintf(output,
+                          capacity,
+                          "%c %u",
+                          offset < 0 ? 'L' : 'R',
+                          static_cast<unsigned>(magnitude));
+        }
+        return;
+    }
+
+    const int8_t step = toneStep(value);
+    std::snprintf(output,
+                  capacity,
+                  step > 0 ? "+%d" : "%d",
+                  static_cast<int>(step));
+}
+
+void drawControlIcon(Control control, int16_t x, int16_t y) {
+    switch (control) {
+        case Control::Volume:
+            g_panel.fillRect(x, y + 4, 4, 5, SH110X_WHITE);
+            g_panel.fillTriangle(
+                x + 3, y + 4, x + 8, y, x + 8, y + 12, SH110X_WHITE);
+            g_panel.drawFastVLine(x + 11, y + 3, 7, SH110X_WHITE);
+            g_panel.drawFastVLine(x + 14, y + 1, 11, SH110X_WHITE);
+            break;
+        case Control::Bass:
+            g_panel.drawLine(x, y + 9, x + 3, y + 9, SH110X_WHITE);
+            g_panel.drawLine(x + 3, y + 9, x + 6, y + 1, SH110X_WHITE);
+            g_panel.drawLine(x + 6, y + 1, x + 9, y + 1, SH110X_WHITE);
+            g_panel.drawLine(x + 9, y + 1, x + 12, y + 9, SH110X_WHITE);
+            g_panel.drawLine(x + 12, y + 9, x + 15, y + 9, SH110X_WHITE);
+            break;
+        case Control::Treble:
+            g_panel.drawLine(x, y + 10, x + 3, y, SH110X_WHITE);
+            g_panel.drawLine(x + 3, y, x + 6, y + 10, SH110X_WHITE);
+            g_panel.drawLine(x + 6, y + 10, x + 9, y, SH110X_WHITE);
+            g_panel.drawLine(x + 9, y, x + 12, y + 10, SH110X_WHITE);
+            g_panel.drawLine(x + 12, y + 10, x + 15, y, SH110X_WHITE);
+            break;
+        case Control::Balance:
+            g_panel.drawFastVLine(x + 7, y, 12, SH110X_WHITE);
+            g_panel.fillTriangle(
+                x, y + 6, x + 5, y + 1, x + 5, y + 11, SH110X_WHITE);
+            g_panel.fillTriangle(x + 15,
+                                 y + 6,
+                                 x + 10,
+                                 y + 1,
+                                 x + 10,
+                                 y + 11,
+                                 SH110X_WHITE);
+            break;
+    }
+}
+
 void setPanelPowerState(PanelPowerState state) {
     if (state == g_panelPowerState) {
         return;
@@ -213,13 +311,10 @@ void renderPrimaryFunction(int16_t y) {
 }
 
 void renderLocalDashboard() {
-    g_panel.setTextSize(2);
-    g_panel.setCursor(centredViewportX(60), kContentTop);
-    g_panel.print("DECCA");
-    g_panel.drawFastHLine(28, 43, 72, SH110X_WHITE);
     g_panel.setTextSize(1);
-    g_panel.setCursor(28, 50);
-    g_panel.print("MUSIC CENTRE");
+    printCentredClipped("SOURCE", 19, kContentTop);
+    g_panel.drawFastHLine(18, 34, 92, SH110X_WHITE);
+    renderPrimaryFunction(38);
 }
 
 void renderNowPlaying() {
@@ -267,10 +362,10 @@ void renderControl(Control control, uint16_t value) {
     const char* name = controlName(control);
     g_panel.setTextSize(1);
     printCentredClipped(name, 19, kContentTop);
+    drawControlIcon(control, 7, kContentTop - 3);
 
-    char valueText[5]{};
-    std::snprintf(valueText, sizeof(valueText), "%u%%",
-                  static_cast<unsigned>(percent(clampedControl(value))));
+    char valueText[6]{};
+    formatControlValue(control, value, valueText, sizeof(valueText));
     g_panel.setTextSize(2);
     const int16_t valueWidth =
         static_cast<int16_t>(std::strlen(valueText)) * 12;
@@ -278,10 +373,24 @@ void renderControl(Control control, uint16_t value) {
     g_panel.print(valueText);
 
     g_panel.drawRect(10, 54, 108, 6, SH110X_WHITE);
-    const int16_t fillWidth = static_cast<int16_t>(
-        (static_cast<uint32_t>(clampedControl(value)) * 104U) / kControlMax);
-    if (fillWidth > 0) {
-        g_panel.fillRect(12, 56, fillWidth, 2, SH110X_WHITE);
+    if (control == Control::Volume) {
+        const int16_t fillWidth = static_cast<int16_t>(
+            (static_cast<uint32_t>(clampedControl(value)) * 104U) /
+            kControlMax);
+        if (fillWidth > 0) {
+            g_panel.fillRect(12, 56, fillWidth, 2, SH110X_WHITE);
+        }
+    } else {
+        const int16_t offset = bipolarOffset(value);
+        const uint16_t magnitude = static_cast<uint16_t>(
+            offset < 0 ? -offset : offset);
+        const int16_t fillWidth = static_cast<int16_t>(
+            (static_cast<uint32_t>(magnitude) * 52U) / 500U);
+        if (fillWidth > 0) {
+            const int16_t fillX = offset < 0 ? 64 - fillWidth : 65;
+            g_panel.fillRect(fillX, 56, fillWidth, 2, SH110X_WHITE);
+        }
+        g_panel.drawFastVLine(64, 52, 10, SH110X_WHITE);
     }
     g_panel.display();
 }
@@ -599,6 +708,13 @@ void hideCalibrationPattern() {
 
 #ifdef PIO_UNIT_TESTING
 namespace testing {
+
+void formatControlValue(Control control,
+                        uint16_t value,
+                        char* output,
+                        size_t capacity) {
+    ::decca::display::formatControlValue(control, value, output, capacity);
+}
 
 void setTimeProvider(TimeProvider provider) {
     g_timeProvider = provider;
