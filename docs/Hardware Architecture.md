@@ -1,9 +1,10 @@
 # Hardware Architecture
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
-> locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35 and
-> OLED I²C GPIO21/22 are bench-verified; remaining ESP32 assignments are
-> **(proposed)** or unassigned. See `docs/Wiring.md` for the authoritative
+> locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
+> sole Gram input GPIO23 and OLED I²C GPIO21/22 are bench-verified. On/off GPIO19
+> and lighting GPIO25 remain **(proposed)**; other pins are unassigned. See
+> `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
 > amplifier and power-control decisions.
 
