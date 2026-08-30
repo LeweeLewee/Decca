@@ -13,6 +13,12 @@ Initial dimensions may be refined through bezel test prints.
 
 **There shall be no change to the released Rev P.5 display carrier.**
 
+Owner amendment, 2026-08-30: replace the initial clearance-fit target with a
+controlled horizontal interference fit. Increase the visible opening by
+0.50 mm horizontally and 0.25 mm vertically; move the inset walls outward by
+0.25 mm on each horizontal side and 0.10 mm on each vertical side; add R2.00 mm
+outer corners to the inset walls.
+
 ## 2. Controlled baseline
 
 Verified physical/interface facts:
@@ -38,13 +44,14 @@ Frozen Rev P.5 file hashes at the Rev Q baseline:
 | `mechanical/STL/Rear_Display_Carrier_revP.stl` | `ec8a4adb8e4e80f3452da2edf9d56c17e55b7aa80db075310e2af75e224c5897` |
 | `mechanical/CAD/Decca_Display_Mount_revP_assembly.step` | `e7d9c40d250fd23d6b8aa250b2363714c8a396772bad623746ba594173d2b24a` |
 
-Provisional values requiring test-print confirmation:
+Rev Q amended targets requiring test-print confirmation:
 
 - full-perimeter lip wall: **0.40 mm nominal**;
-- nominal lip clearance: **0.15 mm per side** from the measured opening;
-- continuous corner radius/relief: derive from the proven Rev N geometry where
-  possible and keep parametric because the physical corner radius is not
-  recorded.
+- visible bezel opening: **30.90 × 15.35 mm**;
+- Perspex inset-wall outer envelope: **35.40 × 15.20 mm**;
+- horizontal fit: **0.10 mm nominal interference per side**;
+- vertical fit: **0.05 mm nominal clearance per side**;
+- inset-wall outer corner radius: **R2.00 mm**.
 
 ## 3. Required Rev Q topology
 
@@ -52,19 +59,24 @@ Provisional values requiring test-print confirmation:
    external radii, finish intent and recessed adhesive pads.
 2. Replace the two side-only locating rails with one continuous rearward
    masking skirt around the left, right, top, bottom and all four corners.
-3. Keep the skirt outer envelope at the proven initial
-   **34.90 × 15.00 mm** and its rearward depth at **2.80 mm**.
+3. Increase the skirt outer envelope from the Rev N baseline to
+   **35.40 × 15.20 mm** and keep its rearward depth at **2.80 mm**.
 4. Start with a **0.40 mm** wall measured inward from that outer envelope. The
    wall and opening it creates must be derived, not independently dimensioned.
-5. Add only the minimum lead-in needed to prevent the thin lip catching on the
+5. Apply **R2.00 mm** to all four outer inset-wall corners. Offset the inner
+   corners from the outer profile so the nominal 0.40 mm wall remains constant.
+6. Add only the minimum lead-in needed to prevent the thin lip catching on the
    Perspex edge. A lead-in must not reduce cut-edge coverage at the seated
    position.
-6. The lip is cosmetic and locating only. It must use clearance, not
-   interference, and must not become a snap, clamp or structural feature.
-7. The bezel front seating face must remain flush and snug to the Perspex.
-8. No lip material may extend behind the 3.00 mm Perspex, contact the OLED
+7. The lip is cosmetic and locating only. Its sole interference is the declared
+   **0.10 mm per horizontal side**. It must not become a snap, clamp or
+   structural feature.
+8. The thin printed lip shall flex to accommodate the interference; the
+   original Perspex shall not be spread or visibly stressed. The bezel front
+   seating face must remain flush and snug to the Perspex.
+9. No lip material may extend behind the 3.00 mm Perspex, contact the OLED
    glass, touch the Rev P.5 carrier or enter its sprung-post corridors.
-9. The new lip must not obscure the intended powered screen content. Report
+10. The new lip must not obscure the intended powered screen content. Report
    the exact change to the clear optical opening; do not declare it acceptable
    from CAD alone.
 
@@ -76,18 +88,29 @@ At minimum expose:
 panel_open_w         = 35.20 mm   // measured
 panel_open_h         = 15.30 mm   // measured
 panel_t              = 3.00 mm    // measured
-bezel_lip_outer_w    = 34.90 mm   // provisional fit target
-bezel_lip_outer_h    = 15.00 mm   // provisional fit target
-bezel_lip_clear_x    = 0.15 mm    // derived per side
-bezel_lip_clear_y    = 0.15 mm    // derived per side
+bezel_window_w       = 30.90 mm   // Rev N 30.40 + 0.50
+bezel_window_h       = 15.35 mm   // Rev N 15.10 + 0.25
+bezel_lip_outer_w    = 35.40 mm   // Rev N 34.90 + 2 x 0.25
+bezel_lip_outer_h    = 15.20 mm   // Rev N 15.00 + 2 x 0.10
+bezel_lip_interf_x   = 0.10 mm    // derived per horizontal side
+bezel_lip_clear_y    = 0.05 mm    // derived per vertical side
 bezel_lip_depth      = 2.80 mm    // proven Rev N depth
 bezel_lip_wall       = 0.40 mm    // provisional test-print value
-bezel_lip_corner_r   = extracted/proven value; unresolved if unavailable
+bezel_lip_corner_r   = 2.00 mm    // outer corner radius
+bezel_lip_inner_w    = 34.60 mm   // derived: outer width - 2 x wall
+bezel_lip_inner_h    = 14.40 mm   // derived: outer height - 2 x wall
+bezel_lip_inner_r    = 1.60 mm    // derived: outer radius - wall
 bezel_lip_lead       = provisional, minimum printable value
 ```
 
-Do not bury fit values in sketches. Changing the outer clearance, wall,
-corner relief or lead-in must regenerate a valid single solid.
+Do not bury fit values in sketches. Changing the interference/clearance, wall,
+corner radius or lead-in must regenerate a valid single solid.
+
+At the initial 0.40 mm wall, the lip—not the bezel face—limits the vertical
+clear opening. The expected coaxial effective opening is therefore
+**30.90 × 14.40 mm**: width controlled by the 30.90 mm face opening and height
+controlled by the 14.40 mm lip inner envelope. CAD shall measure and report the
+actual result.
 
 ## 5. File and revision control
 
@@ -108,10 +131,16 @@ CAD must demonstrate:
 
 - one connected, manifold bezel solid with no slivers;
 - continuous lip coverage around all four sides and corners;
-- 34.90 × 15.00 mm initial outer lip envelope and 2.80 mm depth;
-- exact wall thickness and the resulting clear optical opening;
-- no intersection with the measured Perspex solid other than the intended
-  clearance relationship;
+- 30.90 × 15.35 mm bezel face opening;
+- 35.40 × 15.20 mm outer lip envelope and 2.80 mm depth;
+- 0.10 mm horizontal interference per side and 0.05 mm vertical clearance per
+  side against the measured opening;
+- R2.00 mm outer corners and constant 0.40 mm wall through the corners;
+- 34.60 × 14.40 mm derived lip inner envelope with R1.60 mm inner corners;
+- exact wall thickness and the expected 30.90 × 14.40 mm effective optical
+  opening;
+- no intersection with the measured Perspex solid except the declared
+  horizontal interference envelope, with deformation assigned to the thin lip;
 - no material behind the Perspex rear face;
 - at least the released 0.50 mm clearance to OLED glass;
 - no intersection with the unchanged Rev P.5 carrier or its assembly/removal
@@ -125,10 +154,10 @@ The first print is an **integration prototype**, not a release part.
 
 With the original Perspex and the released carrier installed:
 
-1. The bezel seats fully against the Perspex without force, rocking or a
-   visible front-face gap.
-2. The lip is snug but removable and does not mark, spread or stress the
-   Perspex.
+1. The bezel seats fully against the Perspex with light, even hand pressure and
+   without excessive force, rocking or a visible front-face gap.
+2. The horizontal interference gives a snug fit, but the bezel remains
+   removable and does not mark, spread or visibly stress the Perspex.
 3. The Perspex cut edge is concealed continuously on all four sides and at the
    corners from normal front and oblique viewing positions.
 4. The lip is not visibly wavy, broken or translucent.
@@ -144,9 +173,10 @@ make the bezel fit.
 
 Stop and report rather than improvise if:
 
-- the physical opening corner form cannot be derived from the Rev N design or
-  existing evidence;
-- a continuous lip cannot fit without interference or unacceptable masking;
+- the R2.00 wall corners or declared interference cannot seat without damaging
+  or visibly stressing the Perspex;
+- the continuous lip requires more interference than the declared 0.10 mm per
+  horizontal side or creates unacceptable masking;
 - the lip would reduce OLED visibility beyond the owner's accepted powered
   presentation;
 - the Rev P.5 carrier or its released files would need to change; or
