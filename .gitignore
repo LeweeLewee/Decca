@@ -35,3 +35,9 @@ secrets.h
 # *.step
 # *.stl
 mechanical/CAD/__pycache__/
+
+# A hand-exported 3MF of a superseded Rev Q build keeps getting swept in by
+# `git add -A`. The generated, always-current one lives in mechanical/STL/ and
+# is written by Decca_Display_Bezel_revQ_fusion.py export(). Remove this line if
+# you ever want a CAD/-side 3MF tracked deliberately.
+mechanical/CAD/Front_Bezel_revQ.3mf

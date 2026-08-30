@@ -1885,6 +1885,21 @@ def export(what="bezel"):
         em.execute(o)
         written.append(p)
 
+        # 3MF as well as STL. A hand-exported 3MF of a superseded build got
+        # swept into the repo twice; generating it here means the path always
+        # holds the CURRENT geometry instead of whatever was last exported by
+        # hand. 3MF also carries units and per-object settings, which STL does
+        # not, so it is the better thing to hand a slicer.
+        p = _guard(os.path.join(stl, "Front_Bezel_revQ.3mf"))
+        try:
+            o = em.createC3MFExportOptions(body, p)
+            o.meshRefinement = (
+                adsk.fusion.MeshRefinementSettings.MeshRefinementHigh)
+            em.execute(o)
+            written.append(p)
+        except Exception as ex:
+            print("3MF export skipped: %s" % ex)
+
     if what in ("assembly", "all"):
         p = _guard(os.path.join(cad, "Decca_Display_Bezel_revQ_assembly.step"))
         em.execute(em.createSTEPExportOptions(p))
