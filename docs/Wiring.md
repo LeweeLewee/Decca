@@ -64,14 +64,16 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
 | Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
 | SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
+| Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Closed Stereo = lights requested on; open Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (proposed) | D25 | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
-> is bench-verified. GPIO16, GPIO17 and GPIO18 are released for future use and
-> must not be connected to the unreliable selector contacts.
+> is bench-verified. GPIO16 and GPIO18 are released for future use. GPIO17 is
+> reserved for the separate Stereo/Mono contact and must not be connected to
+> the unreliable source-selector contacts.
 
 ## H1 — Potentiometers
 
@@ -166,7 +168,8 @@ Authoritative source logic:
 Pressing SW, MW, LW or Gram releases VHF through the retained interlock. Those
 positions have no individual ESP32 input; the open VHF state authoritatively
 selects Vinyl. Their former conductors are disconnected and individually
-insulated at the controller end. GPIO16, GPIO17 and GPIO18 are no longer assigned.
+insulated at the controller end. GPIO16 and GPIO18 are not assigned; GPIO17 is
+reserved for the separate Stereo/Mono contact.
 
 A purpose-built replacement button panel is a deferred fallback if the two-state
 scheme later proves insufficient. No LW solder repair is required for the
@@ -174,8 +177,19 @@ current design.
 
 ## Stereo/Mono Control
 
-Retained mechanically, **unwired**, decorative in Phase 1, deferred for possible
-future use. **No function assigned.** See ADR-0005.
+TX2 / **GPIO17** is assigned as an active-low digital input with the ESP32
+internal pull-up. Wire the isolated contact only:
+
+| Stereo/Mono contact | ESP32 termination |
+|---------------------|-------------------|
+| Contact that closes in Stereo | GPIO17 / board label TX2 |
+| Common / return | GND |
+
+Do not connect either contact to 3.3 V or 5 V. Closed/LOW means **Stereo** and
+requests dial lights on; open/HIGH means **Mono** and requests them off. This
+assignment and input behaviour are implemented but remain physically unverified.
+GPIO25 and the lamp load are commissioned separately. See ADR-0014, which
+supersedes ADR-0005.
 
 ## H4 — OLED Display
 

@@ -54,9 +54,15 @@ GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
 physically verified. Lighting PWM GPIO25 remains proposed pending its
 documented physical test.
 
+Stereo/Mono is assigned to TX2/GPIO17 as an active-low input with the internal
+pull-up: closed Stereo requests lights on; open Mono requests lights off. The
+input and GPIO25 load both remain physically unverified; do not energise the
+lamp load merely to test the switch.
+
 Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
-every other selector position = Vinyl. GPIO16/17/18 are released and the sole
-source input remains GPIO23.
+every other selector position = Vinyl. GPIO16/17/18 remain released from the
+source selector and the sole source input remains GPIO23; GPIO17 is separately
+allocated to Stereo/Mono under ADR-0014.
 
 The current `main.cpp` is deliberately a safe hardware-plus-OTA bootstrap. It
 does not yet initialise or orchestrate the other Phase 1 modules. USB-to-OTA

@@ -24,7 +24,7 @@ AI-assisted editing.
 |------------|--------------------------------------------------|-----------------------|
 | `hardware` | Pin map and board-level init                     | —                     |
 | `settings` | Persisted config + shared runtime state (NVS)    | —                     |
-| `buttons`  | Debounced on/off switch + sole VHF two-state selector | `hardware`  |
+| `buttons`  | Debounced on/off, sole VHF source selector and Stereo/Mono lighting request | `hardware`  |
 | `pots`     | Filtered ADC1 reads of the four position pots (Balance, Treble, Bass, Volume) | `hardware` |
 | `display`  | OLED rendering and idle pixel protection          | `hardware`, `settings`|
 | `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|

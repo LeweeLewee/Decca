@@ -1,10 +1,12 @@
 /**
  * @file    buttons.h
- * @brief   Debounced retained on/off switch and sole VHF source contact.
+ * @brief   Debounced retained on/off, VHF and Stereo/Mono contacts.
  *
  * The original selector PCB is unreliable for multi-button electrical use.
  * Only the reliable VHF contact is read. Its stable state is authoritative:
  * latched/closed selects Digital Streamer; released/open selects Vinyl.
+ * The Stereo/Mono contact is active-low: closed requests dial lights on;
+ * open requests them off. The lighting output is commissioned separately.
  */
 #pragma once
 
@@ -16,11 +18,17 @@ enum class Button : uint8_t {
     None,
     OnOff,
     Vhf,
+    Stereo,
 };
 
 enum class SourceMode : uint8_t {
     DigitalStreamer,
     Vinyl,
+};
+
+enum class LightingRequest : uint8_t {
+    Off,
+    On,
 };
 
 constexpr uint32_t kDebounceMs = 25;
@@ -35,6 +43,11 @@ bool isPressed(Button button);
  *         otherwise Vinyl. Call after update() in the main loop.
  */
 SourceMode sourceMode();
+
+/**
+ * @return On while the debounced Stereo contact is closed; otherwise Off.
+ */
+LightingRequest lightingRequest();
 
 #ifdef PIO_UNIT_TESTING
 namespace testing {

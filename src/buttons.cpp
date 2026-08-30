@@ -1,6 +1,6 @@
 /**
  * @file    buttons.cpp
- * @brief   Debounced on/off and two-state VHF source-selection input.
+ * @brief   Debounced power, source-selection and lighting-command inputs.
  */
 #include "buttons.h"
 
@@ -11,17 +11,19 @@
 namespace decca::buttons {
 namespace {
 
-constexpr uint8_t kButtonCount = 2;
+constexpr uint8_t kButtonCount = 3;
 constexpr uint8_t kEventQueueCapacity = 4;
 
 constexpr Button kButtons[kButtonCount] = {
     Button::OnOff,
     Button::Vhf,
+    Button::Stereo,
 };
 
 constexpr uint8_t kPins[kButtonCount] = {
     hardware::kSwitchOnOff,
     hardware::kButtonVhf,
+    hardware::kSwitchStereoMono,
 };
 
 struct ButtonState {
@@ -127,6 +129,11 @@ bool isPressed(Button button) {
 SourceMode sourceMode() {
     return isPressed(Button::Vhf) ? SourceMode::DigitalStreamer
                                   : SourceMode::Vinyl;
+}
+
+LightingRequest lightingRequest() {
+    return isPressed(Button::Stereo) ? LightingRequest::On
+                                     : LightingRequest::Off;
 }
 
 #ifdef PIO_UNIT_TESTING

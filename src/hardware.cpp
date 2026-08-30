@@ -23,6 +23,7 @@ void init() {
 
     pinMode(kSwitchOnOff, INPUT_PULLUP);
     pinMode(kButtonVhf, INPUT_PULLUP);
+    pinMode(kSwitchStereoMono, INPUT_PULLUP);
 
     Wire.begin(kDisplaySda, kDisplayScl);
 

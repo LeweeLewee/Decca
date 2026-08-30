@@ -33,7 +33,7 @@ Implemented modules:
 |---|---|
 | `hardware` | Pin map and safe initialisation implemented |
 | `settings` | NVS persistence implemented, schema version 2 |
-| `buttons` | On/off plus sole VHF contact, 25 ms non-blocking debounce |
+| `buttons` | On/off, sole VHF contact and TX2 Stereo/Mono lighting request, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
 | `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
 | `lighting` | Safe-off non-blocking PWM fades |
@@ -56,7 +56,8 @@ state is reliable electrically:
 
 GPIO23/D23 is the only source input. The accepted VHF-derived pair is Green to
 GPIO23 and Yellow to GND, although the two dry-contact wires may be swapped.
-GPIO16, GPIO17 and GPIO18 are released. SW, MW, LW and Gram have no individual
+GPIO16 and GPIO18 are released. GPIO17 is released from the source bank and
+assigned to the separate Stereo/Mono contact. SW, MW, LW and Gram have no individual
 firmware function; their interlocked release of VHF selects Vinyl. A replacement
 button panel is deferred.
 
@@ -72,6 +73,7 @@ button panel is deferred.
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
+| Stereo/Mono lighting request | GPIO17/TX2 | Assigned, physical test pending |
 | Dial-light PWM | GPIO25/D25 | Proposed, load test pending |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
@@ -178,10 +180,9 @@ the user's Wi-Fi or OTA passwords.
 6. **Current:** bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade
    behaviour.
 7. Commission normal and standby lighting levels.
-8. **Deferred control reuse:** wire and implement the original Stereo/Mono switch
-   so Stereo commands the dial lights on and Mono commands them off. It remains
-   unwired in the current Phase 1 build; assign and bench-verify a safe GPIO
-   before implementation.
+8. **Assigned, physical test pending:** wire the original Stereo/Mono switch to
+   TX2/GPIO17 and GND. Stereo closed requests dial lights on; Mono open requests
+   them off. Keep the GPIO25 load disabled while verifying this input.
 9. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 10. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -232,11 +233,10 @@ continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
 L50..0..R50 with centred bars and monochrome icons.
 
-Continue with non-blocking Phase 1 main-loop orchestration, then GPIO25 lighting
-commissioning. Keep the deferred Stereo/Mono
-lighting mapping on the later development list: Stereo = lights on; Mono = lights
-off. Preserve the accepted VHF-only source logic: VHF closed = Digital Streamer;
-VHF open = Vinyl/Line-In; GPIO16/17/18 remain unused. Preserve the final OLED loom: Brown GND,
+Continue by physically verifying TX2/GPIO17 in both Stereo/Mono positions with
+the GPIO25 load disabled, then commission GPIO25 lighting. Preserve the accepted
+VHF-only source logic: VHF closed = Digital Streamer; VHF open = Vinyl/Line-In;
+GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
 Keep the ESP32 control/UI-only, preserve module independence, update all affected

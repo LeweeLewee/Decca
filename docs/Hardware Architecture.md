@@ -3,6 +3,7 @@
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
 > sole VHF input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
+> Stereo/Mono input GPIO17/TX2 is assigned pending physical verification.
 > Lighting GPIO25 remains **(proposed)**; other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
@@ -187,8 +188,13 @@ multi-button electrical reuse unsuitable.
 Only the reliable VHF-derived dry-contact state is connected to GPIO23 / D23
 with the internal pull-up and software debounce. Closed/latched VHF selects
 Digital Streamer; every other interlocked position releases VHF and selects
-Vinyl. GPIO16, GPIO17 and GPIO18 are released. A new button panel remains a
-deferred fallback (ADR-0013). Stereo/Mono remains unwired (ADR-0005).
+Vinyl. GPIO16 and GPIO18 are released; GPIO17 is released from the source bank
+and assigned separately to the Stereo/Mono contact. A new button panel remains
+a deferred fallback (ADR-0013).
+
+The Stereo/Mono contact uses TX2/GPIO17 with the internal pull-up. Closed/LOW
+requests dial lights on and open/HIGH requests them off. It is a command input
+only; GPIO25 and the lighting load remain separately gated (ADR-0014).
 
 ## Outputs
 

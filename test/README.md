@@ -112,3 +112,10 @@ that round to centre display plain `0`. Physical interaction and fitted-screen
 appearance were accepted. The release build passed and all eight suites passed
 53/53: buttons 9/9, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
 power 5/5 and settings 3/3. Production was restored over COM3.
+
+Stereo/Mono assignment (2026-08-30): TX2/GPIO17 is now included in the buttons
+suite as an active-low lighting request. Stereo closed maps to on; Mono open maps
+to off. The release firmware builds successfully (RAM 49,880 bytes / 15.2%; flash
+836,337 bytes / 63.8%) and all eight test suites compile without uploading. The
+expanded buttons suite contains 11 tests, but the accepted on-target baseline
+remains 53/53 until both physical switch states and the new suite are run.

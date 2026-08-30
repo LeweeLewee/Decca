@@ -323,7 +323,25 @@ service diagnostic but is not shown during normal startup.
 If the panel is blank, disconnect USB before checking VCC/GND order and the
 SDA/SCL labels.
 
-### 7.5 Dial-lighting bench verification
+### 7.5 Stereo/Mono input verification
+
+Keep GPIO25 and the lamp load disconnected for this input-only test.
+
+1. Connect the Stereo contact between TX2/GPIO17 and GND. Do not connect 3.3 V
+   or 5 V to the switch.
+2. Connect the ESP32 by USB and run:
+
+   ```powershell
+   pio test -e esp32dev -f test_buttons
+   ```
+
+3. Capture the `BUTTON_SNAPSHOT` once in each stable position. Stereo must show
+   `stereo=1 lights=on`; Mono must show `stereo=0 lights=off`.
+4. Confirm all eleven button tests pass. If the two physical positions are
+   reversed, stop and correct the documented contact/polarity before enabling
+   any lighting output.
+
+### 7.6 Dial-lighting bench verification
 
 GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
 from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
@@ -356,7 +374,8 @@ Pass criteria:
 - the MOSFET and wiring remain cool;
 - all seven behavioural tests pass.
 
-### 7.6 Remaining commissioning
+### 7.7 Remaining commissioning
 
 - Selecting the final normal and standby dial brightness
 - Bench-verifying GPIO25 and the installed three-lamp MOSFET load
+- Physically verifying both TX2/GPIO17 Stereo/Mono states
