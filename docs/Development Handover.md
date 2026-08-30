@@ -164,9 +164,13 @@ the user's Wi-Fi or OTA passwords.
    continuously servicing OTA.
 5. Bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade behaviour.
 6. Commission normal and standby lighting levels.
-7. Add WiiM Pro integration only in Phase 2, after the hardware is available and
+7. **Deferred control reuse:** wire and implement the original Stereo/Mono switch
+   so Stereo commands the dial lights on and Mono commands them off. It remains
+   unwired in the current Phase 1 build; assign and bench-verify a safe GPIO
+   before implementation.
+8. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
-8. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+9. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -214,7 +218,9 @@ on-target suites (43/43 tests). Production firmware was restored afterward and
 serial reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
 
 After power/GPIO19 verification, continue with non-blocking Phase 1 main-loop
-orchestration, then GPIO25 lighting commissioning. Preserve the locked Gram-only
+orchestration, then GPIO25 lighting commissioning. Keep the deferred Stereo/Mono
+lighting mapping on the later development list: Stereo = lights on; Mono = lights
+off. Preserve the locked Gram-only
 source logic: Gram closed = Vinyl/Line-In; Gram open = Digital Streamer controlled
 by phone; GPIO16/17/18 remain unused. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
