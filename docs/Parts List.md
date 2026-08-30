@@ -72,6 +72,6 @@ design decision**, not an approved component purchase.
 
 ## Consumables / Harness
 
-- Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SDA and Yellow = SCL; H4 Orange must never be connected to 5 V
+- Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SCL and Yellow = SDA; both are signals and must never be connected to 5 V
 - Removable connectors at the controller end (harnesses H1–H6), including the purchased Lyeteung JST-XH 4-pin set where appropriate
 - Heat-shrink, solder, ferrules and strain-relief materials
