@@ -115,8 +115,9 @@ power 5/5 and settings 3/3. Production was restored over COM3.
 
 Stereo/Mono assignment (2026-08-30): TX2/GPIO17 is now included in the buttons
 suite as a pulled-up lighting request. Stereo open/high maps to on; Mono
-closed/low maps to off. The release firmware builds successfully (RAM 49,880 bytes / 15.2%; flash
-836,337 bytes / 63.8%) and all eight test suites compile without uploading. The
+closed/low maps to off. The credential-enabled production firmware builds
+successfully (RAM 49,880 bytes / 15.2%; flash 837,497 bytes / 63.9%) and all
+eight test suites compile without uploading. The
 expanded buttons suite passed 11/11 on target in both physical positions:
 `stereo_mono_contact=0 lights=on` in Stereo and
 `stereo_mono_contact=1 lights=off` in Mono.
