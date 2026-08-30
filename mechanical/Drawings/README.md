@@ -38,7 +38,7 @@ The released Rev P.5 carrier is now frozen. The active follow-on work is the
 `Decca_OLED_Display_Bezel_CAD_Brief_revQ.md`: replace the Rev N side-only
 locating rails with a continuous inset masking wall around the complete Perspex
 opening. Two owner amendments have since re-scoped it — first to a controlled
-**0.10 mm per side horizontal interference fit** with R2.00 corners and a larger
+**0.10 mm per side horizontal interference fit** with rounded corners and a larger
 visible opening, then to an **0.80 mm wall** so the established 0.40 mm
 extrusion configuration resolves as **two continuous wall loops** rather than
 the single loop the 0.40 mm wall produced. Rev Q must not change the carrier.
@@ -48,10 +48,11 @@ the single loop the 0.40 mm wall produced. Rev Q must not change the carrier.
 **Rev Q is built, modelled and validated, and is awaiting its first test
 print. It is NOT released.** Built to brief commit `7b107f2` ("require two-loop
 inset wall"). The bezel is one connected manifold solid: the Rev N face,
-envelope, external radii and both recessed adhesive pads are carried over, and
-the two Rev N side rails are replaced by a single continuous **0.80 mm** inset
-masking wall, 2.80 mm deep, around all four sides and all four corners, on a
-controlled **0.10 mm per side horizontal interference**.
+envelope and external radii are carried over, and the two Rev N side rails are
+replaced by a single continuous **0.80 mm** inset masking wall, 2.80 mm deep,
+around all four sides and all four corners, on a controlled **0.10 mm per side
+horizontal interference**. The two Rev N recessed adhesive pads are deleted at
+owner instruction, so the underside is one unbroken seating face.
 
 | File | Role |
 |---|---|
@@ -73,14 +74,14 @@ Validation: **46/46 gates PASS** in Fusion and **42/42 PASS** in the independent
 offline mesh verifier. One shell, one lump, zero slivers, no degenerate
 triangles. Continuity is proved by **cross-section area**, which matches the
 analytic value to four decimals at three depths and in every region including
-the four R2.00 corners — a stronger proof than point sampling, since any gap or
+the four R3.00 corners — a stronger proof than point sampling, since any gap or
 thin spot anywhere removes area.
 
 | | mm |
 |---|---:|
 | Bezel face opening, at the front face | **30.900 × 15.350** |
 | Inset-wall outer / inner envelope | **35.400 × 15.200** / 33.800 × 13.600 |
-| Wall / corner radii | **0.800** (two 0.40 loops) / R2.000 outer, R1.200 inner |
+| Wall / corner radii | **0.800** (two 0.40 loops) / R3.000 outer, R2.200 inner |
 | Depth | 2.800 |
 | Fit | **0.100 interference** per horizontal side, 0.050 clearance per vertical side |
 | **Effective clear optical opening** | **30.900 × 13.600** |
@@ -103,6 +104,14 @@ thin spot anywhere removes area.
 > leave the top and bottom wall runs detached from the bezel face. The aperture
 > therefore tapers in Y at 35.47°, self-supporting, preserving every published
 > number. Build report §3.3.
+
+
+> **Two owner changes on top of the brief, both reversible single parameters.**
+> The two recessed adhesive pads are **deleted** (brief section 3.1 asks for them
+> preserved; the interference fit makes bonded pads redundant, so the underside
+> is now one unbroken seating face), and the inset-wall outer corner is raised
+> 50% to **R3.00** because R2.00 did not match the real opening corner. Build
+> report section 3.5.
 
 ## Display mount
 

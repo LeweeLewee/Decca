@@ -127,10 +127,25 @@ P = {
     "bezel_window_w": 30.90,        # AMENDED     Rev N 30.40 + 0.50
     "bezel_window_h": 15.35,        # AMENDED     face opening, AT THE FRONT FACE
     "bezel_window_r": 0.80,         # PRESERVED   window corner radius
-    "pad_x_half": 12.00,            # PRESERVED   adhesive pad half length
-    "pad_y0": 7.85,                 # PRESERVED
-    "pad_y1": 9.85,                 # PRESERVED
-    "pad_depth": 0.30,              # PRESERVED   recess into the seating face
+    # -- recessed adhesive pads - DELETED at owner instruction -------------
+    # Rev N has two: 24.00 x 2.00 mm, 0.30 mm deep into the seating face at
+    # y +/-7.85..9.85. The owner inspected the model, identified them as the
+    # "two rectangle cut outs on the underside", and directed their removal.
+    # pads_enabled is therefore False and the seating face is now a plain
+    # unbroken annulus.
+    #
+    # DECLARED DEVIATION from brief 3.1, which lists "recessed adhesive pads"
+    # among the Rev N features to preserve. It is a defensible one: Rev N
+    # located on two side rails with a CLEARANCE fit and needed adhesive to
+    # stay put, whereas Rev Q is held by a 0.10 mm per side INTERFERENCE fit,
+    # which makes the pads redundant. Set pads_enabled back to True to restore
+    # them exactly - the Rev N values below are kept for that purpose and
+    # nothing else depends on them.
+    "pads_enabled": False,          # OWNER       deleted 2026-08-30
+    "pad_x_half": 12.00,            # Rev N value, retained for restoration
+    "pad_y0": 7.85,                 # Rev N value, retained for restoration
+    "pad_y1": 9.85,                 # Rev N value, retained for restoration
+    "pad_depth": 0.30,              # Rev N value, retained for restoration
 
     # -- Rev Q: the continuous inset masking wall --------------------------
     # Owner amendment, brief commit 7b107f2: a controlled horizontal
@@ -141,7 +156,14 @@ P = {
     "bezel_lip_outer_h": 15.20,     # AMENDED     Rev N 15.00 + 2 x 0.10
     "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
     "bezel_lip_wall": 0.80,         # AMENDED     two 0.40 mm wall loops
-    "bezel_lip_corner_r": 2.00,     # SPECIFIED   outer corner radius
+    # Owner refinement 2026-08-30: R2.00 did not match the real Perspex
+    # opening corner, so the outer corner radius is increased by 50% to
+    # R3.00. The inner corner radius follows from it (3.00 - 0.80 = 2.20) and
+    # is not entered separately. Brief 7 explicitly allows the named corner
+    # parameters to be changed when the fit needs it; the brief's stated 2.00
+    # is therefore superseded by observation, and this is recorded as a
+    # deviation from brief 2/4.
+    "bezel_lip_corner_r": 3.00,     # OWNER       was 2.00, +50% 2026-08-30
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
 
     # The established production extrusion width. bezel_lip_wall must be an
@@ -416,12 +438,14 @@ def build_bezel(b, P, d):
     face = b.rprism(-d["bw2"], d["bw2"], -d["bh2"], d["bh2"],
                     d["z_panel_front"], d["z_bezel_front"], P["bezel_outer_r"])
 
-    # 2. the two recessed adhesive pads - PRESERVED from Rev N
-    for sy in (1, -1):
-        y0, y1 = sorted((sy * P["pad_y0"], sy * P["pad_y1"]))
-        b.sub(face, b.box(-P["pad_x_half"], P["pad_x_half"], y0, y1,
-                          d["z_panel_front"] - 0.5,
-                          d["z_panel_front"] + P["pad_depth"]))
+    # 2. the two recessed adhesive pads - DELETED at owner instruction.
+    #    Guarded rather than removed so they can be restored exactly.
+    if P.get("pads_enabled", True):
+        for sy in (1, -1):
+            y0, y1 = sorted((sy * P["pad_y0"], sy * P["pad_y1"]))
+            b.sub(face, b.box(-P["pad_x_half"], P["pad_x_half"], y0, y1,
+                              d["z_panel_front"] - 0.5,
+                              d["z_panel_front"] + P["pad_depth"]))
 
     # 3. THE REV Q FEATURE - one continuous inset wall, all four sides and
     #    all four corners, constant 0.80 mm through the R2.00 corners.
@@ -1040,11 +1064,15 @@ def fit_study(P=P):
           % d["bezel_lip_clear_y"])
     print("")
     print("WHAT THE R%.2f CORNERS DO ABOUT THE UNMEASURED OPENING CORNER" % R)
-    print("   The R2.00 outer corner pulls the lip well away from the corner,")
+    print("   The R%.2f outer corner pulls the lip well away from the corner," % R)
     print("   so an unmeasured opening corner radius no longer decides whether")
     print("   the part seats - it only decides how much corner is left")
     print("   unmasked. That was the open risk at the 0.40 mm wall; it is not")
     print("   the open risk now. The interference is.")
+    print("")
+    print("   Larger corners buy robustness against the unmeasured opening")
+    print("   corner and pay for it in corner masking - the largest-gap")
+    print("   column above is cut edge left visible at each corner.")
     print("")
     print("   R_panel   deepest penetration   largest gap   verdict")
     for rp in (0.00, 0.25, 0.50, 0.75, 1.00, 1.50, 2.00, 2.50, 3.00):

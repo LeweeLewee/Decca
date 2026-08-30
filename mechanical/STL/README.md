@@ -16,8 +16,8 @@ Print-ready meshes exported from the CAD sources.
 
 | File | Print notes |
 |---|---|
-| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side**. Each is the complete right-hand end of the real Rev Q wall — full 15.20 mm height, both R2.00 corners, the real 0.80 mm two-loop wall, the real 2.80 mm depth — so it engages the interference exactly as the bezel will. ≈1.54 cm³ ≈ 2 g for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6056 cm³ ≈ 0.77 g. The 0.80 mm continuous inset wall must slice as **exactly two 0.40 mm loops** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side**. Each is the complete right-hand end of the real Rev Q wall — full 15.20 mm height, both R3.00 corners, the real 0.80 mm two-loop wall, the real 2.80 mm depth — so it engages the interference exactly as the bezel will. ≈1.53 cm³ ≈ 2 g for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.6304 cm³ ≈ 0.80 g. The 0.80 mm continuous inset wall must slice as **exactly two 0.40 mm loops** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
 > ### Rev Q print gate 1 — TWO CONTINUOUS WALL LOOPS
 >
@@ -37,7 +37,7 @@ Print-ready meshes exported from the CAD sources.
 >
 > **Step through every layer of the wall in the slicer preview before
 > printing.** Confirm two continuous 0.40 mm loops around the complete
-> perimeter — both straight runs, both ends, **and all four R2.00 corners**.
+> perimeter — both straight runs, both ends, **and all four R3.00 corners**.
 > **Reject** the profile on any of: a single variable-width wall, a missing
 > second loop, gap fill substituted for a loop, or the two loops locally merged
 > into one wide extrusion. Fix the slicer — do not thicken `bezel_lip_wall` to
@@ -68,10 +68,23 @@ Print-ready meshes exported from the CAD sources.
 > Full detail, the fit study and the test procedure:
 > `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
 
+> ### Two owner changes since the brief
+>
+> The two **recessed adhesive pads are deleted** - the underside is now one
+> unbroken seating face. Retention is by the interference fit alone; if
+> adhesive is still wanted it goes on the flat face. **Re-check removability**
+> on the prototype.
+>
+> The inset-wall outer corner is **R3.00, up 50% from the brief's R2.00**,
+> because R2.00 did not match the real opening corner. It makes slicing the
+> corners easier (tightest loop radius 1.400 -> 2.400 mm) and holds penetration
+> at 0.100 mm across the whole plausible range of opening corner radii, at the
+> cost of a larger unmasked corner gap. Build report section 3.5.
+
 `Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
 unchanged. The first issue's `Bezel_Corner_Gauge_revQ_*` meshes are deleted —
-the corner radius is now specified at R2.00, so the fit gauge replaces the
-corner gauge.
+the corner radius is now set by the owner at R3.00, so the fit gauge
+replaces the corner gauge.
 
 ---
 

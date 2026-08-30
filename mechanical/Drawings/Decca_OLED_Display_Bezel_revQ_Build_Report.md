@@ -5,7 +5,8 @@ Status: **OPEN — bezel-only integration prototype. NOT released, NOT for merge
 Date: 2026-08-30
 Controlled requirements: `Decca_OLED_Display_Bezel_CAD_Brief_revQ.md` at commit
 `7b107f2389b2ce128c18bef2f5195ef5ab468890` ("require two-loop inset wall"),
-which supersedes `ebfa277` via `edab34b` ("define Rev Q interference fit")
+which supersedes `ebfa277` via `edab34b` ("define Rev Q interference fit"),
+plus **two owner changes made on the model, recorded in §3.5**
 Specification: `Decca_OLED_Display_Mount_Spec_v1.0.md` v1.2, §2 and §4
 Carrier: **Rev P.5, RELEASED and FROZEN — unchanged, and proved unchanged (§9)**
 
@@ -39,8 +40,9 @@ rear
 The wall is a **masking and locating skirt**. Its only interference is the
 declared **0.10 mm per horizontal side**; vertically it runs on a 0.05 mm
 clearance. It is not a snap, not a clamp and not a structural feature, and it
-carries no load. Retention remains removable adhesive on the unchanged
-recessed pads.
+carries no load. The two Rev N recessed adhesive pads are DELETED at owner
+instruction (§3.5), so retention is now by the interference fit alone; if
+adhesive is still wanted it goes on the flat seating face.
 
 ### 1.1 What the two owner amendments changed
 
@@ -51,8 +53,9 @@ recessed pads.
 | Horizontal fit | 0.15 clearance/side | **0.10 INTERFERENCE/side** |
 | Vertical fit | 0.15 clearance/side | **0.05 clearance/side** |
 | Wall | 0.40 (one loop) | **0.80 (two loops)** |
-| Outer corner radius | R0.60, UNRESOLVED | **R2.00, specified** |
-| Inner corner radius | R0.20 | **R1.20** |
+| Outer corner radius | R0.60, UNRESOLVED | **R3.00** (brief 2.00, owner +50%) |
+| Inner corner radius | R0.20 | **R2.20** (derived) |
+| Recessed adhesive pads | two, preserved | **deleted** (owner) |
 | Wall inner envelope | 34.10 × 14.20 | **33.80 × 13.60** |
 | Effective optical opening | 30.40 × 14.20 | **30.90 × 13.60** |
 | Depth | 2.80 | 2.80 (unchanged) |
@@ -154,12 +157,13 @@ Source of truth is the `P` dict in
 | `bezel_window_w` | **30.90 mm** | AMENDED | Rev N 30.40 + 0.50 |
 | `bezel_window_h` | **15.35 mm** | AMENDED | face opening, **at the front face** |
 | `bezel_window_r` | 0.80 mm | PRESERVED | window corner radius |
-| `pad_*` | 12.00 / 7.85 / 9.85 / 0.30 mm | PRESERVED | adhesive pads |
+| `pads_enabled` | **False** | **OWNER** | the two recessed adhesive pads are DELETED — §3.5 |
+| `pad_*` | 12.00 / 7.85 / 9.85 / 0.30 mm | retained | Rev N values, kept only so the pads can be restored |
 | **`bezel_lip_outer_w`** | **35.40 mm** | AMENDED | Rev N 34.90 + 2 × 0.25 |
 | **`bezel_lip_outer_h`** | **15.20 mm** | AMENDED | Rev N 15.00 + 2 × 0.10 |
 | **`bezel_lip_depth`** | **2.80 mm** | PROVEN | Rev N engagement depth |
 | **`bezel_lip_wall`** | **0.80 mm** | AMENDED | two 0.40 mm loops |
-| **`bezel_lip_corner_r`** | **2.00 mm** | SPECIFIED | outer corner radius |
+| **`bezel_lip_corner_r`** | **3.00 mm** | **OWNER** | outer corner radius; brief says 2.00, raised 50% — §3.5 |
 | **`bezel_lip_lead`** | **0.20 mm** | PROVISIONAL | minimum entry lead-in |
 | **`extrusion_width`** | **0.40 mm** | PRODUCTION | the wall *is* two of these |
 | `ap_root_relief` | 0.02 mm | MODELLING | anti-tangency, §3.4 |
@@ -172,7 +176,7 @@ Source of truth is the `P` dict in
 | `bezel_lip_clear_y` | `(panel_open_h − bezel_lip_outer_h) / 2` | **+0.050 mm** (clearance) |
 | `bezel_lip_inner_w` | `bezel_lip_outer_w − 2 × bezel_lip_wall` | **33.800 mm** |
 | `bezel_lip_inner_h` | `bezel_lip_outer_h − 2 × bezel_lip_wall` | **13.600 mm** |
-| `bezel_lip_inner_r` | `bezel_lip_corner_r − bezel_lip_wall` | **1.200 mm** |
+| `bezel_lip_inner_r` | `bezel_lip_corner_r − bezel_lip_wall` | **2.200 mm** |
 | `wall_loops` | `bezel_lip_wall / extrusion_width` | **2.000** |
 | `aperture_rear_h` | `bezel_lip_inner_h + 2 × ap_root_relief` | 13.640 mm |
 | `bezel_face_t` | `bezel_t − bezel_lip_depth` | 1.200 mm |
@@ -250,6 +254,54 @@ re-dimensioned and flared by the amendment, so its section could not have been
 carried over from Rev N unchanged in any case. **This is a declared deviation
 and the only one in the visible face detail.**
 
+### 3.5 Two owner changes made on the model
+
+Both were directed after inspecting the built model, and both are **deviations
+from the controlled brief**. Both are single named parameters, so either can be
+reversed without touching anything else.
+
+**1. The two recessed adhesive pads are deleted.** `pads_enabled = False`.
+Brief §3.1 lists the "recessed adhesive pads" among the Rev N features to
+preserve, and Rev N has two: 24.00 × 2.00 mm, 0.30 mm deep into the seating
+face at y ±7.85…9.85. The owner identified them as the "two rectangle cut outs
+on the underside" and directed their removal.
+
+The deviation is defensible on its own terms. Rev N located on two side rails
+with a **clearance** fit and needed adhesive to stay put. Rev Q is held by a
+**0.10 mm per side interference** fit, which makes bonded pads redundant — and
+a pocket in the seating face is a place for the bezel to rock or for adhesive
+to squeeze out. The seating face is now one unbroken annulus of **278.212 mm²**.
+Set `pads_enabled = True` to restore them exactly; the Rev N pad dimensions are
+retained in the parameter table for that purpose.
+
+**Consequence for retention:** the bezel is now retained by the interference fit
+alone. If adhesive is still wanted it goes on the flat seating face rather than
+into pads. **Removability must be re-checked on the prototype** — §10 Stage 1.
+
+**2. The inset-wall outer corner radius is raised 50%, R2.00 → R3.00.** The
+owner judged R2.00 not to match the real Perspex opening corner. Brief §2 and §4
+state 2.00, but §7 explicitly allows the named corner parameters to be changed
+when the fit needs it, so this is observation superseding a provisional value —
+which is the whole point of an OPEN revision.
+
+The inner corner radius follows from it and is not entered separately:
+`bezel_lip_inner_r = 3.00 − 0.80 = 2.20`.
+
+It makes the part strictly more robust where it matters and slightly worse where
+it does not:
+
+| | R2.00 | **R3.00** |
+|---|---:|---:|
+| Deepest penetration, any plausible opening corner | 0.100 up to R_panel 2.05 | **0.100 across the whole range** |
+| Tightest wall-loop radius at the corner | 1.400 | **2.400** — easier to slice |
+| Unmasked corner gap, sharp opening | 0.562 | **0.836** |
+| Ring cross-section area | 76.2025 mm² | 74.8290 mm² |
+
+A corner that is too **square** jams before the bezel seats; a corner that is
+too **round** merely leaves a little cut edge visible at each corner. The change
+trades the first failure mode for the second, which is the safer direction while
+the opening corner remains unmeasured. §8.3 has the full table.
+
 ---
 
 ## 4. Exact resulting dimensions
@@ -270,19 +322,20 @@ and the only one in the visible face detail.**
 | **Inset-wall inner envelope** | **33.800 × 13.600** |
 | **Wall thickness** | **0.800 everywhere, including through the corners** |
 | **Wall depth** | **2.800** (z +3.000 → +0.200) |
-| Outer corner radius | **R2.000** |
-| Inner corner radius | **R1.200** |
+| Outer corner radius | **R3.000** |
+| Inner corner radius | **R2.200** |
 | Entry lead-in | 0.200 × 45°, outer rear edge only |
 | **Horizontal fit** | **0.100 INTERFERENCE per side** |
 | **Vertical fit** | **0.050 clearance per side** |
-| Interference volume, as modelled | 6.378 mm³ |
+| Interference volume, as modelled | 5.419 mm³ |
 | Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
 | Clearance to OLED glass front face | **0.500** — the released Rev N/P value |
 | Minimum distance to the Rev P.5 carrier | **0.939** |
 | **Effective optical opening** | **30.900 × 13.600**, R0.800 |
-| Solid volume | 0.6056 cm³ (mesh 605.46 mm³) |
-| Mass in PETG @ 1.27 g/cm³ | ≈ **0.77 g** |
-| Mesh | 7118 triangles, 3559 vertices, closed, manifold, no degenerates |
+| Seating face | one unbroken annulus, **278.212 mm²** (no adhesive pads) |
+| Solid volume | 0.6304 cm³ (mesh 630.46 mm³) |
+| Mass in PETG @ 1.27 g/cm³ | ≈ **0.80 g** |
+| Mesh | 7138 triangles, 3569 vertices, closed, manifold, no degenerates |
 
 ---
 
@@ -345,13 +398,13 @@ Two independent tools. Neither check was altered, relaxed or removed.
 |---|---|
 | Solid integrity | one body, closed solid, **1 shell, 1 lump**, 0 sliver faces < 0.001 mm², 0 sliver edges < 0.005 mm |
 | Envelope | 40.00000 × 20.30000 × 4.00000; front face +4.20000; rearmost +0.20000 |
-| **Wall continuity, by AREA** | full ring **76.2025 mm²** at z = 0.45, 1.60 and 2.95 — matching the analytic value to four decimals |
-| Continuity by region | top **25.1200**, bottom **25.1200**, right **8.9600**, left **8.9600**, corners **8.0425 mm²** — every one exact |
-| Wall through the R2.00 corners | corner area **8.0425** vs `π(2.00² − 1.20²) = 8.0425` |
+| **Wall continuity, by AREA** | full ring **74.8290 mm²** at z = 0.45, 1.60 and 2.95 — matching the analytic value to four decimals |
+| Continuity by region | top **23.5200**, bottom **23.5200**, right **7.3600**, left **7.3600**, corners **13.0690 mm²** — every one exact |
+| Wall through the R3.00 corners | corner area **13.0690** vs `π(3.00² − 2.20²) = 13.0690` |
 | Outer envelope | exactly 35.4000 × 15.2000 |
-| Two-loop wall | 0.800 / 0.40 = **2.0000** loops; corner loop radii **1.800** and **1.400**, no cusp; centrelines exactly **0.4000** apart |
-| **Interference present** | **6.3779 mm³** of overlap |
-| Interference located | only outboard of the opening wall, \|x\| = 17.7000 vs 17.6000; \|y\| max 6.2245 vs 7.6500; z 0.3000…3.0000 |
+| Two-loop wall | 0.800 / 0.40 = **2.0000** loops; corner loop radii **2.800** and **2.400**, no cusp; centrelines exactly **0.4000** apart |
+| **Interference present** | **5.4186 mm³** of overlap |
+| Interference located | only outboard of the opening wall, \|x\| = 17.7000 vs 17.6000; \|y\| max 5.3681 vs 7.6500; z 0.3000…3.0000 |
 | Interference bounded | deepest **0.1000 mm** — exactly the declared value |
 | Relief test | with 0.100 mm relief applied, overlap falls to **0.000000 mm³** |
 | Behind the Perspex rear face | **0.000000 mm³** |
@@ -378,8 +431,8 @@ from the generator.
 ```text
 1. MESH TOPOLOGY       every edge shared by exactly 2 triangles; consistent
                        winding; ONE connected component; no orphan vertices;
-                       NO degenerate triangles (min area 6.297e-04 mm2);
-                       volume 605.4639 mm3
+                       NO degenerate triangles (min area 1.653e-04 mm2);
+                       volume 630.4627 mm3
 2. ENVELOPE            40.0000 x 20.3000 x 4.0000; front +4.2000; rear +0.2000
 3. BEHIND THE PERSPEX  lowest z = +0.2000; 0.2000 clear of the rear face;
                        0.5000 clear of the OLED glass
@@ -388,9 +441,9 @@ from the generator.
                        left 88/88  right 88/88  top 88/88  bottom 88/88
                        corner 368/368
                        measured wall mean 0.8000  min 0.8000  max 0.8000
-                       through the R2.00 corners: 368 stations, 0.8000 flat
-5b. TWO-LOOP WALL      exactly 2 x 0.40 loops; corner loop radii 1.80 / 1.40,
-                       no cusp; centrelines 0.4000 apart; inner corner R1.20
+                       through the R3.00 corners: 368 stations, 0.8000 flat
+5b. TWO-LOOP WALL      exactly 2 x 0.40 loops; corner loop radii 2.80 / 2.40,
+                       no cusp; centrelines 0.4000 apart; inner corner R2.20
 6. ENVELOPE + FIT      inner 33.8000 x 13.6000; depth 2.8000;
                        INTERFERENCE +0.1000/side; clearance +0.0500/side
 7. FACE + OPTICAL      aperture 13.9250 @ z=3.20 and 14.6375 @ z=3.70,
@@ -448,14 +501,15 @@ What CAD can prove, and does:
 | Wall / extrusion width | **0.800 / 0.400 = 2.000 exactly** |
 | Measured wall, 720 stations | min **0.8000**, max **0.8000** |
 | Measured wall through the corners | 368 stations, **0.8000** flat |
-| Outer loop centreline radius at the corner | 2.00 − 0.20 = **1.800** |
-| Inner loop centreline radius at the corner | 2.00 − 0.60 = **1.400** |
+| Outer loop centreline radius at the corner | 3.00 − 0.20 = **2.800** |
+| Inner loop centreline radius at the corner | 3.00 − 0.60 = **2.400** |
 | Loop centreline separation | **0.400** — one extrusion, everywhere |
 | Smallest offset radius | **1.400** — no cusp, no self-intersection |
 
-Because the wall is a constant 0.80 mm offset with an R2.00 outer and R1.20
+Because the wall is a constant 0.80 mm offset with an R3.00 outer and R2.20
 inner corner, both loop centrelines remain smooth closed curves the whole way
-round, and neither collapses or merges at the corners.
+round, and neither collapses or merges at the corners. The larger corner makes
+this easier, not harder: the tightest loop radius rises from 1.400 to 2.400 mm.
 
 > **CAD cannot prove what the slicer does.** It proves the geometry *admits*
 > two continuous loops. The production slicer preview is a separate, physical
@@ -499,7 +553,7 @@ can settle it.** It is a physical test.
 `Bezel_Fit_Gauge_revQ` exists to answer it before a whole bezel is committed:
 five loose end-tabs at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm** interference per
 side, notch-numbered 1…5. Each is the complete right-hand end of the real
-Rev Q wall — full 15.20 mm height, both R2.00 corners, the real 0.80 mm
+Rev Q wall — full 15.20 mm height, both R3.00 corners, the real 0.80 mm
 two-loop wall, the real 2.80 mm depth — so it engages the interference exactly
 as the bezel will. 1.54 cm³ for all five, about 2 g.
 
@@ -515,26 +569,32 @@ CAD cannot see. §10 Stage 0b is the check.
 The corner radius of the real Perspex opening has never been measured and is
 recorded nowhere in this project. It could not be recovered from Rev N (§2.3).
 
-**The R2.00 outer corner has largely defused it.** The R2.00 arc pulls the wall
+**The R3.00 outer corner has effectively defused it.** The arc pulls the wall
 well away from the corner, so the unmeasured corner form no longer decides
 whether the part seats — it only decides how much corner is left unmasked:
 
 | assumed `R_panel` | deepest penetration | largest corner gap |
 |---:|---:|---:|
-| 0.00 | +0.100 | 0.562 |
-| 0.50 | +0.100 | 0.562 |
-| 1.00 | +0.100 | 0.383 |
-| 1.50 | +0.100 | 0.180 |
-| 2.00 | +0.100 | 0.050 |
-| 2.50 | **+0.250** | 0.050 |
+| 0.00 | +0.100 | 0.836 |
+| 0.50 | +0.100 | 0.836 |
+| 1.00 | +0.100 | 0.794 |
+| 1.50 | +0.100 | 0.589 |
+| 2.00 | +0.100 | 0.383 |
+| 2.50 | +0.100 | 0.180 |
+| 3.00 | +0.100 | 0.050 |
 
-Penetration stays at exactly the declared **0.100 mm** for every opening corner
-radius up to **2.050 mm** — the flanks set it, not the corners. Only beyond
-that do the corners themselves start to bite harder than declared, which would
-trip brief §8's "more interference than declared" stop condition. A routed
-opening in a 15.30 mm tall window is very unlikely to carry a corner radius
-above 2.05 mm, but it has still never been measured, and the fit gauge tabs
-carry the real R2.00 corners so a first offering-up will show it immediately.
+At R3.00 the deepest penetration stays at exactly the declared **0.100 mm**
+across the whole plausible range — the flanks set it, and the corners no longer
+reach the opening wall at all. That is the robustness the owner's +50% buys.
+
+It is paid for in corner masking. Against a sharp opening the unmasked corner
+gap grows from 0.562 mm at R2.00 to **0.836 mm at R3.00**, and the gap only
+closes to Rev Q's old figures if the real opening corner is itself R2.50–R3.00.
+**That is the point of the change** — the owner judged R2.00 not to match the
+real opening, and a corner that is too square jams before it seats, whereas a
+corner that is too round merely leaves a little cut edge visible. The fit gauge
+tabs carry the real R3.00 corners, so a first offering-up shows both the seating
+and the corner gap immediately.
 
 ### 8.4 Second-order — the 15.20 mm outer height
 
@@ -642,7 +702,7 @@ Print in **PETG, matt or satin black**, front face down, no supports, per §7.
 6. Step through **every layer of the wall**, from the first layer above the
    bezel face to the top, and confirm **two continuous 0.40 mm loops** around
    the complete perimeter — both straight runs, both ends, **and all four
-   R2.00 corners**.
+   R3.00 corners**.
 7. **Reject** the profile if you see any of: a single variable-width wall, a
    missing second loop, gap fill substituted for a loop, or the two loops
    locally merged into one wide extrusion. Fix the slicer — do not thicken
@@ -712,7 +772,7 @@ The brief's six stop conditions, honestly assessed:
 
 | Condition | Status |
 |---|---|
-| R2.00 corners or the declared interference cannot seat without damaging or visibly stressing the Perspex | **OPEN — the primary prototype gate.** CAD confirms the geometry is exactly as declared, and that penetration stays at 0.100 mm for any opening corner radius up to 2.05 mm. Whether an 8× stiffer wall takes that deflection instead of the Perspex is a physical question. Fit gauge first. §8.1 |
+| The wall corners (now R3.00) or the declared interference cannot seat without damaging or visibly stressing the Perspex | **OPEN — the primary prototype gate.** CAD confirms the geometry is exactly as declared, and that at R3.00 penetration stays at 0.100 mm across the whole plausible range of opening corner radii. Whether an 8× stiffer wall takes that deflection instead of the Perspex is a physical question. Fit gauge first. §8.1 |
 | Continuous wall needs more than 0.10 mm per horizontal side, or masks unacceptably | **NOT triggered geometrically** — interference is exactly 0.100 mm, bounded and located, and the wall is continuous. Whether the masking is acceptable is deferred to the powered test. |
 | Slicer cannot maintain two continuous loops at 0.80 mm | **NOT triggered, but NOT closed.** The geometry is exactly two 0.40 mm loops with no thin spot and no corner cusp. Only the production slicer preview can close it. §10 Stage 0b |
 | Wall reduces OLED visibility beyond the accepted presentation | **REPORTED, not judged.** Lit band 8.100 → 7.450 mm, all at the top. A powered-test decision. §5.1 |
@@ -745,8 +805,9 @@ The brief's six stop conditions, honestly assessed:
 
 `Front_Bezel_revN.*` remain untouched as the last **released** bezel baseline.
 The first issue's `Bezel_Corner_Gauge_revQ.*` files are **deleted**: the corner
-radius is now specified at R2.00, so a corner gauge answers a question that is
-no longer open, and `Bezel_Fit_Gauge_revQ.*` replaces it with one that is.
+radius is now set by the owner at R3.00, so a corner gauge answers a question
+that is no longer open, and `Bezel_Fit_Gauge_revQ.*` replaces it with one that
+is.
 
 ### Rebuilding
 

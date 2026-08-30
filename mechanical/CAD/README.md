@@ -20,8 +20,9 @@ masking wall** around the complete inside perimeter of the Perspex opening —
 left, right, top, bottom and all four corners. The wall conceals the visible
 cut edge and locates the bezel on a **controlled 0.10 mm per side horizontal
 interference**, with 0.05 mm vertical clearance. It is not a snap, not a clamp
-and carries no load. Retention remains removable adhesive on the unchanged
-recessed pads.
+and carries no load. The two Rev N recessed adhesive pads are DELETED at owner
+instruction, so retention is now by the interference fit alone; if adhesive is
+still wanted it goes on the flat seating face.
 
 Built to brief commit `7b107f2` ("require two-loop inset wall"): the wall is
 **0.80 mm**, exactly **two 0.40 mm extrusion loops**, because the first issue's
@@ -45,7 +46,7 @@ Key dimensions, each verified by two independent tools:
 | Inset-wall outer envelope | **35.400 × 15.200** |
 | Inset-wall inner envelope (derived) | 33.800 × 13.600 |
 | Wall | **0.800** = exactly two 0.400 mm loops |
-| Outer / inner corner radius | **R2.000** / R1.200 (derived) |
+| Outer / inner corner radius | **R3.000** / R2.200 (derived) |
 | Wall depth | **2.800** into the 3.00 mm Perspex |
 | Horizontal fit | **0.100 INTERFERENCE per side** |
 | Vertical fit | 0.050 clearance per side |
@@ -54,7 +55,8 @@ Key dimensions, each verified by two independent tools:
 | Clearance to the OLED glass | **0.500** — the released Rev N/P value |
 | Minimum distance to the Rev P.5 carrier | 0.939 |
 | Effective clear optical opening | **30.900 × 13.600**, R0.800 |
-| Volume | 0.6056 cm³ ≈ 0.77 g in PETG |
+| Seating face | one unbroken annulus, 278.212 mm² (adhesive pads deleted) |
+| Volume | 0.6304 cm³ ≈ 0.80 g in PETG |
 
 **46/46 gates PASS** in Fusion; **42/42 PASS** offline from the mesh. One shell,
 one lump, zero slivers, no degenerate triangles; the wall's cross-section area
@@ -76,8 +78,17 @@ Perspex rear face.
 > **Two continuous loops is a PRODUCTION gate, not a CAD one.** CAD proves the
 > geometry admits them: 0.800/0.400 = 2.000 exactly, wall 0.8000 min and max
 > over 720 stations including 368 corner stations, loop centrelines 0.400 apart
-> with corner radii 1.800 and 1.400 and no cusp. Only the slicer preview can
+> with corner radii 2.800 and 2.400 and no cusp. Only the slicer preview can
 > prove it lays them. Build report §7.1 and §10 Stage 0b.
+
+> **Two owner changes on top of the brief, both single parameters and both
+> reversible.** The two recessed adhesive pads are **deleted**
+> (`pads_enabled = False`) — brief §3.1 asks for them preserved, but the
+> interference fit makes bonded pads redundant, and the seating face is now one
+> unbroken annulus. And the inset-wall outer corner is raised 50%, **R2.00 →
+> R3.00**, because R2.00 did not match the real opening corner; penetration now
+> holds at exactly 0.100 mm across the whole plausible range of opening corner
+> radii, at the cost of a larger unmasked corner gap. Build report §3.5.
 
 > **The wall costs 0.650 mm of lit screen height.** The clear opening is
 > 30.90 × 13.60 — width by the face opening, **height by the wall** — and the
