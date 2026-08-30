@@ -1,22 +1,77 @@
-# Architecture Decision Records (ADRs)
+# Decca music-centre restoration
 
-Short, immutable records of significant decisions. Each ADR captures the context,
-the decision, and its consequences at the time it was made. Supersede rather than
-rewrite: if a decision changes, add a new ADR and mark the old one `Superseded`.
+ESP32 firmware, hardware and mechanical design for restoring a 1960s Decca
+music centre while preserving its original controls and appearance.
 
-Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
-`Superseded`, `Deprecated`.
+The ESP32 provides control and user interface only. Audio remains outside it:
+the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
-| ADR  | Title                                                       | Status   |
-|------|-------------------------------------------------------------|----------|
-| 0001 | Retain the original selector PCB as mechanical carrier      | Accepted |
-| 0002 | Use four 10k analogue potentiometers as position sensors    | Accepted |
-| 0003 | Reuse the original on/off switch and cable as a low-voltage input | Accepted |
-| 0004 | Reuse VHF, MW, LW and Gram; defer SW                        | Superseded |
-| 0005 | Leave Stereo/Mono unwired in Phase 1                        | Accepted |
-| 0006 | Keep WiiM Pro integration in Phase 2                        | Accepted |
-| 0007 | Present logical function and now-playing context            | Accepted |
-| 0008 | Lock WiiM Pro with separate power amplification             | Accepted |
-| 0009 | Omit legacy button labels from user-facing display views    | Accepted |
-| 0011 | Use Gram as the sole two-state source selector               | Accepted |
-| 0012 | Use authenticated local-network ArduinoOTA                   | Accepted |
+## Current state
+
+- Safe board initialisation and authenticated local-network OTA are implemented.
+- Four analogue controls and the SH1106 OLED are bench-verified.
+- Only the original Gram contact is used as a source input:
+  closed = Vinyl, open = Digital Streamer.
+- The display, buttons, pots, settings and lighting modules are implemented and
+  independently tested.
+- The current production `main.cpp` is still the safe OTA bootstrap, not the
+  complete Phase 1 control scheduler.
+- USB-to-OTA physical acceptance, GPIO19 on/off verification and GPIO25 lighting
+  commissioning remain open.
+
+Read [Development Handover](docs/Development%20Handover.md) before continuing
+firmware work.
+
+## Locked controller map
+
+| Function | ESP32 | Status |
+|---|---:|---|
+| Volume | GPIO32/D32 | Bench-verified |
+| Bass | GPIO33/D33 | Bench-verified |
+| Treble | GPIO34/D34 | Bench-verified |
+| Balance | GPIO35/D35 | Bench-verified |
+| Gram | GPIO23/D23 | Bench-verified |
+| OLED SDA | GPIO21/D21 | Bench-verified |
+| OLED SCL | GPIO22/D22 | Bench-verified |
+| On/off | GPIO19/D19 | Proposed |
+| Dial lighting PWM | GPIO25/D25 | Proposed |
+
+Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
+
+## Repository guide
+
+- [Specification](docs/Specification.md)
+- [Firmware architecture](docs/Firmware%20Architecture.md)
+- [Hardware architecture](docs/Hardware%20Architecture.md)
+- [Authoritative wiring](docs/Wiring.md)
+- [Build and commissioning guide](docs/Build%20Guide.md)
+- [Parts list](docs/Parts%20List.md)
+- [Decision records](docs/adr/)
+- [Development handover](docs/Development%20Handover.md)
+- `src/`: firmware modules
+- `test/`: PlatformIO suites
+- `hardware/`: BOM, wiring and electrical design
+- `mechanical/`: CAD, drawings and print files
+
+## Windows build tools
+
+If `pio` is not recognised in PowerShell, use the executable installed by the
+PlatformIO VS Code extension:
+
+```powershell
+$pio = "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe"
+& $pio --version
+& $pio run -e esp32dev
+& $pio test -e esp32dev
+```
+
+The first OTA bootstrap and commissioning procedure is in the
+[Build Guide](docs/Build%20Guide.md). Never commit `src/secrets.h`.
+
+## Engineering rules
+
+Firmware modules remain independent and are coordinated in `main.cpp`. Update
+paths must be non-blocking, persisted state belongs in `settings`, and hardware
+changes must be reconciled across the pin map, wiring, BOM and revision history.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for code and commit conventions.
