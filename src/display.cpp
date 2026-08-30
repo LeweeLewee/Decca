@@ -23,6 +23,7 @@ char g_artist[kArtistCapacity + 1]{};
 bool g_ready = false;
 bool g_dirty = false;
 bool g_startupActive = false;
+bool g_calibrationActive = false;
 uint32_t g_startupStartedMs = 0;
 uint8_t g_startupFrame = 0;
 bool g_transientActive = false;
@@ -268,6 +269,48 @@ void renderMessage(FrameKind kind, const char* message) {
     g_panel.display();
 }
 
+void renderCalibration() {
+    g_panel.clearDisplay();
+    g_panel.setTextColor(SH110X_WHITE, SH110X_BLACK);
+    g_panel.setTextWrap(false);
+
+    // Three nested full-canvas borders expose clipping at 0, 2 and 4 pixels.
+    g_panel.drawRect(0, 0, kWidth, kHeight, SH110X_WHITE);
+    g_panel.drawRect(2, 2, kWidth - 4, kHeight - 4, SH110X_WHITE);
+    g_panel.drawRect(4, 4, kWidth - 8, kHeight - 8, SH110X_WHITE);
+
+    // Eight-pixel grid plus labelled major X coordinates locate the aperture.
+    for (int16_t x = 8; x < kWidth; x += 8) {
+        g_panel.drawFastVLine(x, 0, kHeight, SH110X_WHITE);
+    }
+    for (int16_t y = 8; y < kHeight; y += 8) {
+        g_panel.drawFastHLine(0, y, kWidth, SH110X_WHITE);
+    }
+
+    g_panel.setTextSize(1);
+    for (uint8_t y = 0; y < kHeight; y += 8) {
+        g_panel.setCursor(10, static_cast<int16_t>(y) + 1);
+        if (y < 10) {
+            g_panel.print('0');
+        }
+        g_panel.print(y);
+    }
+    g_panel.setCursor(34, 27);
+    g_panel.print("X32");
+    g_panel.setCursor(58, 27);
+    g_panel.print("X64");
+    g_panel.setCursor(82, 27);
+    g_panel.print("X96");
+
+    // Asymmetric corner marks make a 180-degree orientation error obvious.
+    g_panel.fillRect(0, 0, 4, 4, SH110X_WHITE);
+    g_panel.fillRect(kWidth - 7, 0, 7, 3, SH110X_WHITE);
+    g_panel.fillRect(0, kHeight - 7, 3, 7, SH110X_WHITE);
+    g_panel.drawRect(kWidth - 7, kHeight - 7, 7, 7, SH110X_WHITE);
+    g_panel.drawCircle(kWidth / 2, kHeight / 2, 4, SH110X_WHITE);
+    g_panel.display();
+}
+
 void writeFrame(FrameKind kind) {
 #ifdef PIO_UNIT_TESTING
     if (g_frameWriter != nullptr) {
@@ -297,6 +340,9 @@ void writeFrame(FrameKind kind) {
         case FrameKind::Status:
         case FrameKind::Diagnostic:
             renderMessage(kind, g_message);
+            break;
+        case FrameKind::Calibration:
+            renderCalibration();
             break;
     }
 }
@@ -362,6 +408,7 @@ void init() {
     g_state.artist = g_artist;
     g_dirty = false;
     g_startupActive = false;
+    g_calibrationActive = false;
     g_startupFrame = 0;
     g_transientActive = false;
     g_message[0] = '\0';
@@ -371,6 +418,8 @@ void init() {
         Serial.println("DISPLAY_ERROR SH1106 not found at 0x3C");
         return;
     }
+
+    g_panel.setRotation(kPanelRotation);
 
     g_startupStartedMs = nowMs();
     g_startupActive = true;
@@ -383,6 +432,13 @@ void update() {
     }
 
     const uint32_t now = nowMs();
+    if (g_calibrationActive) {
+        if (g_dirty) {
+            writeFrame(FrameKind::Calibration);
+            g_dirty = false;
+        }
+        return;
+    }
     if (g_transientActive) {
         if (!timeReached(now, g_transientExpiresMs)) {
             if (g_dirty) {
@@ -454,6 +510,25 @@ void showDiagnostic(const char* message) {
 
 void showSwUnavailable() {
     showStatus("SW: NO FUNCTION");
+}
+
+void showCalibrationPattern() {
+    if (!g_ready) {
+        return;
+    }
+    g_calibrationActive = true;
+    g_startupActive = false;
+    g_transientActive = false;
+    g_message[0] = '\0';
+    g_dirty = true;
+}
+
+void hideCalibrationPattern() {
+    if (!g_calibrationActive) {
+        return;
+    }
+    g_calibrationActive = false;
+    g_dirty = true;
 }
 
 #ifdef PIO_UNIT_TESTING

@@ -35,7 +35,7 @@ Implemented modules:
 | `settings` | NVS persistence implemented, schema version 2 |
 | `buttons` | On/off plus sole Gram contact, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
-| `display` | SH1106 UI, animation, mapped function, metadata-ready views |
+| `display` | SH1106 UI plus active fitted-aperture calibration pattern; output rotated 180 degrees |
 | `lighting` | Safe-off non-blocking PWM fades |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | Planned, not implemented |
@@ -87,8 +87,11 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 ## Completed evidence
 
 - Four pots passed on target with full 0–4095 travel and clockwise increase.
-- Pi Hut 1.3-inch 128×64 white SH1106 OLED passed 10/10 on target at address
-  0x3C; display orientation and layout were visually accepted.
+- Pi Hut 1.3-inch 128×64 white SH1106 OLED was electrically verified at address
+  0x3C. After final Perspex installation exposed a restricted visible area, the
+  output was rotated 180 degrees and an 8-pixel fitted-aperture calibration
+  pattern passed its expanded 11/11 display suite on 2026-08-30. Straight-on
+  photo analysis and final safe-viewport layout remain pending.
 - Gram GPIO23 contact was physically verified before the firmware was simplified
   to its final two-state model.
 - Revised button logic passed strict host compilation and its nine-case harness.
@@ -158,19 +161,22 @@ the user's Wi-Fi or OTA passwords.
 1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
 2. **Complete (2026-08-30):** full PlatformIO `esp32dev` release build and all
    seven on-target suites, 43/43 tests passed.
-3. **Current:** implement the planned `power` module and bench-test GPIO19.
-4. Reconcile `main.cpp` from safe bootstrap into the non-blocking Phase 1
+3. **Current:** photograph the active fitted-aperture calibration pattern
+   straight-on, derive the visible pixel bounds, then redesign and verify every
+   display view inside the calibrated safe viewport.
+4. Implement the planned `power` module and bench-test GPIO19.
+5. Reconcile `main.cpp` from safe bootstrap into the non-blocking Phase 1
    scheduler, initialising and coordinating all existing modules while
    continuously servicing OTA.
-5. Bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade behaviour.
-6. Commission normal and standby lighting levels.
-7. **Deferred control reuse:** wire and implement the original Stereo/Mono switch
+6. Bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade behaviour.
+7. Commission normal and standby lighting levels.
+8. **Deferred control reuse:** wire and implement the original Stereo/Mono switch
    so Stereo commands the dial lights on and Mono commands them off. It remains
    unwired in the current Phase 1 build; assign and bench-verify a safe GPIO
    before implementation.
-8. Add WiiM Pro integration only in Phase 2, after the hardware is available and
+9. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
-9. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+10. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -211,9 +217,16 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: implement the planned `power` module and bench-test GPIO19,
-one step at a time. The preceding gates passed on 2026-08-30: authenticated
-USB-to-OTA physical acceptance, a clean `esp32dev` release build and all seven
+Immediate priority: use a straight-on photograph of the fitted OLED's active
+8-pixel calibration grid to derive the visible pixel bounds, then redesign all
+display views inside that calibrated safe viewport. Output is already rotated
+180 degrees and the production safe-bootstrap runtime is holding the pattern
+while continuously servicing OTA. The expanded display suite passed 11/11.
+
+After the fitted-display refinement, implement the planned `power` module and
+bench-test GPIO19 one step at a time. Earlier gates passed on 2026-08-30:
+authenticated USB-to-OTA physical acceptance, a clean `esp32dev` release build
+and all seven
 on-target suites (43/43 tests). Production firmware was restored afterward and
 serial reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
 

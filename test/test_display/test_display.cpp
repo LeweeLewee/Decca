@@ -113,6 +113,30 @@ void test_display_physical_sh1106_snapshot() {
     }
     delay(decca::display::kStartupFrameIntervalMs);
     decca::display::update();
+    decca::display::showCalibrationPattern();
+    decca::display::update();
+    UnityPrint("DISPLAY_CALIBRATION rotation=2 grid=8");
+    UNITY_PRINT_EOL();
+}
+
+void test_display_holds_and_leaves_calibration_pattern() {
+    startInjected();
+
+    TEST_ASSERT_EQUAL_UINT8(2, decca::display::kPanelRotation);
+    decca::display::showCalibrationPattern();
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(FrameKind::Calibration),
+                      static_cast<int>(g_lastKind));
+
+    const uint16_t calibrationFrames = g_frameCount;
+    g_nowMs += decca::display::kStartupDurationMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL_UINT16(calibrationFrames, g_frameCount);
+
+    decca::display::hideCalibrationPattern();
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(FrameKind::Dashboard),
+                      static_cast<int>(g_lastKind));
 }
 
 void test_display_animates_startup_without_blocking() {
@@ -312,6 +336,7 @@ void test_display_begin_failure_is_safe() {
 
 void runAll() {
     RUN_TEST(test_display_physical_sh1106_snapshot);
+    RUN_TEST(test_display_holds_and_leaves_calibration_pattern);
     RUN_TEST(test_display_animates_startup_without_blocking);
     RUN_TEST(test_display_dashboard_carries_function_and_controls);
     RUN_TEST(test_display_copies_and_clears_now_playing_metadata);

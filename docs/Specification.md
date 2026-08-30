@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA physical acceptance and full `esp32dev` toolchain verification are complete: the release build passed and all seven on-target suites passed 43/43 tests. Interrupted-transfer acceptance and Phase 3 automatic failed-boot rollback remain outstanding. Control orchestration and WiiM integration remain in progress. |
-| Version  | 0.19                                              |
+| Status   | Draft. USB-to-OTA physical acceptance and full `esp32dev` toolchain verification are complete. Fitted-Perspex display refinement is active: output is rotated 180 degrees and a tested full-canvas calibration pattern awaits straight-on photo analysis to define the visible safe viewport. Interrupted-transfer acceptance, control orchestration and WiiM integration remain outstanding. |
+| Version  | 0.20                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 

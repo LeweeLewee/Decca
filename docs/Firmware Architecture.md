@@ -63,7 +63,12 @@ AI-assisted editing.
   it does not call input or WiiM modules. It redraws only when its semantic
   frame changes, an animation frame advances, or a transient expires. Mapped
   names and metadata use fixed-size copied text fields, so Phase 2 can supply
-  them without allocation or changing the display interface.
+  them without allocation or changing the display interface. The installed
+  panel is rendered at Adafruit GFX rotation 2 (180 degrees). A persistent,
+  non-blocking full-canvas calibration frame exposes nested 0/2/4-pixel borders,
+  an 8-pixel grid, labelled coordinates and asymmetric corner marks so a
+  straight-on photograph through the fitted Perspex can define the final safe
+  viewport without changing the mechanical aperture.
 
 ## Data Flow
 

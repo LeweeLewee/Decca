@@ -53,7 +53,8 @@ source identity retained in state but omitted from the user-facing layout,
 copied now-playing metadata and fallback, all four control values, two-second
 control overlays, function confirmation, change-only refresh, diagnostics,
 SW-unavailable presentation and safe initialisation failure. It also performs a
-real SH1106 address/frame snapshot for H4 bench verification. Keeping one suite
+real SH1106 address/frame snapshot for H4 bench verification and covers the
+persistent 180-degree fitted-aperture calibration frame. Keeping one suite
 per module reinforces the low-coupling design in
 `docs/Firmware Architecture.md`.
 
@@ -77,3 +78,9 @@ and all seven suites passed on the physical ESP32 — buttons 9/9, display 10/10
 hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6 and settings 3/3 (43/43 total).
 The production safe-bootstrap image was restored by USB after testing and serial
 reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
+
+Display-calibration increment (2026-08-30): the release build passed and the
+expanded `test_display` suite passed 11/11 on the physical SH1106. The production
+safe-bootstrap image was then installed with the 180-degree, 8-pixel calibration
+pattern active; OTA readiness remained available. Final visible-boundary photo
+analysis is pending and is not yet a layout-acceptance claim.

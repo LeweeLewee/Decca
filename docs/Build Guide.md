@@ -276,6 +276,17 @@ artefacts. GPIO21 (SDA) and GPIO22 (SCL) are bench-verified. Final loom
 orientation was physically confirmed on 2026-08-30: Brown = GND, Red = VCC,
 Orange = SCL and Yellow = SDA.
 
+Fitted-aperture refinement (2026-08-30): after the OLED was installed behind
+the final Perspex opening, the restricted visible height required a second
+layout calibration. Firmware now rotates the output 180 degrees and holds a
+full 128×64 diagnostic pattern with nested borders, an 8-pixel grid, coordinate
+labels and asymmetric corner marks. The expanded display suite passed 11/11.
+Photograph the pattern square-on, centred on the opening, with the complete
+visible aperture in frame and minimal perspective distortion. Use that image to
+record the first and last visible X/Y coordinates before changing any normal,
+transient, startup or diagnostic layout. Retain the pattern as a service
+diagnostic after the calibrated safe viewport is implemented.
+
 If the panel is blank, disconnect USB before checking VCC/GND order and the
 SDA/SCL labels.
 
