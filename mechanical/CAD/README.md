@@ -11,6 +11,95 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
+## Display bezel — current revision: **Q — OPEN, bezel test print required**
+
+**Rev Q is bezel-only. The released Rev P.5 carrier is FROZEN and unchanged.**
+
+Rev Q replaces the two Rev N side locating rails with **one continuous masking
+lip** around the complete inside perimeter of the Perspex opening — left, right,
+top, bottom and all four corners. The lip conceals the visible cut edge of the
+Perspex and locates the bezel. It works on clearance, not interference: it is
+not a snap, not a clamp and not a press fit, and it carries no load. Retention
+remains removable adhesive on the unchanged recessed pads.
+
+Everything else about the Rev N bezel is carried over untouched — the
+40.00 × 20.30 × 4.00 envelope, the R2.00 external corners, the R0.40 front edge
+break, the 30.40 mm visible window width, the R0.80 window corners, the seating
+face and both adhesive pads.
+
+| File | Role |
+|---|---|
+| `Decca_Display_Bezel_revQ_fusion.py` | **the generator — single source of truth for every Rev Q dimension** |
+| `Decca_Display_Bezel_revQ_verify.py` | independent offline verification of the exported STL (numpy only) |
+| `Decca_Display_Bezel_revQ_frozen_check.py` | proves the six frozen Rev P.5 files still match the Rev Q brief — run before and after any Rev Q work. Hashes text files as-is, forced LF and forced CRLF, so a Windows/Linux line-ending difference cannot masquerade as tampering |
+| `Decca_Display_Bezel_revQ.f3d` | **editable source** — named parameters, derived values written as real formulas |
+| `Front_Bezel_revQ.step` | the bezel alone |
+| `Decca_Display_Bezel_revQ_assembly.step` | bezel + measured Perspex + OLED glass proxy + the **unchanged Rev P.5 carrier**. Does **not** overwrite `Decca_Display_Mount_revP_assembly.step` |
+| `Bezel_Corner_Gauge_revQ.step` | five-tab corner-radius gauge — **print this before the bezel** |
+
+Key dimensions, each verified by two independent tools:
+
+| | mm |
+|---|---:|
+| Lip outer envelope | **34.900 × 15.000** |
+| Lip inner envelope (derived) | 34.100 × 14.200 |
+| Lip wall | **0.400** — one controlled extrusion width |
+| Lip depth | **2.800** into the 3.00 mm Perspex |
+| Lip outer corner radius | R0.600 — **UNRESOLVED**, see below |
+| Entry lead-in | 0.200 × 45°, outer rear edge only |
+| Clearance into the measured opening | **0.150 per side, all four sides** |
+| Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
+| Clearance to the OLED glass | **0.500** — the released Rev N/P value |
+| Minimum distance to the Rev P.5 carrier | 1.171 |
+| Effective clear optical opening | **30.400 × 14.200**, R0.800 |
+| Volume | 0.5243 cm³ ≈ 0.67 g in PETG |
+
+**30/30 gates PASS** in Fusion; **35/35 PASS** offline from the mesh. One shell,
+one lump, zero slivers; the lip is continuous at 1440/1440 perimeter stations at
+three depths; wall 0.4000 min and max; zero interference with the Perspex, the
+glass or the carrier; nothing behind the Perspex rear face.
+
+> **The opening corner radius has never been measured.** It could not be
+> recovered from Rev N — those rails ran only y −4.00…+4.00 and never approached
+> a corner, which is precisely why that architecture was chosen. So
+> `bezel_lip_corner_r` is a named **UNRESOLVED** parameter, set to the proven
+> Rev N rail-end relief R0.60. That seats for any opening corner radius up to
+> **1.112 mm** (the rule is `R_panel_max ≈ R_lip + 0.51`). If the real corners
+> are rounder, the bezel stands proud of the fascia — obvious, harmless, and
+> fixed by raising one parameter and reprinting. **Print
+> `Bezel_Corner_Gauge_revQ` first** and measure it. Build report §8.
+
+> **The lip costs 0.350 mm of lit screen height.** The clear opening goes from
+> 30.40 × 14.90 (Rev N) to 30.40 × 14.20, now controlled by the top and bottom
+> lip rather than by the bezel face, and the visible active band drops 8.100 →
+> **7.750 mm**, all of it at the top. The bottom loses nothing and in fact hides
+> 0.35 mm more unlit board. **CAD reports this; only the powered test can say
+> whether it is acceptable.** Build report §5.
+
+> **One deliberate deviation from Rev N**, and only one: the window **height**
+> is now derived from the lip at 14.200 mm instead of the Rev N 14.900 mm. At
+> 14.900 the lip's 0.400 mm wall would have met the bezel face over just
+> 0.050 mm at the top and bottom — a knife-edge root and a sliver. It costs
+> nothing optically, because the lip already controlled the clear height. The
+> window **width** is untouched. Build report §3.3.
+
+### Rebuilding Rev Q
+
+Inside Fusion (Utilities → Add-Ins → Scripts), point `OUT_DIR` at this clone's
+`mechanical` folder and run `main()`, `import_carrier()`, `coupon()`,
+`corner_study()`, `validate()`, `export()` and `snapshots()`. `main()` creates
+its own new document and never opens, modifies or saves the Rev N, Rev O or
+Rev P documents; `export()` refuses, in code, to write any path whose basename
+contains `revN`, `revO` or `revP`. Then, offline:
+
+```bash
+python mechanical/CAD/Decca_Display_Bezel_revQ_verify.py
+```
+
+`Front_Bezel_revN.step` remains the last **released** bezel and is untouched.
+
+---
+
 ## Display mount — current revision: **P.5 — RELEASED**
 
 **The Rev P.5 carrier has been manufactured, installed and physically tested,
@@ -87,7 +176,7 @@ The `.f3d` is the source of truth; the STEPs and the STL are derived exports.
 | `Rear_Display_Carrier_revP.step` | the one structural part |
 | `Decca_Display_Mount_revP_assembly.step` | carrier + Perspex + OLED + bezel + **original nuts / bolt envelope** references. **No lighting-unit keepout proxy** — Rev P.4 deleted it, and both tools assert its absence |
 | `Hex_Pocket_Fit_Coupon_revP.step` | five-station captive-nut pocket fit coupon — print this **before** the carrier |
-| `Front_Bezel_revN.step` | cosmetic bezel — **unchanged, still the file of record for Rev P** |
+| `Front_Bezel_revN.step` | cosmetic bezel — **unchanged, still the file of record for Rev P, and the last RELEASED bezel**. Superseded for new work by the OPEN Rev Q above, which is not yet released |
 
 Rev N files are retained as the last front-loaded design:
 `Decca_Display_Mount_revN.f3d`, `Decca_Display_Mount_revN_assembly.step`,

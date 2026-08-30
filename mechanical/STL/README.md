@@ -10,13 +10,74 @@ Print-ready meshes exported from the CAD sources.
 - STLs are derived artefacts — the editable source lives in `../CAD/`.
 - Name files to match their CAD source and revision.
 
+## Display bezel — current revision: **Q — OPEN, integration prototype**
+
+**Rev Q is bezel-only. The Rev P.5 carrier mesh below is FROZEN and unchanged.**
+
+| File | Print notes |
+|---|---|
+| `Bezel_Corner_Gauge_revQ_COUPON_R{040,060,100,160,250}.stl` | **Print these FIRST.** PETG, front face flat on the bed, no supports. Five L-tabs, notch-numbered 1…5, each carrying a real section of the Rev Q lip — same 0.40 mm wall, same 2.80 mm depth — at R0.40, R0.60, R1.00, R1.60 and R2.50. Offer each into a corner of the real opening; the smallest that seats flush sets `bezel_lip_corner_r`. Together they cover opening corner radii 0.91–3.01 mm. ≈0.59 cm³ for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, lip pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.5243 cm³ ≈ 0.67 g. The 0.40 mm continuous lip is **exactly one extrusion width** — see the print gate below. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+
+> ### Rev Q print gate — the single-width wall
+>
+> The whole revision hangs on a 0.40 mm wall standing 2.80 mm tall, right
+> around the opening. Orientation is what makes it printable: **front face
+> down**, so the lip is a **vertical wall** (measured worst overhang across all
+> 26 lip faces is **0.000°**), printed last, standing on the already-solid
+> bezel face for its whole height, with the 0.20 mm lead-in at the top tapering
+> inward and therefore self-supporting. Bed contact is 295.4 mm² of flat
+> cosmetic face. Rear-face-down is wrong — the lip would print first as an
+> unsupported free ring under a 90° overhang.
+>
+> | Setting | Value |
+> |---|---|
+> | Nozzle / extrusion width | **0.40 mm** — the wall *is* one extrusion |
+> | Layer height | 0.15–0.20 mm |
+> | Perimeters in the lip | let the slicer lay **one**; two will not fit |
+> | Thin wall / gap fill | **ON** (or Arachne) — classic slicers silently delete a 0.40 mm wall |
+> | External perimeter speed | **≤ 25 mm/s** through the lip |
+> | Cooling | 100 % — tiny loop, very short layer time |
+> | Supports | **none** |
+>
+> **Slice it and check the preview before printing.** Confirm the lip appears
+> as a continuous single-extrusion loop on every one of its layers, all the way
+> round including the corners. If the slicer dropped, thinned or broke it, fix
+> the slicer — do not thicken `bezel_lip_wall` to paper over it.
+>
+> **If your extrusion width is not 0.40 mm**, set `bezel_lip_wall` to one
+> *actual* extrusion width and regenerate. `bezel_lip_inner_w/h`,
+> `bezel_window_h` and the optical opening are all derived and will follow.
+> Same rule as `rear_light_shield_t` on the carrier.
+
+> ### Two things this print exists to settle
+>
+> 1. **The Perspex opening corner radius has never been measured.** The Rev N
+>    side rails sat at y ±4.00 and never went near a corner.
+>    `bezel_lip_corner_r` is **UNRESOLVED**, set to the proven Rev N rail-end
+>    relief R0.60, which seats for any opening corner radius up to **1.112 mm**.
+>    If the real corners are rounder the bezel stands proud — visible, harmless,
+>    and fixed with one parameter and a reprint. Print the gauge coupon first.
+> 2. **The lip costs 0.350 mm of lit screen height** — clear opening
+>    30.40 × 14.90 → **30.40 × 14.20 mm**, visible active band 8.100 →
+>    **7.750 mm**, all of it at the top. Only the powered test can say whether
+>    that is acceptable.
+>
+> Full detail, the corner tolerance study and the test procedure:
+> `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
+
+`Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
+unchanged.
+
+---
+
 ## Display mount — current revision: **P.5 — RELEASED**
 
 | File | Print notes |
 |---|---|
 | `Hex_Pocket_Fit_Coupon_revP.stl` | **Print this FIRST.** PETG, rear face flat on the bed, no supports. Five captive-nut pockets at 0.10/0.15/0.20/0.25/0.30 mm fit allowance, notch-numbered. Sets `nut_pocket_fit_allowance` from a physical part. 4.570 cm³. |
 | `Rear_Display_Carrier_revP.stl` | PETG **in OPAQUE BLACK**. **Rear face flat on the bed, building forward.** No supports. 4+ top layers or ironing on the Perspex seating face. Print the **four** Ø2.80 split sprung posts slowly — they stand 4.40 mm tall on a 0.80 mm half-section (exactly two 0.40 mm perimeters). **Print the 1.20 mm rear light shield fully solid** — it is the first 6 layers, flat on the bed; solid perimeters, never sparse infill and never a single translucent skin. The two light blocks grow up off it. 56.60 × 39.15 × **6.00 mm**, 4.411 cm³ ≈ 5.6 g. |
-| `Front_Bezel_revN.stl` | PETG, matt/satin black. **Unchanged for Rev P** — no revP-named file exists. |
+| `Front_Bezel_revN.stl` | PETG, matt/satin black. **Unchanged for Rev P** — no revP-named file exists. This is the last **released** bezel mesh; the OPEN Rev Q above supersedes it for new work but is not yet released. |
 
 > ## Rev P.5 is RELEASED — this mesh has been printed and tested
 >
