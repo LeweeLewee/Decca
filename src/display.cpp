@@ -10,6 +10,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#include <cstdio>
 #include <cstring>
 
 namespace decca::display {
@@ -100,6 +101,11 @@ uint16_t clampedControl(uint16_t value) {
     return value > kControlMax ? kControlMax : value;
 }
 
+int16_t centredViewportX(int16_t width) {
+    return static_cast<int16_t>(kViewportX) +
+           (static_cast<int16_t>(kViewportWidth) - width) / 2;
+}
+
 void printClipped(const char* text, uint8_t maxCharacters) {
     char buffer[kTitleCapacity + 1]{};
     uint8_t limit = maxCharacters;
@@ -109,6 +115,16 @@ void printClipped(const char* text, uint8_t maxCharacters) {
     std::strncpy(buffer, textOrEmpty(text), limit);
     buffer[limit] = '\0';
     g_panel.print(buffer);
+}
+
+void printCentredClipped(const char* text,
+                         uint8_t maxCharacters,
+                         int16_t y) {
+    const size_t length = std::strlen(textOrEmpty(text));
+    const uint8_t visibleLength = static_cast<uint8_t>(
+        length > maxCharacters ? maxCharacters : length);
+    g_panel.setCursor(centredViewportX(visibleLength * 6), y);
+    printClipped(text, maxCharacters);
 }
 
 void renderStartup(uint8_t frame) {
@@ -125,7 +141,7 @@ void renderStartup(uint8_t frame) {
     g_panel.setTextWrap(false);
     g_panel.setTextSize(2);
     const int16_t wordWidth = static_cast<int16_t>(characters) * 12;
-    g_panel.setCursor((kWidth - wordWidth) / 2, 18);
+    g_panel.setCursor(centredViewportX(wordWidth), kContentTop);
     g_panel.print(revealed);
 
     const int16_t halfLine = static_cast<int16_t>(12U + (frame * 10U));
@@ -144,7 +160,7 @@ void renderPrimaryFunction(int16_t y) {
     if (length <= 10U) {
         g_panel.setTextSize(2);
         const int16_t width = static_cast<int16_t>(length) * 12;
-        g_panel.setCursor((kWidth - width) / 2, y);
+        g_panel.setCursor(centredViewportX(width), y);
         g_panel.print(function);
         return;
     }
@@ -154,43 +170,31 @@ void renderPrimaryFunction(int16_t y) {
                                      ? kFunctionCapacity
                                      : length;
     const int16_t width = static_cast<int16_t>(visibleLength) * 6;
-    g_panel.setCursor((kWidth - width) / 2, y + 4);
+    g_panel.setCursor(centredViewportX(width), y + 4);
     printClipped(function, kFunctionCapacity);
 }
 
 void renderLocalDashboard() {
-    renderPrimaryFunction(0);
+    g_panel.setTextSize(2);
+    g_panel.setCursor(centredViewportX(60), kContentTop);
+    g_panel.print("DECCA");
+    g_panel.drawFastHLine(28, 43, 72, SH110X_WHITE);
     g_panel.setTextSize(1);
-    g_panel.drawFastHLine(0, 21, kWidth, SH110X_WHITE);
-
-    g_panel.setCursor(0, 28);
-    g_panel.print("VOL ");
-    g_panel.print(percent(g_state.volume));
-    g_panel.print('%');
-    g_panel.setCursor(68, 28);
-    g_panel.print("BASS ");
-    g_panel.print(percent(g_state.bass));
-
-    g_panel.setCursor(0, 47);
-    g_panel.print("TREB ");
-    g_panel.print(percent(g_state.treble));
-    g_panel.setCursor(68, 47);
-    g_panel.print("BAL  ");
-    g_panel.print(percent(g_state.balance));
+    g_panel.setCursor(28, 50);
+    g_panel.print("MUSIC CENTRE");
 }
 
 void renderNowPlaying() {
     g_panel.setTextSize(1);
-    g_panel.setCursor(0, 0);
-    printClipped(primaryFunction(), 20);
-    g_panel.drawFastHLine(0, 10, kWidth, SH110X_WHITE);
-
-    g_panel.setCursor(0, 17);
-    printClipped(g_title, 20);
-    g_panel.setCursor(0, 34);
-    printClipped(g_artist, 20);
-    g_panel.setCursor(0, 52);
-    g_panel.print("PLAYING");
+    printCentredClipped(g_title, 19, kContentTop);
+    g_panel.drawFastHLine(18, 34, 92, SH110X_WHITE);
+    printCentredClipped(g_artist, 19, 39);
+    if (g_state.playing) {
+        g_panel.fillTriangle(113, 51, 113, 59, 120, 55, SH110X_WHITE);
+    } else {
+        g_panel.fillRect(112, 51, 3, 8, SH110X_WHITE);
+        g_panel.fillRect(118, 51, 3, 8, SH110X_WHITE);
+    }
 }
 
 void renderDashboard() {
@@ -200,17 +204,16 @@ void renderDashboard() {
 
     if (g_state.power == PowerState::Standby) {
         g_panel.setTextSize(2);
-        g_panel.setCursor(34, 15);
+        g_panel.setCursor(centredViewportX(60), kContentTop);
         g_panel.print("DECCA");
         g_panel.setTextSize(1);
-        g_panel.setCursor(43, 42);
+        g_panel.setCursor(centredViewportX(42), 50);
         g_panel.print("STANDBY");
         g_panel.display();
         return;
     }
 
-    const bool hasMetadata = g_state.playing &&
-                             (g_title[0] != '\0' || g_artist[0] != '\0');
+    const bool hasMetadata = g_title[0] != '\0' || g_artist[0] != '\0';
     if (hasMetadata) {
         renderNowPlaying();
     } else {
@@ -223,23 +226,25 @@ void renderControl(Control control, uint16_t value) {
     g_panel.clearDisplay();
     g_panel.setTextColor(SH110X_WHITE);
     g_panel.setTextWrap(false);
-    g_panel.setTextSize(2);
     const char* name = controlName(control);
-    const int16_t nameWidth = static_cast<int16_t>(std::strlen(name)) * 12;
-    g_panel.setCursor((kWidth - nameWidth) / 2, 4);
-    g_panel.print(name);
-
-    g_panel.drawRect(5, 27, 118, 14, SH110X_WHITE);
-    const int16_t fillWidth = static_cast<int16_t>(
-        (static_cast<uint32_t>(clampedControl(value)) * 114U) / kControlMax);
-    if (fillWidth > 0) {
-        g_panel.fillRect(7, 29, fillWidth, 10, SH110X_WHITE);
-    }
-
     g_panel.setTextSize(1);
-    g_panel.setCursor(52, 49);
-    g_panel.print(percent(clampedControl(value)));
-    g_panel.print('%');
+    printCentredClipped(name, 19, kContentTop);
+
+    char valueText[5]{};
+    std::snprintf(valueText, sizeof(valueText), "%u%%",
+                  static_cast<unsigned>(percent(clampedControl(value))));
+    g_panel.setTextSize(2);
+    const int16_t valueWidth =
+        static_cast<int16_t>(std::strlen(valueText)) * 12;
+    g_panel.setCursor(centredViewportX(valueWidth), 34);
+    g_panel.print(valueText);
+
+    g_panel.drawRect(10, 54, 108, 6, SH110X_WHITE);
+    const int16_t fillWidth = static_cast<int16_t>(
+        (static_cast<uint32_t>(clampedControl(value)) * 104U) / kControlMax);
+    if (fillWidth > 0) {
+        g_panel.fillRect(12, 56, fillWidth, 2, SH110X_WHITE);
+    }
     g_panel.display();
 }
 
@@ -248,10 +253,8 @@ void renderFunctionConfirmation() {
     g_panel.setTextColor(SH110X_WHITE);
     g_panel.setTextWrap(false);
     g_panel.setTextSize(1);
-    g_panel.setCursor(0, 0);
-    g_panel.print("SELECTED");
-    g_panel.drawFastHLine(0, 11, kWidth, SH110X_WHITE);
-    renderPrimaryFunction(24);
+    printCentredClipped("SOURCE", 19, kContentTop);
+    renderPrimaryFunction(38);
     g_panel.display();
 }
 
@@ -260,11 +263,13 @@ void renderMessage(FrameKind kind, const char* message) {
     g_panel.setTextColor(SH110X_WHITE);
     g_panel.setTextSize(1);
     g_panel.setTextWrap(false);
-    g_panel.setCursor(0, 0);
-    g_panel.print(kind == FrameKind::Diagnostic ? "DIAGNOSTIC" : "STATUS");
-    g_panel.drawFastHLine(0, 10, kWidth, SH110X_WHITE);
+    printCentredClipped(
+        kind == FrameKind::Diagnostic ? "DIAGNOSTIC" : "STATUS",
+        19,
+        kContentTop);
+    g_panel.drawFastHLine(18, 34, 92, SH110X_WHITE);
     g_panel.setTextWrap(true);
-    g_panel.setCursor(0, 18);
+    g_panel.setCursor(7, 39);
     g_panel.print(message);
     g_panel.display();
 }
@@ -420,6 +425,7 @@ void init() {
     }
 
     g_panel.setRotation(kPanelRotation);
+    g_panel.setContrast(kPanelContrast);
 
     g_startupStartedMs = nowMs();
     g_startupActive = true;

@@ -79,8 +79,13 @@ hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6 and settings 3/3 (43/43 total).
 The production safe-bootstrap image was restored by USB after testing and serial
 reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
 
-Display-calibration increment (2026-08-30): the release build passed and the
-expanded `test_display` suite passed 11/11 on the physical SH1106. The production
-safe-bootstrap image was then installed with the 180-degree, 8-pixel calibration
-pattern active; OTA readiness remained available. Final visible-boundary photo
-analysis is pending and is not yet a layout-acceptance claim.
+Display-refinement increment (2026-08-30): the persistent 180-degree calibration
+frame, calibrated viewport contract, safe content band and retained paused
+metadata expanded `test_display` to 12/12. Physical photographs were used to
+accept the final fitted-Perspex layouts, including the corner play/pause glyph.
+The calibration frame remains available as a service diagnostic; production
+startup returns to the accepted standby view while OTA remains continuously
+serviced. The final release build passed and the complete physical run passed
+45/45: buttons 9/9, display 12/12, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6
+and settings 3/3. Production was restored by USB and serial reconfirmed
+`[OTA] ready at 192.168.1.79 (decca.local)`.

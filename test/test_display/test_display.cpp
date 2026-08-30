@@ -139,6 +139,22 @@ void test_display_holds_and_leaves_calibration_pattern() {
                       static_cast<int>(g_lastKind));
 }
 
+void test_display_calibrated_viewport_contract() {
+    TEST_ASSERT_EQUAL_UINT8(4, decca::display::kViewportX);
+    TEST_ASSERT_EQUAL_UINT8(10, decca::display::kViewportY);
+    TEST_ASSERT_EQUAL_UINT8(120, decca::display::kViewportWidth);
+    TEST_ASSERT_EQUAL_UINT8(52, decca::display::kViewportHeight);
+    TEST_ASSERT_EQUAL_UINT8(24, decca::display::kContentTop);
+    TEST_ASSERT_EQUAL_UINT8(60, decca::display::kContentBottom);
+    TEST_ASSERT_EQUAL_UINT8(0x80, decca::display::kPanelContrast);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT8(
+        decca::display::kWidth,
+        decca::display::kViewportX + decca::display::kViewportWidth);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT8(
+        decca::display::kHeight,
+        decca::display::kViewportY + decca::display::kViewportHeight);
+}
+
 void test_display_animates_startup_without_blocking() {
     startInjected();
 
@@ -211,6 +227,16 @@ void test_display_copies_and_clears_now_playing_metadata() {
 
     TEST_ASSERT_TRUE(g_lastState.playing);
     TEST_ASSERT_EQUAL_STRING("BBC RADIO 2", g_lastFunction);
+    TEST_ASSERT_EQUAL_STRING("Gimme Shelter", g_lastTitle);
+    TEST_ASSERT_EQUAL_STRING("The Rolling Stones", g_lastArtist);
+
+    state.functionName = "BBC RADIO 2";
+    state.title = "Gimme Shelter";
+    state.artist = "The Rolling Stones";
+    state.playing = false;
+    decca::display::setState(state);
+    decca::display::update();
+    TEST_ASSERT_FALSE(g_lastState.playing);
     TEST_ASSERT_EQUAL_STRING("Gimme Shelter", g_lastTitle);
     TEST_ASSERT_EQUAL_STRING("The Rolling Stones", g_lastArtist);
 
@@ -337,6 +363,7 @@ void test_display_begin_failure_is_safe() {
 void runAll() {
     RUN_TEST(test_display_physical_sh1106_snapshot);
     RUN_TEST(test_display_holds_and_leaves_calibration_pattern);
+    RUN_TEST(test_display_calibrated_viewport_contract);
     RUN_TEST(test_display_animates_startup_without_blocking);
     RUN_TEST(test_display_dashboard_carries_function_and_controls);
     RUN_TEST(test_display_copies_and_clears_now_playing_metadata);

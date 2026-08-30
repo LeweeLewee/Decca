@@ -64,11 +64,14 @@ AI-assisted editing.
   frame changes, an animation frame advances, or a transient expires. Mapped
   names and metadata use fixed-size copied text fields, so Phase 2 can supply
   them without allocation or changing the display interface. The installed
-  panel is rendered at Adafruit GFX rotation 2 (180 degrees). A persistent,
-  non-blocking full-canvas calibration frame exposes nested 0/2/4-pixel borders,
-  an 8-pixel grid, labelled coordinates and asymmetric corner marks so a
-  straight-on photograph through the fitted Perspex can define the final safe
-  viewport without changing the mechanical aperture.
+  panel is rendered at Adafruit GFX rotation 2 (180 degrees) and contrast 0x80.
+  Physical calibration established viewport X4–123/Y10–61; production content
+  uses Y24–60 to avoid the upper viewing-angle/parallax zone. The accepted UI
+  presents one priority at a time: identity/standby, a control value and bar,
+  source confirmation, status, or title/artist metadata. A small bottom-right
+  triangle or two-bar glyph communicates playing or paused without repeating a
+  text label. The non-blocking full-canvas calibration frame remains available
+  as a service diagnostic.
 
 ## Data Flow
 

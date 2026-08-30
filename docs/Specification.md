@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA physical acceptance and full `esp32dev` toolchain verification are complete. Fitted-Perspex display refinement is active: output is rotated 180 degrees and a tested full-canvas calibration pattern awaits straight-on photo analysis to define the visible safe viewport. Interrupted-transfer acceptance, control orchestration and WiiM integration remain outstanding. |
-| Version  | 0.20                                              |
+| Status   | Draft. USB-to-OTA acceptance, full `esp32dev` verification and the fitted-Perspex display visual cycle are complete. The accepted UI uses 180-degree rotation, a conservative calibrated content band, reduced contrast and focused play/pause-aware views. Interrupted-transfer acceptance, control orchestration and WiiM integration remain outstanding. |
+| Version  | 0.21                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -220,10 +220,10 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ### Phase 1 — Local Control
 - FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06, FR-LGT, FR-SET satisfied.
 - Local controls and vinyl selection remain available without a network; digital content selection requires the WiiM app/network.
-- **Confirmed 2026-08-30:** all seven `esp32dev` on-target suites passed, 43/43 tests.
+- **Confirmed 2026-08-30:** all seven `esp32dev` on-target suites passed, 45/45 tests after fitted-display refinement.
 - **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.1.79 (decca.local)`.
 - Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
-- **Confirmed 2026-08-30:** the `esp32dev` release build passed cleanly (RAM 49,520 bytes / 15.1%; flash 825,965 bytes / 63.0%).
+- **Confirmed 2026-08-30:** the final `esp32dev` release build passed cleanly (RAM 49,728 bytes / 15.2%; flash 832,205 bytes / 63.5%).
 
 ### Phase 2 — WiiM Integration
 - FR-WIM-01..04 and FR-DSP-03/07 satisfied.

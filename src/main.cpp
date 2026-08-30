@@ -8,7 +8,6 @@ void setup(){
     Serial.begin(115200);
     decca::hardware::init();
     decca::display::init();
-    decca::display::showCalibrationPattern();
     decca::ota::init();
 }
 void loop(){

@@ -35,7 +35,7 @@ Implemented modules:
 | `settings` | NVS persistence implemented, schema version 2 |
 | `buttons` | On/off plus sole Gram contact, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
-| `display` | SH1106 UI plus active fitted-aperture calibration pattern; output rotated 180 degrees |
+| `display` | Fitted-Perspex SH1106 UI physically accepted; 180-degree rotation, calibrated safe band and play/pause metadata views |
 | `lighting` | Safe-off non-blocking PWM fades |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | Planned, not implemented |
@@ -88,10 +88,12 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 
 - Four pots passed on target with full 0–4095 travel and clockwise increase.
 - Pi Hut 1.3-inch 128×64 white SH1106 OLED was electrically verified at address
-  0x3C. After final Perspex installation exposed a restricted visible area, the
-  output was rotated 180 degrees and an 8-pixel fitted-aperture calibration
-  pattern passed its expanded 11/11 display suite on 2026-08-30. Straight-on
-  photo analysis and final safe-viewport layout remain pending.
+  0x3C and physically accepted behind the final Perspex on 2026-08-30. Output is
+  rotated 180 degrees; the measured viewport is X4–123/Y10–61 and normal content
+  is restricted to Y24–60 for viewing-angle readability. Contrast 0x80 and the
+  focused identity, control, source, metadata, play/pause and standby layouts
+  were accepted from physical photographs. The calibration pattern remains a
+  service diagnostic.
 - Gram GPIO23 contact was physically verified before the firmware was simplified
   to its final two-state model.
 - Revised button logic passed strict host compilation and its nine-case harness.
@@ -100,9 +102,10 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
   `esp32dev-ota` upload succeeded and the rebooted ESP32 reported
   `[OTA] ready at 192.168.1.79 (decca.local)`.
-- The full `esp32dev` release build passed and all seven on-target suites passed
-  43/43 tests on 2026-08-30. Production firmware was restored afterward and
-  OTA readiness was reconfirmed.
+- The final fitted-display `esp32dev` release build passed and all seven
+  on-target suites passed 45/45 tests on 2026-08-30 (buttons 9, display 12,
+  hardware 3, lighting 7, OTA 5, pots 6 and settings 3). Production firmware
+  was restored afterward and OTA readiness was reconfirmed.
 - Display mount Rev P.5 is released and physically validated.
 - Root documentation and the final OLED loom colours were reconciled at chat
   close-out.
@@ -160,11 +163,10 @@ the user's Wi-Fi or OTA passwords.
 
 1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
 2. **Complete (2026-08-30):** full PlatformIO `esp32dev` release build and all
-   seven on-target suites, 43/43 tests passed.
-3. **Current:** photograph the active fitted-aperture calibration pattern
-   straight-on, derive the visible pixel bounds, then redesign and verify every
-   display view inside the calibrated safe viewport.
-4. Implement the planned `power` module and bench-test GPIO19.
+   seven on-target suites; latest accepted run passed 45/45 tests.
+3. **Complete (2026-08-30):** fitted-Perspex display calibration, visual design
+   cycle and physical acceptance.
+4. **Current:** implement the planned `power` module and bench-test GPIO19.
 5. Reconcile `main.cpp` from safe bootstrap into the non-blocking Phase 1
    scheduler, initialising and coordinating all existing modules while
    continuously servicing OTA.
@@ -217,18 +219,11 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: use a straight-on photograph of the fitted OLED's active
-8-pixel calibration grid to derive the visible pixel bounds, then redesign all
-display views inside that calibrated safe viewport. Output is already rotated
-180 degrees and the production safe-bootstrap runtime is holding the pattern
-while continuously servicing OTA. The expanded display suite passed 11/11.
-
-After the fitted-display refinement, implement the planned `power` module and
-bench-test GPIO19 one step at a time. Earlier gates passed on 2026-08-30:
-authenticated USB-to-OTA physical acceptance, a clean `esp32dev` release build
-and all seven
-on-target suites (43/43 tests). Production firmware was restored afterward and
-serial reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
+Immediate priority: implement the planned `power` module and bench-test GPIO19,
+one step at a time. The preceding gates passed on 2026-08-30: authenticated
+USB-to-OTA physical acceptance, the full PlatformIO build/test gate, and fitted-
+Perspex display calibration plus visual acceptance. Production firmware starts
+the accepted display in standby while continuously servicing OTA.
 
 After power/GPIO19 verification, continue with non-blocking Phase 1 main-loop
 orchestration, then GPIO25 lighting commissioning. Keep the deferred Stereo/Mono
