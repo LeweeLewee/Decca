@@ -111,6 +111,11 @@ Pass criteria:
 - an authenticated wireless upload succeeds and the ESP32 reboots;
 - the device reports ready again after the OTA reboot.
 
+Recorded result (2026-08-30): the authenticated `esp32dev-ota` upload succeeded.
+After the ESP32 rebooted, serial reported
+`[OTA] ready at 192.168.1.79 (decca.local)`. USB-to-OTA physical acceptance is
+complete.
+
 The dual application slots protect against interrupted or rejected transfers.
 Automatic rollback after a fully received image fails to boot remains a Phase 3
 hardening item, so preserve a practical USB recovery route even after OTA passes.

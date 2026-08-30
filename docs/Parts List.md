@@ -12,7 +12,7 @@ validation remains.
 
 | Item | Qty | Status | Spec / Notes | Source |
 |------|-----|--------|--------------|--------|
-| ESP32 DevKit | 1 | **ACQUIRED — OTA BOOTSTRAP IMPLEMENTED** | 30-pin DevKit V1 / DOIT-style board. Authenticated local-network OTA uses dual application partitions; complete USB→OTA acceptance before enclosure. | Existing stock |
+| ESP32 DevKit | 1 | **ACQUIRED — USB→OTA VERIFIED** | 30-pin DevKit V1 / DOIT-style board. Authenticated `esp32dev-ota` upload and post-reboot readiness were physically verified on 2026-08-30; dual application partitions are in use. | Existing stock |
 | ESP32 screw-terminal adapter | 1 | **ACQUIRED** | Matching 30-pin terminal adapter used for the installed controller. | Existing stock |
 | ABW1 10K linear potentiometers | 4 | **INSTALLED / VERIFIED** | AB Elektronik / TT Electronics ABW1 10K, CPC order code RE04644. Position sensors for Balance, Treble, Bass and Volume; not in the audio path. | CPC |
 | OLED display | 1 | **INSTALLED / VERIFIED** | Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V. | The Pi Hut |

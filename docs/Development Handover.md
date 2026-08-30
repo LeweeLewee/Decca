@@ -94,6 +94,9 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - Revised button logic passed strict host compilation and its nine-case harness.
 - Lighting logic passed strict host compilation and its seven-case harness.
 - OTA logic passed strict host compilation and its five-case harness.
+- USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
+  `esp32dev-ota` upload succeeded and the rebooted ESP32 reported
+  `[OTA] ready at 192.168.1.79 (decca.local)`.
 - Display mount Rev P.5 is released and physically validated.
 - Root documentation and the final OLED loom colours were reconciled at chat
   close-out.
@@ -101,11 +104,12 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 Do not convert host validation into an on-target claim. Record future physical
 results explicitly.
 
-## Immediate gate before mounting the ESP32
+## Completed gate before mounting the ESP32
 
-OTA is implemented but **USB-to-OTA physical acceptance is still pending**.
-Do not treat OTA as commissioned until one USB bootstrap flash and one
-authenticated wireless upload both succeed.
+USB-to-OTA physical acceptance **passed on 2026-08-30**. The authenticated
+`esp32dev-ota` upload succeeded and, after reboot, serial reported
+`[OTA] ready at 192.168.1.79 (decca.local)`. The procedure is retained below for
+future controller replacement or recovery.
 
 On the user's Windows machine, `pio` is not currently on PATH. Use the
 PlatformIO executable directly:
@@ -148,8 +152,9 @@ the user's Wi-Fi or OTA passwords.
 
 ## Recommended firmware sequence
 
-1. Complete and record USB-to-OTA acceptance before enclosure.
-2. Run the full PlatformIO build and all suites on the actual toolchain.
+1. **Complete (2026-08-30):** USB-to-OTA acceptance before enclosure.
+2. **Current:** run the full PlatformIO `esp32dev` build and all suites on the
+   actual toolchain.
 3. Implement the planned `power` module and bench-test GPIO19.
 4. Reconcile `main.cpp` from safe bootstrap into the non-blocking Phase 1
    scheduler, initialising and coordinating all existing modules while
@@ -199,18 +204,15 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: complete the physical USB-to-OTA acceptance before the ESP32
-is mounted. The Windows PowerShell command "pio" is not on PATH, so use:
-$pio = "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe"
-First confirm the PlatformIO version and actual COM port, then guide me one step
-at a time through test_ota, the initial USB flash, serial confirmation of
-"[OTA] ready", and one authenticated esp32dev-ota upload. Never ask me to paste
-or reveal Wi-Fi or OTA passwords, and never commit src/secrets.h. Do not type or
-tell me to type the literal placeholder COM_PORT.
+Immediate priority: run the full `esp32dev` PlatformIO build and all test
+suites on the actual toolchain, recording the exact result before moving on.
+USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
+`esp32dev-ota` upload succeeded and the rebooted ESP32 reported
+`[OTA] ready at 192.168.1.79 (decca.local)`. Do not repeat that acceptance unless
+the controller, credentials or network environment changes.
 
-Do not claim OTA commissioning until the physical wireless upload succeeds.
-After that, continue the documented firmware sequence: full on-target
-build/tests, power-module and GPIO19 verification, non-blocking Phase 1 main-loop
+After the full build/tests, continue the documented firmware sequence:
+power-module and GPIO19 verification, non-blocking Phase 1 main-loop
 orchestration, then GPIO25 lighting commissioning. Preserve the locked Gram-only
 source logic: Gram closed = Vinyl/Line-In; Gram open = Digital Streamer controlled
 by phone; GPIO16/17/18 remain unused. Preserve the final OLED loom: Brown GND,

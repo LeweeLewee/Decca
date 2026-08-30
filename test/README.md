@@ -66,3 +66,8 @@ by testing extracted libraries under `lib/`. Not required for Phase 1.
 ## OTA suite
 
 `pio test -e esp32dev -f test_ota` covers disabled operation, non-blocking connection, timed retry, service start/handling and Wi-Fi-loss recovery. Physical acceptance is one USB bootstrap flash followed by one authenticated wireless upload.
+
+USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
+`esp32dev-ota` upload succeeded and, after reboot, serial reported
+`[OTA] ready at 192.168.1.79 (decca.local)`. Interrupted-transfer acceptance
+remains a separate outstanding check.

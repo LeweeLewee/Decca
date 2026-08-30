@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Safe bootstrap runtime now initialises hardware and provides authenticated, non-blocking local-network OTA. Dual OTA partitions protect against interrupted transfer; automatic rollback after a fully received but boot-invalid image remains Phase 3. Control orchestration and WiiM integration remain in progress. |
-| Version  | 0.17                                              |
+| Status   | Draft. Authenticated USB-to-OTA physical acceptance is complete: the wireless upload succeeded and the ESP32 returned ready after reboot. Interrupted-transfer acceptance and Phase 3 automatic failed-boot rollback remain outstanding. Control orchestration and WiiM integration remain in progress. |
+| Version  | 0.18                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -221,7 +221,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - FR-SYS-01..04, all FR-BTN, FR-POT, FR-DSP-01/02/05/06, FR-LGT, FR-SET satisfied.
 - Local controls and vinyl selection remain available without a network; digital content selection requires the WiiM app/network.
 - All Phase 1 module test suites pass (`pio test`).
-- One USB bootstrap flash and one authenticated OTA upload both succeed before enclosure.
+- **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.1.79 (decca.local)`.
 - Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
 - Build is clean per NFR-04.
 
