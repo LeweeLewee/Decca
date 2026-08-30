@@ -29,35 +29,91 @@ from parts.
 
 ## 5. Firmware Flashing and OTA Bootstrap
 
-Complete both tests before mounting the ESP32 where USB access is difficult.
+Complete both the USB and wireless uploads before mounting the ESP32 where USB
+access is difficult. OTA code being present is not proof that the installed
+network and credentials work.
 
-1. Create the private configuration:
-   ```powershell
-   Copy-Item src\secrets.example.h src\secrets.h
-   ```
-2. Replace the placeholders with the Wi-Fi details and a long unique OTA
-   password. Never commit `src/secrets.h`; it is gitignored.
-3. Flash once by USB:
-   ```powershell
-   pio run -e esp32dev -t upload --upload-port COM_PORT
-   ```
-4. Run `pio device monitor -b 115200` and wait for `[OTA] ready`.
-5. Set the same password for PlatformIO:
-   ```powershell
-   $env:DECCA_OTA_PASSWORD = "YOUR_SAME_OTA_PASSWORD"
-   ```
-6. Prove a wireless upload:
-   ```powershell
-   pio run -e esp32dev-ota -t upload
-   ```
-   If mDNS fails, add `--upload-port 192.168.x.x` using the displayed IP.
+### 5.1 Prepare PlatformIO on Windows
+
+In a normal PowerShell window, `pio` may not be on PATH even when the
+PlatformIO VS Code extension is installed. Use its executable directly:
+
+```powershell
+$pio = "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe"
+& $pio --version
+& $pio device list
+```
+
+If the first command fails, install or repair the PlatformIO IDE extension in
+VS Code before continuing.
+
+### 5.2 Create the private configuration
+
+```powershell
+git pull origin main
+if (-not (Test-Path src\secrets.h)) {
+    Copy-Item src\secrets.example.h src\secrets.h
+}
+notepad src\secrets.h
+```
+
+Replace the three placeholders locally. Use a long unique OTA password. Never
+commit, paste into chat or publish `src/secrets.h`; it is gitignored.
+
+### 5.3 Test and flash once by USB
+
+Connect the ESP32 and rerun `device list`. Set the real port shown by
+PlatformIO. The example below assumes COM5. Do **not** type the literal
+placeholder `COM_PORT`, and do not add a backslash before the port name.
+
+```powershell
+$port = "COM5"
+& $pio test -e esp32dev -f test_ota
+& $pio run -e esp32dev -t upload --upload-port $port
+& $pio device monitor --port $port -b 115200
+```
+
+Wait for:
+
+```text
+[OTA] ready at 192.168.x.x (decca.local)
+```
+
+Record the IP address, then exit the serial monitor with Ctrl+C.
+
+### 5.4 Prove authenticated wireless upload
+
+Set the same private OTA password used in `src/secrets.h`, perform one wireless
+upload, then clear it from the PowerShell process:
+
+```powershell
+$env:DECCA_OTA_PASSWORD = "THE SAME PRIVATE OTA PASSWORD"
+& $pio run -e esp32dev-ota -t upload
+Remove-Item Env:DECCA_OTA_PASSWORD
+```
+
+If mDNS cannot resolve `decca.local`, use the address printed by the ESP32:
+
+```powershell
+$env:DECCA_OTA_PASSWORD = "THE SAME PRIVATE OTA PASSWORD"
+& $pio run -e esp32dev-ota -t upload --upload-port 192.168.x.x
+Remove-Item Env:DECCA_OTA_PASSWORD
+```
 
 The computer and Decca must be on the same local network. Guest-network
 isolation or a VPN may block OTA. Do not expose the OTA service to the internet.
 
+Pass criteria:
+
+- `test_ota` passes on the ESP32;
+- the USB bootstrap upload succeeds;
+- serial reports `[OTA] ready`;
+- an authenticated wireless upload succeeds and the ESP32 reboots;
+- the device reports ready again after the OTA reboot.
+
 The dual application slots protect against interrupted or rejected transfers.
 Automatic rollback after a fully received image fails to boot remains a Phase 3
-hardening item, so retain recovery access until it is implemented.
+hardening item, so preserve a practical USB recovery route even after OTA passes.
 
 ## 6. First Power-On
 - Bring-up checklist
