@@ -16,8 +16,8 @@ Print-ready meshes exported from the CAD sources.
 
 | File | Print notes |
 |---|---|
-| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side** — which brackets the declared 0.100 mm two either side. Each is the complete right-hand end of the real Rev Q wall — full **16.60 mm** height, both **R4.25** corners, the real **1.25 mm** side wall, the real 2.80 mm depth. The sweep brackets the **±0.2 mm opening measurement** as well as the fit, so one print resolves both: a tab that drops in loose says the opening is bigger than measured, one that will not enter says it is smaller, and the notch number says by how much. ≈1.80 cm³ ≈ 2.3 g for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.5951 cm³ ≈ 0.76 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side** — which brackets the declared 0.100 mm two either side. Each is the complete right-hand end of the real Rev Q wall — full **16.60 mm** height, both **R4.25** corners, the real **1.25 mm** side wall, the real **2.30 mm** depth. The sweep brackets the **±0.2 mm opening measurement** as well as the fit, so one print resolves both: a tab that drops in loose says the opening is bigger than measured, one that will not enter says it is smaller, and the notch number says by how much. ≈1.74 cm³ ≈ 2.2 g for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **3.50 mm**, 0.5506 cm³ ≈ 0.70 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
 > ### The fit, in one line
 >
@@ -30,6 +30,11 @@ Print-ready meshes exported from the CAD sources.
 >
 > Treat the measurement as **±0.2 mm** — twice the interference it sets. The fit
 > gauge below brackets it. Build report §3.10, §8.4.
+>
+> **THE INSERT FITS** — confirmed on a printed part. One correction followed: at
+> 2.80 mm it bottomed out before the bezel face seated, so the depth is now
+> **2.30 mm** and the part is 3.50 mm deep overall rather than 4.00. The bezel
+> face still stands 1.20 mm proud of the Perspex, unchanged. Build report §3.11.
 
 > ### Rev Q print gate 1 — AT LEAST TWO CONTINUOUS WALL LOOPS
 >
@@ -104,7 +109,7 @@ Print-ready meshes exported from the CAD sources.
 > Full detail, the fit study and the test procedure:
 > `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
 
-> ### Seven owner changes since the brief
+> ### Eight owner changes since the brief
 >
 > 1. The two **recessed adhesive pads are deleted** — the underside is one
 >    unbroken seating face. **Re-check removability** on the prototype.
@@ -120,7 +125,9 @@ Print-ready meshes exported from the CAD sources.
 > 6. The corner **reverted to R3.00** on sight of the front view.
 > 7. **The opening was measured** — 36.74 × 16.45, not 35.20 × 15.30 — which
 >    restored the corner to R4.25 on physical evidence and made the insert derive
->    from the measurement. Build report §3.5 to §3.10.
+>    from the measurement.
+> 8. **The depth was cut 2.80 → 2.30** after a printed part fitted but bottomed
+>    out before the face seated. Build report §3.5 to §3.11.
 
 `Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
 unchanged. The first issue's `Bezel_Corner_Gauge_revQ_*` meshes are deleted —

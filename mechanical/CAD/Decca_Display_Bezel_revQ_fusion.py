@@ -143,7 +143,20 @@ P = {
     # -- PRESERVED: the Rev N bezel, recovered from the released STEP -------
     "bezel_w": 40.00,               # PRESERVED
     "bezel_h": 20.30,               # PRESERVED
-    "bezel_t": 4.00,                # PRESERVED
+    # THE FACE THICKNESS IS THE PRESERVED VALUE, NOT THE TOTAL.
+    # bezel_face_t is how far the bezel stands proud of the Perspex, and it
+    # is the whole of the Rev N external appearance. bezel_t is the total
+    # part depth and is DERIVED as (face + insert depth) below.
+    #
+    # It used to run the other way - bezel_t entered at 4.00 with the face
+    # derived as (bezel_t - bezel_lip_depth). That was fine while the depth
+    # never moved, but the moment the owner shortened the insert by 0.50 mm
+    # it would have pushed the front face +4.200 -> +4.700 and made the
+    # bezel stand half a millimetre prouder, which is a visible change
+    # nobody asked for. Entering the face instead means shortening the
+    # insert shortens the PART, which is what "reduce the depth of the
+    # insert, no other changes" actually means.
+    "bezel_face_t": 1.20,           # PRESERVED   Rev N, stands proud of the Perspex
     "bezel_outer_r": 2.00,          # PRESERVED   external corner radius
     "bezel_edge_break": 0.40,       # PRESERVED   front face edge fillet
     # THE FACE OPENING IS FLUSH WITH THE SKIRT ON ALL FOUR SIDES, so all
@@ -249,7 +262,14 @@ P = {
     # deliberate because it is resisted by the thinner 0.80 mm wall.
     "bezel_lip_interf_x": 0.100,    # OWNER/SPEC  per side, INTERFERENCE
     "bezel_lip_interf_y": 0.075,    # OWNER/SPEC  per side, INTERFERENCE
-    "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
+    # OWNER 2026-08-31: the insert FITS, but at 2.80 it bottoms out before
+    # the bezel face seats against the Perspex, so it comes down 0.50 mm.
+    # 2.80 was the Rev N rail engagement depth and had been carried through
+    # unchanged; this is the first physical evidence about it. The insert
+    # now covers 2.30 of the 3.00 mm Perspex thickness and stops 0.700 mm
+    # short of the rear face instead of 0.200 - which also buys back the
+    # carrier clearance the wider skirt had spent.
+    "bezel_lip_depth": 2.30,        # OWNER       was 2.80, bottoming out
 
     # THE WALL IS NO LONGER UNIFORM, at owner instruction 2026-08-30.
     #
@@ -370,6 +390,10 @@ P = {
 # Sign convention: interference positive means the insert is WIDER than the
 # hole and has to flex to enter.
 # ---------------------------------------------------------------------------
+# The bezel stands bezel_face_t proud of the Perspex whatever the insert
+# does, so the TOTAL depth follows the insert rather than constraining it.
+P["bezel_t"] = P["bezel_face_t"] + P["bezel_lip_depth"]
+
 P["bezel_lip_outer_w"] = P["panel_open_w"] + 2 * P["bezel_lip_interf_x"]
 P["bezel_lip_outer_h"] = P["panel_open_h"] + 2 * P["bezel_lip_interf_y"]
 
@@ -382,7 +406,8 @@ P["bezel_window_r"] = P["bezel_lip_corner_r"] - P["bezel_lip_wall_x"]
 
 # Names written into the Fusion parameter table as FORMULAS rather than as
 # frozen numbers, because they are derived above.
-DERIVED_INTO_P = ("bezel_lip_outer_w", "bezel_lip_outer_h",
+DERIVED_INTO_P = ("bezel_t",
+                  "bezel_lip_outer_w", "bezel_lip_outer_h",
                   "bezel_window_w", "bezel_window_h", "bezel_window_r")
 
 # Horizontal interference per side carried by the fit gauge, ascending.
@@ -407,7 +432,7 @@ def derive(P):
     # Z-chain --------------------------------------------------------------
     d["z_panel_front"] = P["panel_t"]                                # +3.000
     d["z_panel_rear"] = 0.0                                          #  0.000
-    d["bezel_face_t"] = P["bezel_t"] - P["bezel_lip_depth"]          #  1.200
+    d["bezel_face_t"] = P["bezel_face_t"]                            #  1.200
     d["z_bezel_front"] = d["z_panel_front"] + d["bezel_face_t"]      # +4.200
     d["z_lip_rear"] = d["z_panel_front"] - P["bezel_lip_depth"]      # +0.200
 
@@ -989,7 +1014,8 @@ def _write_params(design, P, d):
         "DERIVED  the lip controls the clear height")
     put("optical_h", "bezel_lip_inner_h",
         "DERIVED  face opening is flush with it, so they are equal")
-    put("bezel_face_t", "bezel_t - bezel_lip_depth", "DERIVED")
+    put("bezel_t", "bezel_face_t + bezel_lip_depth",
+        "DERIVED  total depth follows the insert")
     put("z_panel_front", "panel_t", "DERIVED seating plane")
     put("z_bezel_front", "z_panel_front + bezel_face_t", "DERIVED")
     put("z_lip_rear", "z_panel_front - bezel_lip_depth", "DERIVED")
@@ -1576,12 +1602,15 @@ def validate(P=P):
           "%.5f" % sx)
     _gate(abs(sy - P["bezel_h"]) < 1e-6, "envelope height 20.30 mm",
           "%.5f" % sy)
-    _gate(abs(sz - P["bezel_t"]) < 1e-6, "envelope depth   4.00 mm",
+    _gate(abs(sz - P["bezel_t"]) < 1e-6,
+          "envelope depth   %.2f mm (face %.2f + insert %.2f)"
+          % (P["bezel_t"], P["bezel_face_t"], P["bezel_lip_depth"]),
           "%.5f" % sz)
     _gate(abs(bb.maxPoint.z * 10 - d["z_bezel_front"]) < 1e-6,
           "bezel front face at z = +4.200", "%.5f" % (bb.maxPoint.z * 10))
     _gate(abs(bb.minPoint.z * 10 - d["z_lip_rear"]) < 1e-6,
-          "rearmost material at z = +0.200", "%.5f" % (bb.minPoint.z * 10))
+          "rearmost material at z = %+.3f" % d["z_lip_rear"],
+          "%.5f" % (bb.minPoint.z * 10))
 
     print("")
     print("3. THE CONTINUOUS LIP - by measured cross-section AREA")
@@ -1726,10 +1755,11 @@ def validate(P=P):
             "prove that it lays them")
 
     tip = _planar_face(body, d["z_lip_rear"])
-    _gate(tip is not None, "lip rear tip face exists at z = +0.200",
+    _gate(tip is not None,
+          "lip rear tip face exists at z = %+.3f" % d["z_lip_rear"],
           "%.4f mm2" % (tip.area * 100.0 if tip else 0.0))
     _gate(abs((d["z_panel_front"] - d["z_lip_rear"]) - P["bezel_lip_depth"])
-          < 1e-9, "lip depth = 2.800 mm",
+          < 1e-9, "lip depth = %.3f mm" % P["bezel_lip_depth"],
           "%.5f" % (d["z_panel_front"] - d["z_lip_rear"]))
     _gate(abs(d["bezel_lip_interf_x"]
               - (P["bezel_lip_outer_w"] - P["panel_open_w"]) / 2.0) < 1e-9,
@@ -1896,7 +1926,7 @@ def validate(P=P):
           "%.3f x %.3f" % (d["optical_w"], d["optical_h"]))
     _report("versus the figure brief 4 predicts",
             "30.90 x 13.60 - now %+.2f mm wider and %+.2f mm taller, all of "
-            "it owner-directed across six changes made on the model"
+            "it owner-directed across eight changes made on the model"
             % (d["optical_w"] - 30.90, d["optical_h"] - 13.60))
     _report("controlled by",
             "the skirt inner envelope on ALL FOUR sides - the face opening "

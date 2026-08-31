@@ -35,16 +35,18 @@ STL = os.path.join(HERE, "..", "STL", "Front_Bezel_revQ.stl")
 # Expected values - typed in from the controlled documents, NOT imported from
 # the generator. If the generator and these disagree, that is the point.
 # ---------------------------------------------------------------------------
-BEZEL_W, BEZEL_H, BEZEL_T = 40.00, 20.30, 4.00      # Rev N envelope, PRESERVED
+BEZEL_W, BEZEL_H = 40.00, 20.30                      # Rev N envelope, PRESERVED
+BEZEL_FACE_T = 1.20                                  # Rev N, stands proud - PRESERVED
 Z_FRONT = 4.20                                       # bezel front face
 Z_SEAT = 3.00                                        # Perspex front / seating
-Z_TIP = 0.20                                         # lip rear tip
+Z_TIP = 0.70                                         # lip rear tip
 LIP_OUT_W, LIP_OUT_H = 36.94, 16.60                  # inset-wall outer envelope
 LIP_IN_W, LIP_IN_H = 34.44, 15.00                    # derived, split wall
 LIP_WALL_X = 1.25                    # sides, flush with the face opening
 LIP_WALL_Y = 0.80                    # top/bottom, unchanged by the refinement
 LIP_WALL_MIN = LIP_WALL_Y            # the corners never go below this
-LIP_DEPTH = 2.80
+LIP_DEPTH = 2.30                     # owner: 2.80 bottomed out before seating
+BEZEL_T = BEZEL_FACE_T + LIP_DEPTH   # total depth FOLLOWS the insert
 LIP_CORNER_R = 4.25                                  # owner RESTORED on evidence
 LIP_INNER_R = 3.00                                   # derived: 4.25 - 1.25
 LIP_LEAD = 0.20
@@ -316,11 +318,14 @@ def main():
          "%.4f" % (hi[0] - lo[0]))
     gate(abs((hi[1] - lo[1]) - BEZEL_H) < TOL, "envelope height 20.30 mm",
          "%.4f" % (hi[1] - lo[1]))
-    gate(abs((hi[2] - lo[2]) - BEZEL_T) < TOL, "envelope depth 4.00 mm",
+    gate(abs((hi[2] - lo[2]) - BEZEL_T) < TOL,
+         "envelope depth %.2f mm (face %.2f + insert %.2f)"
+         % (BEZEL_T, BEZEL_FACE_T, LIP_DEPTH),
          "%.4f" % (hi[2] - lo[2]))
     gate(abs(hi[2] - Z_FRONT) < TOL, "front face at z = +4.200",
          "%.4f" % hi[2])
-    gate(abs(lo[2] - Z_TIP) < TOL, "rearmost material at z = +0.200",
+    gate(abs(lo[2] - Z_TIP) < TOL,
+         "rearmost material at z = %+.3f" % Z_TIP,
          "%.4f" % lo[2])
     gate(abs(lo[0] + BEZEL_W / 2) < TOL and abs(lo[1] + BEZEL_H / 2) < TOL,
          "centred on the opening datum",
@@ -340,7 +345,7 @@ def main():
 
     print("")
     print("4. THE CONTINUOUS LIP - cross-sections through the skirt")
-    for z in (Z_TIP + LIP_LEAD + 0.05, 1.60, Z_SEAT - 0.05):
+    for z in (Z_TIP + LIP_LEAD + 0.05, (Z_TIP + Z_SEAT) / 2.0, Z_SEAT - 0.05):
         bb = section_bbox(tris, z)
         okw = abs((bb[1] - bb[0]) - LIP_OUT_W) < TOL
         okh = abs((bb[3] - bb[2]) - LIP_OUT_H) < TOL
@@ -352,7 +357,7 @@ def main():
     # walk the whole perimeter and demand material at every station
     print("")
     print("5. THE CONTINUOUS LIP - continuity right around the perimeter")
-    zs = [Z_TIP + LIP_LEAD + 0.05, 1.60, Z_SEAT - 0.05]
+    zs = [Z_TIP + LIP_LEAD + 0.05, (Z_TIP + Z_SEAT) / 2.0, Z_SEAT - 0.05]
     path_pts = rrect_path(LIP_OUT_W / 2.0, LIP_OUT_H / 2.0, LIP_CORNER_R, 720)
     sides = {"left": [0, 0], "right": [0, 0], "top": [0, 0],
              "bottom": [0, 0], "corner": [0, 0]}
@@ -511,7 +516,8 @@ def main():
          "%.4f" % iw)
     gate(abs(ih - LIP_IN_H) < 0.02, "lip inner height %.2f mm" % LIP_IN_H,
          "%.4f" % ih)
-    gate(abs((Z_SEAT - Z_TIP) - LIP_DEPTH) < 1e-9, "lip depth 2.800 mm",
+    gate(abs((Z_SEAT - Z_TIP) - LIP_DEPTH) < 1e-9,
+         "lip depth %.3f mm" % LIP_DEPTH,
          "%.4f" % (Z_SEAT - Z_TIP))
     ix = (LIP_OUT_W - PANEL_OPEN_W) / 2.0          # positive = interference
     iy = (LIP_OUT_H - PANEL_OPEN_H) / 2.0          # positive = interference
@@ -588,8 +594,9 @@ def main():
          "%.4f vs %.4f" % (tip_w, LIP_OUT_W - 2 * LIP_LEAD))
     bbf = section_bbox(tris, Z_TIP + LIP_LEAD + 0.02)
     gate(abs((bbf[1] - bbf[0]) - LIP_OUT_W) < TOL,
-         "full envelope restored by z = +0.400, so 2.600 mm of the 3.000 mm "
-         "Perspex is covered at full section",
+         "full envelope restored by z = %+.3f, so %.3f mm of the %.3f mm "
+         "Perspex is covered at full section"
+         % (Z_TIP + LIP_LEAD, LIP_DEPTH - LIP_LEAD, PANEL_T),
          "%.4f" % (bbf[1] - bbf[0]))
     tip_gap = (PANEL_OPEN_W - (LIP_OUT_W - 2 * LIP_LEAD)) / 2.0
     gate(tip_gap > 0.0,
