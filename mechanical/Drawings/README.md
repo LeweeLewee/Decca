@@ -44,10 +44,10 @@ single loop the original 0.40 mm wall produced, and finally to an aperture that
 is **flush with the skirt on all four sides**. Rev Q must not change the
 carrier.
 
-## Display bezel — Rev Q, **OPEN**
+## Display bezel — Rev Q, **COMPLETE — signed off 2026-08-31**
 
-**Rev Q is built, modelled and validated, and is awaiting its first test
-print. It is NOT released.** Built to brief commit `7b107f2` ("require two-loop
+**Rev Q is built, modelled, validated, printed, fitted and signed off by the
+owner on 2026-08-31.** Built to brief commit `7b107f2` ("require two-loop
 inset wall") plus four owner changes made on the model. The bezel is one
 connected manifold solid: the Rev N face, envelope and external radii are
 carried over, and the two Rev N side rails are replaced by a single continuous
@@ -64,10 +64,11 @@ are deleted at owner instruction, so the underside is one unbroken seating face.
 > measurement plus 0.100 mm per side across and 0.075 mm per side up. Treat the
 > reading as ±0.2 mm; a further iteration is expected. Build report §3.10.
 >
-> **It fits.** Confirmed on a printed part. The insert depth then came down
-> 2.80 → **2.30 mm** because it bottomed out before the bezel face seated —
-> which also recovered the carrier clearance to 0.754 mm and doubled the OLED
-> glass clearance to 1.000 mm. Build report §3.11.
+> **It fits, and it is signed off.** Confirmed on printed parts: the fit, the
+> opening corner and the opening dimensions. A 2.30 mm depth was tried and
+> reverted — the bottoming-out was a printing issue, not the geometry. The slicer
+> two-loop preview and the powered test were not run as checks and are recorded
+> as not-run rather than passed. Build report §3.11–§3.12.
 
 | File | Role |
 |---|---|
@@ -97,7 +98,7 @@ thin spot anywhere removes area.
 | Bezel face opening, at the front face | **34.440 × 15.000**, R3.000 |
 | Inset-wall outer / inner envelope | **36.940 × 16.600** / 34.440 × 15.000 (flush, all four sides) |
 | Wall / corner radii | **1.250 sides / 0.800 top+bottom** / R4.250 outer, R3.000 inner |
-| Insert depth | **2.300** — was 2.800, it bottomed out |
+| Insert depth | **2.800** — 2.300 tried and reverted, the cause was a print issue |
 | Aperture | a straight bore — taper 0.00° |
 | Fit | **0.100 interference** per horizontal side, **0.075 interference** per vertical side |
 | **Effective clear optical opening** | **34.440 × 15.000** |
@@ -132,8 +133,9 @@ thin spot anywhere removes area.
 > least** two per side; the **interference-fit refinement**; the **pull-back**;
 > the corner **reverted to R3.00** on the render; **the opening measured** —
 > which restored R4.25 on physical evidence and made the insert derive from
-> the measurement; and the **depth cut 2.80 → 2.30 mm** after a printed part
-> fitted but bottomed out before the face seated. Build report §3.5 to §3.11.
+> the measurement; the **depth cut 2.80 → 2.30 mm** after a printed part fitted
+> but bottomed out; and that cut **reverted** when the cause proved to be a
+> printing issue, followed by **sign-off**. Build report §3.5 to §3.12.
 
 ## Display mount
 

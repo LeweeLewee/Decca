@@ -262,14 +262,19 @@ P = {
     # deliberate because it is resisted by the thinner 0.80 mm wall.
     "bezel_lip_interf_x": 0.100,    # OWNER/SPEC  per side, INTERFERENCE
     "bezel_lip_interf_y": 0.075,    # OWNER/SPEC  per side, INTERFERENCE
-    # OWNER 2026-08-31: the insert FITS, but at 2.80 it bottoms out before
-    # the bezel face seats against the Perspex, so it comes down 0.50 mm.
-    # 2.80 was the Rev N rail engagement depth and had been carried through
-    # unchanged; this is the first physical evidence about it. The insert
-    # now covers 2.30 of the 3.00 mm Perspex thickness and stops 0.700 mm
-    # short of the rear face instead of 0.200 - which also buys back the
-    # carrier clearance the wider skirt had spent.
-    "bezel_lip_depth": 2.30,        # OWNER       was 2.80, bottoming out
+    # 2.80 is the Rev N rail engagement depth, recovered from the released
+    # STEP. It was briefly cut to 2.30 on 2026-08-31 when a printed insert
+    # bottomed out before the bezel face seated - and REVERTED the same day
+    # when the owner traced that to a PRINTING issue rather than the
+    # geometry. The depth is therefore back to the proven value and the part
+    # is 4.00 mm deep overall again.
+    #
+    # Worth keeping in view if it ever recurs: 2.80 was proven for two short
+    # Rev N rails on the side flanks, about 8.6 mm of contact. A continuous
+    # wall has roughly 100 mm of perimeter and can foul anything anywhere
+    # behind the opening, so the Rev N figure is good evidence rather than a
+    # guarantee. It has now survived a physical offer-up.
+    "bezel_lip_depth": 2.80,        # PROVEN      Rev N; 2.30 tried and reverted
 
     # THE WALL IS NO LONGER UNIFORM, at owner instruction 2026-08-30.
     #

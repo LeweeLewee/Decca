@@ -10,14 +10,14 @@ Print-ready meshes exported from the CAD sources.
 - STLs are derived artefacts — the editable source lives in `../CAD/`.
 - Name files to match their CAD source and revision.
 
-## Display bezel — current revision: **Q — OPEN, integration prototype**
+## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**
 
 **Rev Q is bezel-only. The Rev P.5 carrier mesh below is FROZEN and unchanged.**
 
 | File | Print notes |
 |---|---|
-| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side** — which brackets the declared 0.100 mm two either side. Each is the complete right-hand end of the real Rev Q wall — full **16.60 mm** height, both **R4.25** corners, the real **1.25 mm** side wall, the real **2.30 mm** depth. The sweep brackets the **±0.2 mm opening measurement** as well as the fit, so one print resolves both: a tab that drops in loose says the opening is bigger than measured, one that will not enter says it is smaller, and the notch number says by how much. ≈1.74 cm³ ≈ 2.2 g for all five. |
-| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **3.50 mm**, 0.5506 cm³ ≈ 0.70 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
+| `Bezel_Fit_Gauge_revQ_GAUGE_I{000,005,010,015,020}.stl` | **Print these FIRST, with the production profile.** PETG, front face flat on the bed, no supports. Five end-tabs, notch-numbered 1…5, at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm horizontal interference per side** — which brackets the declared 0.100 mm two either side. Each is the complete right-hand end of the real Rev Q wall — full **16.60 mm** height, both **R4.25** corners, the real **1.25 mm** side wall, the real **2.80 mm** depth. The sweep brackets the **±0.2 mm opening measurement** as well as the fit, so one print resolves both: a tab that drops in loose says the opening is bigger than measured, one that will not enter says it is smaller, and the notch number says by how much. ≈1.80 cm³ ≈ 2.3 g for all five. |
+| `Front_Bezel_revQ.stl` | PETG, matt/satin **black**. **FRONT FACE FLAT ON THE BED, wall pointing up. No supports.** 40.00 × 20.30 × **4.00 mm**, 0.5951 cm³ ≈ 0.76 g. Every wall must slice as **at least two 0.40 mm loops** — see print gate 1. 4+ top/bottom layers or ironing on the bed face; it is the only surface anyone sees. |
 
 > ### The fit, in one line
 >
@@ -31,10 +31,15 @@ Print-ready meshes exported from the CAD sources.
 > Treat the measurement as **±0.2 mm** — twice the interference it sets. The fit
 > gauge below brackets it. Build report §3.10, §8.4.
 >
-> **THE INSERT FITS** — confirmed on a printed part. One correction followed: at
-> 2.80 mm it bottomed out before the bezel face seated, so the depth is now
-> **2.30 mm** and the part is 3.50 mm deep overall rather than 4.00. The bezel
-> face still stands 1.20 mm proud of the Perspex, unchanged. Build report §3.11.
+> **SIGNED OFF 2026-08-31.** The insert fits — confirmed on a printed part. A
+> 2.30 mm depth was tried and reverted when the bottoming-out that prompted it
+> proved to be a printing issue, so the depth is back at the proven Rev N
+> **2.80 mm** and the part is 4.00 mm deep overall. Build report §3.11–§3.12.
+>
+> The **slicer two-loop preview** and the **powered test** below were not run as
+> checks before sign-off. Parts printed and fitted, so the wall evidently laid,
+> but the gates are recorded as not-run rather than passed — worth doing if the
+> part is ever reprinted on a different machine or profile.
 
 > ### Rev Q print gate 1 — AT LEAST TWO CONTINUOUS WALL LOOPS
 >
@@ -109,7 +114,7 @@ Print-ready meshes exported from the CAD sources.
 > Full detail, the fit study and the test procedure:
 > `../Drawings/Decca_OLED_Display_Bezel_revQ_Build_Report.md`.
 
-> ### Eight owner changes since the brief
+> ### Nine owner changes since the brief
 >
 > 1. The two **recessed adhesive pads are deleted** — the underside is one
 >    unbroken seating face. **Re-check removability** on the prototype.
@@ -127,7 +132,9 @@ Print-ready meshes exported from the CAD sources.
 >    restored the corner to R4.25 on physical evidence and made the insert derive
 >    from the measurement.
 > 8. **The depth was cut 2.80 → 2.30** after a printed part fitted but bottomed
->    out before the face seated. Build report §3.5 to §3.11.
+>    out before the face seated.
+> 9. That cut was **reverted** — the cause was a printing issue, not the geometry
+>    — and the bezel was signed off. Build report §3.5 to §3.12.
 
 `Front_Bezel_revN.stl` remains the last **released** bezel mesh and is
 unchanged. The first issue's `Bezel_Corner_Gauge_revQ_*` meshes are deleted —
@@ -142,7 +149,7 @@ replaces the corner gauge.
 |---|---|
 | `Hex_Pocket_Fit_Coupon_revP.stl` | **Print this FIRST.** PETG, rear face flat on the bed, no supports. Five captive-nut pockets at 0.10/0.15/0.20/0.25/0.30 mm fit allowance, notch-numbered. Sets `nut_pocket_fit_allowance` from a physical part. 4.570 cm³. |
 | `Rear_Display_Carrier_revP.stl` | PETG **in OPAQUE BLACK**. **Rear face flat on the bed, building forward.** No supports. 4+ top layers or ironing on the Perspex seating face. Print the **four** Ø2.80 split sprung posts slowly — they stand 4.40 mm tall on a 0.80 mm half-section (exactly two 0.40 mm perimeters). **Print the 1.20 mm rear light shield fully solid** — it is the first 6 layers, flat on the bed; solid perimeters, never sparse infill and never a single translucent skin. The two light blocks grow up off it. 56.60 × 39.15 × **6.00 mm**, 4.411 cm³ ≈ 5.6 g. |
-| `Front_Bezel_revN.stl` | PETG, matt/satin black. **Unchanged for Rev P** — no revP-named file exists. This is the last **released** bezel mesh; the OPEN Rev Q above supersedes it for new work but is not yet released. |
+| `Front_Bezel_revN.stl` | PETG, matt/satin black. **Unchanged for Rev P** — no revP-named file exists. Superseded for new work by the signed-off Rev Q above. |
 
 > ## Rev P.5 is RELEASED — this mesh has been printed and tested
 >

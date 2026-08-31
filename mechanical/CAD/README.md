@@ -11,7 +11,7 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## Display bezel — current revision: **Q — OPEN, bezel test print required**
+## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**
 
 **Rev Q is bezel-only. The released Rev P.5 carrier is FROZEN and unchanged.**
 
@@ -58,16 +58,16 @@ Key dimensions, each verified by two independent tools:
 | Inset-wall inner envelope (derived) | 34.440 × 15.000 — **flush with the face opening on all four sides** |
 | Wall | **1.250 sides** (3.125 loops) / **0.800 top+bottom** (2.000 loops) |
 | Outer / inner corner radius | **R4.250** / R3.000 (derived from the side wall) |
-| Wall depth | **2.300** into the 3.00 mm Perspex — was 2.800, it bottomed out |
+| Wall depth | **2.800** into the 3.00 mm Perspex — 2.300 tried and reverted |
 | Horizontal fit | **0.100 INTERFERENCE per side** |
 | Vertical fit | **0.075 INTERFERENCE per side** |
 | Entry lead-in | 0.200 × 45°, outer rear edge only — tip is 0.100 / 0.125 mm per side UNDER the opening |
-| Rearmost material | z = **+0.700** — 0.700 clear of the Perspex rear face |
-| Clearance to the OLED glass | **1.000** — double the brief minimum |
-| Minimum distance to the Rev P.5 carrier | **0.754** — recovered from 0.339 by the shorter insert |
+| Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
+| Clearance to the OLED glass | **0.500** — the brief minimum, and the released Rev N/P value |
+| Minimum distance to the Rev P.5 carrier | **0.339** — carry this forward |
 | Effective clear optical opening | **34.440 × 15.000**, R3.000 |
 | Seating face | one unbroken annulus, 210.867 mm² (adhesive pads deleted) |
-| Volume | 0.5506 cm³ ≈ 0.70 g in PETG |
+| Volume | 0.5951 cm³ ≈ 0.76 g in PETG |
 
 **52/52 gates PASS** in Fusion; **47/47 PASS** offline from the mesh. One shell,
 one lump, zero slivers, no degenerate triangles; the wall's cross-section area
@@ -77,11 +77,22 @@ including the corners; the interference is exactly 0.100 mm per side across and
 zero interference with the OLED glass or the carrier; nothing behind the
 Perspex rear face.
 
-> **THE INSERT FITS** — confirmed on a printed part. One correction followed: at
-> 2.80 mm it bottomed out before the bezel face seated, so the depth is now
-> **2.30 mm**. That also recovered the carrier clearance the wider skirt had
-> spent, 0.339 → **0.754 mm**, and doubled the OLED glass clearance to 1.000 mm.
-> Build report §3.11.
+> ## Signed off — 2026-08-31
+>
+> **The bezel is complete.** Confirmed on printed parts: the interference
+> fit, the opening corner (R4.25 a good match) and the opening dimensions
+> themselves. A 2.30 mm insert depth was tried and **reverted** when the
+> bottoming-out that prompted it turned out to be a printing issue rather
+> than the geometry — the depth is back at the proven Rev N 2.80 mm.
+>
+> **Not separately reported at sign-off:** the slicer two-loop preview and
+> the powered visibility test. Parts printed and fitted, so the wall
+> evidently laid, but neither was run as a check.
+>
+> **One figure to carry forward:** the bezel passes within **0.339 mm** of
+> the frozen Rev P.5 carrier. Zero interference, and it has been assembled,
+> but worth re-checking if either part is reprinted on a different machine.
+> Build report §3.11–§3.12.
 
 > **The fit is the primary gate.** 0.100 / 0.075 mm per side is an ordinary
 > press fit on paper, but acrylic is brittle and takes up interference by
@@ -92,10 +103,9 @@ Perspex rear face.
 > **Print `Bezel_Fit_Gauge_revQ` first** — five tabs at
 > 0.00/0.05/0.10/0.15/0.20 mm, which now brackets the declared value two either
 > side, each carrying the real wall section, the full 16.60 mm height, the
-> 2.30 mm depth and both R4.25 corners — and the sweep brackets the ±0.2 mm
+> 2.80 mm depth and both R4.25 corners — and the sweep brackets the ±0.2 mm
 > **measurement** error as well as the fit. Also plan on adhesive: **PETG
-> creeps**, so a press fit slackens over months, and the shorter insert has 18 %
-> less wall in contact. Build report §8.1, §8.4.
+> creeps**, so a press fit slackens over months. Build report §8.1, §8.4.
 
 > **The loop rule is a PRODUCTION gate, not a CAD one.** CAD proves the
 > geometry admits the loops: sides 1.250/0.400 = 3.125, top and bottom
@@ -121,8 +131,10 @@ Perspex rear face.
 > (5) the **pull-back**; (6) the corner **reverted to R3.00** on the render;
 > (7) **the opening measured** — which restored the corner to R4.25 on physical
 > evidence, showed the recorded opening was 1.54 × 1.15 mm small, and made the
-> insert derive from the measurement; and (8) **the depth cut 2.80 → 2.30** after
-> a printed part bottomed out before seating. Build report §3.5 to §3.11.
+> insert derive from the measurement; (8) **the depth cut 2.80 → 2.30** after a
+> printed part bottomed out before seating; and (9) that cut **reverted** when
+> the cause proved to be a printing issue, followed by **sign-off**. Build report
+> §3.5 to §3.12.
 
 > **The wall no longer costs lit screen height.** The clear opening is
 > 34.44 × 15.00, controlled by the skirt on all four sides with the face
@@ -234,7 +246,7 @@ The `.f3d` is the source of truth; the STEPs and the STL are derived exports.
 | `Rear_Display_Carrier_revP.step` | the one structural part |
 | `Decca_Display_Mount_revP_assembly.step` | carrier + Perspex + OLED + bezel + **original nuts / bolt envelope** references. **No lighting-unit keepout proxy** — Rev P.4 deleted it, and both tools assert its absence |
 | `Hex_Pocket_Fit_Coupon_revP.step` | five-station captive-nut pocket fit coupon — print this **before** the carrier |
-| `Front_Bezel_revN.step` | cosmetic bezel — **unchanged, still the file of record for Rev P, and the last RELEASED bezel**. Superseded for new work by the OPEN Rev Q above, which is not yet released |
+| `Front_Bezel_revN.step` | cosmetic bezel — **unchanged, still the file of record for Rev P**. Superseded for new work by the signed-off Rev Q above |
 
 Rev N files are retained as the last front-loaded design:
 `Decca_Display_Mount_revN.f3d`, `Decca_Display_Mount_revN_assembly.step`,

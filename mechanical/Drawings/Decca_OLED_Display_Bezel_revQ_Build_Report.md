@@ -1,12 +1,13 @@
 # Decca OLED Display Bezel — Rev Q Build Report
 
-Status: **OPEN — bezel-only integration prototype. NOT released, NOT for merge.**
+Status: **COMPLETE — signed off by the owner, 2026-08-31.** Bezel-only; the
+released Rev P.5 carrier is untouched throughout.
 
 Date: 2026-08-31
 Controlled requirements: `Decca_OLED_Display_Bezel_CAD_Brief_revQ.md` at commit
 `7b107f2389b2ce128c18bef2f5195ef5ab468890` ("require two-loop inset wall"),
 which supersedes `ebfa277` via `edab34b` ("define Rev Q interference fit"),
-plus **eight owner changes made on the model, recorded in §3.5 to §3.11**
+plus **nine owner changes made on the model, recorded in §3.5 to §3.12**
 Specification: `Decca_OLED_Display_Mount_Spec_v1.0.md` v1.2, §2 and §4
 Carrier: **Rev P.5, RELEASED and FROZEN — unchanged, and proved unchanged (§9)**
 
@@ -29,12 +30,30 @@ Carrier: **Rev P.5, RELEASED and FROZEN — unchanged, and proved unchanged (§9
 > whether the re-measured opening is right. Nothing in this report is a claim
 > about appearance.
 >
-> **THE INSERT FITS.** The owner printed it and reported the fit good. One
-> correction followed: at 2.80 mm the insert bottomed out before the bezel face
-> seated, so the depth comes down to **2.30 mm** (§3.11). That also handed back
-> the carrier clearance the wider skirt had spent — 0.339 → **0.754 mm**.
+> ## Signed off
+>
+> **The bezel is signed off as complete by the owner, 2026-08-31.**
+>
+> Confirmed on printed parts and offer-ups: the **interference fit**, the
+> **opening corner** (R4.25 a good match), and the **opening dimensions**
+> themselves (36.74 × 16.45, gauge-block method, §3.10). A 2.30 mm insert depth
+> was tried and **reverted** when the bottoming-out that prompted it was traced
+> to a printing issue rather than the geometry — the depth is back at the proven
+> Rev N 2.80 mm (§3.12).
+>
+> **Not separately reported at sign-off:** the slicer two-loop preview (§10
+> Stage 0b) and the powered visibility test (§10 Stage 4). Parts printed and
+> fitted, so the wall evidently laid, but neither check was run as such. They are
+> recorded here as not-run rather than passed.
+>
+> **One figure to carry forward:** the bezel passes within **0.339 mm** of the
+> frozen Rev P.5 carrier. Zero interference, and it has now been assembled, but
+> two FDM parts at ±0.1 mm each make that a real number — worth knowing if either
+> part is ever reprinted on a different machine or profile. §6.1.
 
 ---
+
+## 1. What Rev Q changes---
 
 ## 1. What Rev Q changes---
 
@@ -49,10 +68,10 @@ front
 BEZEL FACE
 ──────────────  seats against the Perspex front face,  z = +3.000
        │
-       │  continuous inset wall, 2.30 mm rearwards,
+       │  continuous inset wall, 2.80 mm rearwards,
        │  1.25 mm at the sides / 0.80 mm top and bottom
 PERSPEX│
-───────┘        wall rear tip,                         z = +0.700
+───────┘        wall rear tip,                         z = +0.200
 rear
 ```
 
@@ -83,7 +102,7 @@ the bezel must not drop out.
 | Aperture | straight | tapered in Y | **straight bore, flush all four sides** |
 | Effective optical opening | 30.40 × 14.20 | 30.90 × 13.60 | **34.44 × 15.00** |
 | Visible lit band | 8.100 (Rev N) | 7.450 | **8.150** |
-| Insert depth | 2.80 | 2.80 | **2.30** — the only change to it in the revision |
+| Insert depth | 2.80 | 2.80 | **2.80** — 2.30 tried and reverted, §3.11–§3.12 |
 
 Two things settled themselves at §3.10, both from one printed part. The
 **opening** is measured for the first time. The **corner** went to R4.25, back
@@ -145,9 +164,9 @@ z = -0.300   OLED glass front face
 
 ### 2.3 What the Rev N rails proved, and what they did not
 
-* **PROVED at the time:** the 2.80 mm engagement depth — since **corrected to
-  2.30 by the owner's offer-up** (§3.11), because a rail 2.80 deep and a
-  continuous wall 2.80 deep do not bottom out at the same point. Also that a
+* **PROVED:** the 2.80 mm engagement depth. It was briefly cut to 2.30 (§3.11)
+  and reverted when the bottoming-out proved to be a print issue (§3.12), so it
+  has now survived a physical offer-up on Rev Q as well. Also that a
   34.90 mm outer envelope
   clears the opening in X.
 * **NOT PROVED — anything in Y.** The rails span only y −4.000…+4.000. No Rev N
@@ -191,7 +210,7 @@ Source of truth is the `P` dict in
 | `panel_open_corner_r` | 0.00 mm | **UNRESOLVED** | modelled sharp, as the released Rev P reference. Not a measurement. |
 | `bezel_w` / `bezel_h` | 40.00 / 20.30 mm | PRESERVED | Rev N |
 | `bezel_face_t` | **1.20 mm** | **PRESERVED** | Rev N — how far the bezel stands proud of the Perspex; **entered**, so the total follows the insert (§3.11) |
-| `bezel_t` | **3.50 mm** | **DERIVED** | `bezel_face_t + bezel_lip_depth` |
+| `bezel_t` | **4.00 mm** | **DERIVED** | `bezel_face_t + bezel_lip_depth` |
 | `bezel_outer_r` | 2.00 mm | PRESERVED | Rev N external corner |
 | `bezel_edge_break` | 0.40 mm | PRESERVED | front face break |
 | `bezel_window_w` | **34.44 mm** | **DERIVED** | = skirt inner width, i.e. flush — §3.10 |
@@ -201,7 +220,7 @@ Source of truth is the `P` dict in
 | `pad_*` | 12.00 / 7.85 / 9.85 / 0.30 mm | retained | Rev N values, kept only so the pads can be restored |
 | **`bezel_lip_outer_w`** | **36.94 mm** | **DERIVED** | `panel_open_w + 2 × interf_x` — §3.10 |
 | **`bezel_lip_outer_h`** | **16.60 mm** | **DERIVED** | `panel_open_h + 2 × interf_y` — §3.10 |
-| **`bezel_lip_depth`** | **2.30 mm** | **OWNER** | was 2.80 (Rev N rail depth) — bottomed out before seating, §3.11 |
+| **`bezel_lip_depth`** | **2.80 mm** | PROVEN | Rev N rail depth; 2.30 tried and reverted — the cause was a print issue, §3.12 |
 | **`bezel_lip_wall_y`** | **0.80 mm** | **OWNER** | top/bottom, 2 loops — unchanged since the brief amendment |
 | **`bezel_lip_wall_x`** | **1.25 mm** | **OWNER** | sides, 3.125 loops — now entered, the clear width derives from it (§3.10) |
 | **`bezel_lip_corner_r`** | **4.25 mm** | **OWNER** | R2.00 (brief) → R3.00 (§3.5) → R3.40 (§3.7) → R4.25 (§3.8) → R3.00 (§3.9) → **R4.25 restored on physical evidence** (§3.10) |
@@ -224,8 +243,8 @@ Source of truth is the `P` dict in
 | `wall_loops_x` / `wall_loops_y` | `wall / extrusion_width` | **3.125** / **2.000** |
 | `aperture_rear_h` | `bezel_lip_inner_h` | 15.000 mm |
 | `bezel_face_t` | `bezel_t − bezel_lip_depth` | 1.200 mm |
-| **`bezel_t`** | `bezel_face_t + bezel_lip_depth` | **3.500 mm** |
-| `z_lip_rear` | `z_panel_front − bezel_lip_depth` | **+0.700 mm** |
+| **`bezel_t`** | `bezel_face_t + bezel_lip_depth` | **4.000 mm** |
+| `z_lip_rear` | `z_panel_front − bezel_lip_depth` | **+0.200 mm** |
 
 Three constraints are enforced in code and refuse to build if violated:
 
@@ -767,6 +786,12 @@ sound, but the black border is visibly slimmer than at any earlier issue — see
 
 ### 3.11 Eighth owner change — the insert fits, but it is 0.5 mm too deep
 
+> **REVERTED by §3.12.** The depth reduction below was undone the same day when
+> the owner traced the bottoming-out to a **printing issue**, not the geometry.
+> The depth is back at 2.80 mm. The **fit confirmation** in this section stands
+> — that is what closed the interference gate — and so does the reasoning about
+> `bezel_face_t`, which is why the revert cost nothing.
+
 *"Fits! We need to reduce the depth of the insert by 0.5 mm, it is preventing
 full insertion, no other changes."*
 
@@ -831,12 +856,65 @@ minimum.
 
 ---
 
+### 3.12 Ninth owner change — the depth reduction is reverted, and sign-off
+
+*"Undo that last 0.5 mm insertion reduction, the cause was a printing issue.
+Once reverted the bezel is signed off as complete."*
+
+`bezel_lip_depth` returns to **2.80 mm**, the Rev N engagement depth recovered
+from the released STEP in §2.3 and carried unchanged through this revision until
+§3.11 briefly cut it. Everything the reduction moved moves back:
+
+| | §3.11 | **reverted** |
+|---|---:|---:|
+| Insert depth | 2.300 | **2.800** |
+| Wall rear tip | z = +0.700 | **z = +0.200** |
+| Total part depth | 3.500 | **4.000** |
+| Clear of the Perspex rear face | 0.700 | **0.200** |
+| Clearance to the OLED glass | 1.000 | **0.500** |
+| Minimum distance to the Rev P.5 carrier | 0.754 | **0.339** |
+| Perspex covered by the insert | 2.300 of 3.000 | **2.600 of 3.000** |
+
+**A printing issue, not a design one — and the distinction matters.** §3.11
+reasoned from the bottoming-out that 2.80 might be wrong for a continuous wall
+even though it was proven for two short Rev N rails. That reasoning was sound but
+the premise was false: the obstruction was in the print, not in the geometry.
+2.80 has now survived a physical offer-up, which is the first time it has been
+tested outside Rev N.
+
+**The §3.11 restructure is kept, and it is why this revert was free.**
+`bezel_face_t` stays **entered** at 1.20 mm with `bezel_t` **derived** as face +
+insert depth. Putting the depth back therefore returns the total to exactly
+4.000 mm on its own, with the bezel face still standing 1.20 mm proud of the
+Perspex. Had the old arrangement survived, the revert would have had to move two
+numbers in step and could have left the face in the wrong place.
+
+**Engagement is restored**: the insert covers 2.600 of the 3.000 mm Perspex
+thickness again, so the 18 % of wall contact §3.11 gave up comes back, along with
+the grip and the resistance to rocking.
+
+**Two clearances go back to their tighter values**, and both are recorded rather
+than waived: the OLED glass at **0.500 mm**, which is exactly the brief minimum
+and the released Rev N/P value; and the frozen Rev P.5 carrier at **0.339 mm**.
+The carrier figure is the one to carry forward — see the sign-off note at the
+top of this report.
+
+**Unchanged**: everything else. The 40.00 × 20.30 envelope, the 1.20 mm face, the
+36.940 × 16.600 insert outer, the 34.440 × 15.000 clear opening and its 8.150 mm
+lit band, R4.250 / R3.000 corners, the 1.250 / 0.800 wall, the 0.100 / 0.075 mm
+fit, the 0.200 mm lead-in, the flush rule, the straight bore and the two-loop
+minimum.
+
+**With that reverted the owner signed the bezel off as complete.**
+
+---
+
 ## 4. Exact resulting dimensions
 
 | | mm |
 |---|---:|
 | **Perspex opening, MEASURED 2026-08-31** | **36.740 × 16.450** × 3.000 thick |
-| Bezel envelope | **40.000 × 20.300 × 3.500** — depth derived as face + insert |
+| Bezel envelope | **40.000 × 20.300 × 4.000** — depth derived as face + insert |
 | Bezel face thickness | **1.200** — PRESERVED, entered; the total follows it |
 | External corner radius | R2.000 |
 | Front edge break, outer | R0.400 fillet |
@@ -849,7 +927,7 @@ minimum.
 | **Inset-wall outer envelope** | **36.940 × 16.600** |
 | **Inset-wall inner envelope** | **34.440 × 15.000** — flush with the face opening on all four sides |
 | **Wall thickness** | **1.250 sides / 0.800 top and bottom**; corners sweep 0.800 → 1.216, never below 0.800 |
-| **Wall depth** | **2.300** (z +3.000 → +0.700) — was 2.800, §3.11 |
+| **Wall depth** | **2.800** (z +3.000 → +0.200) — 2.300 tried and reverted, §3.12 |
 | Outer corner radius | **R4.250** |
 | Inner corner radius | **R3.000** |
 | Entry lead-in | 0.200 × 45°, outer rear edge only |
@@ -858,15 +936,15 @@ minimum.
 | Bezel cover over the Perspex opening | 1.630 sides / 1.925 top and bottom |
 | **Horizontal fit** | **0.100 INTERFERENCE per side** |
 | **Vertical fit** | **0.075 INTERFERENCE per side** |
-| Interference volume, as modelled | **13.465 mm³** |
-| Rearmost material | z = **+0.700** — 0.700 clear of the Perspex rear face |
-| Clearance to OLED glass front face | **1.000** — double the brief minimum, was 0.500 |
-| **Minimum distance to the Rev P.5 carrier** | **0.754** — recovered from 0.339 by the shorter insert |
+| Interference volume, as modelled | **16.610 mm³** |
+| Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
+| Clearance to OLED glass front face | **0.500** — the brief minimum, and the released Rev N/P value |
+| **Minimum distance to the Rev P.5 carrier** | **0.339** — carry this forward, §3.12 |
 | **Effective optical opening** | **34.440 × 15.000**, R3.000 |
 | Seating face | one unbroken annulus, **210.867 mm²** (no adhesive pads) |
-| Perspex covered by the insert | **2.300 of 3.000** — 0.700 unmasked at the rear |
-| Solid volume | 0.5506 cm³ (mesh 550.221 mm³) |
-| Mass in PETG @ 1.27 g/cm³ | ≈ **0.70 g** |
+| Perspex covered by the insert | **2.600 of 3.000** — 0.200 unmasked at the rear |
+| Solid volume | 0.5951 cm³ (mesh 594.615 mm³) |
+| Mass in PETG @ 1.27 g/cm³ | ≈ **0.76 g** |
 | Mesh | 3590 triangles, 1795 vertices, closed, manifold, no degenerates |
 
 ---
@@ -944,31 +1022,33 @@ Two independent tools. Neither check was altered, relaxed or removed.
 | Group | Result |
 |---|---|
 | Solid integrity | one body, closed solid, **1 shell, 1 lump**, 0 sliver faces < 0.001 mm², 0 sliver edges < 0.005 mm; 45 faces, 108 edges |
-| Envelope | 40.00000 × 20.30000 × **3.50000**; front face +4.20000; rearmost **+0.70000** |
-| **Wall continuity, by AREA** | full ring **88.8247 mm²** at z = 0.95, 1.85 and 2.95 — matching the analytic value to four decimals |
+| Envelope | 40.00000 × 20.30000 × **4.00000**; front face +4.20000; rearmost **+0.20000** |
+| **Wall continuity, by AREA** | full ring **88.8247 mm²** at z = 0.45, 1.60 and 2.95 — matching the analytic value to four decimals |
 | Continuity by region | top **22.7520**, bottom **22.7520**, right **10.1250**, left **10.1250**, corners **23.0707 mm²** — every one exact |
 | Outer envelope | exactly 36.9400 × 16.6000 |
 | Clear width derivation | 34.440 = 36.94 − 2 × 1.25, i.e. from the entered side wall |
 | **Flush, all four sides** | skirt inner **34.4400 × 15.0000 R3.0000** == face opening **34.4400 × 15.0000 R3.0000** — three separate gates |
 | Wall through the R4.25 corners | sweeps **0.8000 → 1.2164 mm**, never below the 0.80 top/bottom wall, never above the 1.25 side wall |
 | Loop rule, per side | sides **3.125** loops, top/bottom **2.000** loops, corners never below **2.000**; corner loop radii **4.050** and **3.650**, no cusp; centrelines exactly **0.4000** apart |
-| **Interference present** | **13.4650 mm³** of overlap |
+| **Interference present** | **16.6102 mm³** of overlap |
 | Interference bounded | deepest **0.1000 mm** in X and **0.0750 mm** in Y — exactly the declared values, nowhere more |
-| Interference located | confined to the lip depth, z 0.8000…3.0000 — below +0.800 the lead-in holds the section clear |
+| Interference located | confined to the lip depth, z 0.3000…3.0000 — below +0.300 the lead-in holds the section clear |
 | Relief test | with 0.100/0.075 mm relief applied, overlap falls to **0.000000 mm³** |
 | Behind the Perspex rear face | **0.000000 mm³** |
-| OLED glass | 0.000000 mm³; clearance **1.0000 mm** |
-| **Rev P.5 carrier** | **0.000000 mm³**; minimum distance **0.7539 mm** — recovered from 0.3394 by the shorter insert |
+| OLED glass | 0.000000 mm³; clearance 0.5000 mm |
+| **Rev P.5 carrier** | **0.000000 mm³**; minimum distance **0.3394 mm** — see below |
 | Optical opening, plug test | a 34.40 × 14.96 plug passes clean through (0.000000 mm³); a 34.48 × 15.04 plug does not |
 | Aperture | 34.440 × 15.000 at both the seating plane and the front face — taper **0.00°** |
 | Print orientation | wall worst overhang **0.000°**; 0.0000 mm² of >45° overhang outside the bed-adjacent break; bed contact 215.443 mm² |
 
-> **Carrier clearance recovered to 0.754 mm.** The §3.10 skirt, sized to the
-> re-measured opening, had cut it from 0.939 to 0.339 mm; shortening the insert
-> to 2.30 mm (§3.11) hands most of that back, because the tip no longer reaches
-> as far behind the Perspex. Still worth confirming on the first dry fit with the
-> carrier bolted up — the carrier is released and frozen, so any conflict is the
-> bezel's to resolve — but it is off the watch list.
+> **Carrier clearance is 0.339 mm — carry this forward.** The §3.10 skirt, sized
+> to the re-measured opening, cut it from 0.939 mm. The §3.11 depth reduction
+> briefly recovered it to 0.754, and §3.12 reverted that. It is a **pass** — zero
+> interference — and the assembly has been made, but two FDM parts at roughly
+> ±0.1 mm each make 0.339 mm a real number rather than a comfortable one. The
+> carrier is released and frozen, so if it ever bites it is the bezel that
+> changes. Worth re-checking if either part is reprinted on a different machine
+> or profile.
 
 Two gates are reports rather than pass/fail: the fit summary, and the **entry
 clearance at the tip** — 0.100 mm per side across and 0.125 mm per side up,
@@ -992,11 +1072,11 @@ from the generator.
 1. MESH TOPOLOGY       every edge shared by exactly 2 triangles; consistent
                        winding; ONE connected component; no orphan vertices;
                        NO degenerate triangles; 3590 triangles,
-                       volume 550.2213 mm3
-2. ENVELOPE            40.0000 x 20.3000 x 3.5000; front +4.2000; rear +0.7000
-3. BEHIND THE PERSPEX  lowest z = +0.7000; 0.7000 clear of the rear face;
-                       1.0000 clear of the OLED glass
-4. WALL SECTIONS       36.9400 x 16.6000 at z = 0.95, 1.85 and 2.95
+                       volume 594.6145 mm3
+2. ENVELOPE            40.0000 x 20.3000 x 4.0000; front +4.2000; rear +0.2000
+3. BEHIND THE PERSPEX  lowest z = +0.2000; 0.2000 clear of the rear face;
+                       0.5000 clear of the OLED glass
+4. WALL SECTIONS       36.9400 x 16.6000 at z = 0.45, 1.60 and 2.95
 5. WALL CONTINUITY     720/720 stations x 3 depths, 0 voids
                        left 88/88  right 88/88  top 88/88  bottom 88/88
                        corner 368/368
@@ -1005,13 +1085,13 @@ from the generator.
 5b. LOOP RULE          sides 3.125 loops, top/bottom 2.000; corner loop radii
                        4.05 / 3.65, no cusp; centrelines 0.4000 apart;
                        inner corner R3.00; FLUSH
-6. ENVELOPE + FIT      inner 34.4400 x 15.0000; depth 2.3000;
+6. ENVELOPE + FIT      inner 34.4400 x 15.0000; depth 2.8000;
                        INTERFERENCE +0.1000/side X and +0.0750/side Y
 7. FACE + OPTICAL      15.0000 at z = 3.70, 3.20 and 1.60, spread 0.0000;
                        34.4400 wide at all three; taper 0.000 deg;
                        EFFECTIVE 34.4400 x 15.0000; vs Rev N +4.040 / +0.100
 8. LEAD-IN             tip 36.5400 vs 36.7400 opening, +0.100 mm per side
-                       UNDER it; full section by z = +0.900, so 2.100 of
+                       UNDER it; full section by z = +0.400, so 2.600 of
                        the 3.000 mm Perspex is covered at full section
 RESULT: 47/47 PASS
 ```
@@ -1034,7 +1114,7 @@ beyond, z from −30 to 0) was intersected with the bezel: **0.000000 mm³**.
 Every corridor of concern — the four sprung posts and their noses (forward-most
 at z = −0.400), the module insertion and removal path, the glass, the PCB and
 the carrier itself — lies entirely at z < 0. The bezel's rearmost material is at
-z = +0.700 and it does not reach z = 0. It therefore cannot enter any of them,
+z = +0.200 and it does not reach z = 0. It therefore cannot enter any of them,
 and this is proved without needing to model any of them individually.
 
 ---
@@ -1048,7 +1128,7 @@ In this orientation:
 * the wall is a **vertical wall** — measured worst overhang across all 26 wall
   faces is **0.000°**;
 * the wall is printed **last**, standing on the already-solid bezel face, so it
-  is supported at its root for its entire 2.30 mm height;
+  is supported at its root for its entire 2.80 mm height;
 * the 0.20 mm entry lead-in is at the **top** of the print and tapers *inward*,
   so it is self-supporting;
 * the aperture is a **straight bore** — there is no taper left to check against
@@ -1154,8 +1234,8 @@ committed: five loose end-tabs at **0.00 / 0.05 / 0.10 / 0.15 / 0.20 mm**
 interference per side, notch-numbered 1…5. The sweep now brackets the declared
 0.100 mm properly for the first time — two below, two above. Each is the complete
 right-hand end of the real Rev Q wall — full 16.60 mm height, both R4.25 corners,
-the real 1.25 mm side wall and 2.30 mm depth — so it engages exactly as the bezel
-will. 1.74 cm³ for all five, about 2.2 g.
+the real 1.25 mm side wall and 2.80 mm depth — so it engages exactly as the bezel
+will. 1.80 cm³ for all five, about 2.3 g.
 
 > **The sweep now brackets the MEASUREMENT as well as the fit.** The opening
 > reading carries perhaps ±0.2 mm (§3.10), which is twice the declared
@@ -1320,7 +1400,7 @@ Print in **PETG, matt or satin black**, front face down, no supports, per §7.
 
 ### Stage 0 — fit gauge first
 
-1. Print `Bezel_Fit_Gauge_revQ` (5 tabs, ≈1.74 cm³, ≈2.2 g) with the **production
+1. Print `Bezel_Fit_Gauge_revQ` (5 tabs, ≈1.80 cm³, ≈2.3 g) with the **production
    profile you will use for the bezel**.
 2. Offer each tab into the end of the real opening, notch 1 (0.00 mm
    interference) first, working up.
@@ -1405,8 +1485,16 @@ Print in **PETG, matt or satin black**, front face down, no supports, per §7.
 
 ### Acceptance
 
-Rev Q may be considered for release only when 6–22 pass on a real part with the
-real Perspex and the released carrier. Until then the revision stays **OPEN**.
+**Signed off by the owner on 2026-08-31.** The procedure above is retained as
+the record of what this design was tested against, and as the route back if the
+part is ever reprinted on a different machine or profile.
+
+What was closed on real parts: the **interference fit** (Stage 1), the **opening
+corner** and the **opening dimensions** (Stage 0, by the gauge-block method of
+§3.10). Not separately reported: the **slicer two-loop preview** (Stage 0b) and
+the **powered visibility test** (Stage 4) — parts printed and fitted, so the wall
+evidently laid, but neither was run as a check. They are recorded here as
+not-run rather than passed.
 
 If the fit needs adjustment, change only `panel_open_w` / `panel_open_h` (if
 you have re-measured them), `bezel_lip_outer_w`, `bezel_lip_outer_h`,
@@ -1431,10 +1519,16 @@ The brief's six stop conditions, honestly assessed:
 | Rev P.5 carrier or its released files would need to change | **NOT triggered, but WATCH IT.** All six frozen files byte-identical and zero interference — however the minimum distance has fallen 0.939 → **0.339 mm** as the skirt grew. The carrier is frozen, so any conflict is the bezel's to resolve. §6.1, §9 |
 | Fusion cannot produce and verify a stable, parametric single solid | **NOT triggered.** One shell, one lump, closed solid, zero slivers; mesh manifold, single-component, no degenerate triangles. Three build obstacles were met and resolved in the open: the window-edge fillet (→ chamfer, §3.4), a tangency seam of zero-area triangles (→ `ap_root_relief`, since designed out, §3.4), and two defects in the offline verifier's own wall probe (§6.2). |
 
-**No stop condition is triggered as built.** Two were at §3.7 and both were
-cleared — first by the §3.8 pull-back and then, properly, by discovering at
-§3.10 that the opening figures they were tested against were wrong. The revision
-stays **OPEN** on the physical gates above.
+**No stop condition is triggered as built, and the revision is signed off.**
+Two were triggered at §3.7 and both were cleared — first by the §3.8 pull-back,
+and then properly at §3.10 by discovering that the opening figures they had been
+tested against were wrong by 1.54 × 1.15 mm.
+
+The owner signed the bezel off as complete on 2026-08-31 (§3.12), with the fit,
+the opening corner and the opening dimensions all confirmed on printed parts.
+The two gates listed above as NOT CLOSED — the slicer two-loop preview and the
+powered test — remain not-run rather than passed, and the 0.339 mm carrier
+clearance remains the one figure worth carrying forward.
 
 ---
 
