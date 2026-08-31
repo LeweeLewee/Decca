@@ -6,6 +6,34 @@ Dimensioned engineering drawings for fabrication, measurement, and reference.
 - PDF drawings with critical dimensions and tolerances.
 - Reference sketches for cabinet fit and mounting.
 
+## ESP32 controller housing — Rev A, **PROTOTYPE CAD, not physically validated**
+
+| File | Contents |
+|---|---|
+| `Decca_ESP32_Controller_Housing_Spec_v1.0.md` | The controlling specification. Authority for the architecture. |
+| `Decca_ESP32_Controller_Housing_Build_Report_revA.md` | Rev A build report: derived dimensions, the envelope deviation and its arithmetic, both verification suites, every open prototype gate, print orientations and the recommended first print. |
+| `Decca_ESP32_Controller_Housing_revA_01_closed.png` | Closed housing. |
+| `..._02_lid_removed.png` | Lid removed, controller and breakout in place. |
+| `..._03_exploded.png` | Exploded assembly. |
+| `..._04_plan.png` / `..._05_elevation.png` | Overall plan and elevation. |
+| `..._06_section.png` / `..._06b_section_oblique.png` | Transverse section through the board, base and lid. |
+| `..._07_terminal_corridors.png` | All thirty screwdriver corridors as solids, lid removed. |
+| `..._08_cable_exits.png` | Wire runs and the lacing rails. |
+| `..._09_underside_clearances.png` | Continuous floor, with every fastener envelope outside it. |
+| `..._10_usb_envelope.png` | USB service envelope swept to the connector. |
+| `..._11_button_access.png` | EN/RESET and BOOT tool corridors. |
+| `..._12_antenna_keepout.png` | Wi-Fi antenna keep-out. |
+| `..._13_mounting_slots.png` | The four cabinet mounting slots. |
+| `..._14_fit_gauge.png` | The fit gauge — print this one first. |
+| `..._15_dimensioned_plan.png` | Dimensioned plan, plotted from the exported mesh. |
+| `..._16_dimensioned_section.png` | Dimensioned transverse section, plotted from the exported mesh. |
+
+Every image is regenerated from the model by `images()` and `--drawings`; none
+is posed by hand. Keep-out volumes are drawn as translucent yellow solids and
+acquired hardware as green, so a reader can tell manufacturing geometry from a
+dimensional assumption without opening the browser.
+
+
 ## Active OLED mount design direction
 
 `Decca_OLED_Display_Mount_CAD_Review_revO.md` is the authoritative carrier

@@ -11,6 +11,76 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
+## ESP32 controller housing — current revision: **A — PROTOTYPE CAD, NOT physically validated**
+
+Built to `../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`. Full write-up:
+`../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revA.md`.
+
+**Nothing here has been printed, and no dimension in it has been measured off
+the acquired hardware.** Every hardware figure is a CAD starting value taken
+from the specification, and every one of them is a prototype gate. The
+generator tags them in one place — the `STARTING` tuple — and both verification
+tools refuse to mark any of them `PASS`.
+
+Holds **only** the 30-pin ESP32 DevKit V1 / DOIT-style board and its matching
+30-pin screw-terminal breakout. The MOSFET board, WAGO connectors, fuse, DC
+socket, OLED, WiiM Pro, Fosi ZA3 and the future 12 V trigger are all mounted
+separately and were not brought into this box to solve a layout problem.
+
+| File | What it is |
+|---|---|
+| `Decca_ESP32_Controller_Housing_fusion.py` | The generator. `main()` builds all nine components, `validate()` runs the section 14 gates on the solids, `export()` writes every f3d/STEP/STL into this clone, `images()` regenerates the fourteen review PNGs. Idempotent: re-running rebuilds in place. |
+| `Decca_ESP32_Controller_Housing_verify.py` | The independent offline verifier. Reads **only** the exported STLs. `--drawings` plots the two dimensioned views from the same triangles. |
+| `Decca_ESP32_Controller_Housing.f3d` | Editable archive, 219 named user parameters. |
+| `Decca_ESP32_Controller_Housing_assembly.step` | Assembly, keep-out solids removed for readability. |
+| `ESP32_Controller_Housing_Base.step` | Base tray. |
+| `ESP32_Controller_Housing_Lid.step` | Lid. |
+| `ESP32_Controller_PCB_Clamps.step` | Both edge clamps in one exchange file. |
+| `ESP32_Controller_Carrier_Fit_Gauge.step` | Fit gauge. |
+
+**Retention uses no PCB hole.** The repository records no breakout
+mounting-hole pattern and specification section 2 forbids inventing one, so
+nothing enters the board: one short edge butts a hard datum, the other is held
+by a printed clamp with ±1.00 mm of slot travel, and each clamp bottoms on a
+plinth 0.20 mm above the board face so tightening cannot bow it.
+
+> **The derived envelope is 105.00 × 77.00 × 38.30 mm against a 90 × 78 ×
+> approximately 35 mm target, and that is an open owner decision, not an
+> oversight.** Section 10's 72.0 mm body budget contains no length at all for
+> the section 5.2 end clamps, their M3 screws, or the section 9 lid bosses that
+> section 9 itself requires to sit outside the board outline. The height is
+> forced by section 5.1, which measures its 3.00 mm clearance *beneath* the
+> solder joints that hang 2.50 mm down. Build report section 5 gives the
+> arithmetic and two documented ways to shorten it — one of which brings the
+> length inside target by moving the ears to the long sides. Neither was
+> applied unilaterally.
+
+### Rebuilding
+
+Inside Fusion (Utilities → Add-Ins → Scripts), or through the Fusion MCP
+bridge, run in order:
+
+```python
+g = runpy.run_path("mechanical/CAD/Decca_ESP32_Controller_Housing_fusion.py")
+g["main"](None)       # build or rebuild every component
+g["validate"](None)   # 59 CAD gates; returns the failure count
+g["export"](None)     # f3d, STEP and STL into this clone
+g["images"](None)     # the fourteen review PNGs
+```
+
+Then, offline:
+
+```bash
+python mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py
+python mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py --drawings
+```
+
+The verifier reads only the exported meshes and exits non-zero on failure, so
+it works as a gate. It is deliberately not a second run of the generator's
+recipe: it caught a floating lacing rail, four non-manifold tangency sites and
+four lid legends that reported success while cutting zero material.
+
+
 ## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**
 
 **Rev Q is bezel-only. The released Rev P.5 carrier is FROZEN and unchanged.**
