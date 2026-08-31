@@ -19,12 +19,13 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 90% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
-- USB-to-OTA, GPIO19 power, controls, source selection, fitted display and
-  GPIO25/MOSFET/lamp electrical acceptance are complete. Normal Stereo lighting
-  is locked at 90%; Mono and logical standby are off.
+- USB-to-OTA, GPIO19 power, controls, source selection and the fitted display
+  are complete. Final GPIO25 lighting acceptance is reopened as HW-LGT-01,
+  pending the selected DFR0457 replacement stage. Normal Stereo lighting remains
+  locked at 90%; Mono and logical standby are off.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
-firmware work.
+firmware work, then check [Open Issues](docs/Open%20Issues.md).
 
 ## Locked controller map
 
@@ -39,7 +40,7 @@ firmware work.
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted |
-| Dial lighting PWM | GPIO25/D25 | Physically accepted with MOSFET/lamp bank |
+| Dial lighting PWM | GPIO25/D25 | Pin accepted; final DFR0457 stage open under HW-LGT-01 |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 
@@ -53,6 +54,7 @@ Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 - [Parts list](docs/Parts%20List.md)
 - [Decision records](docs/adr/)
 - [Development handover](docs/Development%20Handover.md)
+- [Open issues](docs/Open%20Issues.md)
 - `src/`: firmware modules
 - `test/`: PlatformIO suites
 - `hardware/`: BOM, wiring and electrical design

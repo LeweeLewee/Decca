@@ -9,8 +9,8 @@ for the design that governs all firmware changes.
 
 ## Start here
 
-Read `docs/Development Handover.md` before changing firmware. It records the
-current physical evidence, immediate OTA acceptance gate and open work.
+Read `docs/Development Handover.md` and `docs/Open Issues.md` before changing
+firmware. They record the current physical evidence and open work.
 
 ## Build / test
 - Build: `pio run`
@@ -74,5 +74,8 @@ accepted. Automatic rollback after a fully received but boot-invalid image
 remains Phase 3.
 
 The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow
-SDA GPIO21. Draft PR #7 is separate Rev Q bezel work and must not be merged
-until its recorded physical gates pass.
+SDA GPIO21. Rev Q bezel PR #7 is merged, complete and owner-approved.
+
+GitHub `main` is the firmware source of truth. The ESP32's last-known installed
+image is the temporary 100% lighting diagnostic build; restore a verified build
+from `main` after implementing the <=1 kHz DFR0457 PWM change in HW-LGT-01.

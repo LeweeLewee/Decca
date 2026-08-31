@@ -1,6 +1,6 @@
 # Development Handover
 
-> **Close-out date:** 2026-08-30  
+> **Close-out date:** 2026-08-31
 > **Repository:** `LeweeLewee/Decca`  
 > **Authoritative branch:** `main`
 
@@ -10,22 +10,24 @@ Read it before relying on chat history.
 ## Read first
 
 1. `CLAUDE.md`
-2. `docs/Specification.md`
-3. `docs/Firmware Architecture.md`
-4. `docs/Hardware Architecture.md`
-5. `docs/Wiring.md`
-6. `docs/Build Guide.md`
-7. Relevant ADRs under `docs/adr/`
+2. `docs/Open Issues.md`
+3. `docs/Specification.md`
+4. `docs/Firmware Architecture.md`
+5. `docs/Hardware Architecture.md`
+6. `docs/Wiring.md`
+7. `docs/Build Guide.md`
+8. Relevant ADRs under `docs/adr/`
 
 Always inspect the live `main` branch before changing code. Historical chat
 messages and old revision-history entries may describe superseded hardware.
 
 ## Current firmware state
 
-The production `src/main.cpp` now initialises the safe board state, buttons,
-logical power, display and authenticated ArduinoOTA. It continuously services
-the original on/off switch, display and OTA without blocking. Full settings,
-pots, source, lighting and WiiM coordination is not yet implemented.
+The production `src/main.cpp` initialises the safe board state, buttons, logical
+power, display, lighting and authenticated ArduinoOTA. It continuously services
+the original on/off switch, pots, VHF source, Stereo/Mono lighting request,
+display and OTA without blocking. WiiM coordination is Phase 2 and is not yet
+implemented. Final lighting hardware acceptance is reopened as HW-LGT-01.
 
 Implemented modules:
 
@@ -40,7 +42,7 @@ Implemented modules:
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
 | WiiM interface | Phase 2, not implemented |
-| Main orchestration | Power, pots, VHF source, fitted display and OTA integrated; lighting commissioning open |
+| Main orchestration | Power, pots, VHF source, fitted display, lighting command and OTA integrated; final DFR0457 hardware acceptance open |
 
 The ESP32 is control/UI only. It never carries or processes audio.
 
@@ -190,25 +192,30 @@ the user's Wi-Fi or OTA passwords.
 8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
    Mono closed requests them off. GPIO25 load remained disabled during testing.
-9. Add WiiM Pro integration only in Phase 2, after the hardware is available and
+9. **Open — HW-LGT-01:** install and accept the selected DFR0457 final lighting
+   stage. Reduce PWM from 5 kHz to no more than 1 kHz first, then prove no lamp
+   flicker or pot/display chatter. The last-known device image is the temporary
+   100% diagnostic build; GitHub `main` retains the approved 90% source value.
+10. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
-10. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+11. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
 
-Consult `docs/Parts List.md` and the CSV BOMs for current detail. Principal open
-items are the inline fuse holder and matching fuses, 5 V/GND distribution
-connectors, final lighting level/current/holder checks, the ZA3 12 V trigger interface,
-WiiM Pro, Fosi ZA3, speakers and final audio interconnects.
+`docs/Open Issues.md` is the authoritative short list. Consult
+`docs/Parts List.md` and the CSV BOMs for procurement detail. Immediate open
+items are the DFRobot DFR0457, the WAGO 221-415 distribution-connector pack, the
+inline fuse holder and matching fuses, and final lighting current/holder checks.
+Phase 2 items remain the ZA3 12 V trigger interface, WiiM Pro, Fosi ZA3,
+speakers and final audio interconnects.
 
-## Open mechanical work
+## Mechanical status
 
-Draft PR [#7](https://github.com/LeweeLewee/Decca/pull/7) contains the Rev Q
-display bezel prototype. It is deliberately **not ready to merge**. Keep it
-draft until its corner gauge, dry fit, lip quality, cut-edge masking, carrier
-independence and powered readability tests pass. Do not alter the released Rev
-P.5 carrier to make Rev Q fit.
+Rev Q display bezel PR [#7](https://github.com/LeweeLewee/Decca/pull/7) is
+merged and owner-approved. The released Rev P.5 carrier remains frozen and
+unchanged. Re-check the recorded 0.339 mm carrier clearance if either part is
+reprinted on a different machine or profile.
 
 ## Engineering guardrails
 
@@ -220,7 +227,7 @@ P.5 carrier to make Rev Q fit.
 - Treat proposed pins as unverified until a physical test is recorded.
 - Update wiring, BOM, architecture and revision history with relevant changes.
 - Use Conventional Commits and do not overwrite unrelated work.
-- Do not merge draft mechanical work merely to make `main` look complete.
+- Do not alter the frozen Rev P.5 carrier to resolve a future bezel reprint.
 
 ## New-chat handover prompt
 
@@ -228,13 +235,21 @@ P.5 carrier to make Rev Q fit.
 Continue development and maintenance of the Decca ESP32 restoration firmware in
 https://github.com/LeweeLewee/Decca.
 
-Before acting, read docs/Development Handover.md in full, then CLAUDE.md,
-docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
+Before acting, read docs/Development Handover.md and docs/Open Issues.md in
+full, then CLAUDE.md, docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: complete final lamp-holder fit and current measurement,
-then proceed to Phase 2 WiiM integration when its hardware is available.
+Immediate priority: resolve docs/Open Issues.md HW-LGT-01. Buy and install the
+selected DFRobot DFR0457, reduce lighting PWM from 5 kHz to no more than 1 kHz,
+and repeat the recorded physical acceptance checks. Use WAGO 221-415 five-way
+connectors as separate +5 V and common-GND star points. The shared 5 V PSU is
+connected to ESP32 VIN/5V and USB is removed.
+
+GitHub main is the firmware source of truth and contains the approved 90% duty
+230 setting. The ESP32's last-known installed image is the temporary 100%
+diagnostic build, so restore a verified main-derived image after the PWM change.
+Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
 VHF-derived source, logical power and display while
 continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
@@ -242,8 +257,9 @@ continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
 L50..0..R50 with centred bars and monochrome icons.
 
-TX2/GPIO17 and the GPIO25/MOSFET/three-lamp electrical path are physically
-accepted. Stereo fades to 90%; Mono and standby fade off. Preserve the accepted
+TX2/GPIO17 and GPIO25 are physically accepted. Final MOSFET/three-lamp
+acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
+fades to 90%; Mono and standby fade off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
 GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,
@@ -251,6 +267,6 @@ Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
 Keep the ESP32 control/UI-only, preserve module independence, update all affected
 docs/BOM/status references with each change, verify before committing, and push
-logical changes to main. Draft PR #7 is separate Rev Q bezel work and must not be
-merged until its recorded physical gates pass.
+logical changes to main. Rev Q bezel PR #7 is merged, complete and approved;
+the Rev P.5 carrier remains frozen.
 ```
