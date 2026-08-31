@@ -616,14 +616,16 @@ def main():
     print("RESULT: %d/%d PASS - the exported mesh matches the Rev Q claims"
           % (CHECKS, CHECKS))
     print("")
-    print("This proves geometry only. It does NOT prove the bezel FITS. The")
+    print("This proves geometry only. The signed-off production bezel has")
+    print("separately passed the owner's physical fit acceptance. The")
     print("%.3f mm per side across and %.3f mm per side up are resisted by a"
           % (INTERF_X, INTERF_Y))
     print("%.2f mm side wall and a %.2f mm top and bottom wall, and whether"
           % (LIP_WALL_X, LIP_WALL_Y))
-    print("those flex instead of stressing the Perspex is physical. The")
-    print("opening corner radius has still never been confirmed. Print")
-    print("Bezel_Fit_Gauge_revQ FIRST, and see the Rev Q build report.")
+    print("those flex instead of stressing the Perspex remains physical.")
+    print("The corner was offer-checked as a good match but not numerically")
+    print("measured. Print Bezel_Fit_Gauge_revQ FIRST after regeneration or")
+    print("when changing printer/profile; see the Rev Q build report.")
     print("=" * 74)
     return 0
 

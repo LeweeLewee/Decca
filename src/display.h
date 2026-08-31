@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 #include "settings.h"
@@ -23,6 +24,18 @@ namespace decca::display {
 constexpr uint8_t kI2cAddress = 0x3C;
 constexpr uint8_t kWidth = 128;
 constexpr uint8_t kHeight = 64;
+constexpr uint8_t kPanelRotation = 2;
+constexpr uint8_t kViewportX = 4;
+constexpr uint8_t kViewportY = 10;
+constexpr uint8_t kViewportWidth = 120;
+constexpr uint8_t kViewportHeight = 52;
+constexpr uint8_t kContentTop = 24;
+constexpr uint8_t kContentBottom = 60;
+constexpr uint8_t kPanelContrast = 0x80;
+constexpr uint8_t kDimmedContrast = 0x20;
+constexpr uint32_t kDimAfterMs = 60'000;
+constexpr uint32_t kSleepAfterMs = 300'000;
+constexpr uint32_t kStandbySleepAfterMs = 10'000;
 constexpr uint16_t kControlMax = 1000;
 constexpr uint32_t kStartupDurationMs = 1000;
 constexpr uint8_t kStartupFrameCount = 5;
@@ -79,6 +92,14 @@ enum class FrameKind : uint8_t {
     Function,
     Status,
     Diagnostic,
+    Calibration,
+};
+
+/** @brief Current OLED protection state. */
+enum class PanelPowerState : uint8_t {
+    Awake,
+    Dimmed,
+    Sleeping,
 };
 
 /**
@@ -95,6 +116,12 @@ void update();
 
 /** @brief Return whether the SH1106 acknowledged and initialised. */
 bool ready();
+
+/** @brief Return the current contrast/display-off protection state. */
+PanelPowerState panelPowerState();
+
+/** @brief Wake the OLED and restart its inactivity timers. */
+void noteActivity();
 
 /** @brief Supply a complete display snapshot; pointed-to text is copied. */
 void setState(const ViewState& state);
@@ -118,6 +145,18 @@ void showDiagnostic(const char* message);
 /** @brief Present the retained SW position as unavailable in Phase 1. */
 void showSwUnavailable();
 
+/**
+ * @brief Hold a full-panel orientation and visible-area calibration pattern.
+ *
+ * The pattern remains active until hideCalibrationPattern() is called. It uses
+ * the complete logical 128x64 canvas so a straight-on photograph through the
+ * fitted Perspex can identify the visible pixel boundaries.
+ */
+void showCalibrationPattern();
+
+/** @brief Leave calibration mode and return to the current dashboard. */
+void hideCalibrationPattern();
+
 #ifdef PIO_UNIT_TESTING
 namespace testing {
 
@@ -133,6 +172,12 @@ struct Frame {
 using TimeProvider = uint32_t (*)();
 using PanelBegin = bool (*)();
 using FrameWriter = void (*)(const Frame& frame);
+
+/** Format the visible value used by a control transient. */
+void formatControlValue(Control control,
+                        uint16_t value,
+                        char* output,
+                        size_t capacity);
 
 /** Replace millis() with a deterministic provider. */
 void setTimeProvider(TimeProvider provider);

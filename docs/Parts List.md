@@ -12,13 +12,13 @@ validation remains.
 
 | Item | Qty | Status | Spec / Notes | Source |
 |------|-----|--------|--------------|--------|
-| ESP32 DevKit | 1 | **ACQUIRED — OTA BOOTSTRAP IMPLEMENTED** | 30-pin DevKit V1 / DOIT-style board. Authenticated local-network OTA uses dual application partitions; complete USB→OTA acceptance before enclosure. | Existing stock |
+| ESP32 DevKit | 1 | **ACQUIRED — USB→OTA VERIFIED** | 30-pin DevKit V1 / DOIT-style board. Authenticated `esp32dev-ota` upload and post-reboot readiness were physically verified on 2026-08-30; dual application partitions are in use. | Existing stock |
 | ESP32 screw-terminal adapter | 1 | **ACQUIRED** | Matching 30-pin terminal adapter used for the installed controller. | Existing stock |
 | ABW1 10K linear potentiometers | 4 | **INSTALLED / VERIFIED** | AB Elektronik / TT Electronics ABW1 10K, CPC order code RE04644. Position sensors for Balance, Treble, Bass and Volume; not in the audio path. | CPC |
 | OLED display | 1 | **INSTALLED / VERIFIED** | Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V. | The Pi Hut |
-| DAOKAI MOSFET driver modules | Pack of 10; 1 required | **ORDERED — DELIVERY / BENCH CHECK** | ASIN B09YYH2BTF. Seller describes a 3.3 V / 5 V PWM MOSFET driver module with cable. Use one as the selected H5 candidate only after confirming clean GPIO25 PWM switching and acceptable temperature at the measured lamp current. | Amazon / DAOKAI |
-| ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **DELIVERED — 5 V FUNCTION VERIFIED / FIT CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Bench-confirmed functional from the locked 5 V rail on 2026-08-29. Use three identical lamps in parallel; physical holder fit, final brightness and total bank current still require commissioning confirmation. | Amazon / ShuoHui |
-| 5 V regulated control supply | 1 | **ACQUIRED — PLUG / POLARITY CHECK** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Confirm the actual DC plug dimensions and centre polarity with a multimeter before connection. | Existing stock |
+| DAOKAI MOSFET driver modules | Pack of 10; 1 required | **DELIVERED / ELECTRICALLY VERIFIED** | ASIN B09YYH2BTF. One module passed GPIO25 safe-off and smooth PWM through full duty with the three-lamp load on 2026-08-31. Normal operation is approved at 90% / duty 230; final installed current measurement remains open. | Amazon / DAOKAI |
+| ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **THREE-LAMP ELECTRICAL LOAD VERIFIED / FIT CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Three parallel lamps passed even 5 V PWM illumination on 2026-08-31. Physical holder fit, final brightness and total bank current remain open. | Amazon / ShuoHui |
+| 5 V regulated control supply | 1 | **CONNECTED / LIGHTING FUNCTION VERIFIED** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Successfully powered the accepted three-lamp PWM test on 2026-08-31. | Existing stock |
 | TopHomer panel-mount DC input sockets | Pack of 5; 1 required | **PURCHASED — DELIVERY / FIT / POLARITY CHECK** | ASIN B08HGXYS4J; female two-terminal threaded-nut sockets, 5.5 mm OD × 2.1 mm ID, rated 3 A. Use one only after confirming the actual Phihong plug fit and centre-positive polarity before drilling or wiring. | Amazon / TopHomer |
 | Low-voltage inline fuse holder | 1 | **OPEN — BUY** | Installed in the +5 V conductor immediately after the panel socket and before distribution. | _TBD_ |
 | 2 A fuse | 2 | **OPEN — BUY** | One fitted and one spare; type must match the selected holder. Final rating to be rechecked against measured lamp current during bench commissioning. | _TBD_ |
@@ -32,15 +32,15 @@ validation remains.
 |-------------------------|-------------------------------------------------------------|
 | Original on/off switch  | Retained with original solder joints and cable. Low-voltage logic input only (Red/Green). Not switching mains. |
 | Original selector PCB   | **Retained** as mechanical carrier for the interlocked selector (ADR-0001). Not disposable. |
-| Original source buttons | Original mechanism retained. Only Gram is wired: closed = Vinyl, open = Digital Streamer. VHF/SW/MW/LW are mechanically retained but electrically unused; replacement panel deferred (ADR-0011). |
-| Original Stereo/Mono control | Retained mechanically, **unwired**, decorative in Phase 1 (ADR-0005). |
+| Original source buttons | Original mechanism retained. Only VHF has a reliable electrical state: closed = Digital Streamer, open = Vinyl. SW/MW/LW/Gram mechanically release VHF and have no individual GPIO; replacement panel deferred (ADR-0013). |
+| Original Stereo/Mono control | Retained and physically verified on TX2/GPIO17: open Stereo requests lights on; closed Mono requests lights off (ADR-0014). |
 | Original Decca knobs    | Retained via mechanical adaptor strategy (see `mechanical/Knob Adaptors/`). |
 
 ## Audio Path / Phase 2
 
 | Item | Qty | Decision / procurement status | Notes | Source |
 |------|-----|-------------------------------|-------|--------|
-| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 switches Line-In for Gram/Vinyl and restores the digital path when Gram is released; phone controls digital content. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
+| WiiM Pro | 1 | **LOCKED — NOT ACQUIRED** | Selected networked streamer/source. ESP32 restores the digital path when VHF is latched and selects Line-In for Vinyl when VHF is released; phone controls digital content. Continuously powered with automatic standby. Do not substitute WiiM Amp / Amp Pro without a new ADR. New-unit price watch threshold: £149 or below. | _Price watch active_ |
 | Fosi Audio ZA3 | 1 | **LOCKED — NOT ACQUIRED** | Selected stereo power amplifier. WiiM Pro line output feeds the ZA3; its gain/volume becomes a commissioning ceiling and its operating state is controlled by the 12 V trigger. New-unit price watch threshold: £129 or below. | _Price watch active_ |
 | B&W DM601 S3 speakers | 2 | **PRIMARY TARGET — NOT ACQUIRED / FIT VERIFY** | Primary used-speaker target, not yet a locked purchase. Approx. 365 H × 204 W × 228 D mm; verify the actual pair including terminals against the hard per-bay limit of 400 H × 270 W × 245 D mm. Front-ported. Target ≤£150, exceptional ≤£130; reject damaged/dented tweeters. | _Used-speaker watch active_ |
 | ZA3 12 V trigger driver and source | 1 | **OPEN — DESIGN / SELECT** | ESP32-controlled transistor/MOSFET or isolated interface plus suitable 12 V source. Exact circuit and GPIO require selection and bench verification. | _TBD_ |
@@ -72,6 +72,6 @@ design decision**, not an approved component purchase.
 
 ## Consumables / Harness
 
-- Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SDA and Yellow = SCL; H4 Orange must never be connected to 5 V
+- Wire per the colour standard in `docs/Wiring.md` (Brown GND, Red 3.3 V, Orange 5 V, White signal), except the installed H4 OLED loom: Orange = SCL and Yellow = SDA; both are signals and must never be connected to 5 V
 - Removable connectors at the controller end (harnesses H1–H6), including the purchased Lyeteung JST-XH 4-pin set where appropriate
 - Heat-shrink, solder, ferrules and strain-relief materials

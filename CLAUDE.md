@@ -7,12 +7,20 @@ ESP32 firmware + hardware/mechanical design for a restored 1960s Decca music
 centre. See `README.md` for the full overview and `docs/Firmware Architecture.md`
 for the design that governs all firmware changes.
 
+## Start here
+
+Read `docs/Development Handover.md` before changing firmware. It records the
+current physical evidence, immediate OTA acceptance gate and open work.
+
 ## Build / test
 - Build: `pio run`
 - Upload: `pio run --target upload`
 - Monitor: `pio device monitor`
 - Test: `pio test`
 - Debug build: `pio run -e esp32dev-debug`
+- Windows fallback when `pio` is not on PATH:
+  `$pio = "$env:USERPROFILE\\.platformio\\penv\\Scripts\\platformio.exe"`,
+  then invoke commands as `& $pio run ...`.
 
 ## Source layout
 - `src/` — firmware modules + `main.cpp` (entry point / scheduler)
@@ -39,16 +47,30 @@ for the design that governs all firmware changes.
 - Follow Conventional Commits (see `CONTRIBUTING.md`).
 
 ## Status
-Phase 1 hardware-layer work is in progress. The proposed pin map and confirmed
-control contracts are reconciled, board initialisation is implemented for all
-assigned pins, `settings` implements NVS persistence, and `pots` implements
-filtered/calibrated four-channel ADC1 reads. `buttons` implements active-low,
-25 ms debounced stable state and press events. `lighting` implements safe-off
-PWM control and non-blocking dial fades. `display` implements the ADR-0007/0009
-presentation contract: animated Decca startup, standby/local dashboard,
-transient controls and function confirmations, diagnostics, and Phase 2-ready
-mapped-function/now-playing views without legacy button labels and with
-change-only refreshes. Pot GPIO32–35 and
-source-button GPIO16, GPIO17 and GPIO23 and OLED GPIO21/22 are bench-verified;
-GPIO18 awaits an LW harness repair. The on/off switch, lighting GPIO25 and
-remaining assigned pins stay proposed until their documented bench tests.
+
+Phase 1 module implementation is in progress. `hardware`, `settings`, `pots`,
+`buttons`, `lighting`, `display`, `power` and authenticated `ota` exist. Pot
+GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
+physically verified. Lighting PWM GPIO25, the DAOKAI MOSFET stage and the
+three-lamp bank are electrically accepted. Normal Stereo lighting is locked at
+90% (duty 230); Mono and logical standby are off.
+
+Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
+closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
+requests lights off. Both input positions are physically accepted. GPIO25 and
+the lamp bank passed safe-off and smooth-fade testing through full duty; the
+approved production level is 90%.
+
+Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
+every other selector position = Vinyl. GPIO16/17/18 remain released from the
+source selector and the sole source input remains GPIO23; GPIO17 is separately
+allocated to Stereo/Mono under ADR-0014.
+
+The production `main.cpp` coordinates power, pots, VHF source, display,
+Stereo/Mono lighting and OTA in one non-blocking loop. USB-to-OTA is physically
+accepted. Automatic rollback after a fully received but boot-invalid image
+remains Phase 3.
+
+The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow
+SDA GPIO21. Draft PR #7 is separate Rev Q bezel work and must not be merged
+until its recorded physical gates pass.

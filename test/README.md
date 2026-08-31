@@ -14,7 +14,9 @@ test/
 ├── test_buttons/           active-low debounce, state + event queue
 ├── test_pots/              ADC mapping, smoothing, calibration + deadband
 ├── test_display/           SH1106 frames, timing, refresh + physical bring-up
-└── test_lighting/          PWM safe-off, target and fade behaviour
+├── test_lighting/          PWM safe-off, target and fade behaviour
+├── test_power/             pure logical on/standby transitions
+└── test_ota/               non-blocking authenticated OTA lifecycle
 ```
 
 ## Running
@@ -48,12 +50,15 @@ verification. The lighting suite exercises a real low-duty fade for physical
 bring-up and injects its clock and PWM writer for deterministic safe-off,
 fade-up, fade-down, target-clamping and invalid-zone coverage. The display suite
 injects its clock, panel initialiser and semantic frame writer to exercise the
-five-frame startup animation, standby/local dashboards, mapped function and
-source identity retained in state but omitted from the user-facing layout,
+five-frame startup animation, standby/source dashboards, persistent mapped
+function identity,
 copied now-playing metadata and fallback, all four control values, two-second
 control overlays, function confirmation, change-only refresh, diagnostics,
 SW-unavailable presentation and safe initialisation failure. It also performs a
-real SH1106 address/frame snapshot for H4 bench verification. Keeping one suite
+real SH1106 address/frame snapshot for H4 bench verification and covers the
+persistent 180-degree fitted-aperture calibration frame, inactivity dimming,
+pixel-off sleep and activity wake. The power suite covers initial state and
+one-shot transitions independently of GPIO ownership. Keeping one suite
 per module reinforces the low-coupling design in
 `docs/Firmware Architecture.md`.
 
@@ -66,3 +71,67 @@ by testing extracted libraries under `lib/`. Not required for Phase 1.
 ## OTA suite
 
 `pio test -e esp32dev -f test_ota` covers disabled operation, non-blocking connection, timed retry, service start/handling and Wi-Fi-loss recovery. Physical acceptance is one USB bootstrap flash followed by one authenticated wireless upload.
+
+USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
+`esp32dev-ota` upload succeeded and, after reboot, serial reported
+`[OTA] ready at 192.168.1.79 (decca.local)`. Interrupted-transfer acceptance
+remains a separate outstanding check.
+
+Full on-target result (2026-08-30): the `esp32dev` release build passed cleanly
+and all seven suites passed on the physical ESP32 — buttons 9/9, display 10/10,
+hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6 and settings 3/3 (43/43 total).
+The production safe-bootstrap image was restored by USB after testing and serial
+reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
+
+Display-refinement increment (2026-08-30): the persistent 180-degree calibration
+frame, calibrated viewport contract, safe content band and retained paused
+metadata expanded `test_display` to 12/12. Physical photographs were used to
+accept the final fitted-Perspex layouts, including the corner play/pause glyph.
+The calibration frame remains available as a service diagnostic; production
+startup returns to the accepted standby view while OTA remains continuously
+serviced. The final release build passed and the complete physical run passed
+45/45: buttons 9/9, display 12/12, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6
+and settings 3/3. Production was restored by USB and serial reconfirmed
+`[OTA] ready at 192.168.1.79 (decca.local)`.
+
+Power/protection increment (2026-08-30): GPIO19 was physically accepted in both
+positions and the production coordinator now maps the debounced switch to ON or
+STANDBY display state. The OLED dims after 60 seconds, turns pixels off after
+five minutes, and blanks standby after ten seconds; relevant activity wakes it.
+The release build passed and all eight physical suites passed 52/52: buttons
+9/9, display 14/14, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6, power 5/5 and
+settings 3/3. Production was restored over COM3; serial reported
+`[POWER] state=ON` and `[OTA] ready at 192.168.1.79 (decca.local)`.
+
+Controls/source refinement (2026-08-30): production now samples all four pots
+and the sole VHF state. VHF closed maps to Digital Streamer; VHF open maps to
+Vinyl. The mapped source remains on the normal dashboard until metadata takes
+priority. Control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and
+Balance L50..0..R50 with centred bars and monochrome icons; balance readings
+that round to centre display plain `0`. Physical interaction and fitted-screen
+appearance were accepted. The release build passed and all eight suites passed
+53/53: buttons 9/9, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
+power 5/5 and settings 3/3. Production was restored over COM3.
+
+Stereo/Mono assignment (2026-08-30): TX2/GPIO17 is now included in the buttons
+suite as a pulled-up lighting request. Stereo open/high maps to on; Mono
+closed/low maps to off. The credential-enabled production firmware builds
+successfully (RAM 49,880 bytes / 15.2%; flash 837,497 bytes / 63.9%) and all
+eight test suites compile without uploading. The
+expanded buttons suite passed 11/11 on target in both physical positions:
+`stereo_mono_contact=0 lights=on` in Stereo and
+`stereo_mono_contact=1 lights=off` in Mono.
+The final release build passed and the complete physical run passed 55/55:
+buttons 11/11, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
+power 5/5 and settings 3/3.
+
+GPIO25 load acceptance (2026-08-31): the physical lighting snapshot fades to
+the owner-approved duty 230 (90%), holds for five seconds and fades fully off.
+Comparisons at 70%, 80% and 100% informed the selected level. The DAOKAI MOSFET
+stage and three parallel lamps passed with smooth transitions, even light and no
+flash, flicker, abnormal heat or smell; the lighting suite passed 7/7.
+Integrated production acceptance then confirmed Mono commands target 0 and
+holds the lamps fully off, while Stereo commands target 230 and lights the dial
+at the approved 90% level. OTA remained ready throughout normal operation.
+The final credential-enabled production build passed (RAM 49,936 bytes / 15.2%;
+flash 839,253 bytes / 64.0%) and the complete on-target run passed 55/55.

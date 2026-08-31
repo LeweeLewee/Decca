@@ -29,35 +29,96 @@ from parts.
 
 ## 5. Firmware Flashing and OTA Bootstrap
 
-Complete both tests before mounting the ESP32 where USB access is difficult.
+Complete both the USB and wireless uploads before mounting the ESP32 where USB
+access is difficult. OTA code being present is not proof that the installed
+network and credentials work.
 
-1. Create the private configuration:
-   ```powershell
-   Copy-Item src\secrets.example.h src\secrets.h
-   ```
-2. Replace the placeholders with the Wi-Fi details and a long unique OTA
-   password. Never commit `src/secrets.h`; it is gitignored.
-3. Flash once by USB:
-   ```powershell
-   pio run -e esp32dev -t upload --upload-port COM_PORT
-   ```
-4. Run `pio device monitor -b 115200` and wait for `[OTA] ready`.
-5. Set the same password for PlatformIO:
-   ```powershell
-   $env:DECCA_OTA_PASSWORD = "YOUR_SAME_OTA_PASSWORD"
-   ```
-6. Prove a wireless upload:
-   ```powershell
-   pio run -e esp32dev-ota -t upload
-   ```
-   If mDNS fails, add `--upload-port 192.168.x.x` using the displayed IP.
+### 5.1 Prepare PlatformIO on Windows
+
+In a normal PowerShell window, `pio` may not be on PATH even when the
+PlatformIO VS Code extension is installed. Use its executable directly:
+
+```powershell
+$pio = "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe"
+& $pio --version
+& $pio device list
+```
+
+If the first command fails, install or repair the PlatformIO IDE extension in
+VS Code before continuing.
+
+### 5.2 Create the private configuration
+
+```powershell
+git pull origin main
+if (-not (Test-Path src\secrets.h)) {
+    Copy-Item src\secrets.example.h src\secrets.h
+}
+notepad src\secrets.h
+```
+
+Replace the three placeholders locally. Use a long unique OTA password. Never
+commit, paste into chat or publish `src/secrets.h`; it is gitignored.
+
+### 5.3 Test and flash once by USB
+
+Connect the ESP32 and rerun `device list`. Set the real port shown by
+PlatformIO. The example below assumes COM5. Do **not** type the literal
+placeholder `COM_PORT`, and do not add a backslash before the port name.
+
+```powershell
+$port = "COM5"
+& $pio test -e esp32dev -f test_ota
+& $pio run -e esp32dev -t upload --upload-port $port
+& $pio device monitor --port $port -b 115200
+```
+
+Wait for:
+
+```text
+[OTA] ready at 192.168.x.x (decca.local)
+```
+
+Record the IP address, then exit the serial monitor with Ctrl+C.
+
+### 5.4 Prove authenticated wireless upload
+
+Set the same private OTA password used in `src/secrets.h`, perform one wireless
+upload, then clear it from the PowerShell process:
+
+```powershell
+$env:DECCA_OTA_PASSWORD = "THE SAME PRIVATE OTA PASSWORD"
+& $pio run -e esp32dev-ota -t upload
+Remove-Item Env:DECCA_OTA_PASSWORD
+```
+
+If mDNS cannot resolve `decca.local`, use the address printed by the ESP32:
+
+```powershell
+$env:DECCA_OTA_PASSWORD = "THE SAME PRIVATE OTA PASSWORD"
+& $pio run -e esp32dev-ota -t upload --upload-port 192.168.x.x
+Remove-Item Env:DECCA_OTA_PASSWORD
+```
 
 The computer and Decca must be on the same local network. Guest-network
 isolation or a VPN may block OTA. Do not expose the OTA service to the internet.
 
+Pass criteria:
+
+- `test_ota` passes on the ESP32;
+- the USB bootstrap upload succeeds;
+- serial reports `[OTA] ready`;
+- an authenticated wireless upload succeeds and the ESP32 reboots;
+- the device reports ready again after the OTA reboot.
+
+Recorded result (2026-08-30): the authenticated `esp32dev-ota` upload succeeded.
+After the ESP32 rebooted, serial reported
+`[OTA] ready at 192.168.1.79 (decca.local)`. USB-to-OTA physical acceptance is
+complete.
+
 The dual application slots protect against interrupted or rejected transfers.
 Automatic rollback after a fully received image fails to boot remains a Phase 3
-hardening item, so retain recovery access until it is implemented.
+hardening item, so preserve a practical USB recovery route even after OTA passes.
 
 ## 6. First Power-On
 - Bring-up checklist
@@ -131,15 +192,15 @@ All six `test_pots` cases passed. Midpoint variation is expected because the
 controls have no centre detent. The default 0–4095 calibration is retained with
 no inversion.
 
-### 7.2 Gram two-state source verification
+### 7.2 VHF two-state source verification
 
-Only the verified right-hand Gram Green/Yellow pair is used. Keep the Decca
+Only the reliable VHF-derived Green/Yellow pair is used. Keep the Decca
 disconnected from mains and power only the ESP32 by USB.
 
-1. Connect one conductor of the right-hand Gram pair to GPIO23 / board label
+1. Connect one conductor of the VHF-derived pair to GPIO23 / board label
    D23 and the other to GND. Current termination is Green → GPIO23 and
    Yellow → GND; the dry-contact pair may be swapped.
-2. Leave VHF, SW, MW and LW conductors disconnected and individually insulated.
+2. Leave SW, MW, LW and Gram conductors disconnected and individually insulated.
    Do not connect them to GPIO16, GPIO17 or GPIO18.
 3. Run:
 
@@ -147,27 +208,55 @@ disconnected from mains and power only the ESP32 by USB.
    pio test -e esp32dev -f test_buttons
    ```
 
-4. With Gram latched, expect:
+4. With VHF latched, expect:
 
    ```text
-   BUTTON_SNAPSHOT pressed onoff=<0-or-1> gram=1 source=vinyl
+   BUTTON_SNAPSHOT pressed onoff=<0-or-1> vhf=1 source=digital
    ```
 
-5. Press any other fascia source button to release Gram and rerun. Expect
-   `gram=0 source=digital`.
+5. Press any other fascia source button to release VHF and rerun. Expect
+   `vhf=0 source=vinyl`.
 
 Pass criteria:
 
-- Gram closed reports Vinyl;
-- Gram open reports Digital Streamer;
+- VHF closed reports Digital Streamer;
+- VHF open reports Vinyl;
 - all nine behavioural tests pass;
-- VHF, SW, MW and LW have no individual reported input.
+- SW, MW, LW and Gram have no individual reported input.
 
-The former LW solder repair is no longer required. If the Gram contact itself
+The former LW solder repair is no longer required. If the VHF contact itself
 later becomes unreliable, the deferred fallback is a purpose-built replacement
 button panel.
 
-### 7.3 OLED bench verification
+### 7.3 Original on/off switch verification
+
+This procedure passed on 2026-08-30, confirming GPIO19/D19 and the retained H2
+Red/Green cable. Keep the Decca disconnected from mains and power only the
+low-voltage ESP32 controller by USB.
+
+1. Connect H2 Red to GPIO19 / board label D19 and H2 Green to GND. GPIO19 uses
+   the ESP32 internal pull-up; do not connect either conductor to 3.3 V or 5 V.
+2. Run:
+
+   ```powershell
+   pio test -e esp32dev -f test_buttons
+   pio test -e esp32dev -f test_power
+   ```
+
+3. Restore the production firmware, open the 115200-baud serial monitor and move
+   the retained switch through both positions.
+
+Pass criteria:
+
+- closed reports `[POWER] state=ON` and shows the normal on-state display;
+- open reports `[POWER] state=STANDBY` and shows the standby confirmation;
+- returning to closed wakes the display immediately;
+- all button and power tests pass without using the switch for mains voltage.
+
+Recorded result: both switch directions were physically accepted. GPIO19 is no
+longer proposed and no logical inversion is required.
+
+### 7.4 OLED bench verification
 
 This procedure passed on 2026-08-25, confirming GPIO21 and GPIO22. Keep it as
 the commissioning method after any display, harness or controller replacement.
@@ -178,11 +267,12 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
 2. Connect the purchased Pi Hut SH1106 panel:
    - OLED GND → ESP32 GND (Brown);
    - OLED VCC → ESP32 3V3 (Red), never 5 V for this build;
-   - OLED SDA → GPIO21 / board label D21 (Orange);
-   - OLED SCL → GPIO22 / board label D22 (Yellow).
+   - OLED SDA → GPIO21 / board label D21 (Yellow);
+   - OLED SCL → GPIO22 / board label D22 (Orange).
 
-   H4 is a documented colour-standard exception: its Orange conductor is SDA,
-   not 5 V. Never connect that Orange wire to the 5 V rail.
+   H4 is a documented colour-standard exception: its Orange conductor is SCL
+   and its Yellow conductor is SDA. Both are signals; never connect either to
+   the 5 V rail.
 3. In the PlatformIO terminal run:
 
    ```powershell
@@ -205,17 +295,54 @@ Pass criteria:
 - all five startup frames and the dashboard are upright, complete and not
   offset;
 - white pixels are clear with no persistent noise or clipped columns;
-- all ten display tests pass.
+- all fourteen display tests pass, including inactivity dim, pixel-off sleep and
+  immediate wake behaviour.
+
+Production protection policy: contrast 0x80 while active, contrast 0x20 after
+60 seconds without activity, pixels off after five minutes, and standby pixels
+off after ten seconds. Relevant state/control/status activity wakes the panel.
 
 Recorded result (2026-08-25): the purchased SH1106 panel was detected at 0x3C,
 all ten `test_display` cases passed, and the animated startup and revised
 dashboard were upright, complete, unclipped and free of persistent display
-artefacts. GPIO21 (SDA) and GPIO22 (SCL) are bench-verified.
+artefacts. GPIO21 (SDA) and GPIO22 (SCL) are bench-verified. Final loom
+orientation was physically confirmed on 2026-08-30: Brown = GND, Red = VCC,
+Orange = SCL and Yellow = SDA.
+
+Fitted-aperture refinement (2026-08-30): photographs through the final Perspex
+opening established a logical visible viewport of X4–123 and Y10–61. Normal UI
+content deliberately uses the more conservative Y24–60 band because the upper
+part becomes difficult to read at the installed viewing angle. Firmware rotates
+the output 180 degrees, sets panel contrast to 0x80 to reduce optical bloom and
+uses focused single-purpose views rather than a crowded permanent dashboard.
+The accepted layouts cover identity/standby, control value and bar, source
+confirmation, status/diagnostics, and title/artist metadata with a bottom-right
+play or pause glyph. The full 128×64 calibration pattern remains available as a
+service diagnostic but is not shown during normal startup.
 
 If the panel is blank, disconnect USB before checking VCC/GND order and the
 SDA/SCL labels.
 
-### 7.4 Dial-lighting bench verification
+### 7.5 Stereo/Mono input verification
+
+Keep GPIO25 and the lamp load disconnected for this input-only test.
+
+1. Connect the Stereo contact between TX2/GPIO17 and GND. Do not connect 3.3 V
+   or 5 V to the switch.
+2. Connect the ESP32 by USB and run:
+
+   ```powershell
+   pio test -e esp32dev -f test_buttons
+   ```
+
+3. Capture the `BUTTON_SNAPSHOT` once in each stable position. Stereo must show
+   `stereo_mono_contact=0 lights=on`; Mono must show
+   `stereo_mono_contact=1 lights=off`.
+4. Confirm all eleven button tests pass. If the two physical positions are
+   reversed, stop and correct the documented contact/polarity before enabling
+   any lighting output.
+
+### 7.6 Dial-lighting bench verification
 
 GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
 from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
@@ -237,8 +364,8 @@ for the ESP32.
 
 4. Observe the dial lighting. It should fade gently from off to a low test duty
    and back to off, without flashing at full brightness.
-5. Confirm the output contains `LIGHTING_SNAPSHOT duty=32` and all seven tests
-   pass.
+5. Confirm the output contains `LIGHTING_SNAPSHOT duty=230`, the lamps hold at
+   the approved 90% duty for five seconds, and all seven tests pass.
 
 Pass criteria:
 
@@ -248,7 +375,11 @@ Pass criteria:
 - the MOSFET and wiring remain cool;
 - all seven behavioural tests pass.
 
-### 7.5 Remaining commissioning
+Recorded result (2026-08-31): GPIO25, the DAOKAI MOSFET stage and the three-lamp
+electrical load passed. Brightness comparisons at 70%, 80% and 100% resulted in
+owner approval of 90% / duty 230. The lamps fade smoothly, hold evenly and fade
+fully off with no flash, flicker, abnormal heat or smell.
 
-- Selecting the final normal and standby dial brightness
-- Verifying the on/off control
+### 7.7 Remaining commissioning
+
+- Confirming final holder fit and measuring the installed three-lamp current

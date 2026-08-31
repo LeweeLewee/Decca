@@ -1,9 +1,12 @@
 # Hardware Architecture
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
-> locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35 and
-> OLED I²C GPIO21/22 are bench-verified; remaining ESP32 assignments are
-> **(proposed)** or unassigned. See `docs/Wiring.md` for the authoritative
+> locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
+> sole VHF input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
+> Stereo/Mono input GPIO17/TX2 is physically verified.
+> Lighting GPIO25 and the MOSFET/lamp electrical load are physically accepted;
+> other pins are unassigned. See
+> `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
 > amplifier and power-control decisions.
 
@@ -26,7 +29,7 @@ audio signal path is separate from the controller.
        ADC1 (H1) │       │ H2    │ H3     │ H4    │ H5 (PWM)
         4× 10k   │       │ on/off│ source │ I²C   │ MOSFET gate
      ┌───────────┴──┐ ┌──┴───┐ ┌─┴─────┐ ┌┴─────┐ ┌┴──────────┐
-     │ Balance/Treble│ │orig. │ │ Gram  │ │ OLED │ │ 3× 5V     │
+     │ Balance/Treble│ │orig. │ │ VHF   │ │ OLED │ │ 3× 5V     │
      │ Bass/Volume   │ │switch│ │contact│ │128x64│ │ E10 LEDs  │
      │ (position)    │ │Red/Grn│ │2-state│ │ SH1106│ │ (N-ch FET)│
      └───────────────┘ └──────┘ └───────┘ └──────┘ └───────────┘
@@ -173,21 +176,26 @@ clockwise on 2026-08-24, so the default 0–4095 calibration remains applicable.
 ### On/off switch (H2)
 Retained original switch and cable, active conductors **Red** and **Green**. A
 simple open/close contact read as a **low-voltage digital input** with the ESP32
-**internal pull-up** enabled (proposed GPIO19, board label **D19**). **Not a mains switch.** Optional
-firmware inversion after bench testing. Its logical state drives the locked
-system-power sequence documented above.
+**internal pull-up** enabled on bench-verified GPIO19, board label **D19**.
+**Not a mains switch.** Closed = logical ON; open = logical STANDBY. Both
+directions were physically accepted on 2026-08-30. Its logical state drives the
+locked system-power sequence documented above.
 
 ### Source button bank (H3)
 The original selector PCB and interlocked mechanism are retained as the
 mechanical carrier (ADR-0001), but unreliable soldering/contact behaviour makes
 multi-button electrical reuse unsuitable.
 
-Only the verified right-hand Gram Green/Yellow dry-contact pair is connected to
-GPIO23 / D23 with the internal pull-up and software debounce. Closed Gram selects
-Vinyl; open Gram selects Digital Streamer. VHF, SW, MW and LW are mechanically
-retained but unwired at the ESP32; pressing them may release Gram through the
-interlock. GPIO16, GPIO17 and GPIO18 are released. A new button panel is a
-deferred fallback (ADR-0011). Stereo/Mono remains unwired (ADR-0005).
+Only the reliable VHF-derived dry-contact state is connected to GPIO23 / D23
+with the internal pull-up and software debounce. Closed/latched VHF selects
+Digital Streamer; every other interlocked position releases VHF and selects
+Vinyl. GPIO16 and GPIO18 are released; GPIO17 is released from the source bank
+and assigned separately to the Stereo/Mono contact. A new button panel remains
+a deferred fallback (ADR-0013).
+
+The Stereo/Mono contact uses TX2/GPIO17 with the internal pull-up. Open/HIGH in
+Stereo requests dial lights on and closed/LOW in Mono requests them off. It is a command input
+only; GPIO25 and the lighting load remain separately gated (ADR-0014).
 
 ## Outputs
 
@@ -197,23 +205,29 @@ from 3.3 V at address 0x3C. SDA GPIO21 / board label **D21** and SCL GPIO22 /
 board label **D22** were bench-verified on 2026-08-25 with the on-target display
 suite and a visual layout inspection.
 
+The fitted panel uses firmware protection against uneven OLED ageing: normal
+contrast dims after 60 seconds without activity, pixels turn off after five
+minutes, and the standby confirmation turns off after ten seconds. Activity
+wakes the panel immediately; this does not remove power from the ESP32.
+
 ### Dial lighting (H5)
 The purchased lamp set is **ShuoHui ASIN B0CFTLZFGT**: ten E10 miniature
 screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. The lamps were
 bench-confirmed functional at **5 V** on 2026-08-29, validating compatibility with
-the locked 5 V lighting rail. Physical holder fit, final brightness and total
+the locked 5 V lighting rail. The assembled three-lamp electrical path passed
+PWM testing on 2026-08-31. Physical holder fit, final brightness and measured
 three-lamp current remain commissioning checks.
 
 The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
 module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
-claims do not replace verification: GPIO25 / board label **D25**, safe-off
-behaviour, clean PWM switching and module temperature must pass at the measured
-three-lamp load. The three validated lamps will be wired **in parallel** with
-common ground to the ESP32.
+claims did not replace verification: GPIO25 / board label **D25**, safe-off and
+smooth PWM switching through full duty and return to off passed with the three
+parallel lamps, common ground and no abnormal module behaviour.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
-panel user control. Firmware stores the selected PWM level in non-volatile
-settings and applies it at startup. The unused aerial control may be used as a
+panel user control. The owner-approved normal value is 90% / duty 230. Firmware
+stores it in non-volatile settings and applies it only while logically on and in
+Stereo; Mono and standby fade to zero. The unused aerial control may be used as a
 temporary commissioning input if convenient, but it is not reserved as a
 permanent lighting control. Behaviours: fade up/down, configurable stored
 brightness, safe boot state.

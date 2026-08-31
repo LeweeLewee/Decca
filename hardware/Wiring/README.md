@@ -21,5 +21,5 @@ cabinet.
 - Colour standard: Brown = GND, Red = 3.3 V, Orange = 5 V, White = signal. The
   original on/off switch keeps its original Red/Green conductors as a documented
   exception.
-- H4 OLED loom exception: Orange = SDA (GPIO21) and Yellow = SCL (GPIO22).
-  Never connect the H4 Orange conductor to 5 V.
+- H4 OLED loom exception: Orange = SCL (GPIO22) and Yellow = SDA (GPIO21).
+  Both are signal conductors; never connect either to 5 V.

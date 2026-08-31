@@ -57,9 +57,12 @@ void test_lighting_physical_fade_snapshot() {
     state.dial = 0;
     decca::settings::set(state);
     decca::lighting::init();
-    decca::lighting::setBrightness(Zone::Dial, 32);
+    constexpr uint8_t kCommissioningDuty =
+        decca::settings::kDefaultDialBrightness;
+    constexpr uint32_t kCommissioningHoldMs = 5000;
+    decca::lighting::setBrightness(Zone::Dial, kCommissioningDuty);
 
-    for (uint8_t step = 0; step < 32; ++step) {
+    for (uint8_t step = 0; step < kCommissioningDuty; ++step) {
         delay(decca::lighting::kFadeStepIntervalMs);
         decca::lighting::update();
     }
@@ -67,11 +70,12 @@ void test_lighting_physical_fade_snapshot() {
     UnityPrint("LIGHTING_SNAPSHOT duty=");
     UnityPrintNumberUnsigned(decca::lighting::brightness(Zone::Dial));
     UNITY_PRINT_EOL();
-    TEST_ASSERT_EQUAL_UINT8(32,
+    TEST_ASSERT_EQUAL_UINT8(kCommissioningDuty,
                             decca::lighting::brightness(Zone::Dial));
+    delay(kCommissioningHoldMs);
 
     decca::lighting::setBrightness(Zone::Dial, 0);
-    for (uint8_t step = 0; step < 32; ++step) {
+    for (uint8_t step = 0; step < kCommissioningDuty; ++step) {
         delay(decca::lighting::kFadeStepIntervalMs);
         decca::lighting::update();
     }

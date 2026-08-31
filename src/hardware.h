@@ -8,14 +8,16 @@
 
 namespace decca::hardware {
 
-// GPIO32–35, Gram GPIO23 and display GPIO21/22 are bench-verified.
-// The retained on/off input and lighting PWM remain proposed.
+// GPIO32–35, VHF GPIO23, display GPIO21/22 and on/off GPIO19 are bench-verified.
+// Stereo/Mono GPIO17 (TX2) is physically verified.
+// Lighting PWM GPIO25 and the MOSFET/lamp load are physically verified.
 constexpr uint8_t kPotVolume = 32;
 constexpr uint8_t kPotBass = 33;
 constexpr uint8_t kPotTreble = 34;
 constexpr uint8_t kPotBalance = 35;
 constexpr uint8_t kSwitchOnOff = 19;
-constexpr uint8_t kButtonGram = 23;
+constexpr uint8_t kButtonVhf = 23;
+constexpr uint8_t kSwitchStereoMono = 17;
 constexpr uint8_t kDisplaySda = 21;
 constexpr uint8_t kDisplayScl = 22;
 constexpr uint8_t kDialLightingPwm = 25;

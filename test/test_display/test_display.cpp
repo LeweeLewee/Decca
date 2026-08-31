@@ -12,6 +12,7 @@
 
 using decca::display::Control;
 using decca::display::FrameKind;
+using decca::display::PanelPowerState;
 using decca::display::PowerState;
 using decca::display::ViewState;
 
@@ -113,6 +114,46 @@ void test_display_physical_sh1106_snapshot() {
     }
     delay(decca::display::kStartupFrameIntervalMs);
     decca::display::update();
+    decca::display::showCalibrationPattern();
+    decca::display::update();
+    UnityPrint("DISPLAY_CALIBRATION rotation=2 grid=8");
+    UNITY_PRINT_EOL();
+}
+
+void test_display_holds_and_leaves_calibration_pattern() {
+    startInjected();
+
+    TEST_ASSERT_EQUAL_UINT8(2, decca::display::kPanelRotation);
+    decca::display::showCalibrationPattern();
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(FrameKind::Calibration),
+                      static_cast<int>(g_lastKind));
+
+    const uint16_t calibrationFrames = g_frameCount;
+    g_nowMs += decca::display::kStartupDurationMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL_UINT16(calibrationFrames, g_frameCount);
+
+    decca::display::hideCalibrationPattern();
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(FrameKind::Dashboard),
+                      static_cast<int>(g_lastKind));
+}
+
+void test_display_calibrated_viewport_contract() {
+    TEST_ASSERT_EQUAL_UINT8(4, decca::display::kViewportX);
+    TEST_ASSERT_EQUAL_UINT8(10, decca::display::kViewportY);
+    TEST_ASSERT_EQUAL_UINT8(120, decca::display::kViewportWidth);
+    TEST_ASSERT_EQUAL_UINT8(52, decca::display::kViewportHeight);
+    TEST_ASSERT_EQUAL_UINT8(24, decca::display::kContentTop);
+    TEST_ASSERT_EQUAL_UINT8(60, decca::display::kContentBottom);
+    TEST_ASSERT_EQUAL_UINT8(0x80, decca::display::kPanelContrast);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT8(
+        decca::display::kWidth,
+        decca::display::kViewportX + decca::display::kViewportWidth);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT8(
+        decca::display::kHeight,
+        decca::display::kViewportY + decca::display::kViewportHeight);
 }
 
 void test_display_animates_startup_without_blocking() {
@@ -187,6 +228,16 @@ void test_display_copies_and_clears_now_playing_metadata() {
 
     TEST_ASSERT_TRUE(g_lastState.playing);
     TEST_ASSERT_EQUAL_STRING("BBC RADIO 2", g_lastFunction);
+    TEST_ASSERT_EQUAL_STRING("Gimme Shelter", g_lastTitle);
+    TEST_ASSERT_EQUAL_STRING("The Rolling Stones", g_lastArtist);
+
+    state.functionName = "BBC RADIO 2";
+    state.title = "Gimme Shelter";
+    state.artist = "The Rolling Stones";
+    state.playing = false;
+    decca::display::setState(state);
+    decca::display::update();
+    TEST_ASSERT_FALSE(g_lastState.playing);
     TEST_ASSERT_EQUAL_STRING("Gimme Shelter", g_lastTitle);
     TEST_ASSERT_EQUAL_STRING("The Rolling Stones", g_lastArtist);
 
@@ -310,8 +361,95 @@ void test_display_begin_failure_is_safe() {
     TEST_ASSERT_EQUAL_UINT16(0, g_frameCount);
 }
 
+void test_display_dims_sleeps_and_wakes_after_inactivity() {
+    startInjected();
+    ViewState state;
+    state.power = PowerState::On;
+    decca::display::setState(state);
+    finishStartup();
+    decca::display::noteActivity();
+
+    g_nowMs += decca::display::kDimAfterMs - 1U;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
+    ++g_nowMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Dimmed),
+                      static_cast<int>(decca::display::panelPowerState()));
+
+    g_nowMs += decca::display::kSleepAfterMs -
+               decca::display::kDimAfterMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Sleeping),
+                      static_cast<int>(decca::display::panelPowerState()));
+
+    decca::display::noteActivity();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
+}
+
+void test_display_standby_blanks_quickly_and_state_change_wakes() {
+    startInjected();
+    finishStartup();
+    decca::display::noteActivity();
+
+    g_nowMs += decca::display::kStandbySleepAfterMs;
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Sleeping),
+                      static_cast<int>(decca::display::panelPowerState()));
+
+    ViewState state;
+    state.power = PowerState::On;
+    decca::display::setState(state);
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
+}
+
+void test_display_formats_unipolar_and_centred_controls() {
+    char value[6]{};
+
+    decca::display::testing::formatControlValue(
+        Control::Volume, 0, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0%", value);
+    decca::display::testing::formatControlValue(
+        Control::Volume, 1000, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("100%", value);
+
+    decca::display::testing::formatControlValue(
+        Control::Bass, 0, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("-50", value);
+    decca::display::testing::formatControlValue(
+        Control::Bass, 500, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0", value);
+    decca::display::testing::formatControlValue(
+        Control::Treble, 750, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("+25", value);
+    decca::display::testing::formatControlValue(
+        Control::Treble, 1000, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("+50", value);
+
+    decca::display::testing::formatControlValue(
+        Control::Balance, 0, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("L 50", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 500, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 504, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("0", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 750, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("R 25", value);
+    decca::display::testing::formatControlValue(
+        Control::Balance, 1000, value, sizeof(value));
+    TEST_ASSERT_EQUAL_STRING("R 50", value);
+}
+
 void runAll() {
     RUN_TEST(test_display_physical_sh1106_snapshot);
+    RUN_TEST(test_display_holds_and_leaves_calibration_pattern);
+    RUN_TEST(test_display_calibrated_viewport_contract);
     RUN_TEST(test_display_animates_startup_without_blocking);
     RUN_TEST(test_display_dashboard_carries_function_and_controls);
     RUN_TEST(test_display_copies_and_clears_now_playing_metadata);
@@ -321,4 +459,7 @@ void runAll() {
     RUN_TEST(test_display_status_expires_back_to_dashboard);
     RUN_TEST(test_display_renders_diagnostics_and_sw_unavailable);
     RUN_TEST(test_display_begin_failure_is_safe);
+    RUN_TEST(test_display_dims_sleeps_and_wakes_after_inactivity);
+    RUN_TEST(test_display_standby_blanks_quickly_and_state_change_wakes);
+    RUN_TEST(test_display_formats_unipolar_and_centred_controls);
 }

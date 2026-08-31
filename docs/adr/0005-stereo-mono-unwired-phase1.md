@@ -1,7 +1,7 @@
 # ADR-0005: Leave Stereo/Mono unwired in Phase 1
 
 ## Status
-Accepted
+Superseded by ADR-0014
 
 ## Context
 The Stereo/Mono control is present on the fascia. It has no confirmed Phase 1

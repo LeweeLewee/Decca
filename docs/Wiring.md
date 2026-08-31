@@ -6,9 +6,9 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole Gram
-source input and OLED I²C GPIO21/22 are bench-verified; all other assigned pins
-remain proposed.
+(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole VHF
+source input, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified; all other
+assigned pins remain proposed.
 
 ## Wiring Colour Standard
 
@@ -27,11 +27,11 @@ its original conductors, **Red** and **Green**. These are pre-existing and are
 See the on/off section.
 
 **Exception — H4 OLED harness.** The installed and bench-verified screen loom
-uses **Orange for SDA** and **Yellow for SCL**. These are signal conductors in H4:
-the Orange SDA wire must **never** be connected to the 5 V rail. H4 retains Red
-for 3.3 V and Brown for GND. See the OLED section.
+uses **Orange for SCL** and **Yellow for SDA**. These are signal conductors in H4
+and must **never** be connected to the 5 V rail. H4 retains Red for 3.3 V and
+Brown for GND. This final orientation was physically confirmed on 2026-08-30. See the OLED section.
 
-H3 now uses only the verified right-hand Gram dry-contact pair. It has its own
+H3 now uses only the reliable VHF-derived dry-contact pair. It has its own
 return and no common-return conductor. All other selector conductors are left
 disconnected and individually insulated at the controller end.
 
@@ -61,17 +61,19 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Bass pot wiper        | GPIO33 (bench-verified) | **D33** | ADC1        | H1      | ADC1 required                            |
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
-| On/off switch (Red)   | GPIO19 (proposed) | D19 | Digital in  | H2      | Internal pull-up; low-voltage logic only |
-| Source selector: Gram | GPIO23 (bench-verified) | D23 | Digital in | H3 | Closed = Vinyl; open = Digital Streamer |
-| VHF / SW / MW / LW    | — | — | Unwired | H3 | Mechanical only; may release Gram |
+| On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
+| Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
+| SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
+| Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO25 (proposed) | D25 | PWM (LEDC)  | H5      | Gate of logic-level N-ch MOSFET          |
+| Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC) | H5 | DAOKAI MOSFET input; three-lamp bank |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
-> is bench-verified. GPIO16, GPIO17 and GPIO18 are released for future use and
-> must not be connected to the unreliable selector contacts.
+> is bench-verified. GPIO16 and GPIO18 are released for future use. GPIO17 is
+> reserved for the separate Stereo/Mono contact and must not be connected to
+> the unreliable source-selector contacts.
 
 ## H1 — Potentiometers
 
@@ -129,10 +131,11 @@ The original Decca on/off switch is retained, including its **original solder
 joints and original cable**. It is a simple open/close switch.
 
 - Active conductors (confirmed): **Red** and **Green**.
-- Interface (proposed): **Red → ESP32 GPIO19 / board label D19** input with **internal pull-up
-  enabled**; **Green → GND**.
+- Interface (bench-verified): **Red → ESP32 GPIO19 / board label D19** input
+  with **internal pull-up enabled**; **Green → GND**.
 - This is a **low-voltage logic input only**. It does **not** switch 230 V mains.
-- Logical inversion may be applied in firmware after bench testing.
+- Confirmed logic: closed/active-low = ON; open = STANDBY. Both directions were
+  physically accepted with production firmware on 2026-08-30.
 - The switch is a **system-state command**. ON causes the ESP32 to assert the ZA3
   trigger, illuminate the dial and enable the OLED; OFF reverses those actions
   and allows the WiiM Pro to use its own automatic standby behaviour.
@@ -141,12 +144,12 @@ joints and original cable**. It is a simple open/close switch.
 
 The original PCB and interlocked selector mechanism are retained mechanically
 (ADR-0001). Repeated soldering and contact tests showed that multi-button
-electrical reuse is not reliable. ADR-0011 therefore supersedes ADR-0004.
+electrical reuse is not reliable. ADR-0013 supersedes ADR-0011 and ADR-0004.
 
-Only the already verified **right-hand Gram Green/Yellow dry-contact pair** is
+Only the physically accepted **VHF-derived Green/Yellow dry-contact pair** is
 connected:
 
-| Gram pair | ESP32 termination | Status |
+| VHF-derived pair | ESP32 termination | Status |
 |-----------|-------------------|--------|
 | Green | GPIO23 / board label D23 | Bench-verified input |
 | Yellow | GND | Bench-verified return |
@@ -157,15 +160,16 @@ either conductor to 3.3 V or 5 V.
 
 Authoritative source logic:
 
-| Debounced Gram state | Logical source | Phase 2 WiiM action |
+| Debounced VHF state | Logical source | Phase 2 WiiM action |
 |----------------------|----------------|----------------------|
-| Closed / latched | Vinyl | Select Line-In |
-| Open / released | Digital Streamer | Restore phone-controlled digital playback |
+| Closed / latched | Digital Streamer | Restore phone-controlled digital playback |
+| Open / released | Vinyl | Select Line-In |
 
-Pressing VHF, SW, MW or LW may mechanically release Gram through the retained
-interlock, but those four positions have no individual ESP32 input or software
-mapping. Their former conductors are disconnected and individually insulated at
-the controller end. GPIO16, GPIO17 and GPIO18 are no longer assigned.
+Pressing SW, MW, LW or Gram releases VHF through the retained interlock. Those
+positions have no individual ESP32 input; the open VHF state authoritatively
+selects Vinyl. Their former conductors are disconnected and individually
+insulated at the controller end. GPIO16 and GPIO18 are not assigned; GPIO17 is
+reserved for the separate Stereo/Mono contact.
 
 A purpose-built replacement button panel is a deferred fallback if the two-state
 scheme later proves insufficient. No LW solder repair is required for the
@@ -173,8 +177,19 @@ current design.
 
 ## Stereo/Mono Control
 
-Retained mechanically, **unwired**, decorative in Phase 1, deferred for possible
-future use. **No function assigned.** See ADR-0005.
+TX2 / **GPIO17** is assigned as an active-low digital input with the ESP32
+internal pull-up. Wire the isolated contact only:
+
+| Stereo/Mono contact | ESP32 termination |
+|---------------------|-------------------|
+| Contact that closes in Mono | GPIO17 / board label TX2 |
+| Common / return | GND |
+
+Do not connect either contact to 3.3 V or 5 V. Open/HIGH means **Stereo** and
+requests dial lights on; closed/LOW means **Mono** and requests them off. This
+assignment and both physical input states were accepted on 2026-08-30.
+GPIO25 and the lamp load are commissioned separately. See ADR-0014, which
+supersedes ADR-0005.
 
 ## H4 — OLED Display
 
@@ -183,12 +198,12 @@ with a pre-soldered four-pin header. Expected address: **0x3C**.
 
 - VCC → 3.3 V (Red)
 - GND → GND (Brown)
-- SDA → GPIO21 / board label **D21** (Orange, bench-verified)
-- SCL → GPIO22 / board label **D22** (Yellow, bench-verified)
+- SDA → GPIO21 / board label **D21** (Yellow, bench-verified)
+- SCL → GPIO22 / board label **D22** (Orange, bench-verified)
 
 The H4 Orange and Yellow signal colours are a documented exception to the
-general loom colour standard. In particular, do not treat the Orange SDA
-conductor as 5 V.
+general loom colour standard. Orange is the SCL signal and Yellow is the SDA
+signal; neither conductor is a power rail.
 
 Check the labels printed on the delivered module before applying power because
 four-pin OLED modules do not all use the same physical pin order.
@@ -196,32 +211,35 @@ four-pin OLED modules do not all use the same physical pin order.
 Bench verification completed 2026-08-25. The panel responded as an SH1106 at
 0x3C on GPIO21/GPIO22, all ten on-target `test_display` cases passed, and visual
 inspection confirmed the startup and revised dashboard were upright, complete,
-unclipped and free of persistent display artefacts.
+unclipped and free of persistent display artefacts. Final loom orientation was
+physically confirmed on 2026-08-30: Brown = GND, Red = VCC, Orange = SCL and
+Yellow = SDA.
 
 ## H5 — Dial Illumination
 
 - Purchased lamp set: **ShuoHui E10 miniature screw LEDs**, ASIN
   **B0CFTLZFGT**, pack of 10; **6 V AC/DC, 0.2 W, 3000 K**. Three are required.
-- The selected lamps are **not yet electrically or mechanically approved**:
-  confirm their approximately 24 mm holder fit, acceptable brightness and total
-  current from the locked 5 V rail before installation.
+- The three-lamp bank is electrically accepted from the locked 5 V rail.
+  Final holder fit, operating brightness and measured total current remain
+  installation/commissioning checks.
 - Wire the three validated lamps **in parallel**.
 - Selected switch candidate: one **DAOKAI 3.3 V / 5 V PWM MOSFET driver module**,
   ASIN **B09YYH2BTF**, from the ordered pack of 10.
-- The seller's compatibility claim is not the bench result. Verify clean PWM
-  switching from ESP32 **GPIO25 / board label D25**, safe-off behaviour and
-  acceptable module temperature at the measured lamp-bank current. Reopen the
-  switch selection if it cannot pass.
+- Physical testing accepted clean PWM switching from ESP32 **GPIO25 / board
+  label D25**, safe-off behaviour and smooth fades through full duty without
+  flicker, uneven lamps or abnormal heat.
 - ESP32 and lighting grounds are **common**.
-- Brightness is set during commissioning, stored in non-volatile settings and
-  then treated as a setup value rather than a normal user control. The unused
+- Normal brightness is owner-approved at **90% / duty 230**, stored in
+  non-volatile settings and treated as a setup value rather than a normal user
+  control. Mono and logical standby command zero. The unused
   aerial control may be used temporarily for commissioning if convenient, but is
   not reserved permanently for lighting.
 
 Expected behaviours: fade up, fade down, stored/configurable brightness, safe
-boot state. Firmware support is implemented. The purchased lamps, ordered
-MOSFET module, GPIO25 and the complete load wiring remain unapproved until the
-dial-lighting bench procedure passes.
+boot state. Firmware support is implemented. GPIO25, the MOSFET stage and the
+three-lamp electrical load passed the dial-lighting bench procedure on
+2026-08-31. Subsequent 70%, 80% and 100% comparisons established the approved
+normal level at 90%; Mono and standby are off. Installed-holder checks remain open.
 
 ## H6 — Fosi ZA3 12 V Trigger
 
