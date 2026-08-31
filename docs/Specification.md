@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. Eight on-target suites pass 55/55. GPIO25 commissioning and WiiM integration remain outstanding. |
-| Version  | 0.24                                              |
+| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source, TX2 Stereo/Mono and GPIO25 lighting electrical acceptance are complete. Eight on-target suites pass 55/55. Final lighting levels and WiiM integration remain outstanding. |
+| Version  | 0.25                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 

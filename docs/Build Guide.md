@@ -364,8 +364,8 @@ for the ESP32.
 
 4. Observe the dial lighting. It should fade gently from off to a low test duty
    and back to off, without flashing at full brightness.
-5. Confirm the output contains `LIGHTING_SNAPSHOT duty=32` and all seven tests
-   pass.
+5. Confirm the output contains `LIGHTING_SNAPSHOT duty=64`, the lamps hold at
+   25% duty for five seconds, and all seven tests pass.
 
 Pass criteria:
 
@@ -375,8 +375,12 @@ Pass criteria:
 - the MOSFET and wiring remain cool;
 - all seven behavioural tests pass.
 
+Recorded result (2026-08-31): GPIO25, the DAOKAI MOSFET stage and the three-lamp
+electrical load passed. The lamps faded smoothly to 25%, held for five seconds,
+lit evenly and faded fully off with no flash, flicker, abnormal heat or smell.
+
 ### 7.7 Remaining commissioning
 
 - Selecting the final normal and standby dial brightness
-- Bench-verifying GPIO25 and the installed three-lamp MOSFET load
+- Confirming final holder fit and measuring the installed three-lamp current
 - Physically verifying both TX2/GPIO17 Stereo/Mono states

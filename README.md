@@ -18,8 +18,9 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   implemented and independently tested.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views while continuously servicing authenticated OTA.
-- USB-to-OTA, GPIO19 power, controls, source selection and fitted-display
-  acceptance are complete; GPIO25 lighting commissioning remains open.
+- USB-to-OTA, GPIO19 power, controls, source selection, fitted display and
+  GPIO25/MOSFET/lamp electrical acceptance are complete. Final normal and
+  standby lighting levels remain to be selected.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work.
@@ -37,7 +38,7 @@ firmware work.
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted |
-| Dial lighting PWM | GPIO25/D25 | Proposed |
+| Dial lighting PWM | GPIO25/D25 | Physically accepted with MOSFET/lamp bank |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 

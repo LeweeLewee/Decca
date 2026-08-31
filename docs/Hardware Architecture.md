@@ -4,7 +4,8 @@
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
 > sole VHF input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
 > Stereo/Mono input GPIO17/TX2 is physically verified.
-> Lighting GPIO25 remains **(proposed)**; other pins are unassigned. See
+> Lighting GPIO25 and the MOSFET/lamp electrical load are physically accepted;
+> other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
 > amplifier and power-control decisions.
@@ -213,15 +214,15 @@ wakes the panel immediately; this does not remove power from the ESP32.
 The purchased lamp set is **ShuoHui ASIN B0CFTLZFGT**: ten E10 miniature
 screw LEDs rated 6 V AC/DC, 0.2 W and 3000 K; three are required. The lamps were
 bench-confirmed functional at **5 V** on 2026-08-29, validating compatibility with
-the locked 5 V lighting rail. Physical holder fit, final brightness and total
+the locked 5 V lighting rail. The assembled three-lamp electrical path passed
+PWM testing on 2026-08-31. Physical holder fit, final brightness and measured
 three-lamp current remain commissioning checks.
 
 The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
 module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
-claims do not replace verification: GPIO25 / board label **D25**, safe-off
-behaviour, clean PWM switching and module temperature must pass at the measured
-three-lamp load. The three validated lamps will be wired **in parallel** with
-common ground to the ESP32.
+claims did not replace verification: GPIO25 / board label **D25**, safe-off,
+smooth PWM switching to a held 25% duty and return to off passed with the three
+parallel lamps, common ground and no abnormal module behaviour.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. Firmware stores the selected PWM level in non-volatile

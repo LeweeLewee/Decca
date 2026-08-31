@@ -74,7 +74,7 @@ button panel is deferred.
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted, open Stereo = on / closed Mono = off |
-| Dial-light PWM | GPIO25/D25 | Proposed, load test pending |
+| Dial-light PWM | GPIO25/D25 | Electrically accepted with MOSFET/three-lamp load |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
 
@@ -180,9 +180,10 @@ the user's Wi-Fi or OTA passwords.
    GPIO19 and integrate on/standby display coordination in production.
 5. **Complete:** production coordinates pots, persistent VHF-derived source,
    logical power, fitted display and OTA in one non-blocking loop.
-6. **Current:** bench-test the MOSFET/lamp bank and verify GPIO25 safe-off/fade
-   behaviour.
-7. Commission normal and standby lighting levels.
+6. **Complete (2026-08-31):** GPIO25/MOSFET/three-lamp electrical test passed:
+   safe off, smooth fade to held 25%, even illumination and fade fully off.
+7. **Current:** commission normal and standby lighting levels, then integrate
+   the accepted Stereo/Mono request in production coordination.
 8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
    Mono closed requests them off. GPIO25 load remained disabled during testing.
@@ -195,7 +196,7 @@ the user's Wi-Fi or OTA passwords.
 
 Consult `docs/Parts List.md` and the CSV BOMs for current detail. Principal open
 items are the inline fuse holder and matching fuses, 5 V/GND distribution
-connectors, final lighting load verification, the ZA3 12 V trigger interface,
+connectors, final lighting level/current/holder checks, the ZA3 12 V trigger interface,
 WiiM Pro, Fosi ZA3, speakers and final audio interconnects.
 
 ## Open mechanical work
@@ -229,16 +230,17 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: commission GPIO25 and the dial-lighting load. Production now
-coordinates all four pots, VHF-derived source, logical power and display while
+Immediate priority: select normal and standby lighting levels and integrate the
+accepted Stereo/Mono request. Production now coordinates all four pots,
+VHF-derived source, logical power and display while
 continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 5 min, and blanks standby after 10 s, waking immediately on activity. The
 accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
 L50..0..R50 with centred bars and monochrome icons.
 
-Continue by physically verifying TX2/GPIO17 in both Stereo/Mono positions with
-the GPIO25 load disabled, then commission GPIO25 lighting. Preserve the accepted
-VHF-only source logic: VHF closed = Digital Streamer; VHF open = Vinyl/Line-In;
+TX2/GPIO17 and the GPIO25/MOSFET/three-lamp electrical path are physically
+accepted. Preserve the accepted VHF-only source logic: VHF closed = Digital
+Streamer; VHF open = Vinyl/Line-In;
 GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
