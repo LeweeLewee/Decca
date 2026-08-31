@@ -27,12 +27,15 @@ Built to brief commit `7b107f2` ("require two-loop inset wall"), then moved on
 by four owner changes made on the model. Every wall carries **at least two
 0.40 mm extrusion loops** — a minimum applied per side, not a fixed count.
 
-> **The fit is a real one again.** The previous issue put the inset wall at
-> 36.20 × 17.20 mm against a measured 35.20 × 15.30 opening, which could not
-> enter at all. The owner's fifth change pulls it back to **35.40 × 15.45** for
-> **0.100 mm per side across and 0.075 mm per side up** — inside the band a thin
-> printed wall flexes out, with the 0.20 mm lead-in leaving the tip *under* the
-> opening so entry is free before the interference engages. Build report §3.8.
+> **THE PERSPEX OPENING HAS BEEN MEASURED, and it is not what this project
+> believed.** For six revisions the model carried 35.20 × 15.30 from Rev C — a
+> figure no released part had ever checked, because Rev N located on two side
+> rails only. The owner printed the 35.400 × 15.450 insert, used it as a gauge
+> block and read the slop: **1.34 mm horizontal, 1.00 mm vertical**. The opening
+> is **36.74 × 16.45**, and the insert is now DERIVED from it:
+> `insert outer = measured opening + declared interference`. Re-measuring is a
+> two-number edit. Treat the reading as ±0.2 mm; a second iteration is expected.
+> Build report §3.10.
 
 | File | Role |
 |---|---|
@@ -48,22 +51,23 @@ Key dimensions, each verified by two independent tools:
 
 | | mm |
 |---|---:|
-| Bezel face opening, at the front face | **32.900 × 13.850**, R1.750 |
+| Bezel face opening, at the front face | **34.440 × 15.000**, R3.000 |
 | Aperture | a **straight bore** — identical at the front face and the seating plane, taper 0.00° |
-| Inset-wall outer envelope | **35.400 × 15.450** |
-| Inset-wall inner envelope (derived) | 32.900 × 13.850 — **flush with the face opening on all four sides** |
+| **Perspex opening, MEASURED 2026-08-31** | **36.740 × 16.450** |
+| Inset-wall outer envelope | **36.940 × 16.600** — derived, opening + fit |
+| Inset-wall inner envelope (derived) | 34.440 × 15.000 — **flush with the face opening on all four sides** |
 | Wall | **1.250 sides** (3.125 loops) / **0.800 top+bottom** (2.000 loops) |
-| Outer / inner corner radius | **R3.000** / R1.750 (derived from the side wall) |
+| Outer / inner corner radius | **R4.250** / R3.000 (derived from the side wall) |
 | Wall depth | **2.800** into the 3.00 mm Perspex |
 | Horizontal fit | **0.100 INTERFERENCE per side** |
 | Vertical fit | **0.075 INTERFERENCE per side** |
 | Entry lead-in | 0.200 × 45°, outer rear edge only — tip is 0.100 / 0.125 mm per side UNDER the opening |
 | Rearmost material | z = **+0.200** — 0.200 clear of the Perspex rear face |
 | Clearance to the OLED glass | **0.500** — the released Rev N/P value |
-| Minimum distance to the Rev P.5 carrier | 0.939 |
-| Effective clear optical opening | **32.900 × 13.850**, R1.750 |
-| Seating face | one unbroken annulus, 269.362 mm² (adhesive pads deleted) |
-| Volume | 0.6549 cm³ ≈ 0.83 g in PETG |
+| Minimum distance to the Rev P.5 carrier | **0.339** — was 0.939, watch it |
+| Effective clear optical opening | **34.440 × 15.000**, R3.000 |
+| Seating face | one unbroken annulus, 210.867 mm² (adhesive pads deleted) |
+| Volume | 0.5951 cm³ ≈ 0.76 g in PETG |
 
 **52/52 gates PASS** in Fusion; **47/47 PASS** offline from the mesh. One shell,
 one lump, zero slivers, no degenerate triangles; the wall's cross-section area
@@ -73,6 +77,11 @@ including the corners; the interference is exactly 0.100 mm per side across and
 zero interference with the OLED glass or the carrier; nothing behind the
 Perspex rear face.
 
+> **Carrier clearance has narrowed 0.939 → 0.339 mm** as the skirt grew to suit
+> the measured opening. Still zero interference, but two FDM parts at ±0.1 mm
+> each make that a real number. The carrier is frozen, so any conflict is the
+> bezel's to resolve. Check it on the first dry fit.
+
 > **The fit is the primary gate.** 0.100 / 0.075 mm per side is an ordinary
 > press fit on paper, but acrylic is brittle and takes up interference by
 > storing stress rather than deforming, the 1.25 mm side wall is ≈31× stiffer
@@ -81,42 +90,43 @@ Perspex rear face.
 > arrives anywhere between 0.00 and 0.25 mm. No CAD check can touch that.
 > **Print `Bezel_Fit_Gauge_revQ` first** — five tabs at
 > 0.00/0.05/0.10/0.15/0.20 mm, which now brackets the declared value two either
-> side, each carrying the real wall section, the full 15.45 mm height and both
-> R3.00 corners. Also plan on adhesive: **PETG creeps**, so a press fit
-> slackens over months. Build report §8.1.
+> side, each carrying the real wall section, the full 16.60 mm height and both
+> R4.25 corners — and the sweep now brackets the ±0.2 mm **measurement** error as
+> well as the fit, so one print resolves both. Also plan on adhesive: **PETG
+> creeps**, so a press fit slackens over months. Build report §8.1, §8.4.
 
 > **The loop rule is a PRODUCTION gate, not a CAD one.** CAD proves the
 > geometry admits the loops: sides 1.250/0.400 = 3.125, top and bottom
 > 0.800/0.400 = 2.000 exactly, measured at all 720 stations (min 0.7950, max
-> 1.2450) including 368 corner stations, loop centrelines 0.400 apart with
-> corner radii 2.800 and 2.400 and no cusp. Only the slicer preview can prove
-> it lays them. Build report §7.1 and §10 Stage 0b.
+> 1.2500) including 368 corner stations, loop centrelines 0.400 apart with
+> corner radii 4.050 and 3.650 and no cusp — the easiest to slice at any issue.
+> Only the slicer preview can prove it lays them. Build report §7.1 and §10
+> Stage 0b.
 
-> **The opening corner radius has still never been confirmed, and it is now the
-> tightest unmeasured margin in the part.** `panel_open_corner_r` stays
-> UNRESOLVED and nothing in the model depends on it — but the part does. An
-> insert corner **squarer** than the opening jams it outright; one that is
-> **rounder** only leaves a crescent of cut edge visible. R4.25 covered opening
-> corners to R4.00; the owner reverted it to **R3.00** on appearance, which
-> covers them only to about **R2.50** and buys back both the rectangular
-> aperture and much tighter corner masking (0.08 mm against a plausible R2.50
-> opening, against 0.60 mm at R4.25). **A single gauge tab settles which way
-> round they are, and it is the first thing to check.** Build report §8.3.
+> **The opening corner is largely closed — by a printed part.** The owner offered
+> the R4.25 insert into the real opening and reports the corner **a good match**,
+> retracting an earlier appearance-based revert in as many words. At R4.25
+> against the measured opening the **flanks set the fit for every plausible
+> opening corner**: penetration never leaves 0.100 mm from a sharp corner all the
+> way to R4.00. `panel_open_corner_r` stays 0.00 in the model, because a
+> qualitative match is evidence rather than a measurement and modelling the
+> opening sharp keeps every figure at its worst case. Build report §8.3.
 
-> **Six owner changes on top of the brief, each recorded and each reversible.**
-> (1) the two recessed adhesive pads **deleted**; (2) the outer corner
-> **R2.00 → R3.00**; (3) the aperture made **flush** on the left and right, with
-> the loop rule clarified to **at least** two per side; (4) the
-> **interference-fit refinement**, which overshot and could not enter; (5) the
-> **pull-back** to 35.40 × 15.45 with the corner at R4.25; (6) the corner
-> **reverted to R3.00** on sight of the front view. Build report §3.5 to §3.9.
+> **Seven owner changes on top of the brief, each recorded and each reversible.**
+> (1) adhesive pads **deleted**; (2) outer corner **R2.00 → R3.00**; (3) aperture
+> made **flush** on the left and right, loop rule clarified to **at least** two
+> per side; (4) the **interference-fit refinement**, which appeared not to fit;
+> (5) the **pull-back**; (6) the corner **reverted to R3.00** on the render; and
+> (7) **the opening measured** — which restored the corner to R4.25 on physical
+> evidence, showed the recorded opening was 1.54 × 1.15 mm small, and made the
+> insert derive from the measurement. Build report §3.5 to §3.10.
 
-> **The wall costs 0.525 mm of lit screen height.** The clear opening is
-> 32.90 × 13.85, controlled by the skirt on all four sides with the face
-> opening flush to it, and the visible active band goes 8.100 → **7.575 mm**,
-> all of it at the top. The aperture corner is **R1.75**, reverted from R3.00 at
-> owner instruction. Only the powered test can say whether the lit band is
-> acceptable. Build report §5.
+> **The wall no longer costs lit screen height.** The clear opening is
+> 34.44 × 15.00, controlled by the skirt on all four sides with the face
+> opening flush to it, and the visible active band goes 8.100 → **8.150 mm** —
+> **above Rev N for the first time**, because the opening was always bigger than
+> recorded. What is worth judging instead is the noticeably slimmer black
+> border: the bezel flange is now 1.530 mm at the sides. Build report §5.
 
 > **The aperture does not taper.** With the face opening flush to the skirt on
 > all four sides there is nothing to blend, so the bore is straight from the

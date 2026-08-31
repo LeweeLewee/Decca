@@ -105,8 +105,30 @@ COMP_ACTIVE = "REF_OLED_Active"
 # ---------------------------------------------------------------------------
 P = {
     # -- MEASURED: the original Decca fascia -------------------------------
-    "panel_open_w": 35.20,          # MEASURED    Rev C
-    "panel_open_h": 15.30,          # MEASURED    Rev C
+    # THE OPENING, RE-MEASURED 2026-08-31 - and it is 1.54 mm wider and
+    # 1.15 mm taller than the Rev C figures this project carried for six
+    # revisions. Those were never corroborated: no Rev N surface ever
+    # touched the top or bottom of the opening, and the side rails only
+    # ever proved an X envelope, so nothing physical had checked either
+    # number until now.
+    #
+    # Method: the owner printed the 35.400 x 15.450 insert and used it as a
+    # gauge block, pushing it to one side and measuring the slop that opened
+    # opposite - 1.34 mm horizontal, 1.00 mm vertical. So
+    #     35.400 + 1.34 = 36.74      15.450 + 1.00 = 16.45
+    #
+    # ACCURACY: the owner reports this as hard to measure and expects a
+    # further iteration. Two error sources stack - the slop reading itself,
+    # and the printed part being nominally rather than actually 35.400 x
+    # 15.450 (a well-tuned FDM machine holds about +/-0.10 mm and tends to
+    # run over). Treat these as +/-0.2 mm, not as gospel. They are still an
+    # enormous improvement on a figure nothing had ever checked.
+    #
+    # These two numbers now DRIVE the whole insert - see the derivation
+    # block below the dict. Re-measuring means changing them and nothing
+    # else.
+    "panel_open_w": 36.74,          # MEASURED    2026-08-31, gauge-block
+    "panel_open_h": 16.45,          # MEASURED    2026-08-31, gauge-block
     "panel_t": 3.00,                # MEASURED
     "panel_fix_pitch": 49.00,       # MEASURED    Rev C, print-confirmed Rev D
     "panel_ref_w": 70.00,           # reference slab only, not a fascia size
@@ -143,9 +165,12 @@ P = {
     #
     # DECLARED DEVIATION from brief 2/4 (face opening 30.90 x 15.35,
     # R0.80). The brief's figures are superseded by owner instruction.
-    "bezel_window_w": 32.90,        # OWNER       was 30.90, = skirt inner
-    "bezel_window_h": 13.85,        # OWNER       was 15.60, = skirt inner
-    "bezel_window_r": 1.75,         # OWNER       reverted, = skirt inner R
+    #                                 bezel_window_w is DERIVED below too -
+    #                                 see bezel_lip_wall_x.
+    #                                 bezel_window_h and bezel_window_r are
+    #                                 DERIVED below - they must equal the
+    #                                 skirt inner envelope or the aperture
+    #                                 is not flush.
     # -- recessed adhesive pads - DELETED at owner instruction -------------
     # Rev N has two: 24.00 x 2.00 mm, 0.30 mm deep into the seating face at
     # y +/-7.85..9.85. The owner inspected the model, identified them as the
@@ -206,8 +231,24 @@ P = {
     # and the 0.20 mm lead-in buys free entry again (0.100 and 0.125 mm of
     # clearance per side at the tip). The panel_open_* figures above are
     # MEASURED Rev C values and have never been adjusted to suit the part.
-    "bezel_lip_outer_w": 35.40,     # OWNER       36.20 - 0.80
-    "bezel_lip_outer_h": 15.45,     # OWNER       17.20 - 1.75
+    # THE INSERT ENVELOPE IS NO LONGER ENTERED. What is entered is the fit
+    # itself, and the envelope is derived from the MEASURED opening plus it,
+    # immediately after this dict. Owner instruction 2026-08-31: "based on
+    # the measured Perspex opening dimension set the Perspex insert
+    # dimensions for an interference fit".
+    #
+    # That inversion matters. The envelope was entered for six changes and
+    # the fit was reported back, so a re-measure of the opening left the
+    # envelope stale and silently changed the fit. Now a re-measure changes
+    # panel_open_w/h ONLY and everything downstream follows: envelope, wall,
+    # clear opening, corner radii, gauge and validator alike.
+    #
+    # 0.100 and 0.075 mm per side are chosen, not measured. They sit in the
+    # 0.05-0.15 mm band a thin printed wall takes up by FLEXING rather than
+    # by pushing on brittle acrylic, and the smaller vertical figure is
+    # deliberate because it is resisted by the thinner 0.80 mm wall.
+    "bezel_lip_interf_x": 0.100,    # OWNER/SPEC  per side, INTERFERENCE
+    "bezel_lip_interf_y": 0.075,    # OWNER/SPEC  per side, INTERFERENCE
     "bezel_lip_depth": 2.80,        # PROVEN      Rev N engagement depth
 
     # THE WALL IS NO LONGER UNIFORM, at owner instruction 2026-08-30.
@@ -228,6 +269,22 @@ P = {
     # the wall tapers smoothly between them and never drops below 0.80 -
     # see derive().
     "bezel_lip_wall_y": 0.80,       # OWNER       top/bottom, 2 loops
+
+    # X IS NOW ENTERED TOO, and the clear width is derived from it. Until
+    # the opening was measured this ran the other way: the clear width was
+    # entered at 32.90 and the side wall absorbed whatever was left. That
+    # only worked while the envelope was a guess. Against the real 36.74
+    # opening it would have forced a 2.02 mm side wall - five extrusion
+    # loops, roughly 130x the bending stiffness of the original 0.40 mm
+    # wall, which is the opposite of what brief 3.8 asks for - and it would
+    # have left the clear width pinned while the owner had asked for it to
+    # grow.
+    #
+    # Entering both walls makes X and Y symmetric, keeps the side wall at
+    # the 1.25 mm that has now been printed and physically confirmed, and
+    # holds the visible corner at R3.00 (= corner_r - wall_x), which is the
+    # corner the owner accepted on the printed part.
+    "bezel_lip_wall_x": 1.25,       # OWNER       sides, 3.125 loops
     #                                 X wall is DERIVED - see derive()
     # The outer corner is the one interface that mates with the Perspex
     # opening corner. Its history:
@@ -237,32 +294,35 @@ P = {
     #   R4.25 (+25%, the fifth change)
     #   R3.00 (REVERTED, the sixth change - see below)
     #
-    # THE SIXTH CHANGE REVERTS IT. R4.25 put the VISIBLE aperture corner at
-    # R3.00, since the inner radius is (corner_r - wall_x) and the flush rule
-    # makes the face opening carry it. On a 13.85 mm tall opening that leaves
-    # only 7.85 mm of straight run, and the owner rejected the look on sight
-    # from the front view, without needing a print. Both radii therefore go
-    # back to the pair they last held with a 1.25 mm side wall: outer R3.00,
-    # visible corner R1.75. That is consistent rather than arbitrary - the
-    # R3.40 only ever existed as R3.00 plus the outward loop, and the fifth
-    # change removed that loop when it took 0.80 mm off the width.
+    # THE SIXTH CHANGE REVERTED IT TO R3.00 on appearance, from the front
+    # view, without a print. THE SEVENTH PUTS IT BACK TO R4.25, and this time
+    # on PHYSICAL EVIDENCE: the owner printed the R4.25 part, offered it into
+    # the real opening, and reports the corner "a good match" - retracting the
+    # earlier judgement in as many words ("I was wrong"). That is the first
+    # hard information about the opening corner anywhere in this project, and
+    # it outranks every calculation in this file.
     #
-    # WHAT IT COSTS, and it is a real cost. The failure modes are asymmetric:
-    # an insert corner SQUARER than the opening corner touches before the
-    # flanks do, so the part jams and never seats - a HARD failure. One that
-    # is ROUNDER only leaves a crescent of cut edge visible at each corner
-    # apex - cosmetic. At R4.25 the flanks set the fit for any opening corner
-    # up to R4.00. At R3.00 they set it only up to about R2.50, and beyond
-    # that the corner takes over: R3.00 opening -> 0.125 mm, R3.50 -> 0.331,
-    # R4.00 -> 0.538. panel_open_corner_r is still UNRESOLVED - a drill-shank
-    # estimate was offered and withdrawn - so this is now the tightest
-    # unmeasured margin in the part, and the fit gauge is the way to close it.
-    # It buys back the appearance the owner wants and tighter corner masking.
+    # It also settles the direction the whole argument was pointing. The
+    # failure modes are asymmetric: an insert corner SQUARER than the opening
+    # corner touches before the flanks do, so the part jams and never seats -
+    # a HARD failure. One that is ROUNDER only leaves a crescent of cut edge
+    # visible at each corner apex - cosmetic. R4.25 keeps the flanks in
+    # control for any opening corner up to R4.00; R3.00 only up to about
+    # R2.50, and the owner's observation puts the real corner near R4.25, so
+    # R3.00 was on the wrong side of it.
+    #
+    # panel_open_corner_r stays 0.00 - a qualitative "good match" is evidence,
+    # not a measurement, and modelling the opening SHARP keeps every
+    # interference figure at its worst case. The reported corner masking is
+    # therefore pessimistic: against a real R4.25 opening corner the crescent
+    # is near zero, not the 1.147 mm the sharp model reports.
+    #
+    "bezel_lip_corner_r": 4.25,     # OWNER       RESTORED, physical evidence
     #
     # Brief 7 explicitly allows the named corner parameters to be changed
     # when the fit needs it; the brief's stated 2.00 is therefore superseded
     # by observation, and this is recorded as a deviation from brief 2/4.
-    "bezel_lip_corner_r": 3.00,     # OWNER       REVERTED from 4.25
+    "bezel_lip_corner_r": 4.25,     # OWNER       RESTORED, physical evidence
     "bezel_lip_lead": 0.20,         # PROVISIONAL minimum entry lead-in
 
     # The established production extrusion width. Every wall must be at least
@@ -298,6 +358,33 @@ P = {
     "coupon_pitch": 24.00,
 }
 
+
+# ---------------------------------------------------------------------------
+# THE INSERT IS DERIVED FROM THE MEASURED OPENING, NOT ENTERED
+# ---------------------------------------------------------------------------
+# One place, four lines, and everything downstream follows. To re-fit the part
+# to a re-measured opening, change panel_open_w / panel_open_h above and
+# nothing else: the envelope, the split wall, the clear opening, both corner
+# radii, the fit gauge and both validators all move with it.
+#
+# Sign convention: interference positive means the insert is WIDER than the
+# hole and has to flex to enter.
+# ---------------------------------------------------------------------------
+P["bezel_lip_outer_w"] = P["panel_open_w"] + 2 * P["bezel_lip_interf_x"]
+P["bezel_lip_outer_h"] = P["panel_open_h"] + 2 * P["bezel_lip_interf_y"]
+
+# The face opening must equal the skirt inner envelope on all four sides, or
+# one of them stands as a ledge in front of the other. Both walls are entered,
+# so all three face-opening values follow the skirt.
+P["bezel_window_w"] = P["bezel_lip_outer_w"] - 2 * P["bezel_lip_wall_x"]
+P["bezel_window_h"] = P["bezel_lip_outer_h"] - 2 * P["bezel_lip_wall_y"]
+P["bezel_window_r"] = P["bezel_lip_corner_r"] - P["bezel_lip_wall_x"]
+
+# Names written into the Fusion parameter table as FORMULAS rather than as
+# frozen numbers, because they are derived above.
+DERIVED_INTO_P = ("bezel_lip_outer_w", "bezel_lip_outer_h",
+                  "bezel_window_w", "bezel_window_h", "bezel_window_r")
+
 # Horizontal interference per side carried by the fit gauge, ascending.
 #
 # The corner radius is no longer the open question - the owner has specified
@@ -305,6 +392,11 @@ P = {
 # side, resisted by a wall that is 8x stiffer in bending than the 0.40 mm one
 # it replaces. These five bracket the declared value so the fit can be chosen
 # from a physical part instead of argued from CAD.
+# The opening measurement carries perhaps +/-0.2 mm (see panel_open_w), so
+# the sweep brackets the MEASUREMENT as well as the fit: two tabs below the
+# declared 0.100 and two above. A tab that drops in loose says the opening is
+# bigger than measured; one that will not enter says it is smaller, and by
+# how much in both cases.
 COUPON_INTERFERENCE = [0.00, 0.05, 0.10, 0.15, 0.20]
 
 
@@ -325,8 +417,7 @@ def derive(P):
     # thick as it needs to be for its inner face to land on the face opening,
     # so there is no set-back on the left and right. Y is the entered value,
     # held at the proven 0.80 so the vertical clear opening stays at 13.60.
-    d["bezel_lip_wall_x"] = (P["bezel_lip_outer_w"]
-                             - P["bezel_window_w"]) / 2.0            # 1.250
+    d["bezel_lip_wall_x"] = P["bezel_lip_wall_x"]                    # 1.250
     d["bezel_lip_wall_y"] = P["bezel_lip_wall_y"]                    # 0.800
     ew = P["extrusion_width"]
     d["wall_loops_x"] = d["bezel_lip_wall_x"] / ew                   # 3.125
@@ -868,18 +959,24 @@ def _write_params(design, P, d):
             pass
 
     for k, v in sorted(P.items()):
+        if k in DERIVED_INTO_P:
+            continue
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             put(k, "%.5f mm" % v, "Rev Q generator")
 
     # derived - written as formulas so changing a driver updates them
-    put("bezel_lip_interf_x", "(bezel_lip_outer_w - panel_open_w) / 2",
-        "DERIVED  horizontal INTERFERENCE per side")
-    put("bezel_lip_interf_y", "(bezel_lip_outer_h - panel_open_h) / 2",
-        "DERIVED  vertical INTERFERENCE per side")
+    put("bezel_lip_outer_w", "panel_open_w + 2 * bezel_lip_interf_x",
+        "DERIVED  from the MEASURED opening and the declared fit")
+    put("bezel_lip_outer_h", "panel_open_h + 2 * bezel_lip_interf_y",
+        "DERIVED  from the MEASURED opening and the declared fit")
+    put("bezel_window_w", "bezel_lip_outer_w - 2 * bezel_lip_wall_x",
+        "DERIVED  == skirt inner width, i.e. flush")
+    put("bezel_window_h", "bezel_lip_outer_h - 2 * bezel_lip_wall_y",
+        "DERIVED  == skirt inner height, i.e. flush")
+    put("bezel_window_r", "bezel_lip_corner_r - bezel_lip_wall_x",
+        "DERIVED  == skirt inner corner, i.e. flush")
     put("bezel_lip_clear_y", "(panel_open_h - bezel_lip_outer_h) / 2",
         "DERIVED  vertical clearance - NEGATIVE, it is an interference")
-    put("bezel_lip_wall_x", "(bezel_lip_outer_w - bezel_window_w) / 2",
-        "DERIVED  side wall, set by the FLUSH requirement")
     put("bezel_lip_inner_w", "bezel_lip_outer_w - 2 * bezel_lip_wall_x",
         "DERIVED  == bezel_window_w, i.e. flush")
     put("bezel_lip_inner_h", "bezel_lip_outer_h - 2 * bezel_lip_wall_y", "DERIVED")
@@ -1557,11 +1654,13 @@ def validate(P=P):
                            else (-1, -1)))
 
     # --- the split wall and its corners ------------------------------------
-    _gate(abs(d["bezel_lip_wall_x"]
-              - (P["bezel_lip_outer_w"] - P["bezel_window_w"]) / 2.0) < 1e-9,
-          "side wall %.3f mm is DERIVED from the flush requirement"
-          % d["bezel_lip_wall_x"],
-          "(%.2f - %.2f)/2" % (P["bezel_lip_outer_w"], P["bezel_window_w"]))
+    _gate(abs(d["bezel_lip_inner_w"]
+              - (P["bezel_lip_outer_w"]
+                 - 2 * P["bezel_lip_wall_x"])) < 1e-9,
+          "clear width %.3f mm is DERIVED from the %.2f mm side wall"
+          % (d["bezel_lip_inner_w"], d["bezel_lip_wall_x"]),
+          "%.2f - 2 x %.2f" % (P["bezel_lip_outer_w"],
+                               P["bezel_lip_wall_x"]))
     _gate(abs(d["bezel_lip_inner_w"] - P["bezel_window_w"]) < 1e-9,
           "FLUSH: skirt inner width == face opening, no set-back at the sides",
           "%.4f vs %.4f" % (d["bezel_lip_inner_w"], P["bezel_window_w"]))

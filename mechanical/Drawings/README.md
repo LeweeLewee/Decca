@@ -58,12 +58,11 @@ The bezel face opening is flush with the skirt on all four sides, so the
 aperture is a straight bore with no taper. The two Rev N recessed adhesive pads
 are deleted at owner instruction, so the underside is one unbroken seating face.
 
-> **The fit is a real one.** The skirt is **35.40 × 15.45 mm** against a MEASURED
-> opening of **35.20 × 15.30 mm** — 0.100 mm per side across and 0.075 mm per
-> side up, both interference, with the 0.20 mm lead-in leaving the tip under the
-> opening so entry is free before it engages. The previous issue overshot to
-> 36.20 × 17.20 and could not enter at all; the owner's fifth change pulled it
-> back. Build report §3.8.
+> **The opening has been measured, and it was not what the project believed.**
+> 36.74 × 16.45, not the 35.20 × 15.30 carried from Rev C — which no released part
+> had ever checked. The skirt is now **36.94 × 16.60**, derived from that
+> measurement plus 0.100 mm per side across and 0.075 mm per side up. Treat the
+> reading as ±0.2 mm; a further iteration is expected. Build report §3.10.
 
 | File | Role |
 |---|---|
@@ -85,18 +84,18 @@ Validation: **52/52 gates PASS** in Fusion and **47/47 PASS** in the independent
 offline mesh verifier. One shell, one lump, zero slivers, no degenerate
 triangles. Continuity is proved by **cross-section area**, which matches the
 analytic value to four decimals at three depths and in every region including
-the four R3.00 corners — a stronger proof than point sampling, since any gap or
+the four R4.25 corners — a stronger proof than point sampling, since any gap or
 thin spot anywhere removes area.
 
 | | mm |
 |---|---:|
-| Bezel face opening, at the front face | **32.900 × 13.850**, R1.750 |
-| Inset-wall outer / inner envelope | **35.400 × 15.450** / 32.900 × 13.850 (flush, all four sides) |
-| Wall / corner radii | **1.250 sides / 0.800 top+bottom** / R3.000 outer, R1.750 inner |
+| Bezel face opening, at the front face | **34.440 × 15.000**, R3.000 |
+| Inset-wall outer / inner envelope | **36.940 × 16.600** / 34.440 × 15.000 (flush, all four sides) |
+| Wall / corner radii | **1.250 sides / 0.800 top+bottom** / R4.250 outer, R3.000 inner |
 | Depth | 2.800 |
 | Aperture | a straight bore — taper 0.00° |
 | Fit | **0.100 interference** per horizontal side, **0.075 interference** per vertical side |
-| **Effective clear optical opening** | **32.900 × 13.850** |
+| **Effective clear optical opening** | **34.440 × 15.000** |
 
 > **Three things the prototype must settle, and CAD cannot.**
 >
@@ -105,15 +104,14 @@ thin spot anywhere removes area.
 >    stiffer in bending** than the original 0.40 mm, and **print tolerance is the
 >    same size as the fit**. Print `Bezel_Fit_Gauge_revQ` first; it is mandatory,
 >    not advisable. Build report §8.1.
-> 2. **The opening corner**, which has never been confirmed and is now the
->    tightest unmeasured margin in the part. Too square jams the part outright;
->    too round only leaves a visible crescent. R4.25 covered opening corners to
->    R4.00 and was reverted to **R3.00** on appearance, which covers them only to
->    about R2.50. A single gauge tab settles which way round they are, and it is
->    the first thing to check. Build report §8.3.
+> 2. **The opening measurement**, at ±0.2 mm — twice the interference it sets.
+>    The gauge sweep brackets it, so one print resolves both. The opening
+>    **corner** is largely closed: the owner's offer-up found R4.25 a good match,
+>    and at R4.25 the flanks set the fit for every plausible corner. Build report
+>    §8.3, §8.4.
 > 3. **The optical result.** The clear opening is 32.90 × 13.85, the lit band
->    goes 8.100 → **7.575 mm**, all off the top. The aperture corner is R1.75,
->    settled by the owner from the front view. A powered-test decision. Build
+>    goes 8.100 → **8.150 mm** — above Rev N for the first time. Judge the
+>    noticeably slimmer black border instead. A powered-test decision. Build
 >    report §5.
 
 > **A forced modelling decision, since designed out.** While the face opening
@@ -123,13 +121,13 @@ thin spot anywhere removes area.
 > the condition: the aperture is now a straight bore, and the generator refuses
 > to build if the two drift apart. Build report §3.3.
 
-> **Six owner changes on top of the brief, each recorded and each reversible.**
+> **Seven owner changes on top of the brief, each recorded and each reversible.**
 > The adhesive pads **deleted**; the outer corner **R2.00 → R3.00**; the aperture
 > made **flush on the left and right** with the loop rule clarified to **at
-> least** two per side; the **interference-fit refinement**, which overshot and
-> could not enter; the **pull-back** to 35.40 × 15.45 with the corner at R4.25;
-> and the corner **reverted to R3.00** on sight of the front view. Build report
-> §3.5 to §3.9.
+> least** two per side; the **interference-fit refinement**; the **pull-back**;
+> the corner **reverted to R3.00** on the render; and finally **the opening
+> measured** — which restored R4.25 on physical evidence and made the insert
+> derive from the measurement. Build report §3.5 to §3.10.
 
 ## Display mount
 
