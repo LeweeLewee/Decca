@@ -67,7 +67,7 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC) | H5 | DAOKAI MOSFET input; three-lamp bank |
+| Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC) | H5 | DFRobot DFR0457 control input after purchase; three-lamp bank |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
@@ -223,11 +223,13 @@ Yellow = SDA.
   Final holder fit, operating brightness and measured total current remain
   installation/commissioning checks.
 - Wire the three validated lamps **in parallel**.
-- Selected switch candidate: one **DAOKAI 3.3 V / 5 V PWM MOSFET driver module**,
-  ASIN **B09YYH2BTF**, from the ordered pack of 10.
-- Physical testing accepted clean PWM switching from ESP32 **GPIO25 / board
-  label D25**, safe-off behaviour and smooth fades through full duty without
-  flicker, uneven lamps or abnormal heat.
+- Selected final switch: one **DFRobot Gravity MOSFET Power Controller,
+  DFR0457**, open to purchase from The Pi Hut. Its 3.3 V control input is driven
+  by ESP32 **GPIO25 / board label D25** and its DC switching limit is 1 kHz.
+- Before connection, reduce firmware PWM from 5 kHz to no more than 1 kHz. Then
+  repeat safe-off, brightness, flicker, pot-stability and lamp-current tests.
+- The previously tested DAOKAI pack is retained as test stock but is superseded
+  for the final installation.
 - ESP32 and lighting grounds are **common**.
 - Normal brightness is owner-approved at **90% / duty 230**, stored in
   non-volatile settings and treated as a setup value rather than a normal user
@@ -277,8 +279,9 @@ The approved low-voltage controller path is:
 - Fit a **2 A low-voltage fuse** in the +5 V conductor immediately after the
   socket and before distribution. Recheck the rating against measured total lamp
   current during commissioning.
-- Use two three-way distribution connectors, preferred **Wago 221-413** or
-  equivalent: one +5 V connector and one GND connector.
+- Use two **WAGO 221-415 five-way lever connectors** from Pi Hut pack SKU
+  **104130**: one as the +5 V star point and one as the common-GND star point.
+  Retain the third connector in the pack as a spare.
 - The +5 V distribution branches to the ESP32 **5V/VIN** terminal and the positive
   side of all three E10 lamps. Never connect this rail to the ESP32 **3V3**
   terminal.

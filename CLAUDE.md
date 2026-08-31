@@ -51,8 +51,10 @@ current physical evidence, immediate OTA acceptance gate and open work.
 Phase 1 module implementation is in progress. `hardware`, `settings`, `pots`,
 `buttons`, `lighting`, `display`, `power` and authenticated `ota` exist. Pot
 GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
-physically verified. Lighting PWM GPIO25, the DAOKAI MOSFET stage and the
-three-lamp bank are electrically accepted. Normal Stereo lighting is locked at
+physically verified. Lighting PWM GPIO25 and the three-lamp bank have prior
+electrical acceptance. DFRobot DFR0457 is selected for the final MOSFET stage
+and remains open to purchase; its installation requires PWM at no more than
+1 kHz and renewed physical acceptance. Normal Stereo lighting remains locked at
 90% (duty 230); Mono and logical standby are off.
 
 Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is

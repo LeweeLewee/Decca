@@ -218,11 +218,13 @@ the locked 5 V lighting rail. The assembled three-lamp electrical path passed
 PWM testing on 2026-08-31. Physical holder fit, final brightness and measured
 three-lamp current remain commissioning checks.
 
-The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
-module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
-claims did not replace verification: GPIO25 / board label **D25**, safe-off and
-smooth PWM switching through full duty and return to off passed with the three
-parallel lamps, common ground and no abnormal module behaviour.
+The selected final switch is one **DFRobot Gravity MOSFET Power Controller,
+DFR0457**, currently open to purchase from The Pi Hut. It accepts the 5 V lamp
+rail and 3.3 V logic/control, with a specified switching range of 0–1 kHz.
+Before final acceptance, firmware PWM must be reduced from the present 5 kHz to
+no more than 1 kHz and safe-off, brightness, flicker, pot-stability and current
+tests repeated. The previously tested DAOKAI pack is retained as test stock but
+is superseded for the final installation.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. The owner-approved normal value is 90% / duty 230. Firmware
