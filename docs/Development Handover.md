@@ -32,7 +32,7 @@ Implemented modules:
 | Module | State |
 |---|---|
 | `hardware` | Pin map and safe initialisation implemented |
-| `settings` | NVS persistence implemented, schema version 2 |
+| `settings` | NVS persistence implemented, schema version 3 |
 | `buttons` | On/off, sole VHF contact and TX2 Stereo/Mono lighting request, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
 | `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
@@ -116,6 +116,9 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - After TX2 Stereo/Mono integration, the release build passed and all eight
   on-target suites passed 55/55 (buttons 11, display 15, hardware 3, lighting 7,
   OTA 5, pots 6, power 5 and settings 3).
+- After production lighting coordination and settings schema v3, the
+  credential-enabled release build passed (RAM 49,936 bytes / 15.2%; flash
+  839,253 bytes / 64.0%) and all eight on-target suites again passed 55/55.
 - Display mount Rev P.5 is released and physically validated.
 - Root documentation and the final OLED loom colours were reconciled at chat
   close-out.
@@ -181,9 +184,9 @@ the user's Wi-Fi or OTA passwords.
 5. **Complete:** production coordinates pots, persistent VHF-derived source,
    logical power, fitted display and OTA in one non-blocking loop.
 6. **Complete (2026-08-31):** GPIO25/MOSFET/three-lamp electrical test passed:
-   safe off, smooth fade to held 25%, even illumination and fade fully off.
-7. **Current:** commission normal and standby lighting levels, then integrate
-   the accepted Stereo/Mono request in production coordination.
+   safe off, smooth fades through full duty, even illumination and fade fully off.
+7. **Complete (2026-08-31):** normal Stereo lighting approved at 90% / duty
+   230 and integrated in production; Mono and logical standby fade to off.
 8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
    Mono closed requests them off. GPIO25 load remained disabled during testing.
@@ -230,8 +233,9 @@ docs/Specification.md, docs/Firmware Architecture.md, docs/Hardware
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: select normal and standby lighting levels and integrate the
-accepted Stereo/Mono request. Production now coordinates all four pots,
+Immediate priority: complete final lamp-holder fit and current measurement,
+then proceed to Phase 2 WiiM integration when its hardware is available.
+Production now coordinates all four pots,
 VHF-derived source, logical power and display while
 continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 5 min, and blanks standby after 10 s, waking immediately on activity. The
@@ -239,7 +243,8 @@ accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Bal
 L50..0..R50 with centred bars and monochrome icons.
 
 TX2/GPIO17 and the GPIO25/MOSFET/three-lamp electrical path are physically
-accepted. Preserve the accepted VHF-only source logic: VHF closed = Digital
+accepted. Stereo fades to 90%; Mono and standby fade off. Preserve the accepted
+VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
 GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.

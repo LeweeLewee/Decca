@@ -17,10 +17,11 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - Production coordinates power, all four pots, the VHF-derived source state and
-  the accepted OLED views while continuously servicing authenticated OTA.
+  the accepted OLED views, and 90% Stereo/off Mono dial lighting while
+  continuously servicing authenticated OTA.
 - USB-to-OTA, GPIO19 power, controls, source selection, fitted display and
-  GPIO25/MOSFET/lamp electrical acceptance are complete. Final normal and
-  standby lighting levels remain to be selected.
+  GPIO25/MOSFET/lamp electrical acceptance are complete. Normal Stereo lighting
+  is locked at 90%; Mono and logical standby are off.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work.

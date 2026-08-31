@@ -220,13 +220,14 @@ three-lamp current remain commissioning checks.
 
 The selected switch candidate is one **DAOKAI 3.3 V / 5 V PWM MOSFET driver
 module, ASIN B09YYH2BTF**, from the ordered pack of ten. Seller compatibility
-claims did not replace verification: GPIO25 / board label **D25**, safe-off,
-smooth PWM switching to a held 25% duty and return to off passed with the three
+claims did not replace verification: GPIO25 / board label **D25**, safe-off and
+smooth PWM switching through full duty and return to off passed with the three
 parallel lamps, common ground and no abnormal module behaviour.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
-panel user control. Firmware stores the selected PWM level in non-volatile
-settings and applies it at startup. The unused aerial control may be used as a
+panel user control. The owner-approved normal value is 90% / duty 230. Firmware
+stores it in non-volatile settings and applies it only while logically on and in
+Stereo; Mono and standby fade to zero. The unused aerial control may be used as a
 temporary commissioning input if convenient, but it is not reserved as a
 permanent lighting control. Behaviours: fade up/down, configurable stored
 brightness, safe boot state.

@@ -52,22 +52,23 @@ Phase 1 module implementation is in progress. `hardware`, `settings`, `pots`,
 `buttons`, `lighting`, `display`, `power` and authenticated `ota` exist. Pot
 GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
 physically verified. Lighting PWM GPIO25, the DAOKAI MOSFET stage and the
-three-lamp bank are electrically accepted; final operating levels remain open.
+three-lamp bank are electrically accepted. Normal Stereo lighting is locked at
+90% (duty 230); Mono and logical standby are off.
 
 Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
 closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
 requests lights off. Both input positions are physically accepted. GPIO25 and
-the lamp bank passed safe-off, smooth-fade and held 25% duty testing.
+the lamp bank passed safe-off and smooth-fade testing through full duty; the
+approved production level is 90%.
 
 Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
 every other selector position = Vinyl. GPIO16/17/18 remain released from the
 source selector and the sole source input remains GPIO23; GPIO17 is separately
 allocated to Stereo/Mono under ADR-0014.
 
-The current `main.cpp` is deliberately a safe hardware-plus-OTA bootstrap. It
-does not yet initialise or orchestrate the other Phase 1 modules. USB-to-OTA
-physical acceptance is still required before enclosure; do not infer it from
-host tests. Automatic rollback after a fully received but boot-invalid image
+The production `main.cpp` coordinates power, pots, VHF source, display,
+Stereo/Mono lighting and OTA in one non-blocking loop. USB-to-OTA is physically
+accepted. Automatic rollback after a fully received but boot-invalid image
 remains Phase 3.
 
 The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow

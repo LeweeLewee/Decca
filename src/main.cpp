@@ -4,9 +4,11 @@
 #include "buttons.h"
 #include "display.h"
 #include "hardware.h"
+#include "lighting.h"
 #include "ota.h"
 #include "pots.h"
 #include "power.h"
+#include "settings.h"
 
 namespace {
 
@@ -103,13 +105,32 @@ void applyPowerState() {
     Serial.println(powerOn ? "ON" : "STANDBY");
 }
 
+void applyLightingState() {
+    const bool lightsRequested =
+        decca::buttons::lightingRequest() ==
+        decca::buttons::LightingRequest::On;
+    const uint8_t target = decca::power::isOn() && lightsRequested
+                               ? decca::settings::get().dial
+                               : 0;
+    if (decca::lighting::targetBrightness(decca::lighting::Zone::Dial) ==
+        target) {
+        return;
+    }
+
+    decca::lighting::setBrightness(decca::lighting::Zone::Dial, target);
+    Serial.print("[LIGHTING] target=");
+    Serial.println(target);
+}
+
 }  // namespace
 
 void setup() {
     Serial.begin(115200);
     decca::hardware::init();
+    decca::settings::init();
     decca::buttons::init();
     decca::pots::init();
+    decca::lighting::init();
     decca::power::init(
         decca::buttons::isPressed(decca::buttons::Button::OnOff));
     g_viewState.power = decca::power::isOn()
@@ -119,6 +140,7 @@ void setup() {
     decca::display::init();
     applySourceState(false);
     applyPowerState();
+    applyLightingState();
     decca::ota::init();
 }
 
@@ -133,6 +155,8 @@ void loop() {
     if (sourceMode != g_sourceMode) {
         applySourceState(true);
     }
+    applyLightingState();
+    decca::lighting::update();
     decca::display::update();
     decca::ota::update();
 }

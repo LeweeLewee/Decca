@@ -21,7 +21,8 @@ void test_settings_defaults() {
     TEST_ASSERT_EQUAL(static_cast<int>(Source::DigitalStreamer),
                       static_cast<int>(defaults.source));
     TEST_ASSERT_EQUAL_UINT8(0, defaults.volume);
-    TEST_ASSERT_EQUAL_UINT8(0, defaults.dial);
+    TEST_ASSERT_EQUAL_UINT8(decca::settings::kDefaultDialBrightness,
+                            defaults.dial);
 }
 
 void test_settings_set_get_roundtrip() {

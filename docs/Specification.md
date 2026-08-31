@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source, TX2 Stereo/Mono and GPIO25 lighting electrical acceptance are complete. Eight on-target suites pass 55/55. Final lighting levels and WiiM integration remain outstanding. |
-| Version  | 0.25                                              |
+| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source, TX2 Stereo/Mono and GPIO25 lighting acceptance are complete. Normal Stereo lighting is 90%; Mono and standby are off. Eight on-target suites pass 55/55. WiiM integration remains outstanding. |
+| Version  | 0.26                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -122,6 +122,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-LGT-02 | Lighting shall support configurable idle brightness and standby dimming.     | 1     |
 | FR-LGT-03 | Lighting transitions shall fade (up/down) rather than switch abruptly.       | 1     |
 | FR-LGT-04 | Lighting shall adopt a defined safe state at boot.                           | 1     |
+| FR-LGT-05 | While logically on, Stereo shall fade the dial lighting to the stored normal level and Mono shall fade it off. Logical standby shall force lighting off. | 1 |
 
 > Confirmed Phase 1 lighting is the **dial illumination** only. Cabinet lighting
 > is not part of the confirmed Phase 1 build.

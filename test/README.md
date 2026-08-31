@@ -125,8 +125,13 @@ The final release build passed and the complete physical run passed 55/55:
 buttons 11/11, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
 power 5/5 and settings 3/3.
 
-GPIO25 load acceptance (2026-08-31): the physical lighting snapshot was made
-deliberately observable by fading to duty 64 (25%), holding for five seconds and
-fading fully off. The DAOKAI MOSFET stage and three parallel lamps passed with
-smooth transitions, even light and no flash, flicker, abnormal heat or smell;
-the lighting suite passed 7/7.
+GPIO25 load acceptance (2026-08-31): the physical lighting snapshot fades to
+the owner-approved duty 230 (90%), holds for five seconds and fades fully off.
+Comparisons at 70%, 80% and 100% informed the selected level. The DAOKAI MOSFET
+stage and three parallel lamps passed with smooth transitions, even light and no
+flash, flicker, abnormal heat or smell; the lighting suite passed 7/7.
+Integrated production acceptance then confirmed Mono commands target 0 and
+holds the lamps fully off, while Stereo commands target 230 and lights the dial
+at the approved 90% level. OTA remained ready throughout normal operation.
+The final credential-enabled production build passed (RAM 49,936 bytes / 15.2%;
+flash 839,253 bytes / 64.0%) and the complete on-target run passed 55/55.

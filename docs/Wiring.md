@@ -226,18 +226,20 @@ Yellow = SDA.
 - Selected switch candidate: one **DAOKAI 3.3 V / 5 V PWM MOSFET driver module**,
   ASIN **B09YYH2BTF**, from the ordered pack of 10.
 - Physical testing accepted clean PWM switching from ESP32 **GPIO25 / board
-  label D25**, safe-off behaviour, a smooth rise to 25% duty, a five-second
-  hold and smooth return to off without flicker, uneven lamps or abnormal heat.
+  label D25**, safe-off behaviour and smooth fades through full duty without
+  flicker, uneven lamps or abnormal heat.
 - ESP32 and lighting grounds are **common**.
-- Brightness is set during commissioning, stored in non-volatile settings and
-  then treated as a setup value rather than a normal user control. The unused
+- Normal brightness is owner-approved at **90% / duty 230**, stored in
+  non-volatile settings and treated as a setup value rather than a normal user
+  control. Mono and logical standby command zero. The unused
   aerial control may be used temporarily for commissioning if convenient, but is
   not reserved permanently for lighting.
 
 Expected behaviours: fade up, fade down, stored/configurable brightness, safe
 boot state. Firmware support is implemented. GPIO25, the MOSFET stage and the
 three-lamp electrical load passed the dial-lighting bench procedure on
-2026-08-31. Final normal/standby levels and installed-holder checks remain open.
+2026-08-31. Subsequent 70%, 80% and 100% comparisons established the approved
+normal level at 90%; Mono and standby are off. Installed-holder checks remain open.
 
 ## H6 — Fosi ZA3 12 V Trigger
 

@@ -57,7 +57,8 @@ void test_lighting_physical_fade_snapshot() {
     state.dial = 0;
     decca::settings::set(state);
     decca::lighting::init();
-    constexpr uint8_t kCommissioningDuty = 64;
+    constexpr uint8_t kCommissioningDuty =
+        decca::settings::kDefaultDialBrightness;
     constexpr uint32_t kCommissioningHoldMs = 5000;
     decca::lighting::setBrightness(Zone::Dial, kCommissioningDuty);
 
