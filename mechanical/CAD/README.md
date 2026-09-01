@@ -11,16 +11,26 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## ESP32 controller housing — current revision: **A — PROTOTYPE CAD, NOT physically validated**
+## ESP32 controller housing — current revision: **B — PROTOTYPE CAD, NOT physically validated**
 
-Built to `../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`. Full write-up:
-`../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revA.md`.
+Built to `../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`, whose
+content is specification revision **v1.1**. Full write-up:
+`../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revB.md`.
+
+**Rev A was rejected on owner review** for bulk and filament consumption:
+105.00 × 77.00 × 38.30 mm and about 68 cm³ to hold a board 66 × 63 mm, with
+all eighteen of its gates passing. Rev B is a redesign, not a trim:
+**81.60 × 70.10 × 35.30 mm and 33.60 cm³**, against mandatory limits of
+85 × 75 × 36 mm and 35 cm³. Rev A geometry is not the baseline, and none of
+its deleted features — lacing rails, mounting ears, sawtooth window roofs, USB
+plug, second clamp, four-corner lid screws, per-terminal wire guides — is
+rebuilt.
 
 **Nothing here has been printed, and no dimension in it has been measured off
-the acquired hardware.** Every hardware figure is a CAD starting value taken
-from the specification, and every one of them is a prototype gate. The
-generator tags them in one place — the `STARTING` tuple — and both verification
-tools refuse to mark any of them `PASS`.
+the acquired hardware.** Every hardware figure is a CAD starting value, and
+every one is a prototype gate. The generator tags them in one place — the
+`STARTING` tuple — and both verification tools refuse to mark any of them
+`PASS`.
 
 Holds **only** the 30-pin ESP32 DevKit V1 / DOIT-style board and its matching
 30-pin screw-terminal breakout. The MOSFET board, WAGO connectors, fuse, DC
@@ -29,31 +39,33 @@ separately and were not brought into this box to solve a layout problem.
 
 | File | What it is |
 |---|---|
-| `Decca_ESP32_Controller_Housing_fusion.py` | The generator. `main()` builds all nine components, `validate()` runs the section 14 gates on the solids, `export()` writes every f3d/STEP/STL into this clone, `images()` regenerates the fourteen review PNGs. Idempotent: re-running rebuilds in place. |
-| `Decca_ESP32_Controller_Housing_verify.py` | The independent offline verifier. Reads **only** the exported STLs. `--drawings` plots the two dimensioned views from the same triangles. |
-| `Decca_ESP32_Controller_Housing.f3d` | Editable archive, 219 named user parameters. |
+| `Decca_ESP32_Controller_Housing_fusion.py` | The generator. `main()` builds all eight components, `validate()` runs the v1.1 section 13 gates on the solids, `export()` writes every f3d/STEP/STL into this clone, `images()` regenerates the sixteen review PNGs. Idempotent: re-running rebuilds in place, and it clears the Rev A component names too. |
+| `Decca_ESP32_Controller_Housing_verify.py` | The independent offline verifier. Reads **only** the exported STLs. numpy is its only dependency. |
+| `Decca_ESP32_Controller_Housing.f3d` | Editable archive, 236 named user parameters. |
 | `Decca_ESP32_Controller_Housing_assembly.step` | Assembly, keep-out solids removed for readability. |
 | `ESP32_Controller_Housing_Base.step` | Base tray. |
 | `ESP32_Controller_Housing_Lid.step` | Lid. |
-| `ESP32_Controller_PCB_Clamps.step` | Both edge clamps in one exchange file. |
-| `ESP32_Controller_Carrier_Fit_Gauge.step` | Fit gauge. |
+| `ESP32_Controller_PCB_Clamp_Adjustable.step` | The one adjustable edge clamp. |
+| `ESP32_Controller_Carrier_Fit_Gauge.step` | Fit gauge (prototype tool). |
 
 **Retention uses no PCB hole.** The repository records no breakout
-mounting-hole pattern and specification section 2 forbids inventing one, so
-nothing enters the board: one short edge butts a hard datum, the other is held
-by a printed clamp with ±1.00 mm of slot travel, and each clamp bottoms on a
-plinth 0.20 mm above the board face so tightening cannot bow it.
+mounting-hole pattern and inventing one is forbidden, so nothing enters the
+board: one short edge slides under an **integral fixed ledge**, the other is
+held by one slotted clamp with ±1.00 mm of travel, and the clamp bottoms on
+plinths 0.20 mm above the board face so tightening cannot bow it.
 
-> **The derived envelope is 105.00 × 77.00 × 38.30 mm against a 90 × 78 ×
-> approximately 35 mm target, and that is an open owner decision, not an
-> oversight.** Section 10's 72.0 mm body budget contains no length at all for
-> the section 5.2 end clamps, their M3 screws, or the section 9 lid bosses that
-> section 9 itself requires to sit outside the board outline. The height is
-> forced by section 5.1, which measures its 3.00 mm clearance *beneath* the
-> solder joints that hang 2.50 mm down. Build report section 5 gives the
-> arithmetic and two documented ways to shorten it — one of which brings the
-> length inside target by moving the ears to the long sides. Neither was
-> applied unilaterally.
+**Shallow base, deep lid.** The base wall is 9.00 mm and the lid skirt 27.10 mm.
+That inversion is what pays for cable-tie tabs built *into the wall plane* and
+two cabinet fixings recessed *under* the carrier — neither of which needs a
+millimetre of external structure. Gate 22 measures 0.004 mm³ of base outside
+its own envelope: there are no projections at all.
+
+> **Mandatory gates met; preferred targets missed, and reported rather than
+> absorbed.** v1.1 section 9 also prefers 30 cm³ or less and 38 g or less. The
+> four shells, at the thinnest walls sections 8 and 10 permit, over the smallest
+> plan a 66 × 63 mm carrier permits, already total **32.01 cm³** before a single
+> boss or pad. Build report section 2.3 gives the arithmetic; section 2.4 shows
+> the one measurement — `assembly_above_pcb_h` — that would move it.
 
 ### Rebuilding
 
@@ -63,22 +75,25 @@ bridge, run in order:
 ```python
 g = runpy.run_path("mechanical/CAD/Decca_ESP32_Controller_Housing_fusion.py")
 g["main"](None)       # build or rebuild every component
-g["validate"](None)   # 59 CAD gates; returns the failure count
+g["validate"](None)   # 23 CAD gates; returns True when none failed
 g["export"](None)     # f3d, STEP and STL into this clone
-g["images"](None)     # the fourteen review PNGs
+g["images"](None)     # the sixteen review PNGs
 ```
 
 Then, offline:
 
 ```bash
 python mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py
-python mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py --drawings
 ```
 
 The verifier reads only the exported meshes and exits non-zero on failure, so
 it works as a gate. It is deliberately not a second run of the generator's
-recipe: it caught a floating lacing rail, four non-manifold tangency sites and
-four lid legends that reported success while cutting zero material.
+recipe, and on Rev B it earned that: it failed five gates the CAD suite had
+passed, and every one was a real defect — eight non-manifold tangency sites
+left by a chamfer cutter whose vertices sat exactly on the faces it cut, a
+mis-centred chamfer that removed a lens instead of a wedge, and three of its own
+measurement bugs found by disagreeing with the CAD suite. Build report section
+6.1 records all of them.
 
 
 ## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**

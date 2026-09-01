@@ -10,28 +10,34 @@ Print-ready meshes exported from the CAD sources.
 - STLs are derived artefacts — the editable source lives in `../CAD/`.
 - Name files to match their CAD source and revision.
 
-## ESP32 controller housing — current revision: **A — PROTOTYPE, nothing printed yet**
+## ESP32 controller housing — current revision: **B — PROTOTYPE, nothing printed yet**
 
-PETG or PETG-HF. 0.40 mm nozzle, 0.20 mm layers. **Four perimeters** around the
-lid-screw piers, the clamp plinths and the mounting ears; three elsewhere.
-20-30% infill. **No part needs support material** — the offline verifier gates
-on it, and measures 0 mm2 of facet steeper than 45 degrees from vertical on
-every part in its stated orientation. Deburr the cable windows and the USB
-opening before assembly.
+PETG or PETG-HF. 0.40 mm nozzle, 0.20 mm layers. **Three perimeters** on the
+lid skirt (1.20 mm = 3 × 0.40); four only locally at the four bosses and the
+two hook features. 15-20% infill. **No part needs support material** — the
+offline verifier gates on it, measuring how far every downward-facing surface
+*reaches* from something holding it up, in each part's stated orientation.
+Worst case on any part is **1.00 mm**, against a stated 1.50 mm limit. Cable
+windows and the USB slot are held to a stricter rule and carry no
+downward-facing facet at all. Deburr the windows and the USB slot before
+assembly.
 
 | File | Print notes |
 |---|---|
-| `ESP32_Controller_Carrier_Fit_Gauge.stl` | **PRINT THIS FIRST, and nothing else.** Plate flat on the bed, no supports. 8.87 cm3, about twenty minutes. Snap it at its two score grooves: Zone A takes the real breakout's short edge in a 1.80 mm slot and settles board thickness, the 0.20 mm clamp clearance and the 5.50 mm pad height against the actual board; Zones B and C mate to give the lid-to-base overlap, 5.00 mm of engagement at 0.25 mm per face, on this printer with this filament. Tight in A means `adapter_pcb_t` is wrong; tight or sloppy in B/C means `lid_fit_clear` is. Either is a one-line change and a re-run. |
-| `ESP32_Controller_Housing_Base.stl` | **Floor flat on the bed.** No supports. 105.00 x 77.00 x 36.50 mm, 49.66 cm3. Longest bridge is the 11.00 mm USB lintel; the 62 mm cable windows need no bridge at all because their roof is a 45 degree sawtooth. Needs eight M3 heat-set inserts - four lid piers, four clamp plinths. **The exact insert is not recorded anywhere in this repository**; 4.00 mm dia x 6.00 mm deep is a starting value. Record the real part before printing. |
-| `ESP32_Controller_PCB_Clamp_Fixed.stl` | Flat, as modelled. 1.28 cm3. Holds the datum end down; plain M3 clearance holes. |
-| `ESP32_Controller_PCB_Clamp_Adjustable.stl` | Flat, as modelled. 1.58 cm3. Slotted for +/-1.00 mm of longitudinal travel, which is what lets a 65.00 to 67.00 mm board fit without redesign. |
-| `ESP32_Controller_Housing_Lid.stl` | **Top face flat on the bed**, skirt pointing up. No supports, no overhang anywhere. 93.50 x 72.50 x 6.80 mm, 14.84 cm3. Printing it this way is what keeps the recessed USB / EN / BOOT / DECCA CONTROLLER legends crisp. The 1.60 mm antenna window is on the underside, so it prints as a raised area, not a bridge. |
-| `ESP32_Controller_USB_Plug.stl` | Optional. Flange face flat on the bed. 0.57 cm3. Dust and contact protection only - it is REMOVED for USB service, and USB service still means disconnecting the shared 5 V rail first. |
+| `ESP32_Controller_Carrier_Fit_Gauge.stl` | **PRINT THIS FIRST, and nothing else.** Plate flat on the bed, no supports. 5.35 cm³, about fifteen minutes. It is a 1:1 slice of the real housing: the -X end wall, the real fixed ledge with its 0.80 mm lead-in, the 4.50 mm support height, the clamp plinth with its insert, and three read-off steps at 65.00 / 66.00 / 67.00 mm standing *below* the carrier plane so they never obstruct it. Slide the acquired breakout under the ledge and read which step its free edge lands on. That settles `adapter_pcb_l`, `adapter_pcb_t`, `pad_h` and the 0.20 mm retention gap against the real board. |
+| `ESP32_Controller_Housing_Base.stl` | **Floor flat on the bed.** No supports. 78.70 × 67.20 × 17.10 mm, 15.65 cm³. Worst unsupported reach 1.00 mm, at the fixed ledge. Needs **four** M3 heat-set inserts: two **vertical** in the clamp plinths, two **horizontal** in the +X lid-screw bosses. **The exact insert is not recorded anywhere in this repository**; 4.00 mm dia × 5.00 mm deep is a starting value. Record the real part before printing. |
+| `ESP32_Controller_Housing_Lid.stl` | **Top face flat on the bed**, skirt pointing up. No supports. 81.60 × 70.10 × 28.70 mm, 16.63 cm³. Printing it this way is the whole design: the four cable windows and the USB slot are open at the skirt's lower free edge, so inverted they only ever grow — no roof, no bridge, no sawtooth, no support. It also keeps the recessed `USB / DISCONNECT 5V` legend crisp. |
+| `ESP32_Controller_PCB_Clamp_Adjustable.stl` | Flat, as modelled, so the loaded cantilever is stressed along the layers. 1.12 cm³. Slotted for ±1.00 mm of travel, which is what lets a 65.00-67.00 mm board fit without redesign. Its underside bottoms on the base plinths, so tightening cannot drive it onto the board. |
+| `ESP32_Controller_Cabinet_Fastener_Cap.stl` | **PRINT 2 OFF.** Flat. 0.10 cm³ each. One presses into each cabinet-fixing recess over the countersunk M3 head. Mandatory, not optional: a recessed metal head under the board cannot be insulated by integral geometry, because it is installed after the base is printed. |
 
 > No mesh here has been printed. Every dimension derives from CAD starting
 > values, not from measurements of the acquired hardware. See
-> `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revA.md` section 7
+> `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revB.md` section 9
 > for the full list of open prototype gates.
+>
+> **Removed as obsolete Rev A artefacts:** `ESP32_Controller_PCB_Clamp_Fixed.stl`
+> (Rev B has one clamp, and the fixed end is now an integral ledge) and
+> `ESP32_Controller_USB_Plug.stl` (deleted by specification v1.1 section 6.2).
 
 
 ## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**

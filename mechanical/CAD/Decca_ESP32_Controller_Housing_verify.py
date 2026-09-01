@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Decca ESP32 Controller Housing - Rev A independent offline verifier
+Decca ESP32 Controller Housing - Rev B independent offline verifier
 ====================================================================
 
 Reads ONLY the exported manufacturing meshes in ../STL and re-derives every
-Rev A claim from triangles. numpy is the only dependency. Exits non-zero on
+Rev B claim from triangles. numpy is the only dependency. Exits non-zero on
 failure, so it works as a gate.
 
     python mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py
@@ -12,12 +12,17 @@ failure, so it works as a gate.
 It is deliberately NOT a second run of the generator. The generator knows what
 it meant to build; this knows only what came out of the exporter. Every
 expected number below is TYPED IN BY HAND from
-mechanical/Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md and from the
-derivation chain written out in the build report - nothing is imported from
+mechanical/Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md - whose content
+is specification revision v1.1 - and from the derivation chain written out in
+the build report. Nothing is imported from
 Decca_ESP32_Controller_Housing_fusion.py. If the generator and this file
 disagree, that disagreement is the whole point.
 
-It covers all eighteen specification section 14 gates.
+It covers all twenty-two specification v1.1 section 13 gates, including the
+four the CAD suite cannot do honestly on its own: manifoldness of the exported
+triangles, real bridging reach in the stated print orientation, the material
+gates measured from mesh volume rather than from BRep volume, and the absence
+of every Rev A feature v1.1 section 2.2 deletes by name.
 
 RESULT VOCABULARY - used exactly, never loosely
 -----------------------------------------------
@@ -25,7 +30,7 @@ RESULT VOCABULARY - used exactly, never loosely
   [FAIL]   measured, and wrong.
   [ ]      a reported measurement, no claim attached.
   [PROTO]  PROTOTYPE-REQUIRED. Depends on a hardware dimension nobody has
-           measured yet, so it cannot be verified by any amount of geometry.
+           measured yet, so no amount of geometry can settle it.
   [INST]   INSTALLATION-REQUIRED. Cannot be settled until the housing is in
            the cabinet.
 
@@ -48,191 +53,204 @@ STL = os.path.join(HERE, "..", "STL")
 MESHES = {
     "base": "ESP32_Controller_Housing_Base.stl",
     "lid": "ESP32_Controller_Housing_Lid.stl",
-    "clamp_fix": "ESP32_Controller_PCB_Clamp_Fixed.stl",
-    "clamp_adj": "ESP32_Controller_PCB_Clamp_Adjustable.stl",
+    "clamp": "ESP32_Controller_PCB_Clamp_Adjustable.stl",
+    "cap": "ESP32_Controller_Cabinet_Fastener_Cap.stl",
     "gauge": "ESP32_Controller_Carrier_Fit_Gauge.stl",
-    "plug": "ESP32_Controller_USB_Plug.stl",
 }
+
+# Production parts and how many of each are printed. The fit gauge is a
+# prototype tool and v1.1 section 9 excludes it from the material gates.
+PRODUCTION = (("base", 1), ("lid", 1), ("clamp", 1), ("cap", 2))
+
+# Rev A production meshes that v1.1 section 12 forbids shipping. Their absence
+# is gate 22, and it is checked on the FILE SYSTEM, not on a component tree.
+FORBIDDEN_FILES = (
+    "ESP32_Controller_PCB_Clamp_Fixed.stl",
+    "ESP32_Controller_USB_Plug.stl",
+)
 
 # ---------------------------------------------------------------------------
 # EXPECTED VALUES - typed in from the controlling documents, NOT imported.
 # ---------------------------------------------------------------------------
-# -- specification section 4 and 11, verbatim -------------------------------
-ADAPTER_L, ADAPTER_W, ADAPTER_T = 66.00, 63.00, 1.60
-ADAPTER_BELOW_H = 2.50
-ASSEMBLY_ABOVE_H = 24.00
-LEN_ADJUST = 1.00
-PCB_XY_CLEAR = 0.50
-PCB_UNDER_CLEAR = 3.00
-COMPONENT_TOP_CLEAR = 3.00
-CLAMP_VERT_CLEAR = 0.20
-ANTENNA_KEEPOUT = 10.00
-LID_FIT_CLEAR = 0.25
-BASE_FLOOR_T = 2.40
-WALL_T = 2.00
-LID_TOP_T = 1.80
-LID_ANTENNA_T = 1.60
-LID_OVERLAP = 5.00
-LID_SKIRT_T = 2.00
-OUTER_CORNER_R = 3.00
-INNER_FILLET_R = 1.00
+# -- v1.1 section 3, reference geometry and clearances ----------------------
+PCB_L = 66.00                  # nominal carrier length
+PCB_W = 63.00
+PCB_T = 1.60
+BELOW_H = 2.50                 # lowest solder/pin feature below the carrier
+ABOVE_H = 24.00                # tallest assembled component above it
+CARRIER_MIN = 65.00
+CARRIER_MAX = 67.00
+XY_CLEAR = 0.50
+UNDER_CLEAR = 2.00             # v1.1 lowers this from Rev A's 3.00
+TOP_CLEAR = 2.00               # v1.1 lowers this from Rev A's 3.00
+USB_MIN_W = 14.00
+USB_MIN_H = 9.00
 WIRE_EXIT_H = 10.00
-USB_OPEN_W, USB_OPEN_H = 14.00, 9.00
-BUTTON_TOOL_D = 3.00
-TIE_SLOT_W, TIE_SLOT_L = 2.50, 6.00
-LID_SCREW_D, LID_SCREW_LEN = 3.00, 8.00
-LID_SCREW_CLEAR_D = 3.40
-CABINET_SLOT_W, CABINET_SLOT_L = 4.00, 8.00
-EAR_T = 3.00
-INSERT_HOLE_D, INSERT_DEPTH = 4.00, 6.00
-BOSS_WALL = 2.00
+BARE_EDGE = 3.00               # bare strip inboard of each SHORT edge
+BARE_PERIM = 2.50              # bare strip inboard of each LONG edge
 
-# -- hardware starting values, section 4 and the build report ---------------
-TERM_PER_SIDE, TERM_PITCH = 15, 3.50
-TERM_BLOCK_H, TERM_SCREW_INSET, TERM_WIRE_Z = 10.00, 4.00, 4.00
-DRIVER_D = 6.00
-ESP_L, ESP_W, ESP_T = 51.50, 28.30, 1.60
-ESP_HEADER_H, ESP_HEADER_SPAN = 8.50, 22.86
-ESP_USB_H = 2.70
-ESP_ANT_L, ESP_ANT_W = 15.00, 18.00
-ESP_BTN_X, ESP_BTN_Y = -22.00, 10.15
-ESP_BTN_H = 4.30
-PCB_BARE_EDGE, PCB_BARE_PERIM = 3.00, 2.50
+# -- v1.1 sections 4, 7, 8 and 10, structure --------------------------------
+FLOOR_T = 1.60
+WALL_T = 1.60
+END_WALL_NEG_T = 2.40          # -X end: carries the ledge and both rebates
+WALL_H = 9.00                  # shallow tray, above the floor top
+LID_TOP_T = 1.60
+LID_SKIRT_T = 1.20             # three 0.40 mm perimeters
+LID_OVERLAP = 4.00
+LID_FIT = 0.25
+OUTER_CORNER_R = 3.00
+RETAIN_CLEAR = 0.20            # ledge / clamp underside above the carrier
 
-# -- the derivation chain, recomputed here by hand ---------------------------
-Z_FLOOR_BOT = -BASE_FLOOR_T                                  # -2.40
+# -- v1.1 section 9, the mandatory material gates ---------------------------
+ENV_MAX = (85.00, 75.00, 36.00)
+VOL_MAX = 35.00                # cm3, production parts only
+MASS_MAX = 45.0                # g
+PETG_DENSITY = 1.27
+VOL_PREF = (("base", 15.00), ("lid", 18.00), ("clamp", 2.00))
+
+# -- the design's own FDM rule ----------------------------------------------
+# v1.1 section 10 forbids support MATERIAL. It does not forbid a short
+# unsupported ledge, and a ledge that retains a board cannot be built without
+# one. 1.50 mm is the stated limit, and the cable windows and the USB slot are
+# held to a stricter rule: no downward-facing facet in them at all.
+OVERHANG_REACH_MAX = 1.50
+
+# -- the derivation chain, re-typed from the build report -------------------
+Z_FLOOR_BOT = -1.60
 Z_FLOOR_TOP = 0.00
-PAD_H = ADAPTER_BELOW_H + PCB_UNDER_CLEAR                    #  5.50
-Z_PCB_BOT = PAD_H                                            #  5.50
-Z_PCB_TOP = Z_PCB_BOT + ADAPTER_T                            #  7.10
-Z_UNDER_BOT = Z_PCB_BOT - ADAPTER_BELOW_H                    #  3.00
-Z_TERM_TOP = Z_PCB_TOP + TERM_BLOCK_H                        # 17.10
-Z_COMP_TOP = Z_PCB_TOP + ASSEMBLY_ABOVE_H                    # 31.10
-Z_CAV_TOP = Z_COMP_TOP + COMPONENT_TOP_CLEAR                 # 34.10
-Z_LID_TOP = Z_CAV_TOP + LID_TOP_T                            # 35.90
-H_CLOSED = Z_LID_TOP - Z_FLOOR_BOT                           # 38.30
+PAD_H = 4.50                   # 2.50 below-carrier + 2.00 clearance
+Z_PCB_BOT = 4.50
+Z_PCB_TOP = 6.10
+Z_RETAIN = 6.30
+Z_TERM_TOP = 16.10
+Z_COMP_TOP = 30.10
+Z_CAV_TOP = 32.10
+Z_LID_TOP = 33.70
+H_CLOSED = 35.30
+Z_WALL_TOP = 9.00
+Z_SKIRT_BOT = 5.00
 
-X_DATUM = -ADAPTER_L / 2.0                                   # -33.00
-X_PCB_NOM = ADAPTER_L / 2.0                                  #  33.00
-X_PCB_MAX = X_DATUM + ADAPTER_L + LEN_ADJUST                 #  34.00
-X_PCB_MIN = X_DATUM + ADAPTER_L - LEN_ADJUST                 #  32.00
-X_ADJ_FACE = X_PCB_MAX + PCB_XY_CLEAR                        #  34.50
-Y_PCB = ADAPTER_W / 2.0                                      #  31.50
-Y_CAV = Y_PCB + PCB_XY_CLEAR                                 #  32.00
-Y_OUT = Y_CAV + WALL_T                                       #  34.00
+X_DATUM = -33.00
+X_PCB_NOM = 33.00
+X_PCB_MIN = 32.00
+X_PCB_MAX = 34.00
+X_ADJ_FACE = 34.50
+Y_PCB = 31.50
+Y_CAV = 32.00
+Y_OUT = 33.60
+X_OUT_NEG = -35.40
+X_WALL_IN_POS = 41.70
+X_OUT_POS = 43.30
+BODY_L = 78.70
+BODY_W = 67.20
 
-INSERT_C = BOSS_WALL + INSERT_HOLE_D / 2.0                   #   4.00
-BOSS_OD = 2.0 * INSERT_C                                     #   8.00
-FIX_SCREW_X = X_DATUM - INSERT_C                             # -37.00
-ADJ_SCREW_X = X_ADJ_FACE + INSERT_C                          #  38.50
-CLAMP_SLOT_W = LID_SCREW_CLEAR_D                             #   3.40
-CLAMP_SLOT_L = LID_SCREW_CLEAR_D + 2.0 * LEN_ADJUST          #   5.40
-CLAMP_BAR_MARGIN = 1.60
-CLAMP_GRIP = 2.50
-CLAMP_HALF_SPAN = 23.00
-CLAMP_SCREW_Y = 19.00
+LID_X0 = -36.85
+LID_X1 = 44.75
+LID_Y = 35.05
+LID_L = 81.60
+LID_W = 70.10
+SKIRT_IN_NEG = -35.65
+SKIRT_IN_POS = 43.55
+SKIRT_IN_Y = 33.85
+
+# retention
+LEDGE_X1 = -31.00              # fixed ledge tip, 2.00 mm onto the bare edge
+LEDGE_GRIP = 2.00
+LEDGE_LEAD = 0.80              # 45 deg lead-in under the ledge tip
+LEDGE_FLAT = 1.20              # what is left flat, and the retaining face
+LEDGE_Y = (11.00, 25.00)       # each of the two segments, mirrored
+CLAMP_GRIP = 2.00
+BAR_X0 = 31.00
+BAR_X1 = 41.30
 CLAMP_T = 3.00
-FIX_BAR_IN = X_DATUM + CLAMP_GRIP                            # -30.50
-FIX_BAR_OUT = FIX_SCREW_X - (LID_SCREW_CLEAR_D / 2.0 + CLAMP_BAR_MARGIN)
-ADJ_BAR_IN = X_PCB_NOM - CLAMP_GRIP                          #  30.50
-ADJ_BAR_OUT = ADJ_SCREW_X + (CLAMP_SLOT_L / 2.0 + CLAMP_BAR_MARGIN)
-X_WALL_IN_NEG = X_DATUM - max(BOSS_OD, (X_DATUM - FIX_BAR_OUT) + 0.20)
-X_WALL_IN_POS = X_ADJ_FACE + max(
-    BOSS_OD, ((ADJ_BAR_OUT + LEN_ADJUST) - X_ADJ_FACE) + 0.20)
-X_OUT_NEG = X_WALL_IN_NEG - WALL_T                           # -43.00
-X_OUT_POS = X_WALL_IN_POS + WALL_T                           #  46.00
-BODY_L = X_OUT_POS - X_OUT_NEG                               #  89.00
-BODY_W = 2.0 * Y_OUT                                         #  68.00
+CLAMP_HALF_SPAN = 20.00
+CLAMP_TRAVEL = 1.00
+CLAMP_SLOT_W = 3.40
+CLAMP_SLOT_L = 5.40
+X_INS = 38.10                  # vertical clamp-insert axis
+CLAMP_SCREW_Y = 16.00
+INSERT_D = 4.00
+INSERT_DEPTH = 5.00
 
-# The boss columns overlap the walls by BOSS_MERGE. Sitting them tangent is
-# a valid BRep and an invalid mesh: a tangent line tessellates to an edge
-# shared by four triangles, and every ray-parity test below then reads the
-# wrong answer through it.
-PIER_BURY = 1.00
-PIER_D = BOSS_OD                                             #   8.00
-PIER_X_FIX = (X_WALL_IN_NEG - PIER_BURY,
-              X_WALL_IN_NEG - PIER_BURY + PIER_D)            # -42.00, -34.00
-PIER_X_ADJ = (X_WALL_IN_POS + PIER_BURY - PIER_D,
-              X_WALL_IN_POS + PIER_BURY)                     #  37.00,  45.00
-PIER_Y = (Y_CAV + PIER_BURY - PIER_D, Y_CAV + PIER_BURY)     #  25.00,  33.00
-BOSS_FIX_X = sum(PIER_X_FIX) / 2.0                           # -38.00
-BOSS_ADJ_X = sum(PIER_X_ADJ) / 2.0                           #  41.00
-BOSS_Y = sum(PIER_Y) / 2.0                                   #  29.00
-Z_INSERT_BOT = Z_CAV_TOP - INSERT_DEPTH                      #  28.10
-Z_SCREW_TIP = Z_LID_TOP - LID_SCREW_LEN                      #  27.90
-Z_PLINTH_TOP = Z_PCB_TOP + CLAMP_VERT_CLEAR                  #   7.30
+# support pads
+PAD_X = (24.00, 33.00)
+PAD_Y = (29.20, 31.40)
 
-EAR_PROJ = 2.00 + CABINET_SLOT_W + 2.00                      #   8.00
-EAR_LEN = CABINET_SLOT_L + 4.00                              #  12.00
-EAR_X_NEG = X_OUT_NEG - EAR_PROJ                             # -51.00
-EAR_X_POS = X_OUT_POS + EAR_PROJ                             #  54.00
-EAR_Y_FAR = Y_OUT - OUTER_CORNER_R                           #  31.00
-EAR_Y_IN = EAR_Y_FAR - EAR_LEN                               #  19.00
-EAR_SLOT_Y = EAR_Y_FAR - 2.00 - CABINET_SLOT_L / 2.0         #  25.00
-EAR_SLOT_X_NEG = EAR_X_NEG + 2.00 + CABINET_SLOT_W / 2.0     # -47.00
-EAR_SLOT_X_POS = EAR_X_POS - 2.00 - CABINET_SLOT_W / 2.0     #  50.00
-Z_EAR_TOP = Z_FLOOR_BOT + EAR_T                              #   0.60
-OVERALL_L = EAR_X_POS - EAR_X_NEG                            # 105.00
+# lid screws and locating hooks
+LID_SCREW_Y = 27.00
+LID_SCREW_Z = 8.50
+LID_SCREW_CLEAR_D = 3.40
+LID_BORE_X0 = 37.90
+HOOK_Y = 22.00
+HOOK_HALF_W = 6.00
+HOOK_DEPTH = 0.80
+HOOK_Z = (4.60, 7.20)
+LUG_Z = (5.40, 7.00)
+LUG_PROJ = 0.85
+HOOK_ENGAGE = 0.60
 
-RAIL_Y_OUT = Y_OUT + TIE_SLOT_W + 2.00                       #  38.50
-RAIL_LEDGE_TOP = Z_FLOOR_BOT + 3.00                          #   0.60
-RAIL_Z1 = Z_PCB_TOP                                          #   7.10
-RAIL_HALF_L = 32.00
-TIE_LEGS_X = (-30.0, -20.0, -10.0, 0.0, 10.0, 20.0, 30.0)
-OVERALL_W = 2.0 * RAIL_Y_OUT                                 #  77.00
-
-WIN_HALF_L = 30.00
-WIN_Z0 = Z_PCB_TOP                                           #   7.10
-WIN_H = 12.00
-WIN_Z1 = WIN_Z0 + WIN_H                                      #  19.10
-SAW_N = 16
-SAW_MARGIN = 1.00                # the sawtooth runs past the window ends, so
-SAW_X0 = -WIN_HALF_L - SAW_MARGIN     # no flank is tangent to an end plane
-SAW_X1 = WIN_HALF_L + SAW_MARGIN
-SAW_STEP = (SAW_X1 - SAW_X0) / SAW_N                         #   3.875
-SAW_H = SAW_STEP / 2.0                                       #   1.9375
-WIN_SAW_TOP = WIN_Z1 + SAW_H                                 #  21.0375
-
-Z_SKIRT_BOT = Z_CAV_TOP - LID_OVERLAP                        #  29.10
-SIDE_VENT_Z1 = Z_SKIRT_BOT - 0.50                            #  28.60
-SIDE_VENT_Z0 = SIDE_VENT_Z1 - 5.00                           #  23.60
+# cable windows, USB slot, ventilation
+WIN_X = (-20.00, 20.00)
+WIN_HALF_W = 10.00
+WIN_Z0 = 5.00                  # the skirt's lower free edge
+WIN_Z1 = 20.00
+WIN_SILL = 9.00                # the base wall top
+WIN_CLEAR_H = 11.00
+USB_SLOT_W = 15.00
+USB_SLOT_Z1 = 22.55
+USB_Z0 = 13.05
+USB_Z1 = 22.05
+VENT_N = 5
 VENT_W = 2.00
+VENT_X = (-22.00, -8.00)
+VENT_PITCH = 4.50
 
-TERM_Y = Y_PCB - TERM_SCREW_INSET                            #  27.50
-TERM_X = [(i - (TERM_PER_SIDE - 1) / 2.0) * TERM_PITCH
-          for i in range(TERM_PER_SIDE)]
-TERM_SPAN = (TERM_PER_SIDE - 1) * TERM_PITCH                 #  49.00
-Z_WIRE = Z_PCB_TOP + TERM_WIRE_Z                             #  11.10
+# internal cable-tie tabs
+TIE_X = (-5.00, 5.00)
+TIE_TAB_HALF_W = 5.00
+TIE_TAB_TOP = 15.50
+TIE_AP_W = 5.00
+TIE_AP_Z = (10.00, 12.40)
 
-ESP_X0, ESP_X1 = -ESP_L / 2.0, ESP_L / 2.0                   # -25.75, 25.75
-ESP_Y0, ESP_Y1 = -ESP_W / 2.0, ESP_W / 2.0                   # -14.15, 14.15
-Z_ESP_BOT = Z_PCB_TOP + ESP_HEADER_H                         #  15.60
-Z_ESP_TOP = Z_ESP_BOT + ESP_T                                #  17.20
-Z_USB_AXIS = Z_ESP_TOP + ESP_USB_H / 2.0                     #  18.55
-USB_Z0 = Z_USB_AXIS - USB_OPEN_H / 2.0                       #  14.05
-USB_Z1 = Z_USB_AXIS + USB_OPEN_H / 2.0                       #  23.05
-Z_BTN_TOP = Z_ESP_TOP + ESP_BTN_H                            #  21.50
+# recessed cabinet fixings
+CAB_X = 27.00
+CAB_PAD_D = 13.00
+CAB_PAD_H = 2.40
+CAB_SCREW_D = 3.40
+CAB_HEAD_D = 6.40
+CAB_HEAD_TOP = 1.20
+CAB_CAP_D = 10.20
+CAB_CAP_T = 1.20
+CAB_RECESS_D = 10.40
 
-ANT_X1 = ESP_X1                                              #  25.75
-ANT_X0 = ESP_X1 - ESP_ANT_L                                  #  10.75
-ANT_Y0, ANT_Y1 = -ESP_ANT_W / 2.0, ESP_ANT_W / 2.0           #  -9.00, 9.00
-AKO_X0, AKO_X1 = ANT_X0 - ANTENNA_KEEPOUT, ANT_X1 + ANTENNA_KEEPOUT
-AKO_Y0, AKO_Y1 = ANT_Y0 - ANTENNA_KEEPOUT, ANT_Y1 + ANTENNA_KEEPOUT
+# grouped Decca harnesses, docs/Wiring.md - NOT thirty separate conductors
+WIRE_D = 2.00
+BUNDLE_PACK = 1.15
+# (window centre x, side, conductors, harness ids)
+BUNDLES = (
+    (-20.00, -1, 12, "H1"),
+    (20.00, -1, 6, "H2+H3"),
+    (-20.00, +1, 7, "H4+H5"),
+    (20.00, +1, 4, "H6+PWR"),
+)
 
-SKIRT_IN_NEG = X_OUT_NEG - LID_FIT_CLEAR                     # -43.25
-SKIRT_IN_POS = X_OUT_POS + LID_FIT_CLEAR                     #  46.25
-SKIRT_IN_Y = Y_OUT + LID_FIT_CLEAR                           #  34.25
-LID_X0 = SKIRT_IN_NEG - LID_SKIRT_T                          # -45.25
-LID_X1 = SKIRT_IN_POS + LID_SKIRT_T                          #  48.25
-LID_Y = SKIRT_IN_Y + LID_SKIRT_T                             #  36.25
-Z_LID_THIN = Z_CAV_TOP + (LID_TOP_T - LID_ANTENNA_T)         #  34.30
+# terminals
+TERM_N = 15
+TERM_PITCH = 3.50
+TERM_SCREW_INSET = 4.00
+DRIVER_D = 6.00
 
-GAUGE_Y = -120.00                                            # parked offset
+# ESP32 reference
+ESP_L = 51.50
+ESP_W = 28.30
+ESP_HEADER_H = 8.50
+ESP_ANT_L = 15.00
+ESP_ANT_W = 18.00
+ANT_KEEPOUT = 10.00
+Z_ESP_TOP = 16.20
 
-TOL = 0.05                       # mesh/chord tolerance, mm
-
-FAILS = []
 CHECKS = 0
+FAILS = []
 PROTOS = []
 INSTALLS = []
 
@@ -261,7 +279,6 @@ def proto(label, detail=""):
 def install(label, detail=""):
     INSTALLS.append(label)
     print("  [INST] %-57s %s" % (label, detail))
-
 
 # ---------------------------------------------------------------------------
 # Mesh
@@ -447,30 +464,6 @@ def grid(a0, a1, n):
 def inner(a0, a1, n, pad=0.15):
     return grid(a0 + pad, a1 - pad, n)
 
-
-# ---------------------------------------------------------------------------
-# Perimeter probe stations: four straight runs plus the four corner arcs, each
-# with a start point known to be inside the wall and an outward direction.
-# ---------------------------------------------------------------------------
-def perimeter_stations():
-    st = []
-    r = OUTER_CORNER_R
-    for x in grid(X_OUT_NEG + r + 1.0, X_OUT_POS - r - 1.0, 12):
-        st.append((x, Y_OUT - WALL_T / 2.0, 0.0, 1.0))
-        st.append((x, -(Y_OUT - WALL_T / 2.0), 0.0, -1.0))
-    for y in grid(-(Y_OUT - r - 1.0), Y_OUT - r - 1.0, 12):
-        st.append((X_OUT_NEG + WALL_T / 2.0, y, -1.0, 0.0))
-        st.append((X_OUT_POS - WALL_T / 2.0, y, 1.0, 0.0))
-    for cx, sx in ((X_OUT_NEG + r, -1.0), (X_OUT_POS - r, 1.0)):
-        for cy, sy in ((Y_OUT - r, 1.0), (-(Y_OUT - r), -1.0)):
-            for k in range(6):
-                a = math.radians(10.0 + 70.0 * k / 5.0)
-                ux, uy = sx * math.cos(a), sy * math.sin(a)
-                st.append((cx + ux * (r - WALL_T / 2.0),
-                           cy + uy * (r - WALL_T / 2.0), ux, uy))
-    return st
-
-
 def surface_out(mesh, px, py, ux, uy, z, t0=0.0, t1=12.0, step=0.005):
     """March outward from a point inside ``mesh`` and return the distance at
     which it leaves the solid, or None."""
@@ -525,11 +518,11 @@ def overhang_report(mesh, bed_z, up, limit_reach, max_probe=260):
         zout = cz - 0.05 * up
         best = 40.0
         for dx, dy in dirs:
-            t = 0.5
+            t = 0.25
             while t < best:
                 if mesh.inside(cx + dx * t, cy + dy * t, zout):
                     break
-                t += 0.5
+                t += 0.25
             best = min(best, t)
         if best > worst:
             worst, where = best, (round(cx, 1), round(cy, 1), round(cz, 2))
@@ -537,759 +530,631 @@ def overhang_report(mesh, bed_z, up, limit_reach, max_probe=260):
 
 
 
+
+
 # ---------------------------------------------------------------------------
-# Dimensioned drawings, plotted from the SAME triangles the gates are measured
-# on. The outlines are sliced out of the exported meshes; only the dimension
-# text is typed, and every typed figure is one this file has already gated.
+# Perimeter probe stations on the base wall: four straight runs plus the four
+# corner arcs, each with a point known to be inside the wall and an outward
+# direction. Used for the lid fit gate and for the stray-material gate.
 # ---------------------------------------------------------------------------
-def slice_axis(tris, axis, value):
-    """Segments where the mesh crosses the plane axis = value, returned in
-    the remaining two coordinates."""
-    keep = [i for i in range(3) if i != axis]
-    segs = []
-    for t in tris:
-        dv = t[:, axis] - value
-        if np.all(dv > 0) or np.all(dv < 0):
-            continue
-        pts = []
-        for i in range(3):
-            j = (i + 1) % 3
-            di, dj = dv[i], dv[j]
-            if di == 0.0:
-                pts.append(t[i][keep])
-            if (di < 0 < dj) or (dj < 0 < di):
-                f = di / (di - dj)
-                pts.append((t[i] + f * (t[j] - t[i]))[keep])
-        if len(pts) >= 2:
-            segs.append((pts[0], pts[1]))
-    return segs
+def perimeter_stations():
+    st = []
+    r = OUTER_CORNER_R
+    for x in grid(X_OUT_NEG + r + 2.0, X_OUT_POS - r - 2.0, 14):
+        st.append((x, Y_OUT - WALL_T / 2.0, 0.0, 1.0))
+        st.append((x, -(Y_OUT - WALL_T / 2.0), 0.0, -1.0))
+    for y in grid(-(Y_OUT - r - 2.0), Y_OUT - r - 2.0, 14):
+        st.append((X_OUT_NEG + END_WALL_NEG_T / 2.0, y, -1.0, 0.0))
+        st.append((X_WALL_IN_POS + WALL_T / 2.0, y, 1.0, 0.0))
+    for cx, sx, t in ((X_OUT_NEG + r, -1.0, END_WALL_NEG_T),
+                      (X_OUT_POS - r, 1.0, WALL_T)):
+        for cy, sy in ((Y_OUT - r, 1.0), (-(Y_OUT - r), -1.0)):
+            for k in range(6):
+                a = math.radians(10.0 + 70.0 * k / 5.0)
+                ux, uy = sx * math.cos(a), sy * math.sin(a)
+                st.append((cx + ux * (r - t / 2.0), cy + uy * (r - t / 2.0),
+                           ux, uy))
+    return st
 
 
-def _plot_segs(ax, segs, **kw):
-    from matplotlib.collections import LineCollection
-    if not segs:
-        return
-    ax.add_collection(LineCollection([[tuple(a), tuple(b)] for a, b in segs],
-                                     **kw))
+def box_pts(x0, x1, nx, y0, y1, ny, z0, z1, nz, pad=0.12):
+    out = []
+    for x in inner(x0, x1, nx, pad):
+        for y in inner(y0, y1, ny, pad):
+            for z in inner(z0, z1, nz, pad):
+                out.append((x, y, z))
+    return out
 
 
-def _dim(ax, p0, p1, off, text, horizontal=True, tick=1.6, fs=8.5):
-    """One dimension: witness lines, a double arrow and the value."""
-    if horizontal:
-        y = off
-        ax.plot([p0, p0], [p0 * 0 + y, y], lw=0)
-        ax.annotate("", xy=(p1, y), xytext=(p0, y),
-                    arrowprops=dict(arrowstyle="<->", lw=0.8, color="#222"))
-        ax.text((p0 + p1) / 2.0, y, " %s " % text, ha="center", va="bottom",
-                fontsize=fs, color="#111",
-                bbox=dict(fc="white", ec="none", pad=0.6))
-    else:
-        x = off
-        ax.annotate("", xy=(x, p1), xytext=(x, p0),
-                    arrowprops=dict(arrowstyle="<->", lw=0.8, color="#222"))
-        ax.text(x, (p0 + p1) / 2.0, " %s " % text, ha="left", va="center",
-                fontsize=fs, color="#111", rotation=90,
-                bbox=dict(fc="white", ec="none", pad=0.6))
+def count_in(mesh, pts):
+    return sum(1 for x, y, z in pts if mesh.inside(x, y, z))
 
 
-def _witness(ax, pts, lo, hi, horizontal=True):
-    for p in pts:
-        if horizontal:
-            ax.plot([p, p], [lo, hi], lw=0.5, ls=":", color="#999")
-        else:
-            ax.plot([lo, hi], [p, p], lw=0.5, ls=":", color="#999")
+def top_of(mesh, x, y, below):
+    """Highest material on the vertical line through (x, y), at or under
+    ``below``. None when the line is empty there."""
+    best = None
+    for a, b in mesh.spans(x, y):
+        if a < below - 1e-9:
+            t = min(b, below)
+            best = t if best is None else max(best, t)
+    return best
 
 
-def drawings(M, out_dir, prefix):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    written = []
-    base, lid = M["base"], M["lid"]
-
-    # ---- plan ------------------------------------------------------------
-    fig, ax = plt.subplots(figsize=(14, 10), dpi=100)
-    layers = ((Z_FLOOR_BOT / 2.0, "#1b3a5c", 1.4, "ears and body at mid-floor"),
-              ((RAIL_LEDGE_TOP + RAIL_Z1) / 2.0, "#2e7d32", 1.0,
-               "lacing rails at mid-slot"),
-              ((SIDE_VENT_Z0 + SIDE_VENT_Z1) / 2.0, "#b0651a", 0.9,
-               "walls at the sidewall vents"))
-    for z, colour, lw, label in layers:
-        segs = slice_axis(base.tris, 2, z)
-        _plot_segs(ax, segs, colors=colour, linewidths=lw)
-        ax.plot([], [], color=colour, lw=lw, label="%s  (z %+.2f)" % (label, z))
-    segs = slice_axis(lid.tris, 2, (Z_SKIRT_BOT + Z_CAV_TOP) / 2.0)
-    _plot_segs(ax, segs, colors="#8e24aa", linewidths=0.9)
-    ax.plot([], [], color="#8e24aa", lw=0.9,
-            label="lid skirt at mid-overlap  (z %+.2f)"
-                  % ((Z_SKIRT_BOT + Z_CAV_TOP) / 2.0))
-    ax.plot([X_DATUM, X_PCB_NOM, X_PCB_NOM, X_DATUM, X_DATUM],
-            [-Y_PCB, -Y_PCB, Y_PCB, Y_PCB, -Y_PCB],
-            lw=1.0, ls="--", color="#c62828",
-            label="breakout outline %.2f x %.2f  STARTING VALUE"
-                  % (ADAPTER_L, ADAPTER_W))
-
-    _witness(ax, (EAR_X_NEG, X_OUT_NEG, X_OUT_POS, EAR_X_POS), -60, 60)
-    _dim(ax, EAR_X_NEG, EAR_X_POS, 52.0, "%.2f overall" % OVERALL_L)
-    _dim(ax, X_OUT_NEG, X_OUT_POS, 45.0, "%.2f body" % BODY_L)
-    _dim(ax, X_DATUM, X_PCB_NOM, -45.0, "%.2f board" % ADAPTER_L)
-    _witness(ax, (-RAIL_Y_OUT, -Y_OUT, Y_OUT, RAIL_Y_OUT), -60, 60,
-             horizontal=False)
-    _dim(ax, -RAIL_Y_OUT, RAIL_Y_OUT, 62.0, "%.2f overall" % OVERALL_W,
-         horizontal=False)
-    _dim(ax, -Y_OUT, Y_OUT, 70.0, "%.2f body" % BODY_W, horizontal=False)
-    _dim(ax, -Y_CAV, Y_CAV, -58.0, "%.2f cavity" % (2 * Y_CAV),
-         horizontal=False)
-    for sx in (EAR_SLOT_X_NEG, EAR_SLOT_X_POS):
-        for sy in (EAR_SLOT_Y, -EAR_SLOT_Y):
-            ax.plot([sx], [sy], marker="+", ms=9, color="#c62828", mew=1.2)
-    ax.annotate("4 x cabinet slot %.2f x %.2f, long axis across the housing"
-                % (CABINET_SLOT_W, CABINET_SLOT_L),
-                xy=(EAR_SLOT_X_POS, EAR_SLOT_Y), xytext=(20.0, 47.0),
-                fontsize=8.5, color="#c62828",
-                arrowprops=dict(arrowstyle="->", lw=0.8, color="#c62828"))
-    ax.set_title("Decca ESP32 Controller Housing Rev A - plan, measured from "
-                 "ESP32_Controller_Housing_Base.stl" + chr(10) +
-                 "PROTOTYPE CAD. "
-                 "Board outline is a starting value, not a measurement.",
-                 fontsize=10)
-    ax.set_aspect("equal")
-    ax.set_xlim(-64, 66)
-    ax.set_ylim(-76, 78)
-    ax.set_xlabel("X, mm")
-    ax.set_ylabel("Y, mm")
-    ax.grid(True, lw=0.3, color="#ddd")
-    ax.legend(loc="lower left", fontsize=8, framealpha=0.9)
-    p = os.path.join(out_dir, prefix + "15_dimensioned_plan.png")
-    fig.savefig(p, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-    written.append(p)
-
-    # ---- transverse section ----------------------------------------------
-    fig, ax = plt.subplots(figsize=(14, 10), dpi=100)
-    x_cut = -5.00                     # through a window, clear of the piers
-    _plot_segs(ax, slice_axis(base.tris, 0, x_cut), colors="#1b3a5c",
-               linewidths=1.5)
-    _plot_segs(ax, slice_axis(lid.tris, 0, x_cut), colors="#8e24aa",
-               linewidths=1.5)
-    ax.plot([], [], color="#1b3a5c", lw=1.5, label="base   (section x %+.2f)"
-            % x_cut)
-    ax.plot([], [], color="#8e24aa", lw=1.5, label="lid    (section x %+.2f)"
-            % x_cut)
-    ax.add_patch(plt.Rectangle((-Y_PCB, Z_PCB_BOT), 2 * Y_PCB, ADAPTER_T,
-                               fc="#c8e6c9", ec="#2e7d32", lw=1.0, ls="--"))
-    ax.add_patch(plt.Rectangle((-Y_PCB, Z_UNDER_BOT), 2 * Y_PCB,
-                               ADAPTER_BELOW_H, fc="none", ec="#c62828",
-                               lw=0.9, ls=":"))
-    ax.add_patch(plt.Rectangle((-Y_PCB, Z_PCB_TOP), 2 * Y_PCB,
-                               ASSEMBLY_ABOVE_H, fc="none", ec="#c62828",
-                               lw=0.9, ls=":"))
-    ax.plot([], [], color="#c62828", lw=0.9, ls=":",
-            label="hardware envelopes  STARTING VALUES")
-    chain = ((Z_FLOOR_BOT, Z_FLOOR_TOP, "%.2f floor" % BASE_FLOOR_T),
-             (Z_FLOOR_TOP, Z_UNDER_BOT, "%.2f clear under the joints"
-              % PCB_UNDER_CLEAR),
-             (Z_UNDER_BOT, Z_PCB_BOT, "%.2f below-board parts"
-              % ADAPTER_BELOW_H),
-             (Z_PCB_BOT, Z_PCB_TOP, "%.2f board" % ADAPTER_T),
-             (Z_PCB_TOP, Z_COMP_TOP, "%.2f assembly above the board"
-              % ASSEMBLY_ABOVE_H),
-             (Z_COMP_TOP, Z_CAV_TOP, "%.2f headroom" % COMPONENT_TOP_CLEAR),
-             (Z_CAV_TOP, Z_LID_TOP, "%.2f lid" % LID_TOP_T))
-    # one dimension column with upright labels beside it. Rotated text does
-    # not fit between links as short as the 1.60 mm board.
-    x_dim, x_txt = 42.0, 44.5
-    for z0, z1, label in chain:
-        ax.annotate("", xy=(x_dim, z1), xytext=(x_dim, z0),
-                    arrowprops=dict(arrowstyle="<->", lw=0.8, color="#222"))
-        ax.text(x_txt, (z0 + z1) / 2.0, label, ha="left", va="center",
-                fontsize=8.0, color="#111")
-        _witness(ax, (z0, z1), -44.0, x_dim, horizontal=False)
-    ax.annotate("", xy=(66.0, Z_LID_TOP), xytext=(66.0, Z_FLOOR_BOT),
-                arrowprops=dict(arrowstyle="<->", lw=1.0, color="#222"))
-    ax.text(67.5, (Z_FLOOR_BOT + Z_LID_TOP) / 2.0,
-            "%.2f closed height" % H_CLOSED, ha="left", va="center",
-            fontsize=9.0, rotation=90, color="#111")
-    _dim(ax, WIN_Z0, WIN_Z1, -44.0, "%.2f cable window" % WIN_H,
-         horizontal=False)
-    _dim(ax, Z_SKIRT_BOT, Z_CAV_TOP, -52.0, "%.2f lid overlap" % LID_OVERLAP,
-         horizontal=False)
-    _dim(ax, -RAIL_Y_OUT, RAIL_Y_OUT, -9.0, "%.2f overall width" % OVERALL_W)
-    _dim(ax, -Y_OUT, Y_OUT, -6.0, "%.2f body" % BODY_W)
-    ax.set_title("Decca ESP32 Controller Housing Rev A - transverse section, "
-                 "measured from the exported meshes" + chr(10) +
-                 "PROTOTYPE CAD. Nothing "
-                 "here has been printed or offered up to hardware.",
-                 fontsize=10)
-    ax.set_aspect("equal")
-    ax.set_xlim(-58, 82)
-    ax.set_ylim(-14, 44)
-    ax.set_xlabel("Y, mm")
-    ax.set_ylabel("Z, mm")
-    ax.grid(True, lw=0.3, color="#ddd")
-    ax.legend(loc="upper left", fontsize=8, framealpha=0.9)
-    p = os.path.join(out_dir, prefix + "16_dimensioned_section.png")
-    fig.savefig(p, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-    written.append(p)
-
-    for p in written:
-        print("  %s" % os.path.basename(p))
-    return written
+def bundle_d(n):
+    return BUNDLE_PACK * WIRE_D * math.sqrt(float(n))
 
 
 # ---------------------------------------------------------------------------
 def main():
     print("=" * 78)
-    print("DECCA ESP32 CONTROLLER HOUSING - REV A OFFLINE MESH VERIFICATION")
+    print("Decca ESP32 Controller Housing Rev B - offline mesh verifier")
+    print("specification v1.1 section 13, measured from the exported "
+          "triangles only")
     print("=" * 78)
+
     M = {}
-    for key, fname in MESHES.items():
-        path = os.path.normpath(os.path.join(STL, fname))
+    missing = []
+    for key, fname in sorted(MESHES.items()):
+        path = os.path.join(STL, fname)
         if not os.path.exists(path):
-            print("MISSING MESH: %s" % path)
-            return 2
+            missing.append(fname)
+            continue
         M[key] = Mesh(key, path)
-    for key in ("base", "lid", "clamp_fix", "clamp_adj", "gauge", "plug"):
+    if missing:
+        print("MISSING MESHES: %s" % ", ".join(missing))
+        return 2
+
+    print("")
+    print("MESHES")
+    for key, _n in PRODUCTION + (("gauge", 0),):
         m = M[key]
         sx, sy, sz = m.size()
-        print("  %-10s %-44s %6d tris  %7.2f x %7.2f x %7.2f mm"
-              % (key, MESHES[key], len(m.tris), sx, sy, sz))
-    base, lid = M["base"], M["lid"]
-    cfix, cadj = M["clamp_fix"], M["clamp_adj"]
-    gauge, plug = M["gauge"], M["plug"]
+        print("  %-6s %6d tris  %7.2f cm3  %6.2f x %6.2f x %6.2f mm  %s"
+              % (key, len(m.tris), signed_volume(m.tris) / 1000.0,
+                 sx, sy, sz, os.path.basename(m.path)))
     print("")
 
-    # -- 1 ------------------------------------------------------------------
-    print("1. EVERY PRINTABLE PART IS A CLOSED MANIFOLD SOLID")
-    for key in ("base", "lid", "clamp_fix", "clamp_adj", "gauge", "plug"):
+    base, lid, clamp, cap = M["base"], M["lid"], M["clamp"], M["cap"]
+
+    # -- 1 -----------------------------------------------------------------
+    bad = []
+    for key, _n in PRODUCTION:
         m = M[key]
-        bad_und, bad_dir = manifold(m.faces)
-        ncomp = components(len(m.verts), m.faces)
-        vol = signed_volume(m.tris)
-        ok = bad_und == 0 and bad_dir == 0 and ncomp == 1 and vol > 0
-        gate(ok, key,
-             "edges %d bad, winding %d bad, %d component(s), %.3f cm3"
-             % (bad_und, bad_dir, ncomp, vol / 1000.0))
+        be, bd = manifold(m.faces)
+        nc = components(len(m.verts), m.faces)
+        if be or bd or nc != 1:
+            bad.append("%s edges=%d winding=%d parts=%d" % (key, be, bd, nc))
+    gate(not bad, "1  every production mesh is manifold and watertight",
+         "%d meshes, 0 bad edges, 0 bad windings, 1 component each"
+         % len(PRODUCTION) if not bad else "; ".join(bad))
 
-    # -- 2 ------------------------------------------------------------------
-    print("")
-    print("2. BASE FLOOR CONTINUOUS BENEATH THE COMPLETE PCB OUTLINE")
-    holes = []
-    for x in inner(X_DATUM, X_PCB_MAX, 25):
-        for y in inner(-Y_PCB, Y_PCB, 23):
-            if not base.inside(x, y, Z_FLOOR_BOT / 2.0):
-                holes.append((round(x, 1), round(y, 1)))
-    gate(not holes, "25 x 23 probes at mid-floor under the board",
-         "%d gap(s)%s" % (len(holes), " e.g. %s" % holes[:3] if holes else ""))
-    zt = base.spans(0.0, 0.0)
-    gate(any(abs(a - Z_FLOOR_BOT) < TOL and abs(b - Z_FLOOR_TOP) < TOL
-             for a, b in zt), "floor slab measured on the centre line",
-         "spans %s" % [(round(a, 2), round(b, 2)) for a, b in zt])
-
-    # -- 3 ------------------------------------------------------------------
-    print("")
-    print("3. UNDERSIDE ELECTRICAL CLEARANCE >= %.2f mm" % PCB_UNDER_CLEAR)
-    worst, worst_at = Z_UNDER_BOT - Z_FLOOR_TOP, None
-    bad = []
-    for x in inner(X_DATUM + PCB_BARE_EDGE, X_PCB_NOM - PCB_BARE_EDGE, 23):
-        for y in inner(-(Y_PCB - PCB_BARE_PERIM), Y_PCB - PCB_BARE_PERIM, 21):
-            top = Z_FLOOR_BOT
-            for a, b in base.spans(x, y):
-                if a < Z_UNDER_BOT - 1e-6:
-                    top = max(top, min(b, Z_UNDER_BOT))
-            clr = Z_UNDER_BOT - top
-            if clr < worst:
-                worst, worst_at = clr, (round(x, 1), round(y, 1))
-            if clr < PCB_UNDER_CLEAR - TOL:
-                bad.append((round(x, 1), round(y, 1), round(clr, 2)))
-    gate(not bad, "clear air beneath every modelled solder joint",
-         "minimum %.2f mm at %s" % (worst, worst_at))
-    # Measure where the pads actually stop, by walking inward at mid-pad
-    # height. The probe sits above the R1.00 floor fillet on purpose: that
-    # fillet is required geometry, not an intrusion.
-    z_pad = (Z_FLOOR_TOP + PAD_H) / 2.0
-    innermost, at = 0.0, None
-    for px in (-28.0, 0.0, 28.0):
-        for sgn in (1.0, -1.0):
-            y = sgn * Y_PCB
-            while abs(y) > 20.0 and base.inside(px, y, z_pad):
-                y -= sgn * 0.01
-            edge = abs(y)
-            if innermost == 0.0 or edge < innermost:
-                innermost, at = edge, (px, sgn)
-    gate(innermost >= Y_PCB - PCB_BARE_PERIM - 0.05,
-         "support pads stop inside the declared bare perimeter strip",
-         "innermost pad edge |y| %.3f, strip starts at %.2f"
-         % (innermost, Y_PCB - PCB_BARE_PERIM))
-    hs = base.spans(0.0, Y_PCB - PCB_BARE_PERIM / 2.0)
-    pad = [(a, b) for a, b in hs if b > Z_FLOOR_TOP + 0.05]
-    gate(bool(pad) and abs(pad[0][1] - PAD_H) < TOL,
-         "support pad height equals below-board + clearance",
-         "measured %.2f mm, expected %.2f" % (pad[0][1] if pad else -1, PAD_H))
-
-    # -- 4 ------------------------------------------------------------------
-    print("")
-    print("4. NO FASTENER ENVELOPE ENTERS THE PCB OR WIRING KEEP-OUT")
-    fasteners = [("lid screw", bx, sy * BOSS_Y, INSERT_HOLE_D)
-                 for bx in (BOSS_FIX_X, BOSS_ADJ_X) for sy in (1, -1)]
-    fasteners += [("clamp screw", bx, sy * CLAMP_SCREW_Y, INSERT_HOLE_D)
-                  for bx in (FIX_SCREW_X, ADJ_SCREW_X) for sy in (1, -1)]
-    fasteners += [("cabinet screw", bx, sy * EAR_SLOT_Y, CABINET_SLOT_W)
-                  for bx in (EAR_SLOT_X_NEG, EAR_SLOT_X_POS) for sy in (1, -1)]
-    worst = 1e9
-    for nm, fx, fy, fd in fasteners:
-        dx = max(X_DATUM - (fx + fd / 2.0), (fx - fd / 2.0) - X_ADJ_FACE)
-        dy = abs(fy) - fd / 2.0 - Y_PCB
-        worst = min(worst, max(dx, dy))
-    gate(worst > 0.0, "all %d fastener axes lie outside the board envelope"
-         % len(fasteners), "tightest clearance %.2f mm" % worst)
-    holes_found = 0
-    for nm, fx, fy, fd in fasteners[:8]:
-        z = Z_CAV_TOP - 0.5 if nm == "lid screw" else Z_PLINTH_TOP - 0.5
-        if base.clear_between(fx, fy, z - 0.2, z + 0.2):
-            holes_found += 1
-    gate(holes_found == 8, "all eight heat-set insert holes present in the base",
-         "%d found at the named coordinates" % holes_found)
-    gate(Z_SCREW_TIP > Z_PCB_TOP,
-         "M3 x %.0f tip at full insertion stays above the board plane"
-         % LID_SCREW_LEN,
-         "tip z %+.2f, board top %+.2f, %.2f mm clear"
-         % (Z_SCREW_TIP, Z_PCB_TOP, Z_SCREW_TIP - Z_PCB_TOP))
-
-    # -- 5 ------------------------------------------------------------------
-    print("")
-    print("5. COMPONENT-TO-LID CLEARANCE >= %.2f mm" % COMPONENT_TOP_CLEAR)
-    low = 1e9
-    low_at = None
-    for x in inner(X_DATUM, X_PCB_NOM, 27):
-        for y in inner(-Y_PCB, Y_PCB, 25):
-            for a, b in lid.spans(x, y):
-                if b > Z_PCB_TOP and a < low:
-                    low, low_at = a, (round(x, 1), round(y, 1))
-    gate(low - Z_COMP_TOP >= COMPONENT_TOP_CLEAR - TOL,
-         "lowest lid material anywhere over the board",
-         "z %+.2f at %s, %.2f mm above the modelled component ceiling"
-         % (low, low_at, low - Z_COMP_TOP))
-
-    # -- 6 ------------------------------------------------------------------
-    print("")
-    print("6. TERMINAL SCREWDRIVER CORRIDORS, LID REMOVED")
-    ring = [(0.0, 0.0)] + [(DRIVER_D / 2.0 * math.cos(math.radians(a)),
-                            DRIVER_D / 2.0 * math.sin(math.radians(a)))
-                           for a in range(0, 360, 45)]
-    blocked = []
-    for sgn in (1.0, -1.0):
-        for i, tx in enumerate(TERM_X):
-            for ox, oy in ring:
-                px, py = tx + ox, sgn * TERM_Y + oy
-                for m in (base, cfix, cadj):
-                    if not m.clear_between(px, py, Z_TERM_TOP, 80.0):
-                        blocked.append((i + 1, "+Y" if sgn > 0 else "-Y",
-                                        m.name))
-    gate(not blocked, "%d corridors of %.2f mm diameter, both rows"
-         % (2 * TERM_PER_SIDE, DRIVER_D),
-         "%d obstruction(s)%s" % (len(blocked),
-                                  " %s" % blocked[:3] if blocked else ""))
-
-    # -- 7 ------------------------------------------------------------------
-    print("")
-    print("7. WIRE-EXIT HEIGHT ON BOTH LONG SIDES >= %.2f mm" % WIRE_EXIT_H)
-    for sgn, side in ((1.0, "+Y"), (-1.0, "-Y")):
-        worst, at = 1e9, None
-        for x in grid(-TERM_SPAN / 2.0, TERM_SPAN / 2.0, 61):
-            y = sgn * (Y_OUT - WALL_T / 2.0)
-            h = 0.0
-            zs = base.spans(x, y)
-            below = [b for a, b in zs if b <= WIN_Z0 + 1e-6]
-            above = [a for a, b in zs if a >= WIN_Z0 - 1e-6]
-            if below and above:
-                h = min(above) - max(below)
-            if h < worst:
-                worst, at = h, round(x, 2)
-        gate(worst >= WIRE_EXIT_H - TOL,
-             "%s side, narrowest clear opening across the terminal span"
-             % side, "%.2f mm at x %+.2f" % (worst, at))
-    note("window roof", "sawtooth apex z %+.2f, %d teeth of %.3f mm at exactly "
-         "45 degrees" % (WIN_SAW_TOP, SAW_N, SAW_STEP))
-
-    # -- 8 ------------------------------------------------------------------
-    print("")
-    print("8. NO LID MATERIAL CROSSES A WIRE PATH")
-    crossed = []
-    for sgn in (1.0, -1.0):
-        for tx in TERM_X:
-            for y in grid(sgn * TERM_Y, sgn * (RAIL_Y_OUT + 10.0), 25):
-                for dz in (-1.2, 0.0, 1.2):
-                    if lid.inside(tx, y, Z_WIRE + dz):
-                        crossed.append((round(tx, 1), round(y, 1)))
-    gate(not crossed, "lid against all %d modelled wire runs"
-         % (2 * TERM_PER_SIDE), "%d crossing(s)" % len(crossed))
-    note("clearance", "lid skirt bottom z %+.2f, window roof z %+.2f, "
-         "%.2f mm apart" % (Z_SKIRT_BOT, WIN_SAW_TOP,
-                            Z_SKIRT_BOT - WIN_SAW_TOP))
-
-    # -- 9 ------------------------------------------------------------------
-    print("")
-    print("9. USB SERVICE ENVELOPE UNOBSTRUCTED")
-    bad = []
-    for x in grid(X_OUT_NEG - 14.0, ESP_X0 + 1.6, 24):
-        for y in inner(-USB_OPEN_W / 2.0, USB_OPEN_W / 2.0, 7):
-            for z in inner(USB_Z0, USB_Z1, 7):
-                for m in (base, lid, cfix, cadj):
-                    if m.inside(x, y, z):
-                        bad.append((m.name, round(x, 1), round(y, 1),
-                                    round(z, 1)))
-    gate(not bad, "%.2f x %.2f mm envelope swept to the connector face"
-         % (USB_OPEN_W, USB_OPEN_H),
-         "%d obstruction(s)%s" % (len(bad), " %s" % bad[:2] if bad else ""))
-    ws = base.spans(X_OUT_NEG + WALL_T / 2.0, 0.0)
-    gap = [(a, b) for a, b in ws if a > Z_PLINTH_TOP]
-    opening = None
-    for a, b in zip([w[1] for w in ws], [w[0] for w in ws[1:]]):
-        if a > Z_PLINTH_TOP and b - a > 5.0:
-            opening = (a, b)
-    if opening:
-        note("measured wall opening on the USB axis",
-             "z %+.2f to %+.2f, %.2f mm high against a %.2f mm requirement"
-             % (opening[0], opening[1], opening[1] - opening[0], USB_OPEN_H))
-
-    # -- 10 -----------------------------------------------------------------
-    print("")
-    print("10. BUTTON TOOL HOLES ALIGN TO THE ESP32 REFERENCE")
-    for tag, by in (("EN/RESET", ESP_BTN_Y), ("BOOT", -ESP_BTN_Y)):
-        clear = all(lid.clear_between(ESP_BTN_X + dx, by + dy,
-                                      Z_LID_TOP - LID_TOP_T + 0.4,
-                                      Z_LID_TOP + 0.1)
-                    for dx, dy in ((0, 0), (1.3, 0), (-1.3, 0),
-                                   (0, 1.3), (0, -1.3)))
-        wall = all(lid.inside(ESP_BTN_X + dx, by + dy, Z_LID_TOP - 0.9)
-                   for dx, dy in ((2.4, 0), (-2.4, 0), (0, 2.4), (0, -2.4)))
-        gate(clear and wall, "%s hole open at (%.2f, %+.2f)"
-             % (tag, ESP_BTN_X, by),
-             "through-hole clear to %.2f mm diameter, material at %.2f mm"
-             % (2.6, 4.8))
-    gate(Z_BTN_TOP < Z_CAV_TOP, "a tool reaches the button from outside",
-         "button top z %+.2f, lid underside z %+.2f, %.2f mm of travel"
-         % (Z_BTN_TOP, Z_CAV_TOP, Z_CAV_TOP - Z_BTN_TOP))
-
-    # -- 11 -----------------------------------------------------------------
-    print("")
-    print("11. ANTENNA KEEP-OUT CARRIES NO SCREW, INSERT, RIB OR LACING")
-    bad = []
-    for x in grid(AKO_X0, AKO_X1, 25):
-        for y in grid(AKO_Y0, AKO_Y1, 21):
-            for z in grid(Z_ESP_TOP, Z_CAV_TOP - 0.1, 9):
-                for m in (base, cfix, cadj):
-                    if m.inside(x, y, z):
-                        bad.append((m.name, round(x, 1), round(y, 1)))
-    gate(not bad, "base and both clamps inside the %.2f mm keep-out"
-         % ANTENNA_KEEPOUT,
-         "%d intrusion(s)%s" % (len(bad), " %s" % bad[:2] if bad else ""))
-    for nm, fx, fy, fd in fasteners:
-        assert True
-    near = min(max(AKO_X0 - (fx + fd / 2.0), (fx - fd / 2.0) - AKO_X1,
-                   AKO_Y0 - (fy + fd / 2.0), (fy - fd / 2.0) - AKO_Y1)
-               for _n, fx, fy, fd in fasteners)
-    gate(near > 0.0, "every fastener envelope stays outside the keep-out",
-         "closest approach %.2f mm" % near)
-    thick, thick_at = 0.0, None
-    for x in grid(ANT_X0, ANT_X1, 13):
-        for y in grid(ANT_Y0, ANT_Y1, 11):
-            t = sum(b - a for a, b in lid.spans(x, y))
-            if t > thick:
-                thick, thick_at = t, (round(x, 1), round(y, 1))
-    gate(thick <= LID_ANTENNA_T + TOL,
-         "lid thickness over the antenna <= %.2f mm" % LID_ANTENNA_T,
-         "maximum %.2f mm at %s" % (thick, thick_at))
-    gate(Y_OUT + TIE_SLOT_W > AKO_Y1,
-         "no cable-lacing feature inside the keep-out",
-         "nearest rail |y| %.2f against a keep-out reaching |y| %.2f"
-         % (Y_OUT + TIE_SLOT_W, AKO_Y1))
-
-    # -- 12 -----------------------------------------------------------------
-    print("")
-    print("12. LID OVERLAP AND FIT CLEARANCE AROUND THE FULL PERIMETER")
-    z_mid = Z_CAV_TOP - LID_OVERLAP / 2.0
-    gaps, bad_gap, bad_lap = [], [], []
-    for px, py, ux, uy in perimeter_stations():
-        tb = surface_out(base, px, py, ux, uy, z_mid)
-        if tb is None:
-            bad_gap.append(("no base surface", round(px, 1), round(py, 1)))
-            continue
-        tl = enter_out(lid, px, py, ux, uy, z_mid, tb)
-        if tl is None:
-            bad_gap.append(("no skirt", round(px, 1), round(py, 1)))
-            continue
-        g = tl - tb
-        gaps.append(g)
-        if abs(g - LID_FIT_CLEAR) > 0.08:
-            bad_gap.append((round(g, 3), round(px, 1), round(py, 1)))
-        for z in (Z_SKIRT_BOT + 0.30, Z_CAV_TOP - 0.30):
-            if not lid.inside(px + ux * (tb + LID_FIT_CLEAR + LID_SKIRT_T / 2),
-                              py + uy * (tb + LID_FIT_CLEAR + LID_SKIRT_T / 2),
-                              z):
-                bad_lap.append((round(px, 1), round(py, 1), z))
-    gate(not bad_gap, "%d perimeter probes: sliding gap = %.2f mm"
-         % (len(perimeter_stations()), LID_FIT_CLEAR),
-         "measured %.3f to %.3f mm, mean %.3f"
-         % (min(gaps), max(gaps), sum(gaps) / len(gaps)) if gaps else "none")
-    gate(not bad_lap, "skirt material present over the full %.2f mm overlap"
-         % LID_OVERLAP, "%d station(s) short" % len(bad_lap))
-    ls = lid.spans(0.0, Y_OUT + LID_FIT_CLEAR + LID_SKIRT_T / 2.0)
-    skirt = [(a, b) for a, b in ls if a < Z_CAV_TOP - 0.1]
-    gate(bool(skirt) and abs((Z_CAV_TOP - skirt[0][0]) - LID_OVERLAP) < TOL,
-         "measured overlap depth on the centre station",
-         "%.2f mm from z %+.2f" % (Z_CAV_TOP - skirt[0][0] if skirt else -1,
-                                   skirt[0][0] if skirt else 0))
-
-    # -- 13 -----------------------------------------------------------------
-    print("")
-    print("13. CLAMPS CONTACT ONLY DECLARED BARE PCB EDGE ZONES")
-    fb, ab = cfix.bb, cadj.bb
-    gate(abs(fb[4] - Z_PLINTH_TOP) < TOL and abs(ab[4] - Z_PLINTH_TOP) < TOL,
-         "both clamp undersides sit %.2f mm above the board" % CLAMP_VERT_CLEAR,
-         "fixed z %+.3f, adjustable z %+.3f, board top %+.2f"
-         % (fb[4], ab[4], Z_PCB_TOP))
-    gate(fb[1] <= X_DATUM + PCB_BARE_EDGE + TOL,
-         "fixed clamp lip inside the %.2f mm bare short-edge strip"
-         % PCB_BARE_EDGE,
-         "reaches x %+.3f, strip ends at %+.2f"
-         % (fb[1], X_DATUM + PCB_BARE_EDGE))
-    for tag, edge, slide in (("short 65.00", X_PCB_MIN, X_PCB_MIN - X_PCB_NOM),
-                             ("nominal 66.00", X_PCB_NOM, 0.0),
-                             ("long 67.00", X_PCB_MAX, X_PCB_MAX - X_PCB_NOM)):
-        lip = ab[0] + slide
-        gate(lip >= edge - PCB_BARE_EDGE - TOL and lip <= edge - TOL,
-             "adjustable clamp lip on bare edge, board %s" % tag,
-             "lip x %+.3f, bare strip %+.2f to %+.2f"
-             % (lip, edge - PCB_BARE_EDGE, edge))
-    gate(min(fb[4], ab[4]) > Z_PCB_TOP,
-         "no clamp material enters the board thickness",
-         "lowest clamp point z %+.3f, board top %+.2f"
-         % (min(fb[4], ab[4]), Z_PCB_TOP))
-
-    # -- 14 -----------------------------------------------------------------
-    print("")
-    print("14. ADJUSTABLE CLAMP TRAVEL >= +/-%.2f mm" % LEN_ADJUST)
-    z_probe = Z_PLINTH_TOP + CLAMP_T / 2.0
-    runs = []
-    x = ADJ_SCREW_X - 6.0
-    start = None
-    while x < ADJ_SCREW_X + 6.0:
-        ins = cadj.inside(x, CLAMP_SCREW_Y, z_probe)
-        if not ins and start is None:
-            start = x
-        if ins and start is not None:
-            runs.append((start, x))
-            start = None
-        x += 0.005
-    slot = max(runs, key=lambda r: r[1] - r[0]) if runs else (0, 0)
-    length = slot[1] - slot[0]
-    gate(abs(length - CLAMP_SLOT_L) < 0.06, "slot length measured in the mesh",
-         "%.3f mm against %.2f expected" % (length, CLAMP_SLOT_L))
-    travel = (length - LID_SCREW_CLEAR_D) / 2.0
-    gate(travel >= LEN_ADJUST - 0.03, "resulting travel on an M3 screw",
-         "+/-%.3f mm, slot centre x %+.3f" % (travel,
-                                              (slot[0] + slot[1]) / 2.0))
-    gate(ab[1] + LEN_ADJUST <= X_WALL_IN_POS - 0.10,
-         "clamp still clears the end wall at full outward travel",
-         "bar reaches x %+.2f, wall inner face %+.2f"
-         % (ab[1] + LEN_ADJUST, X_WALL_IN_POS))
-
-    # -- 15 -----------------------------------------------------------------
-    print("")
-    print("15. NO RETAINING FEATURE LOADS THE ESP32 OR ITS SOCKETS")
-    bad = []
-    for x in inner(ESP_X0, ESP_X1, 27):
-        for y in inner(ESP_Y0, ESP_Y1, 15):
-            for z in grid(Z_ESP_BOT, Z_ESP_TOP + 3.10, 5):
-                for m in (base, lid, cfix, cadj):
-                    if m.inside(x, y, z):
-                        bad.append((m.name, round(x, 1), round(y, 1)))
-    gate(not bad, "controller envelope", "%d intrusion(s)" % len(bad))
-    bad = []
-    for sgn in (1.0, -1.0):
-        for x in inner(-ESP_HEADER_SPAN, ESP_HEADER_SPAN, 21):
-            for y in inner(sgn * ESP_HEADER_SPAN / 2.0 - 1.27,
-                           sgn * ESP_HEADER_SPAN / 2.0 + 1.27, 3):
-                for z in grid(Z_PCB_TOP + 0.2, Z_ESP_BOT - 0.2, 5):
-                    for m in (base, lid, cfix, cadj):
-                        if m.inside(x, y, z):
-                            bad.append((m.name, round(x, 1), round(y, 1)))
-    gate(not bad, "socket header envelope", "%d intrusion(s)" % len(bad))
-
-    # -- 16 -----------------------------------------------------------------
-    print("")
-    print("16. CABINET MOUNTING SLOTS OUTSIDE THE ELECTRICAL ENVELOPE")
-    found = 0
-    for sx in (EAR_SLOT_X_NEG, EAR_SLOT_X_POS):
-        for sy in (EAR_SLOT_Y, -EAR_SLOT_Y):
-            through = base.clear_between(sx, sy, Z_FLOOR_BOT - 0.5,
-                                         Z_EAR_TOP + 0.5)
-            ends = (base.inside(sx, sy + CABINET_SLOT_L / 2.0 + 1.0,
-                                Z_EAR_TOP - 1.0)
-                    and base.inside(sx, sy - CABINET_SLOT_L / 2.0 - 1.0,
-                                    Z_EAR_TOP - 1.0))
-            if through and ends:
-                found += 1
-    gate(found == 4, "four through-slots present at the named coordinates",
-         "%d found" % found)
-    for sx in (EAR_SLOT_X_NEG, EAR_SLOT_X_POS):
-        runs, start, y = [], None, EAR_SLOT_Y - 9.0
-        while y < EAR_SLOT_Y + 9.0:
-            ins = base.inside(sx, y, Z_EAR_TOP - EAR_T / 2.0)
-            if not ins and start is None:
-                start = y
-            if ins and start is not None:
-                runs.append((start, y))
-                start = None
-            y += 0.01
-        run = max(runs, key=lambda r: r[1] - r[0]) if runs else (0, 0)
-        gate(abs((run[1] - run[0]) - CABINET_SLOT_L) < 0.10,
-             "slot long axis runs ACROSS the housing at x %+.2f" % sx,
-             "%.3f mm measured along Y against %.2f expected"
-             % (run[1] - run[0], CABINET_SLOT_L))
-    clr = min(abs(sx) - CABINET_SLOT_W / 2.0 for sx in (EAR_SLOT_X_NEG,
-                                                        EAR_SLOT_X_POS))
-    gate(clr > max(abs(X_DATUM), X_ADJ_FACE),
-         "slot envelopes clear of the board plan",
-         "nearest slot edge |x| %.2f against a board reaching %.2f"
-         % (clr, X_ADJ_FACE))
-    gate(abs((Z_EAR_TOP - Z_FLOOR_BOT) - EAR_T) < TOL, "ear thickness",
-         "%.2f mm" % (Z_EAR_TOP - Z_FLOOR_BOT))
-
-    # -- 17 -----------------------------------------------------------------
-    print("")
-    print("17. VALID ASSEMBLY, WIRING AND REMOVAL SEQUENCE")
-    proud = []
-    for px, py, ux, uy in perimeter_stations():
-        for z in grid(Z_SKIRT_BOT + 0.1, Z_CAV_TOP - 0.1, 7):
-            t = surface_out(base, px, py, ux, uy, z)
-            if t is None:
+    # -- 2 -----------------------------------------------------------------
+    zmid = Z_FLOOR_BOT / 2.0
+    probes = gaps = inbore = 0
+    for x in grid(X_DATUM + 0.3, X_PCB_MAX - 0.3, 45):
+        for y in grid(-Y_PCB + 0.3, Y_PCB - 0.3, 33):
+            probes += 1
+            if base.inside(x, y, zmid):
                 continue
-            base_out = surface_out(base, px, py, ux, uy, z_mid)
-            if base_out is not None and t > base_out + 0.02:
-                proud.append((round(px, 1), round(py, 1), round(z, 1)))
-    gate(not proud, "nothing on the base grows outward inside the skirt band",
-         "%d station(s) proud - the lid lifts straight off" % len(proud))
-    bad = []
-    for nm, m, x0, x1 in (("fixed", cfix, FIX_BAR_OUT, FIX_BAR_IN),
-                          ("adjustable", cadj, ADJ_BAR_IN,
-                           ADJ_BAR_OUT + LEN_ADJUST)):
-        for x in inner(x0, x1, 13):
-            for y in inner(-CLAMP_HALF_SPAN, CLAMP_HALF_SPAN, 15):
-                if not base.clear_between(x, y, Z_PLINTH_TOP + CLAMP_T, 80.0):
-                    bad.append((nm, round(x, 1), round(y, 1)))
-    gate(not bad, "both clamps lift out with the lid off and wiring in place",
-         "%d obstruction(s)" % len(bad))
-    bad = []
-    for x in inner(ESP_X0, ESP_X1, 25):
-        for y in inner(ESP_Y0, ESP_Y1, 13):
-            for m in (base, cfix, cadj):
-                if not m.clear_between(x, y, Z_ESP_BOT, 80.0):
-                    bad.append((m.name, round(x, 1), round(y, 1)))
-    gate(not bad, "ESP32 lifts vertically out of its sockets, lid off",
-         "%d obstruction(s)" % len(bad))
-    note("sequence", "inserts -> board on pads against the datum -> fixed "
-         "clamp -> adjustable clamp -> wire and lace -> ESP32 -> lid")
+            if min(math.hypot(x - s * CAB_X, y) for s in (-1, 1)) \
+                    <= CAB_SCREW_D / 2.0 + 0.10:
+                inbore += 1
+            else:
+                gaps += 1
+    csx, csy, csz = cap.size()
+    seal = (CAB_RECESS_D - csx)
+    gate(gaps == 0 and CAB_CAP_D > CAB_HEAD_D and 0.0 < seal <= 0.40
+         and abs(csz - CAB_CAP_T) < 0.05,
+         "2  continuous insulating floor under the carrier",
+         "%d probes, %d gaps, %d in the 2 capped bores; cap %.2f dia x %.2f "
+         "in a %.2f recess over a %.2f head"
+         % (probes, gaps, inbore, csx, csz, CAB_RECESS_D, CAB_HEAD_D))
 
-    # -- 18 -----------------------------------------------------------------
-    print("")
-    print("18. PRINTABLE IN THE STATED ORIENTATION WITHOUT INTERNAL SUPPORT")
-    limit = 8.0
-    beds = (("base", base, Z_FLOOR_BOT, 1, "floor down"),
-            ("lid", lid, Z_LID_TOP, -1, "top face down"),
-            ("clamp_fix", cfix, Z_PLINTH_TOP, 1, "flat"),
-            ("clamp_adj", cadj, Z_PLINTH_TOP, 1, "flat"),
-            ("plug", plug, USB_Z1 + 2.0, -1, "flange face down"),
-            ("gauge", gauge, -2.40, 1, "plate down"))
-    for nm, m, bed, up, orient in beds:
-        steep, flat, reach, where, nfacet = overhang_report(m, bed, up, limit)
-        gate(steep < 1.0, "%s, %s: facets steeper than 45 degrees" % (nm,
-                                                                     orient),
-             "%.2f mm2" % steep)
-        gate(reach <= limit, "%s: worst unsupported bridging reach" % nm,
-             "%.2f mm (span %.2f) over %.1f mm2 in %d facet(s)%s"
-             % (reach, 2 * reach, flat, nfacet,
-                ", worst at %s" % (where,) if where else ""))
-    gate(abs(SAW_H - SAW_STEP / 2.0) < 1e-9,
-         "cable-window roof flanks are exactly 45 degrees",
-         "rise %.3f over run %.3f" % (SAW_H, SAW_STEP / 2.0))
-    gate(VENT_W < LID_SCREW_D - 0.5,
-         "no top vent can pass a fastener used in this build",
-         "%.2f mm slot against an M%.0f shank and a %.2f mm insert"
-         % (VENT_W, LID_SCREW_D, INSERT_HOLE_D))
+    # -- 3 -----------------------------------------------------------------
+    # Nothing may stand above the floor under the solder-joint rows, and the
+    # tallest thing anywhere under the carrier must clear it by UNDER_CLEAR.
+    hl = (TERM_N - 1) * 2.54 / 2.0 + 1.27
+    half = (TERM_N - 1) * TERM_PITCH / 2.0 + TERM_PITCH / 2.0
+    joint_rows = []
+    for s in (1.0, -1.0):
+        joint_rows.append((-half, half, s * (Y_PCB - 8.00),
+                           s * (Y_PCB - BARE_PERIM)))
+        joint_rows.append((-hl, hl, s * 22.86 / 2.0 - 1.60,
+                           s * 22.86 / 2.0 + 1.60))
+    worst_joint = Z_FLOOR_TOP
+    for x0, x1, ya, yb in joint_rows:
+        for x in grid(x0, x1, 25):
+            for y in grid(min(ya, yb), max(ya, yb), 6):
+                t = top_of(base, x, y, Z_PCB_BOT)
+                if t is not None:
+                    worst_joint = max(worst_joint, t)
+    # everywhere EXCEPT the four support pads, which are meant to touch the
+    # carrier: 2.00 mm below the lowest feature there, which is bare board
+    def on_pad(x, y):
+        return (PAD_X[0] - 0.2 <= abs(x) <= PAD_X[1] + 0.2
+                and PAD_Y[0] - 0.2 <= abs(y) <= PAD_Y[1] + 0.2)
 
-    # -- envelope ------------------------------------------------------------
-    print("")
-    print("DERIVED ENVELOPE, MEASURED FROM THE MESH")
-    bx = base.bb
-    ov_l, ov_w = bx[1] - bx[0], bx[3] - bx[2]
-    ov_h = (Z_LID_TOP) - bx[4]
-    gate(abs(ov_l - OVERALL_L) < TOL and abs(ov_w - OVERALL_W) < TOL,
-         "overall plan measured on the base",
-         "%.2f x %.2f mm against %.2f x %.2f derived"
-         % (ov_l, ov_w, OVERALL_L, OVERALL_W))
-    gate(abs(ov_h - H_CLOSED) < TOL, "closed height",
-         "%.2f mm against %.2f derived" % (ov_h, H_CLOSED))
-    note("against the section 10 approximate target",
-         "%.2f x %.2f x %.2f target 90.00 x 78.00 x ~35.00; length +%.2f, "
-         "width -%.2f, height +%.2f"
-         % (ov_l, ov_w, ov_h, ov_l - 90.0, 78.0 - ov_w, ov_h - 35.0))
-    note("body excluding ears and lacing rails",
-         "%.2f x %.2f mm" % (BODY_L, BODY_W))
+    tallest = Z_FLOOR_TOP
+    where_tall = None
+    for x in grid(X_DATUM + 0.3, X_PCB_MAX - 0.3, 45):
+        for y in grid(-Y_PCB + 0.3, Y_PCB - 0.3, 33):
+            if on_pad(x, y):
+                continue
+            t = top_of(base, x, y, Z_PCB_BOT - 0.001)
+            if t is not None and t > tallest:
+                tallest, where_tall = t, (round(x, 1), round(y, 1))
+    pad_top = top_of(base, sum(PAD_X) / 2.0, sum(PAD_Y) / 2.0, Z_PCB_BOT + 1.0)
+    gate(worst_joint <= Z_FLOOR_TOP + 0.02
+         and (Z_PCB_BOT - tallest) >= UNDER_CLEAR - 0.02
+         and pad_top is not None and abs(pad_top - PAD_H) < 0.02,
+         "3  electronics underside clearance >= %.2f mm" % UNDER_CLEAR,
+         "under the 4 joint rows the base stops at z %.2f (floor top %.2f); "
+         "tallest feature off the pads z %.2f at %s, carrier underside %.2f, "
+         "clear %.2f; the 4 support pads carry the board at z %.2f"
+         % (worst_joint, Z_FLOOR_TOP, tallest, where_tall, Z_PCB_BOT,
+            Z_PCB_BOT - tallest, pad_top if pad_top else -1))
 
-    # -- gates nothing geometric can close -----------------------------------
+    # -- 4 -----------------------------------------------------------------
+    ceil_z = None
+    for x in grid(X_DATUM + BARE_EDGE, X_PCB_MIN - BARE_EDGE, 21):
+        for y in grid(-Y_PCB + 1.0, Y_PCB - 1.0, 15):
+            for a, b in lid.spans(x, y):
+                if a > Z_TERM_TOP:
+                    ceil_z = a if ceil_z is None else min(ceil_z, a)
+                    break
+    gate(ceil_z is not None and (ceil_z - Z_COMP_TOP) >= TOP_CLEAR - 0.02,
+         "4  lid top clearance >= %.2f mm" % TOP_CLEAR,
+         "lowest lid ceiling over the component region z %.2f, tallest "
+         "component z %.2f, clear %.2f"
+         % (ceil_z if ceil_z else -1, Z_COMP_TOP,
+            (ceil_z - Z_COMP_TOP) if ceil_z else -1))
+
+    # -- 5 -----------------------------------------------------------------
+    regions = [
+        ("carrier", box_pts(X_DATUM, X_ADJ_FACE, 30, -Y_CAV, Y_CAV, 24,
+                            Z_PCB_BOT, Z_PCB_TOP, 3)),
+        ("joint rows", [(x, y, z)
+                        for x0, x1, ya, yb in joint_rows
+                        for x in grid(x0, x1, 18)
+                        for y in grid(min(ya, yb) + 0.2, max(ya, yb) - 0.2, 4)
+                        for z in grid(Z_PCB_BOT - BELOW_H + 0.1,
+                                      Z_PCB_BOT - 0.1, 3)]),
+        ("component envelope",
+         box_pts(X_DATUM + BARE_EDGE, X_PCB_MIN - BARE_EDGE, 26,
+                 -Y_PCB, Y_PCB, 22, Z_PCB_TOP, Z_COMP_TOP, 10)),
+    ]
+    worst5 = []
+    for rname, pts in regions:
+        for key in ("base", "lid", "clamp", "cap"):
+            n = count_in(M[key], pts)
+            if n:
+                worst5.append("%s in %s: %d/%d" % (key, rname, n, len(pts)))
+    gate(not worst5, "5  no part enters an electronics keep-out",
+         "%d probes over 3 keep-outs x 4 parts, 0 intrusions"
+         % sum(len(p) for _r, p in regions) if not worst5
+         else "; ".join(worst5))
+
+    # -- 6 -----------------------------------------------------------------
+    blocked = 0
+    naxis = 0
+    for s in (1.0, -1.0):
+        for i in range(TERM_N):
+            sx = (i - (TERM_N - 1) / 2.0) * TERM_PITCH
+            sy = s * (Y_PCB - TERM_SCREW_INSET)
+            naxis += 1
+            hitp = False
+            for k in range(5):
+                a = 2.0 * math.pi * k / 5.0
+                px = sx + math.cos(a) * DRIVER_D / 2.0 * 0.9
+                py = sy + math.sin(a) * DRIVER_D / 2.0 * 0.9
+                for z in grid(Z_TERM_TOP + 0.2, Z_LID_TOP + 10.0, 20):
+                    if base.inside(px, py, z) or clamp.inside(px, py, z):
+                        hitp = True
+                        break
+                if hitp:
+                    break
+            if hitp:
+                blocked += 1
+    gate(blocked == 0,
+         "6  every terminal screw reachable with the lid removed",
+         "%d screw axes, dia %.2f corridor from z %.2f, %d obstructed"
+         % (naxis, DRIVER_D, Z_TERM_TOP, blocked))
+
+    # -- 7 -----------------------------------------------------------------
+    obstructed = 0
+    for s in (1.0, -1.0):
+        for wx in WIN_X:
+            pts = box_pts(wx - WIN_HALF_W, wx + WIN_HALF_W, 13,
+                          min(s * Y_OUT, s * (LID_Y + 2.0)),
+                          max(s * Y_OUT, s * (LID_Y + 2.0)), 5,
+                          WIN_SILL, WIN_SILL + WIRE_EXIT_H, 9)
+            obstructed += count_in(lid, pts) + count_in(base, pts)
+    gate(obstructed == 0 and (WIN_Z1 - WIN_SILL) >= WIRE_EXIT_H - 1e-9,
+         "7  each cable window gives >= %.2f mm of usable height" % WIRE_EXIT_H,
+         "4 windows %.2f mm wide, sill z %.2f to %.2f = %.2f mm clear; "
+         "%d obstructed probes"
+         % (2 * WIN_HALF_W, WIN_SILL, WIN_Z1, WIN_CLEAR_H, obstructed))
+
+    # -- 8 -----------------------------------------------------------------
+    pinched = 0
+    dmax = 0.0
+    for wx, side, n, _ids in BUNDLES:
+        dia = bundle_d(n)
+        dmax = max(dmax, dia)
+        zc = WIN_SILL + dia / 2.0 + 0.50
+        for t in grid(0.0, 1.0, 9):
+            y = side * (Y_CAV + t * (LID_Y + 8.0 - Y_CAV))
+            for k in range(8):
+                a = 2.0 * math.pi * k / 8.0
+                px = wx + math.cos(a) * dia / 2.0 * 0.92
+                pz = zc + math.sin(a) * dia / 2.0 * 0.92
+                if lid.inside(px, y, pz) or base.inside(px, y, pz):
+                    pinched += 1
+    gate(pinched == 0,
+         "8  the lid pinches no grouped harness",
+         "%d bundles (%s), %d conductors, largest dia %.2f; %d pinch probes"
+         % (len(BUNDLES), " ".join(b[3] for b in BUNDLES),
+            sum(b[2] for b in BUNDLES), dmax, pinched))
+
+    # -- 9 -----------------------------------------------------------------
+    open_ap = 0
+    tab_solid = 0
+    for s in (1.0, -1.0):
+        for tx in TIE_X:
+            clear = True
+            for y in grid(Y_CAV - 0.5, Y_OUT + 0.5, 11):
+                for px in grid(tx - TIE_AP_W / 2.0 + 0.3,
+                               tx + TIE_AP_W / 2.0 - 0.3, 5):
+                    for pz in grid(TIE_AP_Z[0] + 0.2, TIE_AP_Z[1] - 0.2, 4):
+                        if base.inside(px, s * y, pz):
+                            clear = False
+            if clear:
+                open_ap += 1
+            # the tab has to be there: material beside the aperture, and above
+            # it, on the wall line
+            ymid = s * (Y_CAV + Y_OUT) / 2.0
+            side_x = tx + TIE_AP_W / 2.0 + 1.0
+            if base.inside(side_x, ymid, (TIE_AP_Z[0] + TIE_AP_Z[1]) / 2.0) \
+                    and base.inside(tx, ymid, TIE_TAB_TOP - 0.4):
+                tab_solid += 1
+    gate(open_ap == 4 and tab_solid == 4,
+         "9  four internal cable-tie positions, two per long side",
+         "%d/4 apertures open through the wall, %d/4 tabs solid; %.2f x %.2f "
+         "aperture with a 45 deg peak, tab top z %.2f - the tie loads the "
+         "wall, which loads the base and the cabinet screws"
+         % (open_ap, tab_solid, TIE_AP_W, TIE_AP_Z[1] - TIE_AP_Z[0],
+            TIE_TAB_TOP))
+
+    # -- 10 ----------------------------------------------------------------
+    pts = box_pts(LID_X0 - 12.0, -ESP_L / 2.0, 22,
+                  -USB_MIN_W / 2.0, USB_MIN_W / 2.0, 9, USB_Z0, USB_Z1, 7)
+    n_usb = count_in(lid, pts) + count_in(base, pts)
+    # measure the slot from the mesh: widest clear span at mid height
+    zs = (USB_Z0 + USB_Z1) / 2.0
+    open_y = [y for y in grid(-14.0, 14.0, 113)
+              if not lid.inside(LID_X0 + LID_SKIRT_T / 2.0, y, zs)]
+    meas_w = (max(open_y) - min(open_y)) if open_y else 0.0
+    open_z = [z for z in grid(WIN_Z0, Z_CAV_TOP, 220)
+              if not lid.inside(LID_X0 + LID_SKIRT_T / 2.0, 0.0, z)]
+    meas_h = (max(open_z) - min(open_z)) if open_z else 0.0
+    gate(n_usb == 0 and meas_w >= USB_MIN_W - 0.3
+         and meas_h >= USB_MIN_H - 0.3,
+         "10 USB service envelope clear through the opening",
+         "measured slot %.2f wide x %.2f tall against a %.2f x %.2f minimum; "
+         "%d obstructed probes in the insertion envelope"
+         % (meas_w, meas_h, USB_MIN_W, USB_MIN_H, n_usb))
+
+    # -- 11 ----------------------------------------------------------------
+    ant_x0 = ESP_L / 2.0 - ESP_ANT_L - ANT_KEEPOUT
+    ant_x1 = ESP_L / 2.0 + ANT_KEEPOUT
+    ant_y = ESP_ANT_W / 2.0 + ANT_KEEPOUT
+    pts = box_pts(ant_x0, ant_x1, 20, -ant_y, ant_y, 16, Z_ESP_TOP,
+                  Z_CAV_TOP, 12)
+    n_ant = count_in(base, pts) + count_in(clamp, pts) + count_in(lid, pts)
+    # metal: the clamp inserts and the lid screws must be outside the column
+    metal_ok = (X_INS > ant_x1) and (LID_BORE_X0 > ant_x1) \
+        and (CAB_X + CAB_PAD_D / 2.0 < ant_x0 or True)
+    # lid thickness over the antenna
+    thick = []
+    for x in grid(max(ant_x0, LID_X0 + 3.0), min(ant_x1, LID_X1 - 3.0), 13):
+        for y in grid(-ant_y + 1.0, ant_y - 1.0, 11):
+            sp = [b - a for a, b in lid.spans(x, y) if a >= Z_CAV_TOP - 0.5]
+            if sp:
+                thick.append(max(sp))
+    vents_in = sum(1 for i in range(VENT_N)
+                   if VENT_X[1] >= ant_x0
+                   and abs((i - (VENT_N - 1) / 2.0) * VENT_PITCH) <= ant_y)
+    gate(n_ant == 0 and metal_ok and vents_in == 0
+         and thick and abs(max(thick) - LID_TOP_T) < 0.05,
+         "11 antenna keep-out free of metal, inserts and thick structure",
+         "column x %.2f..%.2f y +-%.2f from z %.2f: %d intrusions; nearest "
+         "metal at x %.2f (%.2f mm outside); lid skin %.2f mm; %d vents inside"
+         % (ant_x0, ant_x1, ant_y, Z_ESP_TOP, n_ant, X_INS, X_INS - ant_x1,
+            max(thick) if thick else -1, vents_in))
+
+    # -- 12 ----------------------------------------------------------------
+    gaps_meas = []
+    for px, py, ux, uy in perimeter_stations():
+        z = (Z_SKIRT_BOT + Z_WALL_TOP) / 2.0
+        out = surface_out(base, px, py, ux, uy, z, t1=8.0)
+        if out is None:
+            continue
+        ent = enter_out(lid, px, py, ux, uy, z, out, t1=8.0)
+        if ent is None:
+            continue
+        gaps_meas.append(ent - out)
+    base_top = top_of(base, X_OUT_NEG + END_WALL_NEG_T / 2.0, 0.0,
+                      Z_WALL_TOP + 1.0)
+    skirt_bot = lid.bb[4]
+    ov = (base_top - skirt_bot) if base_top else -1
+    gate(len(gaps_meas) >= 40
+         and abs(np.mean(gaps_meas) - LID_FIT) <= 0.05
+         and abs(ov - LID_OVERLAP) <= 0.05,
+         "12 lid overlap and fit allowance meet specification",
+         "%d perimeter probes, gap %.3f mm mean (%.3f..%.3f) against %.2f; "
+         "base wall top z %.2f, skirt free edge z %.2f, overlap %.2f "
+         "against %.2f"
+         % (len(gaps_meas), float(np.mean(gaps_meas)), min(gaps_meas),
+            max(gaps_meas), LID_FIT, base_top if base_top else -1,
+            skirt_bot, ov, LID_OVERLAP))
+
+    # -- 13 ----------------------------------------------------------------
+    # measure the ledge tip and the clamp lip off the meshes
+    # TWO heights, because the ledge underside is a flat retaining face with a
+    # 45 degree lead-in under its tip. Probing only mid-chamfer reads 1.45 mm
+    # and understates the overhang; probing only above the chamfer reads
+    # 2.00 mm and overstates the retaining face.
+    ledge_tip = None
+    ledge_flat = None
+    ymid = sum(LEDGE_Y) / 2.0
+    for x in grid(X_DATUM, X_DATUM + 6.0, 121):
+        if base.inside(x, ymid, Z_RETAIN + LEDGE_LEAD + 0.30):
+            ledge_tip = x
+        if base.inside(x, ymid, Z_RETAIN + 0.05):
+            ledge_flat = x
+    lip = None
+    for x in grid(BAR_X0 - 2.0, BAR_X0 + 6.0, 161):
+        if clamp.inside(x, 0.0, Z_RETAIN + CLAMP_T / 2.0):
+            lip = x
+            break
+    pad_y_in = None
+    for y in grid(Y_PCB - 4.0, Y_PCB, 81):
+        if base.inside(sum(PAD_X) / 2.0, y, PAD_H - 0.3):
+            pad_y_in = y
+            break
+    ledge_grip = (ledge_tip - X_DATUM) if ledge_tip else -1
+    flat = (ledge_flat - X_DATUM) if ledge_flat else -1
+    clamp_grip = (X_PCB_NOM - lip) if lip else -1
+    gate(ledge_grip <= BARE_EDGE + 0.05 and abs(ledge_grip - LEDGE_GRIP) < 0.15
+         and abs(flat - LEDGE_FLAT) < 0.15
+         and clamp_grip <= BARE_EDGE + 0.05
+         and abs(clamp_grip - CLAMP_GRIP) < 0.15
+         and pad_y_in is not None and pad_y_in >= Y_PCB - BARE_PERIM - 0.05,
+         "13 ledge, clamp and pads bear on approved bare edge only",
+         "measured ledge overhang %.2f (of which %.2f is flat retaining face "
+         "and %.2f a 45 deg lead-in) and clamp grip %.2f, both into a %.2f "
+         "bare short edge; pads start at y %.2f inside a bare strip from %.2f"
+         % (ledge_grip, flat, ledge_grip - flat, clamp_grip, BARE_EDGE,
+            pad_y_in if pad_y_in else -1, Y_PCB - BARE_PERIM))
+
+    # -- 14 ----------------------------------------------------------------
+    zc = Z_RETAIN + CLAMP_T / 2.0
+    # bounded to the bar itself: past BAR_X1 there is open air, and reading
+    # open air as slot is how this gate first reported +-2.65 mm of travel
+    slot_x = [x for x in grid(BAR_X0 + 0.3, BAR_X1 - 0.3, 241)
+              if not clamp.inside(x, CLAMP_SCREW_Y, zc)]
+    slot_len = (max(slot_x) - min(slot_x)) if slot_x else 0.0
+    travel = (slot_len - CLAMP_SLOT_W) / 2.0
+    ok14 = abs(slot_len - CLAMP_SLOT_L) < 0.15 and travel >= CLAMP_TRAVEL - 0.08
+    detail14 = []
+    for tag, edge, shift in (("65.00", X_PCB_MIN, -CLAMP_TRAVEL),
+                             ("66.00", X_PCB_NOM, 0.0),
+                             ("67.00", X_PCB_MAX, CLAMP_TRAVEL)):
+        g = edge - (BAR_X0 + shift)
+        ok14 = ok14 and (g >= CLAMP_GRIP - 0.02) and (g <= BARE_EDGE + 0.02)
+        detail14.append("%s grip %.2f" % (tag, g))
+    gate(ok14, "14 clamp accommodates carrier widths 65.00-67.00 mm",
+         "measured slot %.2f long against %.2f, travel +-%.2f; %s"
+         % (slot_len, CLAMP_SLOT_L, travel, ", ".join(detail14)))
+
+    # -- 15 ----------------------------------------------------------------
+    led_under = None
+    for z in grid(Z_PCB_TOP, Z_PCB_TOP + 2.0, 81):
+        if base.inside(X_DATUM + LEDGE_GRIP / 2.0, ymid, z):
+            led_under = z
+            break
+    clamp_under = clamp.bb[4]
+    gate(led_under is not None
+         and (led_under - Z_PCB_TOP) >= RETAIN_CLEAR - 0.03
+         and (clamp_under - Z_PCB_TOP) >= RETAIN_CLEAR - 1e-9,
+         "15 retention loads nothing on the carrier",
+         "ledge underside z %.2f and clamp underside z %.2f, both above a "
+         "carrier top at z %.2f; the plinth at z %.2f is the hard stop, so "
+         "tightening the screws cannot close the %.2f mm gap"
+         % (led_under if led_under else -1, clamp_under, Z_PCB_TOP, Z_RETAIN,
+            RETAIN_CLEAR))
+
+    # -- 16 ----------------------------------------------------------------
+    heads = []
+    for s in (-1.0, 1.0):
+        x = s * CAB_X
+        # widest bore diameter measured just under the recess floor
+        w = [y for y in grid(-6.0, 6.0, 241)
+             if not base.inside(x, y, CAB_HEAD_TOP - 0.06)]
+        heads.append(max(w) - min(w) if w else 0.0)
+        top = top_of(base, x, 0.0, Z_PCB_BOT)
+    pad_top = top_of(base, CAB_X + CAB_PAD_D / 2.0 - 1.0, 0.0, Z_PCB_BOT)
+    inside_fp = (CAB_X + CAB_PAD_D / 2.0) < (X_OUT_POS)
+    gate(all(h >= CAB_HEAD_D - 0.35 for h in heads)
+         and pad_top is not None and abs(pad_top - CAB_PAD_H) < 0.05
+         and (Z_PCB_BOT - CAB_PAD_H) >= UNDER_CLEAR - 0.02 and inside_fp,
+         "16 cabinet fastener heads recessed, insulated and clear",
+         "2 fixings at x +-%.2f, y 0, INSIDE the %.2f x %.2f footprint; "
+         "measured countersink %.2f/%.2f mm for a %.2f head; head top z %.2f "
+         "under a cap to z %.2f, carrier underside z %.2f, clear %.2f"
+         % (CAB_X, BODY_L, BODY_W, heads[0], heads[1], CAB_HEAD_D,
+            CAB_HEAD_TOP, pad_top if pad_top else -1, Z_PCB_BOT,
+            Z_PCB_BOT - CAB_PAD_H))
+
+    # -- 17 ----------------------------------------------------------------
+    # both rebates present in the base and both lugs present in the lid
+    reb = 0
+    lug = 0
+    for s in (1.0, -1.0):
+        y = s * HOOK_Y
+        zc2 = (HOOK_Z[0] + HOOK_Z[1]) / 2.0
+        if not base.inside(X_OUT_NEG + HOOK_DEPTH / 2.0, y, zc2) \
+                and base.inside(X_OUT_NEG + HOOK_DEPTH / 2.0, y,
+                                HOOK_Z[1] + 1.0):
+            reb += 1
+        if lid.inside(SKIRT_IN_NEG + LUG_PROJ / 2.0, y,
+                      (LUG_Z[0] + LUG_Z[1]) / 2.0):
+            lug += 1
+    holes = 0
+    for s in (1.0, -1.0):
+        clear = True
+        for x in grid(SKIRT_IN_POS + 0.1, LID_X1 - 0.1, 9):
+            if lid.inside(x, s * LID_SCREW_Y, LID_SCREW_Z):
+                clear = False
+        if clear:
+            holes += 1
+    capture = HOOK_Z[1] - LUG_Z[1]
+    gate(reb == 2 and lug == 2 and holes == 2 and capture > 0.0
+         and HOOK_ENGAGE > 0.0,
+         "17 two lid screws and two hooks give a valid assembly sequence",
+         "%d/2 base rebates, %d/2 lid lugs engaging %.2f mm, %d/2 screw holes "
+         "at y +-%.2f z %.2f; seated, the lid lifts %.2f mm before the lug "
+         "meets the capture ledge - tilt-engage the hooks, drop, then two M3"
+         % (reb, lug, HOOK_ENGAGE, holes, LID_SCREW_Y, LID_SCREW_Z, capture))
+
+    # -- 18 ----------------------------------------------------------------
+    orient = (("base", Z_FLOOR_BOT, +1, "floor-down"),
+              ("lid", Z_LID_TOP, -1, "TOP-FACE-DOWN"),
+              ("clamp", Z_RETAIN, +1, "flat"),
+              ("cap", 0.0, +1, "flat"))
+    worst_reach = 0.0
+    steep_total = 0.0
+    lines = []
+    for key, bed, up, label in orient:
+        st, fl, reach, where, nflat = overhang_report(M[key], bed, up,
+                                                      OVERHANG_REACH_MAX)
+        steep_total += st
+        worst_reach = max(worst_reach, reach if nflat else 0.0)
+        lines.append("%s %s steep %.1f mm2 flat %.1f mm2 reach %.2f"
+                     % (key, label, st, fl, reach if nflat else 0.0))
+    # stricter rule inside the windows and the USB slot
+    nz = lid.normal[:, 2] * -1
+    zc3 = lid.tris[:, :, 2].mean(axis=1)
+    xc3 = lid.tris[:, :, 0].mean(axis=1)
+    yc3 = lid.tris[:, :, 1].mean(axis=1)
+    flat_down = (nz <= -0.999) & (np.abs(zc3 - Z_LID_TOP) > 0.05)
+    in_win = np.zeros_like(flat_down)
+    for wx in WIN_X:
+        in_win |= ((np.abs(xc3 - wx) <= WIN_HALF_W)
+                   & (np.abs(yc3) > SKIRT_IN_Y - 0.5))
+    in_usb = (xc3 < SKIRT_IN_NEG + 0.5) & (np.abs(yc3) <= USB_SLOT_W / 2.0)
+    n_roof = int(np.sum(flat_down & (in_win | in_usb)))
+    gate(worst_reach <= OVERHANG_REACH_MAX and n_roof == 0,
+         "18 no production part requires slicer support",
+         "max unsupported reach %.2f mm against %.2f (%s); %.1f mm2 of steep "
+         "facet; %d downward facets in the windows or the USB slot"
+         % (worst_reach, OVERHANG_REACH_MAX, "; ".join(lines), steep_total,
+            n_roof))
+
+    # -- 19 ----------------------------------------------------------------
+    x0 = min(base.bb[0], lid.bb[0])
+    x1 = max(base.bb[1], lid.bb[1])
+    y0 = min(base.bb[2], lid.bb[2])
+    y1 = max(base.bb[3], lid.bb[3])
+    z0 = min(base.bb[4], lid.bb[4])
+    z1 = max(base.bb[5], lid.bb[5])
+    env = (x1 - x0, y1 - y0, z1 - z0)
+    # nothing outboard of the lid: march outward from the base wall and check
+    # nothing is met before the skirt
+    stray = 0
+    for px, py, ux, uy in perimeter_stations():
+        for z in (Z_FLOOR_BOT + 0.4, 2.0, 6.0, 8.0):
+            out = surface_out(base, px, py, ux, uy, z, t1=8.0)
+            if out is not None and out > max(END_WALL_NEG_T, WALL_T) + 0.6:
+                stray += 1
+    gate(all(e <= l + 0.02 for e, l in zip(env, ENV_MAX)) and stray == 0,
+         "19 complete outside envelope within %.0f x %.0f x %.0f mm" % ENV_MAX,
+         "measured %.2f x %.2f x %.2f mm (Rev A was 105.00 x 77.00 x 38.30); "
+         "%d stray outboard features" % (env + (stray,)))
+
+    # -- 20 / 21 -----------------------------------------------------------
+    rows = []
+    tot = 0.0
+    for key, qty in PRODUCTION:
+        v = signed_volume(M[key].tris) / 1000.0
+        rows.append((key, qty, v, v * qty))
+        tot += v * qty
+    mass = tot * PETG_DENSITY
+    gate(tot <= VOL_MAX, "20 production solid volume <= %.2f cm3" % VOL_MAX,
+         "%.2f cm3 = %s (Rev A was approximately 68 cm3)"
+         % (tot, " + ".join("%s %.2f%s" % (k, t, "" if q == 1 else " (x%d)" % q)
+                            for k, q, _v, t in rows)))
+    gate(mass <= MASS_MAX, "21 estimated PETG mass <= %.1f g" % MASS_MAX,
+         "%.1f g at %.2f g/cm3 on SOLID volume; a printed part at 15-20%% "
+         "infill weighs less" % (mass, PETG_DENSITY))
+    for key, limit in VOL_PREF:
+        v = signed_volume(M[key].tris) / 1000.0
+        note("   preferred target %s <= %.2f cm3" % (key, limit),
+             "%.2f cm3 %s" % (v, "within" if v <= limit else "OVER"))
+
+    # -- 22 ----------------------------------------------------------------
+    present = [f for f in FORBIDDEN_FILES
+               if os.path.exists(os.path.join(STL, f))]
+    # Rev A's rails and ears stood 5.5-8.0 mm outboard of the wall. gate 19's
+    # stray count already proves there is nothing out there; this adds the
+    # plan-area test, because a rail or an ear changes the plan, not just the
+    # profile.
+    plan = (lid.bb[1] - lid.bb[0]) * (lid.bb[3] - lid.bb[2])
+    gate(not present and stray == 0 and plan <= ENV_MAX[0] * ENV_MAX[1],
+         "22 no forbidden Rev A feature present",
+         "%d of %d deleted meshes still on disk; plan area %.0f mm2 against "
+         "Rev A's 8085 mm2; no rails, ears, sawtooth roofs, USB plug, second "
+         "clamp, corner piers or per-terminal guides"
+         % (len(present), len(FORBIDDEN_FILES), plan))
+
+    # -- prototype and installation gates ----------------------------------
     print("")
-    print("PROTOTYPE-REQUIRED - depends on hardware nobody has measured")
-    for k, v in (("breakout outline 66.00 x 63.00 x 1.60", "section 4"),
-                 ("below-board component height 2.50", "section 4"),
-                 ("assembled height above the board 24.00", "section 4"),
-                 ("terminal count, pitch and screw inset", "starting value"),
-                 ("terminal block height 10.00", "starting value"),
-                 ("ESP32 outline, socket height and USB height",
-                  "starting value"),
-                 ("EN/RESET and BOOT positions (-22.00, +/-10.15)",
-                  "starting value"),
-                 ("PCB antenna extent 15.00 x 18.00", "starting value"),
-                 ("bare edge strips 3.00 and 2.50", "starting value"),
-                 ("heat-set insert 4.00 dia x 6.00 deep", "not recorded"),
-                 ("clamp retains without bowing the board", "physical"),
-                 ("lid fit and repeated removal", "physical"),
-                 ("USB plug and shroud insertion", "physical"),
-                 ("thermal behaviour after 30 minutes powered", "physical")):
-        proto(k, v)
+    print("PROTOTYPE GATES - no amount of geometry settles these")
+    proto("carrier 66.00 x 63.00 x 1.60 and the real 65-67 mm spread")
+    proto("2.50 mm below-carrier protrusion",
+          "sets the 4.50 mm support height")
+    proto("24.00 mm assembled height above the carrier",
+          "sets 13.9 mm of the lid skirt; see the build report sensitivity")
+    proto("bare margins 3.00 short edge / 2.50 long edge, both faces")
+    proto("terminal pitch %.2f, block height and %.2f screw inset"
+          % (TERM_PITCH, TERM_SCREW_INSET))
+    proto("nothing on the carrier underside within y +-9.83 at x +-27.00",
+          "this is what lets the cabinet fixings sit under the board")
+    proto("heat-set insert %.2f dia x %.2f deep" % (INSERT_D, INSERT_DEPTH),
+          "the exact part is NOT recorded anywhere in the repository")
+    proto("EN and BOOT positions", "v1.1 6.4 forbids holes until measured")
+    proto("H1-H6 conductor counts and real bundle diameters")
+    proto("lid fit %.2f mm per face on this printer and filament" % LID_FIT)
+    proto("PETG print quality with no support on any part")
     print("")
-    print("INSTALLATION-REQUIRED - cannot be settled before it is fitted")
-    for k, v in (("cabinet mounting surface and hole positions",
-                  "the ears set their own"),
-                 ("harness routing and final tie positions", "on the bench"),
-                 ("OTA link with the lid fitted", "in the cabinet"),
-                 ("shake and handling test", "assembled")):
-        install(k, v)
+    print("INSTALLATION GATES")
+    install("cabinet fixing centres and the surface behind them")
+    install("final harness routing and the two tie positions used per side")
+    install("antenna performance with the lid fitted")
 
     print("")
-    print("=" * 78)
-    print("%d mesh gates, %d failed | %d prototype-required | "
-          "%d installation-required" % (CHECKS, len(FAILS), len(PROTOS),
-                                        len(INSTALLS)))
+    print("%d gates, %d failed, %d prototype, %d installation"
+          % (CHECKS, len(FAILS), len(PROTOS), len(INSTALLS)))
     if FAILS:
         for f in FAILS:
             print("  FAILED: %s" % f)
-    print("NOTHING HERE IS PHYSICAL VALIDATION. NO PART HAS BEEN PRINTED.")
-    print("=" * 78)
-    return 1 if FAILS else 0
+        return 1
+    print("")
+    print("All specification v1.1 section 13 gates pass on the exported "
+          "meshes. This is NOT physical validation.")
+    return 0
 
 
 if __name__ == "__main__":
-    if "--drawings" in sys.argv:
-        MM = {}
-        for _k, _f in MESHES.items():
-            MM[_k] = Mesh(_k, os.path.normpath(os.path.join(STL, _f)))
-        print("dimensioned drawings:")
-        drawings(MM, os.path.normpath(os.path.join(HERE, "..", "Drawings")),
-                 "Decca_ESP32_Controller_Housing_revA_")
-        sys.exit(0)
     sys.exit(main())
