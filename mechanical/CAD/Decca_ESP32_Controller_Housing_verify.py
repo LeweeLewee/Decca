@@ -13,16 +13,20 @@ It is deliberately NOT a second run of the generator. The generator knows what
 it meant to build; this knows only what came out of the exporter. Every
 expected number below is TYPED IN BY HAND from
 mechanical/Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md - whose content
-is specification revision v1.1 - and from the derivation chain written out in
+is specification revision v1.3 - and from the derivation chain written out in
 the build report. Nothing is imported from
 Decca_ESP32_Controller_Housing_fusion.py. If the generator and this file
 disagree, that disagreement is the whole point.
 
-It covers all twenty-two specification v1.1 section 13 gates, including the
-four the CAD suite cannot do honestly on its own: manifoldness of the exported
+It covers all thirty specification v1.3 section 13 gates, including the four
+the CAD suite cannot do honestly on its own: manifoldness of the exported
 triangles, real bridging reach in the stated print orientation, the material
 gates measured from mesh volume rather than from BRep volume, and the absence
-of every Rev A feature v1.1 section 2.2 deletes by name.
+of every Rev A feature v1.2 section 2.2 deletes by name.
+
+v1.3 adds gates 28-30, the cable-tie anchor's structure. Nothing in them is a
+strength claim: they measure section, wall and blend, and the anchor's real
+robustness in a fitter's hands stays a prototype gate.
 
 RESULT VOCABULARY - used exactly, never loosely
 -----------------------------------------------
@@ -55,24 +59,31 @@ MESHES = {
     "lid": "ESP32_Controller_Housing_Lid.stl",
     "clamp": "ESP32_Controller_PCB_Clamp_Adjustable.stl",
     "cap": "ESP32_Controller_Cabinet_Fastener_Cap.stl",
-    "gauge": "ESP32_Controller_Carrier_Fit_Gauge.stl",
+    "coupon_a": "ESP32_Controller_Carrier_Fit_Coupon.stl",
+    "coupon_b": "ESP32_Controller_Insert_Fastener_Coupon.stl",
 }
 
+COUPONS = ("coupon_a", "coupon_b")
+COUPON_BUDGET = 5.35           # cm3: the single gauge these two replace
+
 # Production parts and how many of each are printed. The fit gauge is a
-# prototype tool and v1.1 section 9 excludes it from the material gates.
+# prototype tool and v1.2 section 9 excludes it from the material gates.
 PRODUCTION = (("base", 1), ("lid", 1), ("clamp", 1), ("cap", 2))
 
-# Rev A production meshes that v1.1 section 12 forbids shipping. Their absence
+# Rev A production meshes that v1.2 section 12 forbids shipping. Their absence
 # is gate 22, and it is checked on the FILE SYSTEM, not on a component tree.
 FORBIDDEN_FILES = (
+    # Rev A
     "ESP32_Controller_PCB_Clamp_Fixed.stl",
     "ESP32_Controller_USB_Plug.stl",
+    # superseded Rev B: one near-full-width gauge, replaced by two coupons
+    "ESP32_Controller_Carrier_Fit_Gauge.stl",
 )
 
 # ---------------------------------------------------------------------------
 # EXPECTED VALUES - typed in from the controlling documents, NOT imported.
 # ---------------------------------------------------------------------------
-# -- v1.1 section 3, reference geometry and clearances ----------------------
+# -- v1.2 section 3, reference geometry and clearances ----------------------
 PCB_L = 66.00                  # nominal carrier length
 PCB_W = 63.00
 PCB_T = 1.60
@@ -89,7 +100,7 @@ WIRE_EXIT_H = 10.00
 BARE_EDGE = 3.00               # bare strip inboard of each SHORT edge
 BARE_PERIM = 2.50              # bare strip inboard of each LONG edge
 
-# -- v1.1 sections 4, 7, 8 and 10, structure --------------------------------
+# -- v1.2 sections 4, 7, 8 and 10, structure --------------------------------
 FLOOR_T = 1.60
 WALL_T = 1.60
 END_WALL_NEG_T = 2.40          # -X end: carries the ledge and both rebates
@@ -101,7 +112,7 @@ LID_FIT = 0.25
 OUTER_CORNER_R = 3.00
 RETAIN_CLEAR = 0.20            # ledge / clamp underside above the carrier
 
-# -- v1.1 section 9, the mandatory material gates ---------------------------
+# -- v1.2 section 9, the mandatory material gates ---------------------------
 ENV_MAX = (85.00, 75.00, 36.00)
 VOL_MAX = 35.00                # cm3, production parts only
 MASS_MAX = 45.0                # g
@@ -109,11 +120,19 @@ PETG_DENSITY = 1.27
 VOL_PREF = (("base", 15.00), ("lid", 18.00), ("clamp", 2.00))
 
 # -- the design's own FDM rule ----------------------------------------------
-# v1.1 section 10 forbids support MATERIAL. It does not forbid a short
+# v1.2 section 10 forbids support MATERIAL. It does not forbid a short
 # unsupported ledge, and a ledge that retains a board cannot be built without
 # one. 1.50 mm is the stated limit, and the cable windows and the USB slot are
 # held to a stricter rule: no downward-facing facet in them at all.
 OVERHANG_REACH_MAX = 1.50
+
+# The release gate this design cannot close on its own. 24.00 mm of assembled
+# electronics height is ASSUMED; the closed height is 35.30 mm against a
+# mandatory 36.00, so 0.70 mm is the entire margin, and neither coupon tests
+# it. The base and the lid must not be printed until the real stack is
+# measured.
+ASSEMBLED_HEIGHT_ASSUMED = 24.00
+HEIGHT_MARGIN = 0.70
 
 # -- the derivation chain, re-typed from the build report -------------------
 Z_FLOOR_BOT = -1.60
@@ -191,11 +210,11 @@ HOOK_ENGAGE = 0.60
 
 # cable windows, USB slot, ventilation
 WIN_X = (-20.00, 20.00)
-WIN_HALF_W = 10.00
+WIN_HALF_W = 11.00
 WIN_Z0 = 5.00                  # the skirt's lower free edge
-WIN_Z1 = 20.00
+WIN_Z1 = 24.00
 WIN_SILL = 9.00                # the base wall top
-WIN_CLEAR_H = 11.00
+WIN_CLEAR_H = 15.00
 USB_SLOT_W = 15.00
 USB_SLOT_Z1 = 22.55
 USB_Z0 = 13.05
@@ -205,23 +224,79 @@ VENT_W = 2.00
 VENT_X = (-22.00, -8.00)
 VENT_PITCH = 4.50
 
-# internal cable-tie tabs
-TIE_X = (-5.00, 5.00)
-TIE_TAB_HALF_W = 5.00
-TIE_TAB_TOP = 15.50
-TIE_AP_W = 5.00
-TIE_AP_Z = (10.00, 12.40)
+# cable-tie anchors: ONE PER WINDOW, inside that window, beside its bundle
+# The anchor sits on the -X side of its window and the bundle on the +X side.
+# The lid is released by tilting its +X end up and withdrawing in -X, which
+# leans every lid feature -X in proportion to its height; on the -X side of the
+# window that motion carries the window's side wall AWAY from the buttress.
+BUNDLE_DX = 4.80               # bundle centre, relative to its window
+TIE_DX = -5.00                 # anchor centre, relative to its window
+TIE_DEVIATION = 9.80           # bundle-to-tie; Rev B as published: 15.00
+TIE_DEVIATION_MAX = 10.50
+TIE_TAB_HALF_W = 4.00          # 4.00 aperture + 2 x 2.00 mm of leg
+TIE_AP_W = 4.00
+TIE_AP_H = 2.30
+TIE_AP_Z = (16.70, 19.00)      # ABOVE the terminal tops, or it cannot be threaded
+TIE_AP_APEX = 21.00
+TIE_TAB_TOP = 23.00
+# the buttressed pier, v1.3 section 5c. v1.2 built this as a plain 1.60 mm
+# slab - the bare wall thickness - standing 14.00 mm above the wall top and
+# taking its load near the tip.
+TIE_Y0 = 32.00                 # inboard face = the cavity wall
+TIE_Y1 = 34.60                 # outboard face, buttress into the window
+TIE_THK = 2.60                 # section in the cable-pull direction
+TIE_THK_MIN = 2.40             # the v1.3 requirement
+TIE_LEG_W = 2.00               # material each side of the aperture
+TIE_CAP = 2.00                 # material above the aperture apex
+TIE_AP_WALL_MIN = 2.00         # the v1.3 requirement
+TIE_BLEND_R = 9.00             # root radius, pier flank into the wall top
+TIE_BLEND_Z = 14.00            # top of the blended foot
+TIE_FOOT_DX = 1.5167           # = R - sqrt(R^2 - (BLEND_Z - WIN_SILL)^2)
+TIE_FOOT_HALF_W = 5.5167
+TIE_FREE_H = 9.00              # unsupported height above the blended foot
+TIE_FREE_H_V12 = 14.00
+TIE_LID_WITHDRAW = 2.00        # window wall to buttress, along the removal path
+TIE_RUN_Y0 = 34.80             # where the strap climbs the buttress
+TIE_RUN_PROUD = 0.85           # how far it stands outside the lid face
+# the tie itself
+TIE_W = 2.50
+TIE_T = 1.10
+TIE_HEAD_W = 4.60
+TIE_HEAD_T = 3.20
+TIE_LOOP_CLEAR = 0.50
+TIE_LOOP_GAP = 0.30            # loop underside to the wall top
+TIE_TAIL = 14.00
+TIE_TOOL_D = 11.00
 
 # recessed cabinet fixings
 CAB_X = 27.00
 CAB_PAD_D = 13.00
 CAB_PAD_H = 2.40
 CAB_SCREW_D = 3.40
-CAB_HEAD_D = 6.40
-CAB_HEAD_TOP = 1.20
-CAB_CAP_D = 10.20
-CAB_CAP_T = 1.20
+# the DECLARED screw-head envelope. Neither figure is measured; the acquired
+# screw is a prototype gate.
+CAB_HEAD_D_NOM = 6.00          # ISO 10642 M3 countersunk, assumed
+CAB_HEAD_D_MAX = 6.20          # envelope this design guarantees to swallow
+CAB_HEAD_ANGLE = 90.00
+CAB_HEAD_CLEAR_R = 0.25
+CAB_CSK_REQ = 6.70             # = MAX + 2 x clearance: the REQUIREMENT
+CAB_CSK_FACET = 0.10           # diametral allowance for STL faceting
+CAB_CSK_D = 6.80               # the cone actually cut
+CAB_CSK_DEPTH = 1.70
+CAB_HEAD_TOP = 1.40            # = recess floor; the head sits flush under the cap
 CAB_RECESS_D = 10.40
+CAB_CAP_T = 1.00
+CAB_CAP_D = 10.10              # slide-fit body, 0.15 per side
+CAB_NIB_N = 3
+CAB_NIB_R = 0.90
+CAB_NIB_INT = 0.12             # radial interference per nib
+CAB_NIB_CREST_D = 10.64
+P_COUPON_W = 12.00             # carrier coupon width
+P_COUPON2_W = 20.00
+P_COUPON2_L = 26.00
+
+CAB_PRY_W = 2.80
+CAB_PRY_D = 1.60
 
 # grouped Decca harnesses, docs/Wiring.md - NOT thirty separate conductors
 WIRE_D = 2.00
@@ -233,6 +308,19 @@ BUNDLES = (
     (-20.00, +1, 7, "H4+H5"),
     (20.00, +1, 4, "H6+PWR"),
 )
+
+
+def bundle_geom(win_x, n):
+    """Bundle centre and its tie loop, re-derived here rather than imported."""
+    dia = BUNDLE_PACK * WIRE_D * math.sqrt(float(n))
+    ri = dia / 2.0 + TIE_LOOP_CLEAR
+    ro = ri + TIE_T
+    return {
+        "d": dia, "ri": ri, "ro": ro,
+        "x": win_x + BUNDLE_DX,
+        "tie_x": win_x + TIE_DX,
+        "z": WIN_SILL + ro + TIE_LOOP_GAP,
+    }
 
 # terminals
 TERM_N = 15
@@ -570,6 +658,38 @@ def count_in(mesh, pts):
     return sum(1 for x, y, z in pts if mesh.inside(x, y, z))
 
 
+def y_span(mesh, x, z, y0, y1, step=0.01):
+    """Longest run of solid met marching along +Y at (x, z). Used to measure
+    the cable-tie pier's section in the cable-pull direction straight off the
+    triangles, rather than trusting the recipe that made it."""
+    best = run = 0.0
+    y = y0
+    while y <= y1:
+        if mesh.inside(x, y, z):
+            run += step
+            if run > best:
+                best = run
+        else:
+            run = 0.0
+        y += step
+    return best
+
+
+def x_gap(mesh, y, z, x0, x1, step=0.01):
+    """Longest run of AIR met marching along +X at (y, z) - the aperture."""
+    best = run = 0.0
+    x = x0
+    while x <= x1:
+        if mesh.inside(x, y, z):
+            run = 0.0
+        else:
+            run += step
+            if run > best:
+                best = run
+        x += step
+    return best
+
+
 def top_of(mesh, x, y, below):
     """Highest material on the vertical line through (x, y), at or under
     ``below``. None when the line is empty there."""
@@ -585,11 +705,38 @@ def bundle_d(n):
     return BUNDLE_PACK * WIRE_D * math.sqrt(float(n))
 
 
+def radial_profile(mesh, cx, cy, z, rmax, n, outward=True, step=0.005):
+    """Radius at ``n`` angles about (cx, cy) at height z.
+
+    outward=True  : march out from the centre until LEAVING the solid - the
+                    outside profile of a boss or a cap.
+    outward=False : march out from the centre until ENTERING the solid - the
+                    inside profile of a bore."""
+    out = []
+    for i in range(n):
+        a = 2.0 * math.pi * i / float(n)
+        ca, sa = math.cos(a), math.sin(a)
+        r = 0.0
+        while r < rmax:
+            got = mesh.inside(cx + r * ca, cy + r * sa, z)
+            if got != outward:
+                break
+            r += step
+        out.append(r)
+    return out
+
+
+def angular_runs(flags):
+    """Number of contiguous True runs around a closed ring."""
+    n = len(flags)
+    return sum(1 for i in range(n) if flags[i] and not flags[i - 1])
+
+
 # ---------------------------------------------------------------------------
 def main():
     print("=" * 78)
     print("Decca ESP32 Controller Housing Rev B - offline mesh verifier")
-    print("specification v1.1 section 13, measured from the exported "
+    print("specification v1.2 section 13, measured from the exported "
           "triangles only")
     print("=" * 78)
 
@@ -607,7 +754,7 @@ def main():
 
     print("")
     print("MESHES")
-    for key, _n in PRODUCTION + (("gauge", 0),):
+    for key, _n in PRODUCTION + tuple((c, 0) for c in COUPONS):
         m = M[key]
         sx, sy, sz = m.size()
         print("  %-6s %6d tris  %7.2f cm3  %6.2f x %6.2f x %6.2f mm  %s"
@@ -616,6 +763,8 @@ def main():
     print("")
 
     base, lid, clamp, cap = M["base"], M["lid"], M["clamp"], M["cap"]
+    coupon_a, coupon_b = M["coupon_a"], M["coupon_b"]
+    BG = [bundle_geom(wx, n) for wx, _s, n, _i in BUNDLES]
 
     # -- 1 -----------------------------------------------------------------
     bad = []
@@ -643,13 +792,48 @@ def main():
             else:
                 gaps += 1
     csx, csy, csz = cap.size()
-    seal = (CAB_RECESS_D - csx)
-    gate(gaps == 0 and CAB_CAP_D > CAB_HEAD_D and 0.0 < seal <= 0.40
-         and abs(csz - CAB_CAP_T) < 0.05,
+    gate(gaps == 0 and abs(csz - CAB_CAP_T) < 0.05,
          "2  continuous insulating floor under the carrier",
-         "%d probes, %d gaps, %d in the 2 capped bores; cap %.2f dia x %.2f "
-         "in a %.2f recess over a %.2f head"
-         % (probes, gaps, inbore, csx, csz, CAB_RECESS_D, CAB_HEAD_D))
+         "%d probes, %d gaps, %d in the 2 capped bores; cap %.2f x %.2f x "
+         "%.2f mm closes each one" % (probes, gaps, inbore, csx, csy, csz))
+
+    # -- 2b/2c: POSITIVE cap retention, measured on the mesh -----------------
+    # Rev B as published had a 10.20 cap in a 10.40 recess and the report
+    # called it a press fit. It was a 0.10 mm per-side CLEARANCE. These gates
+    # measure the cap's own crest and the base's own bore, and fail on a
+    # clearance however it is described.
+    zc = CAB_CAP_T / 2.0
+    cap_r = radial_profile(cap, 0.0, 0.0, zc, 7.0, 360)
+    crest = max(cap_r)
+    body_r = sorted(cap_r)[len(cap_r) // 5]        # the plain cylinder
+    nibs = angular_runs([r > body_r + 0.04 for r in cap_r])
+    # MEDIAN, not max: the recess rim carries a pry notch, and marching
+    # outward along the notch finds no wall at all.
+    _bore = sorted(radial_profile(base, CAB_X, 0.0, CAB_HEAD_TOP + 0.30, 8.0,
+                                  180, outward=False))
+    bore_r = _bore[len(_bore) // 2]
+    interference = crest - bore_r
+    slide = bore_r - body_r
+    gate(interference >= 0.08 and slide >= 0.08 and nibs >= 3
+         and 2.0 * body_r > CAB_CSK_D,
+         "2b cap positively retained, not a clearance fit  [v1.2 gate 25]",
+         "measured on the meshes: %d nibs to a %.2f dia crest in a %.2f dia "
+         "bore = %+.3f mm INTERFERENCE per side; %.2f dia body = %.3f mm "
+         "slide fit; the body covers a %.2f countersink"
+         % (nibs, 2 * crest, 2 * bore_r, interference, 2 * body_r, slide,
+            CAB_CSK_D))
+
+    pry = 0
+    for a in range(0, 360, 2):
+        r = CAB_RECESS_D / 2.0 + 0.40
+        x = CAB_X + r * math.cos(math.radians(a))
+        y = r * math.sin(math.radians(a))
+        if not base.inside(x, y, CAB_PAD_H - 0.30):
+            pry += 1
+    gate(pry > 0,
+         "2c the cap is removable without destroying the base  [v1.2 gate 25]",
+         "%d of 180 probes around the recess rim find the pry notch, %.2f x "
+         "%.2f mm, for a fine blade" % (pry, CAB_PRY_W, CAB_PRY_D))
 
     # -- 3 -----------------------------------------------------------------
     # Nothing may stand above the floor under the solder-joint rows, and the
@@ -762,32 +946,60 @@ def main():
          % (naxis, DRIVER_D, Z_TERM_TOP, blocked))
 
     # -- 7 -----------------------------------------------------------------
+    # Two measurements, because the tie anchor now stands inside the window.
+    #  (a) the corridor each BUNDLE actually uses must be clear for the full
+    #      10.00 mm - this is the requirement;
+    #  (b) the window's remaining full-width clear height is reported, because
+    #      the anchor takes part of the opening and that must be visible.
     obstructed = 0
-    for s in (1.0, -1.0):
-        for wx in WIN_X:
-            pts = box_pts(wx - WIN_HALF_W, wx + WIN_HALF_W, 13,
-                          min(s * Y_OUT, s * (LID_Y + 2.0)),
-                          max(s * Y_OUT, s * (LID_Y + 2.0)), 5,
-                          WIN_SILL, WIN_SILL + WIRE_EXIT_H, 9)
-            obstructed += count_in(lid, pts) + count_in(base, pts)
-    gate(obstructed == 0 and (WIN_Z1 - WIN_SILL) >= WIRE_EXIT_H - 1e-9,
+    for g, (wx, side, n, _i) in zip(BG, BUNDLES):
+        half = g["d"] / 2.0 + 1.0
+        pts = box_pts(g["x"] - half, g["x"] + half, 9,
+                      min(side * Y_OUT, side * (LID_Y + 2.0)),
+                      max(side * Y_OUT, side * (LID_Y + 2.0)), 5,
+                      WIN_SILL, WIN_SILL + WIRE_EXIT_H, 9)
+        obstructed += count_in(lid, pts) + count_in(base, pts)
+    # (c) the full-width prism, outboard of the wall face. The anchor's
+    #     buttress projects into its window, so this is no longer empty - but
+    #     every point found in it has to belong to one of the four named
+    #     buttresses. A rail, an ear or any other projection still fails.
+    in_win = 0
+    unnamed = 0
+    for wx in WIN_X:
+        for side in (-1.0, 1.0):
+            pts = box_pts(wx - WIN_HALF_W, wx + WIN_HALF_W, 25,
+                          min(side * Y_OUT, side * (LID_Y + 1.0)),
+                          max(side * Y_OUT, side * (LID_Y + 1.0)), 5,
+                          WIN_SILL, WIN_SILL + WIRE_EXIT_H, 11)
+            for px, py, pz in pts:
+                if not base.inside(px, py, pz):
+                    continue
+                in_win += 1
+                if not (abs(px - (wx + TIE_DX)) <= TIE_TAB_HALF_W + 0.10
+                        and abs(py) <= TIE_Y1 + 0.10):
+                    unnamed += 1
+    gate(obstructed == 0 and unnamed == 0
+         and (WIN_Z1 - WIN_SILL) >= WIRE_EXIT_H - 1e-9,
          "7  each cable window gives >= %.2f mm of usable height" % WIRE_EXIT_H,
-         "4 windows %.2f mm wide, sill z %.2f to %.2f = %.2f mm clear; "
-         "%d obstructed probes"
-         % (2 * WIN_HALF_W, WIN_SILL, WIN_Z1, WIN_CLEAR_H, obstructed))
+         "4 windows %.2f mm wide, sill z %.2f to %.2f; every bundle corridor "
+         "clear for the full %.2f mm (%d obstructed probes); %d probes meet "
+         "anchor buttress inside the full-width prisms, %d of them outside "
+         "the four named buttresses"
+         % (2 * WIN_HALF_W, WIN_SILL, WIN_Z1, WIRE_EXIT_H, obstructed,
+            in_win, unnamed))
 
     # -- 8 -----------------------------------------------------------------
     pinched = 0
     dmax = 0.0
-    for wx, side, n, _ids in BUNDLES:
-        dia = bundle_d(n)
+    for g, (wx, side, n, _ids) in zip(BG, BUNDLES):
+        dia = g["d"]
         dmax = max(dmax, dia)
-        zc = WIN_SILL + dia / 2.0 + 0.50
+        zc = g["z"]
         for t in grid(0.0, 1.0, 9):
             y = side * (Y_CAV + t * (LID_Y + 8.0 - Y_CAV))
             for k in range(8):
                 a = 2.0 * math.pi * k / 8.0
-                px = wx + math.cos(a) * dia / 2.0 * 0.92
+                px = g["x"] + math.cos(a) * dia / 2.0 * 0.92
                 pz = zc + math.sin(a) * dia / 2.0 * 0.92
                 if lid.inside(px, y, pz) or base.inside(px, y, pz):
                     pinched += 1
@@ -798,33 +1010,158 @@ def main():
             sum(b[2] for b in BUNDLES), dmax, pinched))
 
     # -- 9 -----------------------------------------------------------------
-    open_ap = 0
-    tab_solid = 0
-    for s in (1.0, -1.0):
-        for tx in TIE_X:
-            clear = True
-            for y in grid(Y_CAV - 0.5, Y_OUT + 0.5, 11):
-                for px in grid(tx - TIE_AP_W / 2.0 + 0.3,
-                               tx + TIE_AP_W / 2.0 - 0.3, 5):
-                    for pz in grid(TIE_AP_Z[0] + 0.2, TIE_AP_Z[1] - 0.2, 4):
-                        if base.inside(px, s * y, pz):
-                            clear = False
-            if clear:
-                open_ap += 1
-            # the tab has to be there: material beside the aperture, and above
-            # it, on the wall line
-            ymid = s * (Y_CAV + Y_OUT) / 2.0
-            side_x = tx + TIE_AP_W / 2.0 + 1.0
-            if base.inside(side_x, ymid, (TIE_AP_Z[0] + TIE_AP_Z[1]) / 2.0) \
-                    and base.inside(tx, ymid, TIE_TAB_TOP - 0.4):
-                tab_solid += 1
-    gate(open_ap == 4 and tab_solid == 4,
-         "9  four internal cable-tie positions, two per long side",
-         "%d/4 apertures open through the wall, %d/4 tabs solid; %.2f x %.2f "
-         "aperture with a 45 deg peak, tab top z %.2f - the tie loads the "
-         "wall, which loads the base and the cabinet screws"
-         % (open_ap, tab_solid, TIE_AP_W, TIE_AP_Z[1] - TIE_AP_Z[0],
-            TIE_TAB_TOP))
+    # The FITTED tie, measured on the mesh: the aperture has to be open at the
+    # strap's real cross-section, open on BOTH faces where a fitter can reach
+    # it, and the loop has to pass under its bundle clear of the wall top.
+    #
+    # Rev B as published failed all three and none of them was checked: its
+    # anchor opened outboard into the 0.25 mm lid-skirt gap and inboard into
+    # the 0.50 mm gap beside the terminal blocks, so no strap could be
+    # threaded through it at all.
+    ap_open = 0
+    ap_in = 0
+    ap_out = 0
+    loop_ok = 0
+    for g, (wx, side, n, _i) in zip(BG, BUNDLES):
+        tx = g["tie_x"]
+        zm = (TIE_AP_Z[0] + TIE_AP_Z[1]) / 2.0
+        # (a) the strap's own cross-section, right through the wall
+        clear = True
+        for px in grid(tx - TIE_W / 2.0, tx + TIE_W / 2.0, 5):
+            for pz in grid(zm - TIE_T / 2.0, zm + TIE_T / 2.0, 3):
+                for py in grid(TIE_Y0 - 0.4, TIE_Y1 + 0.4, 17):
+                    if base.inside(px, side * py, pz):
+                        clear = False
+        if clear:
+            ap_open += 1
+        # (b) the inboard face has to be above the terminal blocks
+        if TIE_AP_Z[0] > Z_TERM_TOP:
+            ap_in += 1
+        # (c) the outboard face has to open into the window void, not the
+        #     0.25 mm skirt gap
+        if (abs(tx - wx) + TIE_TAB_HALF_W <= WIN_HALF_W
+                and TIE_AP_Z[1] < WIN_Z1):
+            ap_out += 1
+        # (d) the loop passes under the bundle clear of the wall top
+        if (g["z"] - g["ro"]) > WIN_SILL:
+            loop_ok += 1
+    # the tool and finger volume above the terminal blocks
+    tool_hit = 0
+    for g, (wx, side, n, _i) in zip(BG, BUNDLES):
+        pts = box_pts(g["tie_x"] - TIE_TOOL_D / 2.0,
+                      g["tie_x"] + TIE_TOOL_D / 2.0, 7,
+                      min(side * Y_CAV, side * (Y_CAV - TIE_TAIL)),
+                      max(side * Y_CAV, side * (Y_CAV - TIE_TAIL)), 7,
+                      Z_TERM_TOP + 0.5, Z_TERM_TOP + 0.5 + TIE_TOOL_D, 9,
+                      pad=0.2)
+        tool_hit += count_in(base, pts) + count_in(lid, pts) + \
+            count_in(clamp, pts)
+    gate(ap_open == 4 and ap_in == 4 and ap_out == 4 and loop_ok == 4
+         and tool_hit == 0,
+         "9  four FITTED cable ties: loop, route, head, tool  [v1.2 gate 23]",
+         "%d/4 apertures pass a %.2f x %.2f strap right through the pier; "
+         "%d/4 open inboard above the %.2f terminal tops; %d/4 open outboard "
+         "into their own window; %d/4 loops pass under their bundle clear of "
+         "the %.2f sill; %d obstructed tool probes"
+         % (ap_open, TIE_W, TIE_T, ap_in, Z_TERM_TOP, ap_out, loop_ok,
+            WIN_SILL, tool_hit))
+
+    # -- 9b alignment --------------------------------------------------------
+    dev = abs(TIE_DX - BUNDLE_DX)
+    inside = all(abs(g["tie_x"] - wx) + TIE_TAB_HALF_W <= WIN_HALF_W
+                 for g, (wx, _s, _n, _i) in zip(BG, BUNDLES))
+    aligned = all(abs(g["x"] - wx) + g["ro"] <= WIN_HALF_W
+                  for g, (wx, _s, _n, _i) in zip(BG, BUNDLES))
+    # and the anchor really is where it is claimed to be, on the mesh
+    found = 0
+    for g in BG:
+        zm = (TIE_AP_Z[0] + TIE_AP_Z[1]) / 2.0
+        if base.inside(g["tie_x"] + TIE_TAB_HALF_W - 0.6,
+                       (TIE_Y0 + TIE_Y1) / 2.0, zm):
+            found += 1
+        elif base.inside(g["tie_x"] + TIE_TAB_HALF_W - 0.6,
+                         -(TIE_Y0 + TIE_Y1) / 2.0, zm):
+            found += 1
+    gate(inside and aligned and abs(dev - TIE_DEVIATION) < 0.01
+         and dev <= TIE_DEVIATION_MAX and found >= 2,
+         "9b each tie aligned with its window and bundle  [v1.2 gate 24]",
+         "4 ties, 4 windows, 1:1; bundle-to-tie deviation %.2f mm inside a "
+         "%.2f mm window. Rev B as published: 15.00 mm, with the tie at the "
+         "enclosure centre and the window 15 mm away"
+         % (dev, 2 * WIN_HALF_W))
+
+    # -- 9c the anchor STRUCTURE, measured on the mesh ----------------------
+    # v1.2 built each anchor as a plain 1.60 mm slab standing 14.00 mm above
+    # the wall top and taking its load near the tip. This measures what came
+    # out of the exporter: the section in the cable-pull direction, the
+    # material around the aperture, the blended foot, and the fact that the
+    # pier fouls nothing.
+    #
+    # IT MEASURES GEOMETRY, NOT STRENGTH. No pull force is implied by any
+    # number here and none is asked for: these ties restrain lightweight
+    # low-voltage harnesses. Real robustness stays a prototype gate.
+    zm = (TIE_AP_Z[0] + TIE_AP_Z[1]) / 2.0
+    ym = (TIE_Y0 + TIE_Y1) / 2.0
+    yw = (Y_CAV + Y_OUT) / 2.0
+    ANCHORS = [(wx + TIE_DX, sd) for wx in WIN_X for sd in (-1.0, 1.0)]
+    thin = 99.0
+    legs = 99.0
+    caps = 99.0
+    aps = []
+    blend_ok = 0
+    foul = 0
+    for tx, sd in ANCHORS:
+        ya, yb = sd * (TIE_Y0 - 1.5), sd * (TIE_Y1 + 1.5)
+        # (a) section in the cable-pull direction, at both legs, at the cap
+        #     and at the root
+        for px, pz in ((tx - TIE_TAB_HALF_W + 0.40, zm),
+                       (tx + TIE_TAB_HALF_W - 0.40, zm),
+                       (tx, TIE_AP_APEX + 0.40),
+                       (tx, WIN_SILL + 0.50)):
+            thin = min(thin, y_span(base, px, pz, min(ya, yb), max(ya, yb)))
+        # (b) the aperture and the leg either side of it
+        ap = x_gap(base, sd * ym, zm,
+                   tx - TIE_TAB_HALF_W - 0.5, tx + TIE_TAB_HALF_W + 0.5)
+        aps.append(ap)
+        xs = [x for x in grid(tx - TIE_TAB_HALF_W - 1.0,
+                              tx + TIE_TAB_HALF_W + 1.0, 401)
+              if base.inside(x, sd * ym, zm)]
+        if xs:
+            legs = min(legs, ((max(xs) - min(xs)) - ap) / 2.0)
+        # (c) material above the aperture apex
+        caps = min(caps, top_of(base, tx, sd * ym, TIE_TAB_TOP + 1.0)
+                   - TIE_AP_APEX)
+        # (d) the blended foot: wider than the pier at the sill, gone by its
+        #     top. It lives in the 1.60 mm wall band, the one place on this
+        #     wall neither a harness corridor nor the lid's removal path can
+        #     reach.
+        for sx in (-1.0, 1.0):
+            px = tx + sx * (TIE_FOOT_HALF_W - 0.30)
+            if (base.inside(px, sd * yw, WIN_SILL + 0.25)
+                    and not base.inside(px, sd * yw, TIE_BLEND_Z - 0.25)):
+                blend_ok += 1
+        # (e) it fouls nothing inboard: no pier material at the board edge
+        for px in grid(tx - TIE_FOOT_HALF_W, tx + TIE_FOOT_HALF_W, 9):
+            for pz in grid(Z_PCB_TOP + 0.2, TIE_TAB_TOP, 9):
+                if base.inside(px, sd * (Y_PCB - 0.10), pz):
+                    foul += 1
+    ap_ok = all(abs(a - TIE_AP_W) < 0.15 for a in aps)
+    gate(abs(thin - TIE_THK) < 0.10 and thin >= TIE_THK_MIN - 0.05
+         and legs >= TIE_AP_WALL_MIN - 0.10 and caps >= TIE_AP_WALL_MIN - 0.10
+         and ap_ok and blend_ok == 8 and foul == 0
+         and TIE_LID_WITHDRAW >= HOOK_ENGAGE + 0.50,
+         "9c anchor section, aperture walls, blended foot  [v1.3 gates 28-30]",
+         "measured on the mesh: %.2f mm of section in the cable-pull "
+         "direction (>= %.2f required; v1.2 had 1.60); %.2f mm of leg each "
+         "side of a %.2f mm aperture and %.2f mm above its apex (>= %.2f); "
+         "%d/8 blend probes on an R%.2f root radius %.2f mm tall; "
+         "unsupported height %.2f (v1.2: %.2f); %d probes foul the board "
+         "edge; the lid withdraws %.2f mm past the buttress against the %.2f "
+         "the hooks need. GEOMETRY ONLY - not a strength claim."
+         % (thin, TIE_THK_MIN, legs, max(aps) if aps else -1, caps,
+            TIE_AP_WALL_MIN, blend_ok, TIE_BLEND_R,
+            TIE_BLEND_Z - WIN_SILL, TIE_FREE_H, TIE_FREE_H_V12, foul,
+            TIE_LID_WITHDRAW, HOOK_ENGAGE))
 
     # -- 10 ----------------------------------------------------------------
     pts = box_pts(LID_X0 - 12.0, -ESP_L / 2.0, 22,
@@ -979,23 +1316,35 @@ def main():
     heads = []
     for s in (-1.0, 1.0):
         x = s * CAB_X
-        # widest bore diameter measured just under the recess floor
-        w = [y for y in grid(-6.0, 6.0, 241)
-             if not base.inside(x, y, CAB_HEAD_TOP - 0.06)]
+        # the USABLE countersink: its widest diameter, at the recess floor
+        # probe 0.01 mm below the recess floor - the level at which a
+        # countersunk head's rim actually seats
+        w = [y for y in grid(-6.0, 6.0, 601)
+             if not base.inside(x, y, CAB_HEAD_TOP - 0.01)]
         heads.append(max(w) - min(w) if w else 0.0)
-        top = top_of(base, x, 0.0, Z_PCB_BOT)
     pad_top = top_of(base, CAB_X + CAB_PAD_D / 2.0 - 1.0, 0.0, Z_PCB_BOT)
     inside_fp = (CAB_X + CAB_PAD_D / 2.0) < (X_OUT_POS)
-    gate(all(h >= CAB_HEAD_D - 0.35 for h in heads)
+    # the usable recess must swallow the DECLARED MAXIMUM head plus the
+    # declared clearance. Rev B as published measured 6.20 against a 6.40
+    # nominal and left no tolerance at all.
+    # the REQUIREMENT, not the cut size: the cone is cut CAB_CSK_FACET
+    # oversize so the faceted mesh still meets this.
+    need = CAB_HEAD_D_MAX + 2.0 * CAB_HEAD_CLEAR_R
+    margin = (min(heads) - CAB_HEAD_D_MAX) / 2.0
+    floor_left = CAB_HEAD_TOP - CAB_CSK_DEPTH - Z_FLOOR_BOT
+    gate(min(heads) >= need - 0.05
          and pad_top is not None and abs(pad_top - CAB_PAD_H) < 0.05
-         and (Z_PCB_BOT - CAB_PAD_H) >= UNDER_CLEAR - 0.02 and inside_fp,
-         "16 cabinet fastener heads recessed, insulated and clear",
+         and (Z_PCB_BOT - CAB_PAD_H) >= UNDER_CLEAR - 0.02 and inside_fp
+         and floor_left >= 1.00,
+         "16 countersink swallows the max head envelope  [v1.2 gate 26]",
          "2 fixings at x +-%.2f, y 0, INSIDE the %.2f x %.2f footprint; "
-         "measured countersink %.2f/%.2f mm for a %.2f head; head top z %.2f "
-         "under a cap to z %.2f, carrier underside z %.2f, clear %.2f"
-         % (CAB_X, BODY_L, BODY_W, heads[0], heads[1], CAB_HEAD_D,
-            CAB_HEAD_TOP, pad_top if pad_top else -1, Z_PCB_BOT,
-            Z_PCB_BOT - CAB_PAD_H))
+         "usable countersink, probed 0.01 mm under the recess floor: %.2f/%.2f mm against a %.2f mm "
+         "requirement (%.2f max head + 2 x %.2f) = %.2f mm radial margin; "
+         "%.2f mm of floor beneath; head top z %.2f under a cap topping at "
+         "z %.2f, carrier underside z %.2f, clear %.2f"
+         % (CAB_X, BODY_L, BODY_W, heads[0], heads[1], need, CAB_HEAD_D_MAX,
+            CAB_HEAD_CLEAR_R, margin, floor_left, CAB_HEAD_TOP,
+            pad_top if pad_top else -1, Z_PCB_BOT, Z_PCB_BOT - CAB_PAD_H))
 
     # -- 17 ----------------------------------------------------------------
     # both rebates present in the base and both lugs present in the lid
@@ -1118,6 +1467,35 @@ def main():
          "clamp, corner piers or per-terminal guides"
          % (len(present), len(FORBIDDEN_FILES), plan))
 
+    # -- 23 ----------------------------------------------------------------
+    # The coupons must reproduce production geometry for the interfaces
+    # nobody has tested, and the horizontal insert is the one that matters:
+    # a heat-set insert driven into a bore in a wall printed on its side is
+    # the only fastener in this design whose feasibility is unknown.
+    va = signed_volume(coupon_a.tris) / 1000.0
+    vb = signed_volume(coupon_b.tris) / 1000.0
+    bb = coupon_b.bb
+    x1 = bb[1]
+    horiz = all(not coupon_b.inside(x1 - t, 0.0, LID_SCREW_Z)
+                for t in (0.4, 1.6, 3.0, 4.4))
+    horiz_deep = coupon_b.inside(x1 - (INSERT_DEPTH + 1.6), 0.0, LID_SCREW_Z)
+    # coupon A must carry the real ledge at the real height
+    ledge = coupon_a.inside(X_DATUM + 0.50, 0.0, Z_RETAIN + LEDGE_LEAD + 0.30)
+    ledge_gap = not coupon_a.inside(X_DATUM + 0.50, 0.0, Z_PCB_TOP + 0.05)
+    pads = coupon_a.inside((PAD_X[0] + PAD_X[1]) / 2.0,
+                           P_COUPON_W / 2.0 - 2.0, PAD_H - 0.30)
+    gate(horiz and horiz_deep and ledge and ledge_gap and pads
+         and (va + vb) <= COUPON_BUDGET,
+         "23 coupons cover every untested interface  [v1.2 gate 27]",
+         "A carrier %.2f cm3 + B fasteners %.2f cm3 = %.2f cm3, against the "
+         "%.2f cm3 single gauge they replace; horizontal insert bore %s "
+         "(%.2f deep, bottomed), fixed ledge %s with its %.2f gap, support "
+         "pads %s"
+         % (va, vb, va + vb, COUPON_BUDGET,
+            "present" if horiz else "MISSING", INSERT_DEPTH,
+            "present" if ledge else "MISSING", RETAIN_CLEAR,
+            "present" if pads else "MISSING"))
+
     # -- prototype and installation gates ----------------------------------
     print("")
     print("PROTOTYPE GATES - no amount of geometry settles these")
@@ -1137,6 +1515,25 @@ def main():
     proto("H1-H6 conductor counts and real bundle diameters")
     proto("lid fit %.2f mm per face on this printer and filament" % LID_FIT)
     proto("PETG print quality with no support on any part")
+    proto("A HORIZONTAL heat-set insert driven into coupon B",
+          "no fastener in this design is less proven")
+    proto("the acquired cabinet screw's real head diameter",
+          "%.2f mm max envelope declared, ISO 10642 assumed, not measured"
+          % CAB_HEAD_D_MAX)
+    proto("cap nib press and release force on this printer",
+          "%.2f mm radial interference is a design value" % CAB_NIB_INT)
+    proto("the cable-tie anchor's robustness in a fitter's hands",
+          "gate 9c measures section, not strength: %.2f mm in the cable-pull "
+          "direction, %.2f mm wide, blended into the wall top on an R%.2f "
+          "root radius. No pull test is claimed and none is required - these "
+          "ties restrain lightweight low-voltage harnesses"
+          % (TIE_THK, 2.0 * TIE_TAB_HALF_W, TIE_BLEND_R))
+    print("")
+    print("RELEASE GATE - blocks printing the base and the lid")
+    proto("MEASURE THE ASSEMBLED ELECTRONICS HEIGHT",
+          "%.2f mm assumed; closed height %.2f against a %.2f limit leaves "
+          "%.2f mm of margin, and NEITHER COUPON TESTS IT"
+          % (ASSEMBLED_HEIGHT_ASSUMED, H_CLOSED, ENV_MAX[2], HEIGHT_MARGIN))
     print("")
     print("INSTALLATION GATES")
     install("cabinet fixing centres and the surface behind them")
@@ -1144,14 +1541,15 @@ def main():
     install("antenna performance with the lid fitted")
 
     print("")
-    print("%d gates, %d failed, %d prototype, %d installation"
+    print("%d checks covering all 30 v1.3 section 13 gates, %d failed, "
+          "%d prototype, %d installation"
           % (CHECKS, len(FAILS), len(PROTOS), len(INSTALLS)))
     if FAILS:
         for f in FAILS:
             print("  FAILED: %s" % f)
         return 1
     print("")
-    print("All specification v1.1 section 13 gates pass on the exported "
+    print("All specification v1.3 section 13 gates pass on the exported "
           "meshes. This is NOT physical validation.")
     return 0
 

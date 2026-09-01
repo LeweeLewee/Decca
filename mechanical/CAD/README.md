@@ -14,14 +14,22 @@ Source (editable, parametric) mechanical design files.
 ## ESP32 controller housing — current revision: **B — PROTOTYPE CAD, NOT physically validated**
 
 Built to `../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`, whose
-content is specification revision **v1.1**. Full write-up:
+content is specification revision **v1.3**. Full write-up:
 `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revB.md`.
+
+> ### RELEASE GATE — the base and the lid may NOT be printed yet
+>
+> The 24.00 mm assembled electronics height is **assumed**, and it gives a
+> closed height of 35.30 mm against a mandatory 36.00 — 0.70 mm of margin, and
+> neither coupon tests it. Measure the real stack first. The approved next
+> physical action is printing the two prototype coupons, and nothing else.
 
 **Rev A was rejected on owner review** for bulk and filament consumption:
 105.00 × 77.00 × 38.30 mm and about 68 cm³ to hold a board 66 × 63 mm, with
 all eighteen of its gates passing. Rev B is a redesign, not a trim:
-**81.60 × 70.10 × 35.30 mm and 33.60 cm³**, against mandatory limits of
-85 × 75 × 36 mm and 35 cm³. Rev A geometry is not the baseline, and none of
+**81.60 × 70.10 × 35.30 mm and 34.20 cm³**, against mandatory limits of
+85 × 75 × 36 mm and 35 cm³. Sliced for real on a P1S in PETG-HF: **40.69 g
+and 2 h 30 m** for the whole production set, with zero support features. Rev A geometry is not the baseline, and none of
 its deleted features — lacing rails, mounting ears, sawtooth window roofs, USB
 plug, second clamp, four-corner lid screws, per-terminal wire guides — is
 rebuilt.
@@ -39,14 +47,17 @@ separately and were not brought into this box to solve a layout problem.
 
 | File | What it is |
 |---|---|
-| `Decca_ESP32_Controller_Housing_fusion.py` | The generator. `main()` builds all eight components, `validate()` runs the v1.1 section 13 gates on the solids, `export()` writes every f3d/STEP/STL into this clone, `images()` regenerates the sixteen review PNGs. Idempotent: re-running rebuilds in place, and it clears the Rev A component names too. |
+| `Decca_ESP32_Controller_Housing_fusion.py` | The generator. `main()` builds all eight components, `validate()` runs 27 checks covering the 30 v1.3 section 13 gates on the solids, `export()` writes every f3d/STEP/STL into this clone, `images()` regenerates the twenty-three review PNGs. Idempotent: re-running rebuilds in place, and it clears the Rev A component names too. |
 | `Decca_ESP32_Controller_Housing_verify.py` | The independent offline verifier. Reads **only** the exported STLs. numpy is its only dependency. |
+| `Decca_ESP32_Controller_Housing_slice.py` | The slicer-evidence harness. Drives the Bambu Studio CLI over the production set and both coupons and reports real filament grams and print time. Needs Bambu Studio installed; states plainly if it is not. |
 | `Decca_ESP32_Controller_Housing.f3d` | Editable archive, 236 named user parameters. |
 | `Decca_ESP32_Controller_Housing_assembly.step` | Assembly, keep-out solids removed for readability. |
 | `ESP32_Controller_Housing_Base.step` | Base tray. |
 | `ESP32_Controller_Housing_Lid.step` | Lid. |
 | `ESP32_Controller_PCB_Clamp_Adjustable.step` | The one adjustable edge clamp. |
-| `ESP32_Controller_Carrier_Fit_Gauge.step` | Fit gauge (prototype tool). |
+| `ESP32_Controller_Cabinet_Fastener_Cap.step` | The insulating cap. Print 2 off. |
+| `ESP32_Controller_Carrier_Fit_Coupon.step` | Coupon A, the carrier interface (prototype tool). |
+| `ESP32_Controller_Insert_Fastener_Coupon.step` | Coupon B, the fastener interfaces including the **horizontal** insert (prototype tool). |
 
 **Retention uses no PCB hole.** The repository records no breakout
 mounting-hole pattern and inventing one is forbidden, so nothing enters the
@@ -55,13 +66,22 @@ held by one slotted clamp with ±1.00 mm of travel, and the clamp bottoms on
 plinths 0.20 mm above the board face so tightening cannot bow it.
 
 **Shallow base, deep lid.** The base wall is 9.00 mm and the lid skirt 27.10 mm.
-That inversion is what pays for cable-tie tabs built *into the wall plane* and
-two cabinet fixings recessed *under* the carrier — neither of which needs a
-millimetre of external structure. Gate 22 measures 0.004 mm³ of base outside
-its own envelope: there are no projections at all.
+That inversion is what pays for the cable-tie anchors and two cabinet fixings
+recessed *under* the carrier, neither of which needs a millimetre of external
+structure.
+
+**The four cable-tie anchors are buttressed piers**, not the 1.60 mm uprights
+v1.2 published: 8.00 mm wide, **2.60 mm thick in the cable-pull direction**,
+2.00 mm of material on every side of the aperture, and an **R9.00** blend into
+the wall top that leaves a foot 1.52 mm wider each side. The extra section
+projects into the anchor's own cable window, which is the only free direction
+on that wall. Gate 22 measures **0.000 mm³ of base outside the closed enclosure
+envelope**, and every millimetre outboard of the base wall belongs to one of
+the four named buttresses. Gates 28–30 measure that geometry; **they are not a
+strength claim and no pull test is run or required.**
 
 > **Mandatory gates met; preferred targets missed, and reported rather than
-> absorbed.** v1.1 section 9 also prefers 30 cm³ or less and 38 g or less. The
+> absorbed.** v1.3 section 9 also prefers 30 cm³ or less and 38 g or less. The
 > four shells, at the thinnest walls sections 8 and 10 permit, over the smallest
 > plan a 66 × 63 mm carrier permits, already total **32.01 cm³** before a single
 > boss or pad. Build report section 2.3 gives the arithmetic; section 2.4 shows
@@ -75,25 +95,32 @@ bridge, run in order:
 ```python
 g = runpy.run_path("mechanical/CAD/Decca_ESP32_Controller_Housing_fusion.py")
 g["main"](None)       # build or rebuild every component
-g["validate"](None)   # 23 CAD gates; returns True when none failed
+g["validate"](None)   # 27 checks over the 30 v1.3 gates; True when none failed
 g["export"](None)     # f3d, STEP and STL into this clone
-g["images"](None)     # the sixteen review PNGs
+g["images"](None)     # the twenty-three review PNGs
 ```
 
 Then, offline:
 
 ```bash
 python mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py
+python mechanical/CAD/Decca_ESP32_Controller_Housing_slice.py
 ```
 
 The verifier reads only the exported meshes and exits non-zero on failure, so
 it works as a gate. It is deliberately not a second run of the generator's
-recipe, and on Rev B it earned that: it failed five gates the CAD suite had
-passed, and every one was a real defect — eight non-manifold tangency sites
-left by a chamfer cutter whose vertices sat exactly on the faces it cut, a
-mis-centred chamfer that removed a lens instead of a wedge, and three of its own
-measurement bugs found by disagreeing with the CAD suite. Build report section
-6.1 records all of them.
+recipe, and it keeps earning that. On the first Rev B build it failed five
+gates the CAD suite had passed — eight non-manifold tangency sites from a
+chamfer cutter whose vertices sat exactly on the faces it cut, a mis-centred
+chamfer, and three of its own measurement bugs. On the v1.2 amendment it found
+that the published tie anchor **could not be threaded at all** (its aperture
+opened into a 0.25 mm gap on one face and a 0.50 mm gap on the other), that the
+tie loop dipped 1.10 mm into the wall it was tied to, and that the cap
+described as a press fit was a 0.10 mm clearance. On the v1.3 amendment the
+gates found that a full-width anchor blend fouled a harness corridor, and — the
+largest design move in that amendment — that **the lid could not be taken off
+past the new buttresses** until the tie and its bundle swapped sides inside
+each window. Build report sections 6.1 to 6.3 record all of them.
 
 
 ## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**
