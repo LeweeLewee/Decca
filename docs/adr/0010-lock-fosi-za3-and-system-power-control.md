@@ -67,7 +67,10 @@ switch.
 - The power design no longer requires an ESP32-controlled mains relay for the
   amplifier.
 - A small 12 V trigger-driver subsystem is now a required hardware item.
-- The exact 5 V controller PSU, exact 12 V trigger source, trigger driver and GPIO
-  remain implementation/procurement decisions rather than architectural decisions.
+- The exact **12 V trigger source, trigger driver and GPIO** remain open
+  implementation/procurement decisions.
+- The 5 V controller supply was subsequently selected and acquired as a **Phihong
+  PSA15R-050P, 5.0 V DC, 3.0 A (15 W)**; current implementation status is tracked
+  in `hardware/BOM/phase1.csv`, `docs/Parts List.md` and `docs/Hardware Architecture.md`.
 - Firmware must treat the original switch as a system-state transition and
   coordinate ZA3 trigger, lighting, OLED and WiiM behaviour accordingly.
