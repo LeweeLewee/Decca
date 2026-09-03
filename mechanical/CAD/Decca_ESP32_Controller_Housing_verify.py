@@ -66,8 +66,9 @@ MESHES = {
 COUPONS = ("coupon_a", "coupon_b")
 COUPON_BUDGET = 5.35           # cm3: the single gauge these two replace
 
-# Production parts and how many of each are printed. The fit gauge is a
-# prototype tool and v1.2 section 9 excludes it from the material gates.
+# Production parts and how many of each are printed. The carrier-fit coupon
+# and the insert-fastener coupon are prototype tools, and v1.3 section 9
+# excludes them from the material gates.
 PRODUCTION = (("base", 1), ("lid", 1), ("clamp", 1), ("cap", 2))
 
 # Rev A production meshes that v1.2 section 12 forbids shipping. Their absence
@@ -249,6 +250,15 @@ TIE_THK_MIN = 2.40             # the v1.3 requirement
 TIE_LEG_W = 2.00               # material each side of the aperture
 TIE_CAP = 2.00                 # material above the aperture apex
 TIE_AP_WALL_MIN = 2.00         # the v1.3 requirement
+# Gate 9c allows the measured leg to fall TIE_AP_WALL_TOL below TIE_AP_WALL_MIN.
+# That allowance is for the MEASUREMENT, not for the part. The CAD nominal is
+# exactly 2.00 mm - tie_tab_half_w 4.00 less half of a 4.00 mm aperture - and
+# the STEP carries it exactly. This verifier marches a triangulated surface in
+# 0.01 mm steps, so it reads 1.99 mm: tessellation plus probe resolution. The
+# 1.99 mm figure is representation tolerance and must never be quoted as the
+# manufactured wall thickness. A real thinning of the leg would show up as a
+# loss far larger than this and would still fail the gate.
+TIE_AP_WALL_TOL = 0.10
 TIE_BLEND_R = 9.00             # root radius, pier flank into the wall top
 TIE_BLEND_Z = 14.00            # top of the blended foot
 TIE_FOOT_DX = 1.5167           # = R - sqrt(R^2 - (BLEND_Z - WIN_SILL)^2)
@@ -736,7 +746,7 @@ def angular_runs(flags):
 def main():
     print("=" * 78)
     print("Decca ESP32 Controller Housing Rev B - offline mesh verifier")
-    print("specification v1.2 section 13, measured from the exported "
+    print("specification v1.3 section 13, measured from the exported "
           "triangles only")
     print("=" * 78)
 
@@ -1147,19 +1157,23 @@ def main():
                     foul += 1
     ap_ok = all(abs(a - TIE_AP_W) < 0.15 for a in aps)
     gate(abs(thin - TIE_THK) < 0.10 and thin >= TIE_THK_MIN - 0.05
-         and legs >= TIE_AP_WALL_MIN - 0.10 and caps >= TIE_AP_WALL_MIN - 0.10
+         and legs >= TIE_AP_WALL_MIN - TIE_AP_WALL_TOL
+         and caps >= TIE_AP_WALL_MIN - TIE_AP_WALL_TOL
          and ap_ok and blend_ok == 8 and foul == 0
          and TIE_LID_WITHDRAW >= HOOK_ENGAGE + 0.50,
          "9c anchor section, aperture walls, blended foot  [v1.3 gates 28-30]",
          "measured on the mesh: %.2f mm of section in the cable-pull "
-         "direction (>= %.2f required; v1.2 had 1.60); %.2f mm of leg each "
-         "side of a %.2f mm aperture and %.2f mm above its apex (>= %.2f); "
-         "%d/8 blend probes on an R%.2f root radius %.2f mm tall; "
-         "unsupported height %.2f (v1.2: %.2f); %d probes foul the board "
-         "edge; the lid withdraws %.2f mm past the buttress against the %.2f "
-         "the hooks need. GEOMETRY ONLY - not a strength claim."
-         % (thin, TIE_THK_MIN, legs, max(aps) if aps else -1, caps,
-            TIE_AP_WALL_MIN, blend_ok, TIE_BLEND_R,
+         "direction (>= %.2f required; v1.2 had 1.60); leg beside a %.2f mm "
+         "aperture measures %.2f against a %.2f nominal (%.2f tessellation "
+         "and probe-resolution allowance - the CAD and STEP carry %.2f "
+         "exactly; this is measurement tolerance, NOT the manufactured "
+         "thickness), and %.2f above its apex; %d/8 blend probes on an R%.2f "
+         "root radius %.2f mm tall; unsupported height %.2f (v1.2: %.2f); "
+         "%d probes foul the board edge; the lid withdraws %.2f mm past the "
+         "buttress against the %.2f the hooks need. GEOMETRY ONLY - not a "
+         "strength claim."
+         % (thin, TIE_THK_MIN, max(aps) if aps else -1, legs, TIE_LEG_W,
+            TIE_AP_WALL_TOL, TIE_LEG_W, caps, blend_ok, TIE_BLEND_R,
             TIE_BLEND_Z - WIN_SILL, TIE_FREE_H, TIE_FREE_H_V12, foul,
             TIE_LID_WITHDRAW, HOOK_ENGAGE))
 

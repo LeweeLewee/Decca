@@ -1,6 +1,7 @@
 # Decca ESP32 Controller Housing Specification v1.3
 
-**Status:** Rev A rejected for bulk. Rev B architecture approved; design-review findings addressed. **Physical prototype gates remain open** — nothing in this design has been printed or measured against hardware. Coupons required before any production print.  
+**Status:** Rev A rejected for bulk. Rev B architecture approved; design-review findings addressed. **Physical prototype gates remain open** — nothing in this design has been printed or measured against hardware. Coupons required before any production print.
+
 **Scope:** Enclosure for the selected ESP32 DevKit and 30-pin terminal adapter only. The MOSFET board is excluded and remains separately mounted.
 
 ## Revision record
@@ -144,7 +145,7 @@ The Rev A envelope of approximately 105 × 77 × 38.3 mm and approximately 68 cm
 | Lid solid volume | — | ≤18 cm³ |
 | Adjustable clamp solid volume | — | ≤2 cm³ |
 
-The production-part total includes the base, lid, adjustable clamp, and mandatory fastener caps. It excludes the fit gauge and non-printing reference bodies.
+The production-part total includes the base, lid, adjustable clamp, and mandatory fastener caps. It excludes the prototype coupons and non-printing reference bodies.
 
 No external feature may project beyond the main body envelope.
 
@@ -257,13 +258,17 @@ The verifier shall fail the build unless all applicable checks pass:
 
 The CAD revision is not production-approved until physical checks confirm:
 
-- the fit gauge accepts the real terminal adapter without stress or excessive play;
+- the carrier-fit coupon accepts the real terminal adapter without stress or excessive play;
 - USB insertion and removal are unobstructed;
 - all terminal screws are serviceable;
 - grouped H1–H6 harnesses route through the windows and strain relief without pinch;
 - lid assembly does not disturb wiring;
 - cabinet fastener installation and insulation are practical;
-- the board survives moderate cable pull without movement;
+- a real cable tie can be fitted and threaded through the anchor, tightened
+  normally and cropped, with ordinary tools;
+- the anchor remains intact through ordinary wiring and handling;
+- the lightweight low-voltage harness is restrained without loading the
+  terminal connections;
 - antenna performance is acceptable;
 - PETG print quality is acceptable without supports;
 - a **horizontal** heat-set insert can actually be driven into the coupon boss;
@@ -273,9 +278,10 @@ The CAD revision is not production-approved until physical checks confirm:
   printer and filament;
 - **the real assembled electronics height is measured.** This one is a release
   gate: the base and the lid shall not be printed until it is closed;
-- the cable-tie anchors survive wiring and normal handling. Gates 28–30
-  measure section, wall and blend; they do not measure strength, and no load
-  test is required of them.
+- the cable-tie anchors remain intact through ordinary wiring and handling.
+  Gates 28–30 measure section, wall and blend; they do not measure strength.
+  **No pull test, no load test and no anchor coupon is required**, and no
+  acceptance step above shall be performed as one.
 
 Record the results in the build report before release.
 

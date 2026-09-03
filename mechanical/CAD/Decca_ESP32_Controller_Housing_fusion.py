@@ -34,7 +34,10 @@ Shallow base tray, deep lid.
                         travel, bottoming on the plinths so the board is never
                         loaded.
     Cabinet_Fastener_Caps  two insulating discs over the recessed M3 heads.
-    Carrier_Fit_Gauge   non-production prototype gauge for the 65-67 mm range.
+    Carrier_Fit_Coupon  non-production prototype coupon for the 65-67 mm range.
+    Insert_Fastener_Coupon  non-production prototype coupon for the
+                        horizontal and vertical inserts, the countersink
+                        and the retained cap.
 
 Every external structure below has a stated purpose and a numbered gate in
 ``validate``. There are no ribs, fins, tabs or projections beyond those.
@@ -86,9 +89,10 @@ REF_ESP = "REF_ESP32_DevKit_V1_30Pin"
 REF_ADP = "REF_30Pin_Terminal_Adapter"
 REF_KEEP = "REF_Wired_Keepouts"
 
-# Parts that are printed and shipped. The fit gauge is a prototype tool and is
-# excluded from the section 9 material gates; the caps are mandatory because a
-# recessed metal screw head under the board cannot be insulated any other way.
+# Parts that are printed and shipped. The carrier-fit coupon and the
+# insert-fastener coupon are prototype tools and are excluded from the
+# section 9 material gates; the caps are mandatory because a recessed metal
+# screw head under the board cannot be insulated any other way.
 PRODUCTION = (BASE, LID, CLAMP, CAPS)
 COUPONS = (COUPON_A, COUPON_B)
 PRINTABLE = PRODUCTION + COUPONS

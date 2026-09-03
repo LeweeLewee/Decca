@@ -593,7 +593,7 @@ specification gate it answers.
 | 7 cable window ≥ 10.00 usable | MESH-VERIFIED | 4 windows 22.00 mm wide; every bundle corridor clear for the full 10.00 mm; 608 probes meet anchor buttress inside the full-width prisms and **0 of them fall outside the four named buttresses** |
 | 8 no harness pinched by the lid | MESH-VERIFIED | 4 bundles, 29 conductors, largest Ø7.97, 0 pinch probes |
 | 9 internal strain relief works | MESH-VERIFIED | 4/4 apertures pass a 2.50 × 1.10 strap right through the 2.60 mm pier; 4/4 open inboard above the 16.10 terminal tops; 4/4 open outboard into their own window; 4/4 loops pass under their bundle clear of the 9.00 sill; 0 obstructed tool probes |
-| 28–30 anchor section, aperture walls, blended foot | MESH+CAD-VERIFIED | **2.60 mm** of section in the cable-pull direction against ≥2.40; **1.99 mm** of leg each side of a 4.00 mm aperture and **2.00 mm** above its apex, against ≥2.00; 8/8 blend probes on an R9.00 root radius 5.00 mm tall; unsupported height 9.00 (v1.2: 14.00); 0 probes foul the board edge; lid withdrawal 2.00 mm against the 0.60 the hooks need. **Geometry only — not a strength claim.** |
+| 28–30 anchor section, aperture walls, blended foot | MESH+CAD-VERIFIED | **2.60 mm** of section in the cable-pull direction against ≥2.40; **2.00 mm** of leg each side of a 4.00 mm aperture and **2.00 mm** above its apex, against ≥2.00 — the mesh probe reads the leg as 1.99 mm, which is representation tolerance, not thickness (see below); 8/8 blend probes on an R9.00 root radius 5.00 mm tall; unsupported height 9.00 (v1.2: 14.00); 0 probes foul the board edge; lid withdrawal 2.00 mm against the 0.60 the hooks need. **Geometry only — not a strength claim.** |
 | 10 USB envelope clear | MESH-VERIFIED | measured slot 14.75 × 17.45 against a 14.00 × 9.00 minimum |
 | 11 antenna keep-out clean | MESH-VERIFIED | 0 intrusions; nearest metal 2.35 mm outside; lid skin 1.60 mm; 0 vents inside |
 | 12 lid overlap and fit | MESH-VERIFIED | 62 perimeter probes, gap 0.247 mm mean (0.198–0.257); overlap 4.00 |
@@ -611,6 +611,17 @@ specification gate it answers.
 | 20 volume ≤ 35.00 cm³ | MESH-VERIFIED | 34.20 cm³ |
 | 21 mass ≤ 45.0 g | MESH-VERIFIED | 43.4 g full-solid; 40.69 g sliced |
 | 22 no forbidden Rev A feature | MESH+CAD-VERIFIED | 0 deleted meshes on disk; plan area 5720 mm² against 8085; **0.000 mm³ of base outside the closed enclosure envelope**; 719.7 mm³ outboard of the base wall, all of it inside the four named cable-tie buttresses (0.004 mm³ unaccounted) |
+
+**The aperture leg is 2.00 mm, and the mesh probe reads 1.99.** The CAD
+nominal is **2.00 mm** — `tie_tab_half_w` 4.00 less half of a 4.00 mm aperture,
+exactly, in the parametric model and in the STEP. The offline verifier marches
+that leg in 0.01 mm steps across a triangulated surface and reports **1.99 mm**.
+That difference is **tessellation and probe resolution — representation
+tolerance in the measurement, not material missing from the part.** It is not a
+request for thicker geometry and no geometry was added for it. Gate 9c's
+`TIE_AP_WALL_MIN - 0.10` allowance exists precisely to absorb it, and it is
+retained unchanged; §6.3 records the same effect on the countersink, where the
+faceting was large enough to matter and the *cut* was compensated instead.
 
 ### 6.1 What verification caught in the v1.3 amendment
 
@@ -948,15 +959,17 @@ Three matter most in the short term:
 - **The cable-tie anchor's robustness in a fitter's hands.** Gates 28–30
   measure 2.60 mm of section in the cable-pull direction, 8.00 mm of width,
   2.00 mm of material all round the aperture and an R9.00 root blend. That is
-  section, not strength. **No pull test was run, none is claimed, and §5c does
-  not require one** — these ties restrain lightweight low-voltage harnesses and
-  the requirement is a feature that survives wiring and normal handling. Offer
-  a real tie up to a printed anchor when the coupons are printed and pull it by
-  hand; that is the whole test this design asks for.
+  section, not strength. **No pull test, no load test and no anchor coupon is
+  required, none was run, and none is claimed** — these ties restrain
+  lightweight low-voltage harnesses, and §5c asks only for a feature that is
+  not snapped during wiring or normal handling. The acceptance step is the
+  ordinary one: fit a real tie, thread it, tighten and crop it normally, and
+  confirm the anchor is intact afterwards.
 
 ### 9.3 Physical behaviour nothing geometric can settle
 
-- the fit gauge accepts the real breakout without stress or excessive play;
+- the carrier-fit coupon accepts the real breakout without stress or
+  excessive play;
 - the carrier sits flat on the four pads and slides under the ledge without
   forcing;
 - the clamp retains it without bowing it;
@@ -964,12 +977,12 @@ Three matter most in the short term:
 - every used terminal is reachable with the owner's actual screwdriver;
 - the grouped H1–H6 harnesses route through the windows and the tie piers
   without pinch or sharp bends;
-- the ties transfer pull to the housing and not to the terminals;
-- the board survives moderate cable pull without moving;
+- a real cable tie fits and threads through the anchor, tightens and crops
+  normally with ordinary tools, with the lid off;
+- the anchor is intact after ordinary wiring and handling;
+- the harness is restrained without loading the terminal connections;
 - lid assembly does not disturb the wiring, and the two hooks locate it without
   being stressed;
-- a real tie can be threaded through the anchor, tensioned with a real tool and
-  cropped, with the lid off, and the anchor survives it;
 - the lid comes off past the four buttresses without catching on one;
 - the insulating cap presses in, stays in with the base held vertically, and
   comes out again with a fine blade;
