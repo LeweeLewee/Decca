@@ -29,6 +29,20 @@ content is now specification revision **v1.5**. Full historical write-up:
 > overall**. These have different datums. Replacement CAD must use the 20.00 mm
 > overall envelope from the assembly's actual lowest underside feature.
 
+> ### REPLACEMENT CAD IS BLOCKED AT THE v1.5 §15 MEASUREMENT GATE
+>
+> The repository contains **no model, drawing, datasheet or scaled photograph**
+> of the DORHEA adapter. `REF_30Pin_Terminal_Adapter` in the Rev B generator is
+> built entirely from values that generator itself lists in its `STARTING`
+> tuple — *not measured* — and it has no side ports at all, because Rev B
+> assumed the wrong topology. Twelve of the thirteen mandatory inputs are
+> unmeasured; only the 20.00 mm overall height is closed.
+>
+> The terminal-mouth centre height, opening, insertion depth and outward face
+> position set the long-side wall height and therefore the whole architecture.
+> Nothing replaces Rev B until they exist. See
+> `../Drawings/Decca_ESP32_Controller_Housing_Measurement_Request.md`.
+
 **Rev A was rejected on owner review** for bulk and filament consumption:
 105.00 × 77.00 × 38.30 mm and about 68 cm³ to hold a board 66 × 63 mm, with
 all eighteen of its gates passing. Rev B is a redesign, not a trim:

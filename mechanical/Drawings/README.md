@@ -12,9 +12,14 @@ The actual DORHEA adapter uses horizontal side-entry screw terminals. Rev B's
 above-terminal cable route is wrong, so every Rev B housing render and drawing
 is retained as design history only. Specification v1.5 controls the replacement.
 
+**Replacement CAD has not started.** The v1.5 §15 measurement gate is open:
+the repository holds no model or drawing of the DORHEA adapter, and twelve of
+the thirteen mandatory inputs are unmeasured. See the measurement request.
+
 | File | Contents |
 |---|---|
-| `Decca_ESP32_Controller_Housing_Spec_v1.0.md` | The controlling specification. Its content is revision **v1.3**; the filename is kept for link stability. Authority for the architecture. |
+| `Decca_ESP32_Controller_Housing_Spec_v1.0.md` | The controlling specification. Its content is revision **v1.5**; the filename is kept for link stability. Authority for the architecture. |
+| `Decca_ESP32_Controller_Housing_Measurement_Request.md` | **What has to be measured before replacement CAD can begin.** Datums, twenty labelled measurements, four scaled photographs, and the minimum set that unblocks the architecture. |
 | `Decca_ESP32_Controller_Housing_Build_Report_revB.md` | Rev B build report: the Rev A before/after, derived dimensions, both verification suites and what they caught, the material arithmetic, every open prototype gate, print orientations and the recommended first print. |
 | `Decca_ESP32_Controller_Housing_revB_01_closed.png` | Closed housing. |
 | `..._02_lid_removed.png` | Lid removed, controller and breakout in place. |
