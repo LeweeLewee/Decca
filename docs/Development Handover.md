@@ -193,10 +193,10 @@ the user's Wi-Fi or OTA passwords.
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
    Mono closed requests them off. GPIO25 load remained disabled during testing.
 9. **Open — HW-LGT-01:** DFR0457 is installed and the initial steady-light test
-   reports no flicker. Upload the prepared 1 kHz, 85% / duty 217 firmware with
-   restored soft fades, then prove safe-off, fade behaviour, pot/display
-   stability, temperature and installed lamp current. Until that upload is
-   verified, the last-known device image remains the temporary 100% diagnostic.
+   reports no flicker. Commit `c6cb9a6`, containing 1 kHz PWM and the 85% / duty
+   217 target with restored soft fades, uploaded successfully by authenticated
+   OTA; the ESP32 returned at `decca.local`. Prove safe-off, fade behaviour,
+   pot/display stability, temperature and installed lamp current physically.
 10. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 11. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -241,16 +241,15 @@ full, then CLAUDE.md, docs/Specification.md, docs/Firmware Architecture.md, docs
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: resolve docs/Open Issues.md HW-LGT-01. DFR0457 is installed
-and its initial steady-light test reports no flicker. Upload and verify the
-prepared 1 kHz, 85% / duty 217 firmware, including the existing non-blocking
-soft fades, then complete the remaining physical checks. When delivered, use
+Immediate priority: resolve docs/Open Issues.md HW-LGT-01. DFR0457 is installed,
+its initial steady-light test reports no flicker, and commit `c6cb9a6` is now
+running after authenticated OTA and network-return verification. Complete the
+remaining physical checks at 1 kHz and 85% / duty 217. When delivered, use
 WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
 The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 
-GitHub main is the firmware source of truth and contains the prepared 85% duty
-217 setting. Until the OTA and reboot are verified, the ESP32's last-known
-installed image remains the temporary 100% diagnostic build.
+GitHub main is the firmware source of truth and contains the installed 85% duty
+217 setting. The ESP32's last-known installed image is commit `c6cb9a6`.
 Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
 VHF-derived source, logical power and display while

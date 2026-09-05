@@ -8,7 +8,7 @@ not close a later issue listed here.
 ## HW-LGT-01 — Final dial-lighting stage flickers and disturbs pot UI
 
 **Status:** OPEN — DFR0457 installed; initial steady-light flicker test passed;
-firmware deployment and full integration acceptance in progress.
+85% soft-fade firmware deployed; physical integration acceptance in progress.
 
 **Observed:** the previous MOSFET/module path produced visible lamp flicker. With
 that path energised, electrical disturbance also caused the display to jump
@@ -25,17 +25,18 @@ disturbance stopped, but lamp flicker remained.
 - Buy the Pi Hut pack of three **WAGO 221-415** five-way lever connectors; use
   one for the +5 V star point, one for common GND and retain one spare.
 - Keep the single regulated 5 V supply and common-ground architecture.
-- **Prepared for OTA:** set `decca::hardware::kDialLightingPwmFrequencyHz` to
-  the controller's specified 1 kHz limit and restore the existing non-blocking
-  soft fade engine.
+- **Complete:** set `decca::hardware::kDialLightingPwmFrequencyHz` to the
+  controller's specified 1 kHz limit and restore the existing non-blocking soft
+  fade engine. Commit `c6cb9a6` uploaded by authenticated OTA and the ESP32
+  returned at `decca.local` after reboot.
 
 **Locked behaviour:** GPIO25/D25 remains the lighting PWM output. Stereo
 open/high requests lights on at the owner-approved 85% / duty 217; Mono
 closed/low and logical standby request off. Preserve fades and safe-off boot.
 
-**Device-state warning:** until this change is uploaded and its reboot verified,
-the last known installed image is the temporary 100% diagnostic build. GitHub
-remains the source of truth for the prepared 1 kHz, 85% release candidate.
+**Device state:** the last-known installed image is commit `c6cb9a6`, using
+1 kHz PWM and an 85% / duty 217 target with soft fades. GitHub `main` remains the
+source of truth.
 
 **Acceptance required to close:**
 

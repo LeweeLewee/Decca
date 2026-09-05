@@ -54,8 +54,9 @@ GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
 physically verified. Lighting PWM GPIO25 and the three-lamp bank have prior
 electrical acceptance. DFRobot DFR0457 is installed as the final MOSFET stage;
 its initial steady-light test resolved the flicker. Firmware uses 1 kHz PWM and
-85% / duty 217, with final fade and integration acceptance still open under
-HW-LGT-01. Mono and logical standby are off.
+85% / duty 217. That image was uploaded successfully by authenticated OTA and
+returned at `decca.local`; final physical fade and integration acceptance remain
+open under HW-LGT-01. Mono and logical standby are off.
 
 Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
 closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
@@ -77,5 +78,5 @@ The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow
 SDA GPIO21. Rev Q bezel PR #7 is merged, complete and owner-approved.
 
 GitHub `main` is the firmware source of truth. The ESP32's last-known installed
-image before this change is the temporary 100% lighting diagnostic build;
-restore the verified 1 kHz, 85% image over OTA and complete HW-LGT-01.
+image is commit `c6cb9a6`: the authenticated 1 kHz, 85% lighting image uploaded
+successfully by OTA and returned at `decca.local`. Complete HW-LGT-01 physically.
