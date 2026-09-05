@@ -16,7 +16,7 @@ that source control alone does not express well.
 
 | Date       | Area    | Summary                                  |
 |------------|---------|------------------------------------------|
-| 2026-09-05 | Firmware/Display | Added `src/version.h` as the single firmware-version source, starting at v0.27.0. Cold startup and OTA reboot retain the non-blocking Decca reveal and hold `MUSIC CENTRE v0.27.0` in the lower calibrated visible area before the normal dashboard; logical standby/wake does not replay the sequence. Boot serial also reports `[SYSTEM] firmware=0.27.0` for OTA identification. Specification advanced to v0.27. |
+| 2026-09-05 | Firmware/Display | Added `src/version.h` as the single firmware-version source, starting at v0.27.0. Cold startup and OTA reboot retain the non-blocking Decca reveal and hold `MUSIC CENTRE v0.27.0` in the lower calibrated visible area before the normal dashboard; logical standby/wake does not replay the sequence. Boot serial also reports `[SYSTEM] firmware=0.27.0` for OTA identification. The production build and display-suite compilation passed; commit `1ae242e` uploaded by authenticated OTA and the device returned at `decca.local`. Specification advanced to v0.27. |
 | _TBD_      | Project | Repository foundation created            |
 | _TBD_      | Docs    | Specification baselined (v0.1)           |
 | _TBD_      | Docs    | Phase 1 wiring facts documented; Wiring, Hardware Architecture, Parts List, Firmware Architecture, README and Specification (v0.2) updated; ADR-0001..0006 added. Proposed GPIOs labelled proposed. |

@@ -34,9 +34,10 @@ disturbance stopped, but lamp flicker remained.
 open/high requests lights on at the owner-approved 85% / duty 217; Mono
 closed/low and logical standby request off. Preserve fades and safe-off boot.
 
-**Device state:** the last-known installed image is commit `c6cb9a6`, using
-1 kHz PWM and an 85% / duty 217 target with soft fades. GitHub `main` remains the
-source of truth.
+**Device state:** the last-known installed image is firmware v0.27.0 at commit
+`1ae242e`, using 1 kHz PWM and an 85% / duty 217 target with soft fades. Its
+authenticated OTA upload succeeded and the device returned at `decca.local`.
+GitHub `main` remains the source of truth.
 
 **Acceptance required to close:**
 

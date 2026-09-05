@@ -80,5 +80,5 @@ The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow
 SDA GPIO21. Rev Q bezel PR #7 is merged, complete and owner-approved.
 
 GitHub `main` is the firmware source of truth. The ESP32's last-known installed
-image is commit `c6cb9a6`: the authenticated 1 kHz, 85% lighting image uploaded
-successfully by OTA and returned at `decca.local`. Complete HW-LGT-01 physically.
+image is firmware v0.27.0 at commit `1ae242e`: authenticated OTA succeeded and
+the device returned at `decca.local`. Complete HW-LGT-01 physically.
