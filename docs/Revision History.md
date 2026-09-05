@@ -16,7 +16,7 @@ that source control alone does not express well.
 
 | Date       | Area    | Summary                                  |
 |------------|---------|------------------------------------------|
-| 2026-09-05 | Firmware/UI | Prepared v0.27.1: extended the final startup/version frame by exactly one second, from 1.2 s to 2.2 s, and doubled the non-blocking lighting step interval from 10 ms to 20 ms so both 0–85% transitions take approximately 4.34 s. The production build and affected display/lighting suite compilations passed. Specification advanced to v0.27.1. |
+| 2026-09-05 | Firmware/UI | Released v0.27.1 at commit `d0b1d3c`: extended the final startup/version frame by exactly one second, from 1.2 s to 2.2 s, and doubled the non-blocking lighting step interval from 10 ms to 20 ms so both 0–85% transitions take approximately 4.34 s. The production build and affected display/lighting suite compilations passed; authenticated OTA succeeded and the device returned at `decca.local`. Specification advanced to v0.27.1. |
 | 2026-09-05 | Firmware/Display | Added `src/version.h` as the single firmware-version source, starting at v0.27.0. Cold startup and OTA reboot retain the non-blocking Decca reveal and hold `MUSIC CENTRE v0.27.0` in the lower calibrated visible area before the normal dashboard; logical standby/wake does not replay the sequence. Boot serial also reports `[SYSTEM] firmware=0.27.0` for OTA identification. The production build and display-suite compilation passed; commit `1ae242e` uploaded by authenticated OTA and the device returned at `decca.local`. Specification advanced to v0.27. |
 | _TBD_      | Project | Repository foundation created            |
 | _TBD_      | Docs    | Specification baselined (v0.1)           |

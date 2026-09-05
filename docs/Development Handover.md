@@ -249,11 +249,11 @@ WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
 The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 
 GitHub main is the firmware source of truth and contains the installed 85% duty
-217 setting. The ESP32's last-known installed image is firmware v0.27.0 at
-commit `1ae242e`; its authenticated OTA upload succeeded and the device returned
+217 setting. The ESP32's last-known installed image is firmware v0.27.1 at
+commit `d0b1d3c`; its authenticated OTA upload succeeded and the device returned
 at `decca.local`. Firmware releases use the single version value in
-`src/version.h`; v0.27.0 adds that identifier to the cold-start/OTA-reboot screen
-and serial boot report.
+`src/version.h`; v0.27.1 holds that identifier for 2.2 seconds on the
+cold-start/OTA-reboot screen and uses approximately 4.34-second lighting fades.
 Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
 VHF-derived source, logical power and display while
