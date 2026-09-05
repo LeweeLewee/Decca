@@ -143,3 +143,9 @@ The non-blocking fade interval is now 20 ms per count, giving approximately
 4.34-second transitions between off and duty 217 in both directions. Physical
 OTA and integration acceptance are tracked as HW-LGT-01 in
 `docs/Open Issues.md`.
+
+v0.27.1 physical result (2026-09-05): authenticated OTA and reboot succeeded;
+the owner approved the 2.2-second firmware-version hold and both approximately
+4.34-second 0–85% lighting fades, with no flicker reported. HW-LGT-01 remains
+open for WAGO distribution installation plus pot-stability, temperature and
+installed-current checks.

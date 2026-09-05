@@ -193,10 +193,11 @@ the user's Wi-Fi or OTA passwords.
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
    Mono closed requests them off. GPIO25 load remained disabled during testing.
 9. **Open — HW-LGT-01:** DFR0457 is installed and the initial steady-light test
-   reports no flicker. Commit `c6cb9a6`, containing 1 kHz PWM and the 85% / duty
-   217 target with restored soft fades, uploaded successfully by authenticated
-   OTA; the ESP32 returned at `decca.local`. Prove safe-off, fade behaviour,
-   pot/display stability, temperature and installed lamp current physically.
+   reports no flicker. Firmware v0.27.1 at commit `d0b1d3c` is installed by
+   authenticated OTA. The owner physically approved cold startup, the
+   2.2-second version hold and both approximately 4.34-second 0–85% fades.
+   Install the ordered WAGO star points, recheck pot/display stability with
+   lamps on, then temperature and installed lamp current before closing.
 10. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 11. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -242,9 +243,10 @@ Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
 Immediate priority: resolve docs/Open Issues.md HW-LGT-01. DFR0457 is installed,
-its initial steady-light test reports no flicker, and commit `c6cb9a6` is now
-running after authenticated OTA and network-return verification. Complete the
-remaining physical checks at 1 kHz and 85% / duty 217. When delivered, use
+its v0.27.1 startup and fade behaviour are owner-approved with no flicker, and
+commit `d0b1d3c` is running after authenticated OTA and network-return
+verification. Complete the remaining WAGO installation, pot-stability,
+temperature and current checks at 1 kHz and 85% / duty 217. When delivered, use
 WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
 The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 

@@ -221,7 +221,9 @@ three-lamp current remain commissioning checks.
 The final switch is one **DFRobot Gravity MOSFET Power Controller, DFR0457**,
 now installed. It accepts the 5 V lamp rail and 3.3 V logic/control, with a
 specified switching range of 0–1 kHz. Firmware PWM is set to 1 kHz. The initial
-steady-light test resolved the visible flicker; safe-off, fade, pot-stability,
+steady-light test resolved the visible flicker. Cold startup and both
+approximately 4.34-second fade directions were subsequently owner-approved on
+v0.27.1 with no flicker. WAGO distribution installation plus pot-stability,
 temperature and current checks remain under HW-LGT-01. The previously tested
 DAOKAI pack is retained as superseded test stock.
 

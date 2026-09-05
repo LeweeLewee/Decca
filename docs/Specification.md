@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. DFR0457 is installed and its initial steady-light test resolved flicker; full HW-LGT-01 acceptance remains open at 1 kHz PWM. Normal Stereo lighting is 85% / duty 217; Mono and standby are off. Eight on-target suites last passed 55/55. WiiM integration remains outstanding. |
+| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. DFR0457 is installed; v0.27.1 cold-start, 85% fade-up/down and no-flicker behaviour are physically approved at 1 kHz. HW-LGT-01 remains open for WAGO distribution installation plus pot-stability, temperature and current checks. Eight on-target suites last passed 55/55. WiiM integration remains outstanding. |
 | Version  | 0.27.1                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |

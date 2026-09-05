@@ -57,8 +57,11 @@ physically verified. Lighting PWM GPIO25 and the three-lamp bank have prior
 electrical acceptance. DFRobot DFR0457 is installed as the final MOSFET stage;
 its initial steady-light test resolved the flicker. Firmware uses 1 kHz PWM and
 85% / duty 217. That image was uploaded successfully by authenticated OTA and
-returned at `decca.local`; final physical fade and integration acceptance remain
-open under HW-LGT-01. Mono and logical standby are off.
+returned at `decca.local`. The owner physically approved the v0.27.1
+startup/version timing and both approximately 4.34-second fade directions, with
+no flicker reported. WAGO distribution installation plus pot-stability,
+temperature and current checks remain open under HW-LGT-01. Mono and logical
+standby are off.
 
 Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
 closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
@@ -83,4 +86,5 @@ GitHub `main` is the firmware source of truth. The ESP32's last-known installed
 image is firmware v0.27.1 at commit `d0b1d3c`: authenticated OTA succeeded and
 the device returned at `decca.local`. Its version hold is 2.2 seconds and the
 0–85% lighting transition is approximately 4.34 seconds in either direction.
-Complete HW-LGT-01 physically.
+Complete the remaining HW-LGT-01 WAGO installation, pot-stability, temperature
+and current checks.

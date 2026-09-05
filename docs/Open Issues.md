@@ -5,10 +5,11 @@ This is the canonical short list of unresolved integration issues. Read it with
 the revision history remain valid records of what was tested at the time, but do
 not close a later issue listed here.
 
-## HW-LGT-01 — Final dial-lighting stage flickers and disturbs pot UI
+## HW-LGT-01 — Final dial-lighting integration acceptance
 
-**Status:** OPEN — DFR0457 installed; initial steady-light flicker test passed;
-85% soft-fade firmware deployed; physical integration acceptance in progress.
+**Status:** OPEN — DFR0457 installed; flicker, v0.27.1 startup and 85% fade
+behaviour physically accepted. WAGO installation, pot-stability, temperature
+and current remain.
 
 **Observed:** the previous MOSFET/module path produced visible lamp flicker. With
 that path energised, electrical disturbance also caused the display to jump
@@ -22,13 +23,17 @@ disturbance stopped, but lamp flicker remained.
 
 - **Complete:** install one DFRobot Gravity MOSFET Power Controller,
   **DFR0457**. The owner reports that the lighting flicker is resolved.
-- Buy the Pi Hut pack of three **WAGO 221-415** five-way lever connectors; use
-  one for the +5 V star point, one for common GND and retain one spare.
+- **Ordered:** Pi Hut pack of three **WAGO 221-415** five-way lever connectors.
+  On delivery, use one for the +5 V star point, one for common GND and retain
+  one spare.
 - Keep the single regulated 5 V supply and common-ground architecture.
 - **Complete:** set `decca::hardware::kDialLightingPwmFrequencyHz` to the
   controller's specified 1 kHz limit and restore the existing non-blocking soft
   fade engine. Commit `c6cb9a6` uploaded by authenticated OTA and the ESP32
   returned at `decca.local` after reboot.
+- **Complete (2026-09-05):** deploy v0.27.1 at commit `d0b1d3c`. The owner
+  approved the 2.2-second firmware-version hold and both approximately
+  4.34-second lighting fades, with no flicker reported.
 
 **Locked behaviour:** GPIO25/D25 remains the lighting PWM output. Stereo
 open/high requests lights on at the owner-approved 85% / duty 217; Mono
@@ -41,16 +46,18 @@ returned at `decca.local`. GitHub `main` remains the source of truth.
 
 **Acceptance required to close:**
 
-1. Confirm safe-off at boot before the lamps can energise.
-2. Confirm Stereo softly fades to 85%, Mono softly fades fully off, and standby
-   remains off.
-3. Observe no lamp flicker at steady state or through fades.
-4. Exercise and then release all four pots; confirm the OLED does not chatter
-   between control overlays while the lamps are on.
-5. Confirm no abnormal module or wiring temperature and measure the installed
-   three-lamp current.
-6. Record the physical result, update the BOM/status documents and restore a
-   release build over OTA before closing this issue.
+1. **Passed:** cold startup showed no unwanted lamp flash before the controlled
+   fade.
+2. **Passed:** Stereo softly fades to 85% and Mono softly fades fully off in
+   approximately 4.34 seconds.
+3. **Passed:** no lamp flicker was reported at steady state or through fades.
+4. **Open:** install the ordered WAGO 221-415 +5 V and common-GND star points.
+5. **Open:** exercise and then release all four pots; confirm the OLED does not
+   chatter between control overlays while the lamps are on.
+6. **Open:** confirm no abnormal module or wiring temperature and measure the
+   installed three-lamp current.
+7. **Complete:** physical results are recorded and release v0.27.1 is installed
+   by authenticated OTA. Close only after items 4–6 pass.
 
 **Procurement records:** `hardware/BOM/phase1.csv` and `docs/Parts List.md`.
 **Wiring:** `docs/Wiring.md`, H5 and Power Distribution.

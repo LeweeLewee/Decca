@@ -226,7 +226,8 @@ Yellow = SDA.
 - Installed final switch: one **DFRobot Gravity MOSFET Power Controller,
   DFR0457**. Its 3.3 V control input is driven by ESP32 **GPIO25 / board label
   D25** and firmware PWM is set to its 1 kHz DC switching limit.
-- Initial steady-light testing reports no flicker. Repeat safe-off, fade,
+- Steady-light and v0.27.1 fade testing report no flicker; cold startup and both
+  approximately 4.34-second fade directions are owner-approved. Repeat
   pot-stability, temperature and lamp-current tests before closing HW-LGT-01.
 - The previously tested DAOKAI pack is retained as test stock but is superseded
   for the final installation.
