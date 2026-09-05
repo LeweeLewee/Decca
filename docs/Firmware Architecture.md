@@ -50,8 +50,9 @@ AI-assisted editing.
 - **`lighting`** drives the warm dial illumination only (dial, not cabinet) via a
   logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
   brightness, and a safe boot state. It starts at duty 0, reads its initial
-  target from `settings`, and advances one PWM count every 10 ms without
-  blocking. `main` selects the owner-approved normal target of duty 217 (85%)
+  target from `settings`, and advances one PWM count every 20 ms without
+  blocking. At the owner-approved duty 217 (85%), a complete fade takes about
+  4.34 seconds. `main` selects that normal target
   only when logically on and Stereo is requested; Mono and standby select zero.
   `lighting` does not read buttons or power state directly.
 - **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C

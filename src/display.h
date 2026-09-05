@@ -38,7 +38,7 @@ constexpr uint32_t kSleepAfterMs = 300'000;
 constexpr uint32_t kStandbySleepAfterMs = 10'000;
 constexpr uint16_t kControlMax = 1000;
 constexpr uint32_t kStartupAnimationDurationMs = 1000;
-constexpr uint32_t kStartupDurationMs = 2000;
+constexpr uint32_t kStartupDurationMs = 3000;
 constexpr uint8_t kStartupFrameCount = 5;
 constexpr uint32_t kStartupFrameIntervalMs =
     kStartupAnimationDurationMs / kStartupFrameCount;

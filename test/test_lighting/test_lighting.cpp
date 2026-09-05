@@ -97,6 +97,9 @@ void test_lighting_waits_for_non_blocking_fade_interval() {
     startInjected();
     decca::lighting::setBrightness(Zone::Dial, 20);
 
+    TEST_ASSERT_EQUAL_UINT32(20,
+                             decca::lighting::kFadeStepIntervalMs);
+
     advance(decca::lighting::kFadeStepIntervalMs - 1);
 
     TEST_ASSERT_EQUAL_UINT8(0, decca::lighting::brightness(Zone::Dial));

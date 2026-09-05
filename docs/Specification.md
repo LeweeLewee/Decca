@@ -6,7 +6,7 @@
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
 | Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. DFR0457 is installed and its initial steady-light test resolved flicker; full HW-LGT-01 acceptance remains open at 1 kHz PWM. Normal Stereo lighting is 85% / duty 217; Mono and standby are off. Eight on-target suites last passed 55/55. WiiM integration remains outstanding. |
-| Version  | 0.27                                              |
+| Version  | 0.27.1                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -120,7 +120,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 |-----------|------------------------------------------------------------------------------|-------|
 | FR-LGT-01 | The system shall drive the warm dial illumination via PWM through a logic-level N-channel MOSFET. | 1 |
 | FR-LGT-02 | Lighting shall support configurable idle brightness and standby dimming.     | 1     |
-| FR-LGT-03 | Lighting transitions shall fade (up/down) rather than switch abruptly.       | 1     |
+| FR-LGT-03 | Lighting transitions shall fade (up/down) rather than switch abruptly; the normal 0–85% transition shall take approximately 4.3 s. | 1 |
 | FR-LGT-04 | Lighting shall adopt a defined safe state at boot.                           | 1     |
 | FR-LGT-05 | While logically on, Stereo shall fade the dial lighting to the stored normal level and Mono shall fade it off. Logical standby shall force lighting off. | 1 |
 

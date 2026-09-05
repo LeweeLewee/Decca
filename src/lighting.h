@@ -25,7 +25,7 @@ enum class Zone {
 };
 
 /** Interval between one-count PWM fade steps. */
-constexpr uint32_t kFadeStepIntervalMs = 10;
+constexpr uint32_t kFadeStepIntervalMs = 20;
 
 /**
  * @brief Configure PWM channels and set a safe default state.

@@ -281,9 +281,10 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
    ```
 
 4. Confirm the OLED reveals the `DECCA` wordmark from left to right over roughly
-   1 s, then holds `MUSIC CENTRE v0.27.0` briefly in the lower calibrated area
-   before showing `VINYL` prominently without a legacy button label and a local
-   dashboard with Volume 75% and the other three controls at 50%.
+   1 s, then holds `MUSIC CENTRE v0.27.1` for roughly 2.2 s in the lower
+   calibrated area before showing `VINYL` prominently without a legacy button
+   label and a local dashboard with Volume 75% and the other three controls at
+   50%.
 5. Confirm the output contains:
 
    ```text
