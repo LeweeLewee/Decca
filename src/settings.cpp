@@ -16,7 +16,7 @@ constexpr char kNamespace[] = "decca";
 #endif
 
 constexpr char kStateKey[] = "state";
-constexpr uint8_t kCurrentVersion = 3;
+constexpr uint8_t kCurrentVersion = 4;
 
 struct PersistedState {
     uint8_t version;

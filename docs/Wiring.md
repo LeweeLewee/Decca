@@ -67,7 +67,7 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC) | H5 | DFRobot DFR0457 control input after purchase; three-lamp bank |
+| Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC), 1 kHz | H5 | Installed DFRobot DFR0457 control input; three-lamp bank |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
@@ -223,15 +223,15 @@ Yellow = SDA.
   Final holder fit, operating brightness and measured total current remain
   installation/commissioning checks.
 - Wire the three validated lamps **in parallel**.
-- Selected final switch: one **DFRobot Gravity MOSFET Power Controller,
-  DFR0457**, open to purchase from The Pi Hut. Its 3.3 V control input is driven
-  by ESP32 **GPIO25 / board label D25** and its DC switching limit is 1 kHz.
-- Before connection, reduce firmware PWM from 5 kHz to no more than 1 kHz. Then
-  repeat safe-off, brightness, flicker, pot-stability and lamp-current tests.
+- Installed final switch: one **DFRobot Gravity MOSFET Power Controller,
+  DFR0457**. Its 3.3 V control input is driven by ESP32 **GPIO25 / board label
+  D25** and firmware PWM is set to its 1 kHz DC switching limit.
+- Initial steady-light testing reports no flicker. Repeat safe-off, fade,
+  pot-stability, temperature and lamp-current tests before closing HW-LGT-01.
 - The previously tested DAOKAI pack is retained as test stock but is superseded
   for the final installation.
 - ESP32 and lighting grounds are **common**.
-- Normal brightness is owner-approved at **90% / duty 230**, stored in
+- Normal brightness is owner-approved at **85% / duty 217**, stored in
   non-volatile settings and treated as a setup value rather than a normal user
   control. Mono and logical standby command zero. The unused
   aerial control may be used temporarily for commissioning if convenient, but is
@@ -241,7 +241,8 @@ Expected behaviours: fade up, fade down, stored/configurable brightness, safe
 boot state. Firmware support is implemented. GPIO25, the MOSFET stage and the
 three-lamp electrical load passed the dial-lighting bench procedure on
 2026-08-31. Subsequent 70%, 80% and 100% comparisons established the approved
-normal level at 90%; Mono and standby are off. Installed-holder checks remain open.
+normal level is now 85%; Mono and standby are off. Final DFR0457 integration and
+installed-holder checks remain open.
 
 ## H6 — Fosi ZA3 12 V Trigger
 

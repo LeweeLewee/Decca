@@ -23,6 +23,7 @@ void test_settings_defaults() {
     TEST_ASSERT_EQUAL_UINT8(0, defaults.volume);
     TEST_ASSERT_EQUAL_UINT8(decca::settings::kDefaultDialBrightness,
                             defaults.dial);
+    TEST_ASSERT_EQUAL_UINT8(217, defaults.dial);
 }
 
 void test_settings_set_get_roundtrip() {

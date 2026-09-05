@@ -42,7 +42,7 @@ Implemented modules:
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
 | WiiM interface | Phase 2, not implemented |
-| Main orchestration | Power, pots, VHF source, fitted display, lighting command and OTA integrated; final DFR0457 hardware acceptance open |
+| Main orchestration | Power, pots, VHF source, fitted display, lighting command and OTA integrated; DFR0457 installed, final HW-LGT-01 acceptance open |
 
 The ESP32 is control/UI only. It never carries or processes audio.
 
@@ -192,10 +192,11 @@ the user's Wi-Fi or OTA passwords.
 8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
    Mono closed requests them off. GPIO25 load remained disabled during testing.
-9. **Open — HW-LGT-01:** install and accept the selected DFR0457 final lighting
-   stage. Reduce PWM from 5 kHz to no more than 1 kHz first, then prove no lamp
-   flicker or pot/display chatter. The last-known device image is the temporary
-   100% diagnostic build; GitHub `main` retains the approved 90% source value.
+9. **Open — HW-LGT-01:** DFR0457 is installed and the initial steady-light test
+   reports no flicker. Upload the prepared 1 kHz, 85% / duty 217 firmware with
+   restored soft fades, then prove safe-off, fade behaviour, pot/display
+   stability, temperature and installed lamp current. Until that upload is
+   verified, the last-known device image remains the temporary 100% diagnostic.
 10. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 11. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -205,8 +206,8 @@ the user's Wi-Fi or OTA passwords.
 
 `docs/Open Issues.md` is the authoritative short list. Consult
 `docs/Parts List.md` and the CSV BOMs for procurement detail. Immediate open
-items are the DFRobot DFR0457, the WAGO 221-415 distribution-connector pack, the
-inline fuse holder and matching fuses, and final lighting current/holder checks.
+items are the ordered WAGO 221-415 distribution-connector pack and final DFR0457
+fade, pot-stability, temperature, current and holder checks.
 Phase 2 items remain the ZA3 12 V trigger interface, WiiM Pro, Fosi ZA3,
 speakers and final audio interconnects.
 
@@ -240,15 +241,16 @@ full, then CLAUDE.md, docs/Specification.md, docs/Firmware Architecture.md, docs
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priority: resolve docs/Open Issues.md HW-LGT-01. Buy and install the
-selected DFRobot DFR0457, reduce lighting PWM from 5 kHz to no more than 1 kHz,
-and repeat the recorded physical acceptance checks. Use WAGO 221-415 five-way
-connectors as separate +5 V and common-GND star points. The shared 5 V PSU is
-connected to ESP32 VIN/5V and USB is removed.
+Immediate priority: resolve docs/Open Issues.md HW-LGT-01. DFR0457 is installed
+and its initial steady-light test reports no flicker. Upload and verify the
+prepared 1 kHz, 85% / duty 217 firmware, including the existing non-blocking
+soft fades, then complete the remaining physical checks. When delivered, use
+WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
+The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 
-GitHub main is the firmware source of truth and contains the approved 90% duty
-230 setting. The ESP32's last-known installed image is the temporary 100%
-diagnostic build, so restore a verified main-derived image after the PWM change.
+GitHub main is the firmware source of truth and contains the prepared 85% duty
+217 setting. Until the OTA and reboot are verified, the ESP32's last-known
+installed image remains the temporary 100% diagnostic build.
 Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
 VHF-derived source, logical power and display while
@@ -259,7 +261,7 @@ L50..0..R50 with centred bars and monochrome icons.
 
 TX2/GPIO17 and GPIO25 are physically accepted. Final MOSFET/three-lamp
 acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
-fades to 90%; Mono and standby fade off. Preserve the accepted
+fades to 85%; Mono and standby fade off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
 GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,

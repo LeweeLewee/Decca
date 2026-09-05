@@ -24,7 +24,7 @@ constexpr uint8_t kDialLightingPwm = 25;
 
 constexpr uint8_t kAdcResolutionBits = 12;
 constexpr uint8_t kDialLightingPwmChannel = 0;
-constexpr uint32_t kDialLightingPwmFrequencyHz = 5000;
+constexpr uint32_t kDialLightingPwmFrequencyHz = 1000;
 constexpr uint8_t kDialLightingPwmResolutionBits = 8;
 
 void init();

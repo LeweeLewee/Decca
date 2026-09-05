@@ -51,7 +51,7 @@ AI-assisted editing.
   logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
   brightness, and a safe boot state. It starts at duty 0, reads its initial
   target from `settings`, and advances one PWM count every 10 ms without
-  blocking. `main` selects the owner-approved normal target of duty 230 (90%)
+  blocking. `main` selects the owner-approved normal target of duty 217 (85%)
   only when logically on and Stereo is requested; Mono and standby select zero.
   `lighting` does not read buttons or power state directly.
 - **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C

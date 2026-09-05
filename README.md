@@ -17,12 +17,13 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - Production coordinates power, all four pots, the VHF-derived source state and
-  the accepted OLED views, and 90% Stereo/off Mono dial lighting while
+  the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
 - USB-to-OTA, GPIO19 power, controls, source selection and the fitted display
-  are complete. Final GPIO25 lighting acceptance is reopened as HW-LGT-01,
-  pending the selected DFR0457 replacement stage. Normal Stereo lighting remains
-  locked at 90%; Mono and logical standby are off.
+  are complete. The DFR0457 replacement stage is installed and its initial
+  steady-light test resolved the flicker; final fade and integration acceptance
+  remain open as HW-LGT-01. Normal Stereo lighting is 85%; Mono and logical
+  standby are off.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work, then check [Open Issues](docs/Open%20Issues.md).
@@ -40,7 +41,7 @@ firmware work, then check [Open Issues](docs/Open%20Issues.md).
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted |
-| Dial lighting PWM | GPIO25/D25 | Pin accepted; final DFR0457 stage open under HW-LGT-01 |
+| Dial lighting PWM | GPIO25/D25 | DFR0457 installed; full acceptance open under HW-LGT-01 |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 

@@ -218,16 +218,15 @@ the locked 5 V lighting rail. The assembled three-lamp electrical path passed
 PWM testing on 2026-08-31. Physical holder fit, final brightness and measured
 three-lamp current remain commissioning checks.
 
-The selected final switch is one **DFRobot Gravity MOSFET Power Controller,
-DFR0457**, currently open to purchase from The Pi Hut. It accepts the 5 V lamp
-rail and 3.3 V logic/control, with a specified switching range of 0–1 kHz.
-Before final acceptance, firmware PWM must be reduced from the present 5 kHz to
-no more than 1 kHz and safe-off, brightness, flicker, pot-stability and current
-tests repeated. The previously tested DAOKAI pack is retained as test stock but
-is superseded for the final installation.
+The final switch is one **DFRobot Gravity MOSFET Power Controller, DFR0457**,
+now installed. It accepts the 5 V lamp rail and 3.3 V logic/control, with a
+specified switching range of 0–1 kHz. Firmware PWM is set to 1 kHz. The initial
+steady-light test resolved the visible flicker; safe-off, fade, pot-stability,
+temperature and current checks remain under HW-LGT-01. The previously tested
+DAOKAI pack is retained as superseded test stock.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
-panel user control. The owner-approved normal value is 90% / duty 230. Firmware
+panel user control. The owner-approved normal value is 85% / duty 217. Firmware
 stores it in non-volatile settings and applies it only while logically on and in
 Stereo; Mono and standby fade to zero. The unused aerial control may be used as a
 temporary commissioning input if convenient, but it is not reserved as a

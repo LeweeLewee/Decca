@@ -8,8 +8,8 @@
 
 namespace decca::settings {
 
-/** Owner-approved normal dial-lighting level: 90% of 8-bit PWM. */
-constexpr uint8_t kDefaultDialBrightness = 230;
+/** Owner-approved normal dial-lighting level: 85% of 8-bit PWM. */
+constexpr uint8_t kDefaultDialBrightness = 217;
 
 enum class Source : uint8_t {
     DigitalStreamer,

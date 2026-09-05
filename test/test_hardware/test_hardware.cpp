@@ -27,7 +27,7 @@ void test_hardware_pin_map_contract() {
 void test_hardware_peripheral_configuration() {
     TEST_ASSERT_EQUAL_UINT8(12, decca::hardware::kAdcResolutionBits);
     TEST_ASSERT_EQUAL_UINT8(0, decca::hardware::kDialLightingPwmChannel);
-    TEST_ASSERT_EQUAL_UINT32(5000,
+    TEST_ASSERT_EQUAL_UINT32(1000,
                              decca::hardware::kDialLightingPwmFrequencyHz);
     TEST_ASSERT_EQUAL_UINT8(
         8, decca::hardware::kDialLightingPwmResolutionBits);

@@ -364,8 +364,8 @@ for the ESP32.
 
 4. Observe the dial lighting. It should fade gently from off to a low test duty
    and back to off, without flashing at full brightness.
-5. Confirm the output contains `LIGHTING_SNAPSHOT duty=230`, the lamps hold at
-   the approved 90% duty for five seconds, and all seven tests pass.
+5. Confirm the output contains `LIGHTING_SNAPSHOT duty=217`, the lamps hold at
+   the approved 85% duty for five seconds, and all seven tests pass.
 
 Pass criteria:
 

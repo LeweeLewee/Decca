@@ -135,3 +135,10 @@ holds the lamps fully off, while Stereo commands target 230 and lights the dial
 at the approved 90% level. OTA remained ready throughout normal operation.
 The final credential-enabled production build passed (RAM 49,936 bytes / 15.2%;
 flash 839,253 bytes / 64.0%) and the complete on-target run passed 55/55.
+
+DFR0457 release candidate (2026-09-05): the normal target changes to duty 217
+(85%), settings schema v4 ensures the earlier persisted 90% value cannot
+override it, and GPIO25 PWM changes from 5 kHz to the controller's 1 kHz limit.
+The existing non-blocking one-count-per-10-ms fade remains the required path for
+both on and off transitions. Physical OTA and integration acceptance are tracked
+as HW-LGT-01 in `docs/Open Issues.md`.
