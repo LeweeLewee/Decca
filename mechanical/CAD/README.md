@@ -2,6 +2,11 @@
 
 Source (editable, parametric) mechanical design files.
 
+> **ESP32 housing warning:** the Rev B controller-housing CAD is superseded and
+> must not be printed or released. It models the wrong cable topology for the
+> DORHEA adapter's horizontal side-entry screw terminals. See specification
+> v1.5 before any replacement modelling.
+
 **Intended contents**
 - Fusion 360 archives (`.f3d`) and/or OpenSCAD (`.scad`) source.
 - Neutral exchange formats (STEP `.step`) for interop.
@@ -11,18 +16,18 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## ESP32 controller housing — current revision: **B — PROTOTYPE CAD, NOT physically validated**
+## ESP32 controller housing — revision B: **SUPERSEDED, DO NOT PRINT**
 
 Built to `../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`, whose
-content is specification revision **v1.3**. Full write-up:
+content is now specification revision **v1.5**. Full historical write-up:
 `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revB.md`.
 
-> ### RELEASE GATE — the base and the lid may NOT be printed yet
+> ### HISTORICAL HEIGHT ASSUMPTION — DO NOT REUSE
 >
-> The 24.00 mm assembled electronics height is **assumed**, and it gives a
-> closed height of 35.30 mm against a mandatory 36.00 — 0.70 mm of margin, and
-> neither coupon tests it. Measure the real stack first. The approved next
-> physical action is printing the two prototype coupons, and nothing else.
+> Rev B used an unverified 24.00 mm height above the adapter PCB. The complete
+> adapter plus fitted ESP32 has since been physically measured at **20.00 mm
+> overall**. These have different datums. Replacement CAD must use the 20.00 mm
+> overall envelope from the assembly's actual lowest underside feature.
 
 **Rev A was rejected on owner review** for bulk and filament consumption:
 105.00 × 77.00 × 38.30 mm and about 68 cm³ to hold a board 66 × 63 mm, with

@@ -1,5 +1,12 @@
 # Decca ESP32 Controller Housing — Rev B build report
 
+> **SUPERSEDED BY SPECIFICATION v1.5. DO NOT PRINT THESE PARTS OR COUPONS.**
+> The actual DORHEA adapter takes external conductors horizontally through the
+> outward-facing screw-terminal ports. Rev B modelled grouped harnesses above
+> the terminal blocks, so its cable routing, strain relief, slice evidence and
+> verification results do not demonstrate a usable wired enclosure. This file
+> is retained only as design history pending a replacement build report.
+
 > **Status: PROTOTYPE CAD. NOT PHYSICALLY VALIDATED.**
 > Nothing in this package has been printed, and no dimension in it has been
 > measured off the acquired hardware. Every hardware figure is a CAD starting
@@ -7,7 +14,7 @@
 > prototype gate. Read §9 before ordering filament.
 
 **Controlling document:** `Decca_ESP32_Controller_Housing_Spec_v1.0.md` — whose
-content is specification revision **v1.3**. The filename is retained
+content is now specification revision **v1.5**. The filename is retained
 deliberately, to avoid repository clutter and keep existing links working.
 **Generator:** `../CAD/Decca_ESP32_Controller_Housing_fusion.py`
 **Independent verifier:** `../CAD/Decca_ESP32_Controller_Housing_verify.py`

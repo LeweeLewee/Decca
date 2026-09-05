@@ -2,6 +2,10 @@
 
 Print-ready meshes exported from the CAD sources.
 
+> **ESP32 housing warning:** all Rev B controller-housing meshes and coupons are
+> superseded and must not be printed. They model wiring above the terminal blocks
+> rather than through the DORHEA adapter's horizontal side-entry terminals.
+
 **Intended contents**
 - `.stl` (or `.3mf`) files ready to slice and print.
 - Optional print notes (orientation, supports, material) alongside each part.

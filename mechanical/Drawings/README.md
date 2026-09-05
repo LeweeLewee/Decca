@@ -6,7 +6,11 @@ Dimensioned engineering drawings for fabrication, measurement, and reference.
 - PDF drawings with critical dimensions and tolerances.
 - Reference sketches for cabinet fit and mounting.
 
-## ESP32 controller housing — Rev B, **PROTOTYPE CAD, not physically validated**
+## ESP32 controller housing — Rev B, **SUPERSEDED — DO NOT PRINT**
+
+The actual DORHEA adapter uses horizontal side-entry screw terminals. Rev B's
+above-terminal cable route is wrong, so every Rev B housing render and drawing
+is retained as design history only. Specification v1.5 controls the replacement.
 
 | File | Contents |
 |---|---|
