@@ -38,6 +38,8 @@ firmware. They record the current physical evidence and open work.
 4. **Non-blocking.** No `delay()` in `loop()`/`update()`; use `millis()` timing.
 5. **The header is the contract.** Keep public interfaces stable and documented.
 6. **Persist only through `settings`** (NVS). No direct NVS writes elsewhere.
+7. **Version once.** Update `src/version.h` for every firmware release; the
+   startup screen and serial boot report consume that same value.
 
 ## Working style
 - Edit one module at a time; keep its header stable.

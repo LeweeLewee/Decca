@@ -37,10 +37,14 @@ constexpr uint32_t kDimAfterMs = 60'000;
 constexpr uint32_t kSleepAfterMs = 300'000;
 constexpr uint32_t kStandbySleepAfterMs = 10'000;
 constexpr uint16_t kControlMax = 1000;
-constexpr uint32_t kStartupDurationMs = 1000;
+constexpr uint32_t kStartupAnimationDurationMs = 1000;
+constexpr uint32_t kStartupDurationMs = 2000;
 constexpr uint8_t kStartupFrameCount = 5;
 constexpr uint32_t kStartupFrameIntervalMs =
-    kStartupDurationMs / kStartupFrameCount;
+    kStartupAnimationDurationMs / kStartupFrameCount;
+constexpr uint32_t kStartupFinalFrameHoldMs =
+    kStartupDurationMs -
+    ((kStartupFrameCount - 1U) * kStartupFrameIntervalMs);
 constexpr uint32_t kControlDurationMs = 2000;
 constexpr uint32_t kStatusDurationMs = 1500;
 constexpr uint32_t kDiagnosticDurationMs = 3000;
@@ -166,6 +170,7 @@ struct Frame {
     Control control;
     uint16_t controlValue;
     uint8_t startupFrame;
+    const char* firmwareVersion;
     const char* message;
 };
 

@@ -9,6 +9,7 @@
 #include "pots.h"
 #include "power.h"
 #include "settings.h"
+#include "version.h"
 
 namespace {
 
@@ -126,6 +127,8 @@ void applyLightingState() {
 
 void setup() {
     Serial.begin(115200);
+    Serial.print("[SYSTEM] firmware=");
+    Serial.println(decca::version::kFirmwareVersion);
     decca::hardware::init();
     decca::settings::init();
     decca::buttons::init();

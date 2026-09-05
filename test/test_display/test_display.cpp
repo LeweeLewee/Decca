@@ -30,6 +30,7 @@ char g_lastFunction[decca::display::kFunctionCapacity + 1]{};
 char g_lastTitle[decca::display::kTitleCapacity + 1]{};
 char g_lastArtist[decca::display::kArtistCapacity + 1]{};
 char g_lastMessage[decca::display::kMessageCapacity + 1]{};
+char g_lastFirmwareVersion[16]{};
 
 template <size_t Capacity>
 void captureText(char (&destination)[Capacity], const char* source) {
@@ -56,6 +57,7 @@ void captureFrame(const decca::display::testing::Frame& frame) {
     captureText(g_lastTitle, frame.state.title);
     captureText(g_lastArtist, frame.state.artist);
     captureText(g_lastMessage, frame.message);
+    captureText(g_lastFirmwareVersion, frame.firmwareVersion);
     g_lastState.functionName = g_lastFunction;
     g_lastState.title = g_lastTitle;
     g_lastState.artist = g_lastArtist;
@@ -74,6 +76,7 @@ void startInjected(bool beginResult = true) {
     g_lastTitle[0] = '\0';
     g_lastArtist[0] = '\0';
     g_lastMessage[0] = '\0';
+    g_lastFirmwareVersion[0] = '\0';
     decca::display::testing::setTimeProvider(fakeTime);
     decca::display::testing::setPanelBegin(fakeBegin);
     decca::display::testing::setFrameWriter(captureFrame);
@@ -174,7 +177,14 @@ void test_display_animates_startup_without_blocking() {
         TEST_ASSERT_EQUAL_UINT8(frame, g_lastStartupFrame);
     }
 
-    g_nowMs += decca::display::kStartupFrameIntervalMs;
+    TEST_ASSERT_EQUAL_STRING("0.27.0", g_lastFirmwareVersion);
+    g_nowMs += decca::display::kStartupFinalFrameHoldMs - 1U;
+    decca::display::update();
+    TEST_ASSERT_EQUAL_UINT16(decca::display::kStartupFrameCount, g_frameCount);
+    TEST_ASSERT_EQUAL(static_cast<int>(FrameKind::Startup),
+                      static_cast<int>(g_lastKind));
+
+    ++g_nowMs;
     decca::display::update();
     TEST_ASSERT_EQUAL_UINT16(decca::display::kStartupFrameCount + 1U,
                             g_frameCount);

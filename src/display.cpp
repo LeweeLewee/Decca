@@ -13,6 +13,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include "version.h"
+
 namespace decca::display {
 namespace {
 
@@ -283,9 +285,13 @@ void renderStartup(uint8_t frame) {
     const int16_t halfLine = static_cast<int16_t>(12U + (frame * 10U));
     g_panel.drawFastHLine(64 - halfLine, 43, halfLine * 2, SH110X_WHITE);
     if (frame + 1U == kStartupFrameCount) {
+        char identity[24]{};
+        std::snprintf(identity,
+                      sizeof(identity),
+                      "MUSIC CENTRE v%s",
+                      version::kFirmwareVersion);
         g_panel.setTextSize(1);
-        g_panel.setCursor(28, 50);
-        g_panel.print("MUSIC CENTRE");
+        printCentredClipped(identity, 20, 50);
     }
     g_panel.display();
 }
@@ -471,6 +477,7 @@ void writeFrame(FrameKind kind) {
                                    g_transientControl,
                                    g_transientControlValue,
                                    g_startupFrame,
+                                   version::kFirmwareVersion,
                                    g_message};
         g_frameWriter(frame);
         return;

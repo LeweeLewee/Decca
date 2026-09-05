@@ -6,7 +6,7 @@
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
 | Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. DFR0457 is installed and its initial steady-light test resolved flicker; full HW-LGT-01 acceptance remains open at 1 kHz PWM. Normal Stereo lighting is 85% / duty 217; Mono and standby are off. Eight on-target suites last passed 55/55. WiiM integration remains outstanding. |
-| Version  | 0.26                                              |
+| Version  | 0.27                                              |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -110,7 +110,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-DSP-03 | While a streaming source is playing, the default on-state view shall show available now-playing information, including mapped function/source, title and artist. If metadata is absent, it shall fall back to the mapped function rather than a blank or stale now-playing view. | 2 |
 | FR-DSP-04 | The display shall render configuration menus.                                | 3     |
 | FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
-| FR-DSP-06 | Startup shall show a short, non-blocking monochrome Decca-logo animation lasting approximately 1 s. | 1 |
+| FR-DSP-06 | Cold startup and OTA reboot shall show a short, non-blocking monochrome Decca-logo animation, followed by the firmware version in the calibrated visible area. Logical standby/wake shall not replay it. | 1 |
 | FR-DSP-07 | The display shall identify the mapped logical function prominently. Legacy fascia button labels shall not consume space in normal, now-playing or function-confirmation views. | 2 |
 | FR-DSP-08 | The OLED shall reduce uneven ageing by dimming after inactivity, turning pixels off after extended inactivity and while logically off, and waking immediately on relevant activity. | 1 |
 

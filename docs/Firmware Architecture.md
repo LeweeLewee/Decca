@@ -56,7 +56,8 @@ AI-assisted editing.
   `lighting` does not read buttons or power state directly.
 - **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C
   address 0x3C. Its presentation contract is defined by ADR-0007: a short
-  non-blocking monochrome Decca-logo startup animation; standby; transient
+  non-blocking monochrome Decca-logo startup animation whose final frame shows
+  the firmware version; standby; transient
   control views; diagnostics; and an explicit SW unavailable message. The
   production coordinator supplies all four pot values and persistent source
   state. Volume is presented as 0–100%; Bass/Treble use centred −50..0..+50;
