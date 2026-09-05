@@ -6,6 +6,55 @@ Dimensioned engineering drawings for fabrication, measurement, and reference.
 - PDF drawings with critical dimensions and tolerances.
 - Reference sketches for cabinet fit and mounting.
 
+## ESP32 controller housing — Rev B, **SUPERSEDED — DO NOT PRINT**
+
+The actual DORHEA adapter uses horizontal side-entry screw terminals. Rev B's
+above-terminal cable route is wrong, so every Rev B housing render and drawing
+is retained as design history only. Specification v1.5 controls the replacement.
+
+**Replacement CAD has not started.** The v1.5 §15 measurement gate is open:
+the repository holds no model or drawing of the DORHEA adapter, and twelve of
+the thirteen mandatory inputs are unmeasured. See the measurement request.
+
+| File | Contents |
+|---|---|
+| `Decca_ESP32_Controller_Housing_Spec_v1.0.md` | The controlling specification. Its content is revision **v1.5**; the filename is kept for link stability. Authority for the architecture. |
+| `Decca_ESP32_Controller_Housing_Measurement_Request.md` | **What has to be measured before replacement CAD can begin.** Datums, twenty labelled measurements, four scaled photographs, and the minimum set that unblocks the architecture. |
+| `Decca_ESP32_Controller_Housing_Build_Report_revB.md` | Rev B build report: the Rev A before/after, derived dimensions, both verification suites and what they caught, the material arithmetic, every open prototype gate, print orientations and the recommended first print. |
+| `Decca_ESP32_Controller_Housing_revB_01_closed.png` | Closed housing. |
+| `..._02_lid_removed.png` | Lid removed, controller and breakout in place. |
+| `..._03_exploded.png` | Exploded assembly. |
+| `..._04_plan.png` / `..._05_elevation.png` | Overall plan and elevation. |
+| `..._06_section.png` / `..._06b_section_oblique.png` | Longitudinal section on y = 0: floor, support height, carrier, ledge, clamp, lid overlap and cavity headroom in one view. |
+| `..._07_terminal_access.png` | All thirty screwdriver corridors as solids, lid removed. |
+| `..._08_cable_windows.png` | The four open-bottom cable windows with the grouped H1-H6 bundles passing through them. |
+| `..._09_strain_relief.png` | All four cable ties closed on their grouped bundles. |
+| `..._09b_tie_alignment.png` | Each harness from its terminals, through its aligned tie, to its own window. |
+| `..._09c_tie_heads_and_tool.png` | Locking heads, cut tails and the tightening/tool volume. |
+| `..._09d_anchor_detail.png` | **The buttressed cable-tie pier, close up and uncluttered** — pier, outboard buttress, R9.00 root blend, aperture and peaked roof. Base geometry only: no keep-outs, no tool-clearance blocks. |
+| `..._09e_anchor_and_tie.png` | The same anchor in elevation with its tie fitted: strap through the aperture, loop closed on the bundle, locking head. Still no tool volume. |
+| `..._10_usb_access.png` | USB service envelope swept to the connector. |
+| `..._11_cabinet_fixings.png` | The two recessed cabinet fixings, from below, against the underside-joint envelope. |
+| `..._11b_cabinet_fixing_section.png` | Screw, countersink, retained cap and carrier clearance, in section. |
+| `..._12_antenna_keepout.png` | Wi-Fi antenna keep-out. |
+| `..._13_retention.png` | Fixed ledge and adjustable clamp against the no-contact envelope. |
+| `..._14_locating_hooks.png` | The two locating hooks on the -X end. |
+| `..._15_coupon_a_carrier.png` | Coupon A, the carrier interface — print this one first. |
+| `..._16_coupon_b_inserts.png` | Coupon B, the fastener interfaces including the horizontal insert. |
+| `..._17_insert_test_features.png` | Both insert bosses in the base, with the metal that goes in them. |
+
+Every image is regenerated from the model by `images()`; none is posed by hand.
+Keep-out volumes are drawn as translucent yellow solids and acquired hardware
+as green, so a reader can tell manufacturing geometry from a dimensional
+assumption without opening the browser.
+
+The sixteen `..._revA_*.png` renders and the Rev A build report are removed:
+they show lacing rails, mounting ears, sawtooth window roofs and a USB plug,
+none of which exists any more. The useful historical finding — that Rev A was
+rejected for bulk despite passing all eighteen of its gates — is carried
+forward in sections 1 and 6.1 of the Rev B report.
+
+
 ## Active OLED mount design direction
 
 `Decca_OLED_Display_Mount_CAD_Review_revO.md` is the authoritative carrier
