@@ -69,8 +69,8 @@ STL volume: **4326.486776 mm³**
 
 ## 5. Local build checksums
 
-- CadQuery source: `f250960907e469c918e4fdcedf5afdaacd5c5fa8030b11cbf4834b3f000ce201`
-- STEP: `a60416c8fb1f53fdb350dbb5a650b5539423d824014c4a421353b48734b1580e`
+- CadQuery source: `9059de6e1bbab96b47661f52f4956d324f0525bc6c3a7dd28f094467b303c1b3`
+- STEP: `88490a052b2ffc9eee2647a45866b8bced727ce17cc5107601133e631fd2de1e`
 - STL: `f8f2b5cd85442c2af8480e3f829a39a151d1d11ab3b5c1a89496b39c6e7720e2`
 
 ## 6. Physical gate

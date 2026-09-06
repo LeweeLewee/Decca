@@ -1,5 +1,24 @@
 # CAD
 
+## IEC C14 mounting plate — Rev B — ACTIVE PROTOTYPE / PHYSICAL FIT PENDING
+
+**Rev A is rejected.** Rev B replaces the rectangular opening with the measured six-sided C14 profile.
+
+| File | Role |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_revB_cadquery.py` | controlling parametric Rev B source |
+| `Decca_IEC_C14_Mounting_Plate_revB_verify.py` | independent exported STEP/STL verifier |
+| `Decca_IEC_C14_Mounting_Plate_revB_drawing.py` | dimensioned profile drawing generator |
+| `Decca_IEC_C14_Mounting_Plate_revB.step` | neutral Rev B CAD export |
+
+Measured native profile: **27.14 × 19.50 mm**, **16.00 mm short flat**, **14.00 mm straight side**, with each angled section derived as **5.57 mm run × 5.50 mm rise = 44.638°**. Nominal inlet corners are **R2.00** at the two long-flat corners and **R0.40** at the other four. Production opening uses **0.25 mm normal clearance** and is rotated 90° in the plate.
+
+**15/15 Rev B exported-geometry checks PASS.** Physical fit remains mandatory before release.
+
+### Rev A — REJECTED
+
+The Rev A source and exports are retained for traceability only. Its 20.00 × 27.60 mm rectangular opening does **not** properly enclose the physical C14 profile and must not be printed or installed.
+
 ## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
 
 Rev A is a reproducible CadQuery model built from the measured purchased inlet interface. The controlling specification is `../Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md`.

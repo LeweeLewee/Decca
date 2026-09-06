@@ -1,5 +1,17 @@
 # STL
 
+## IEC C14 mounting plate — Rev B — ACTIVE PROTOTYPE
+
+| File | Print notes |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_revB.stl` | **Use this prototype; do not use Rev A.** PETG minimum; 0.20 mm layers; 4+ perimeters; 100% infill; broad face on bed; no supports. The opening follows the measured six-sided C14 profile with 0.25 mm normal clearance. |
+
+Status is **CAD PASS / physical fit pending**. Confirm socket-profile enclosure, M3/M2 alignment, flat clamping and rear-terminal/wire clearance before release.
+
+### Rev A — REJECTED
+
+`Decca_IEC_C14_Mounting_Plate_revA.stl` is retained only as the failed prototype record and must not be printed for installation.
+
 ## IEC C14 mounting plate — Rev A — PROTOTYPE
 
 | File | Print notes |

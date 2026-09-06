@@ -1,5 +1,18 @@
 # Drawings
 
+## IEC C14 mounting plate — Rev B — ACTIVE / PHYSICAL FIT PENDING
+
+**Rev A is rejected following physical review. Rev B is the active design.**
+
+| File | Role |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_Spec_revB.md` | controlling corrected-profile specification |
+| `Decca_IEC_C14_Mounting_Plate_revB_Build_Report.md` | Rev B exported-geometry validation record |
+| `Decca_IEC_C14_Mounting_Plate_revB_views.png` | dimensioned measured-profile and installed-orientation view |
+| `Decca_IEC_C14_Mounting_Plate_revA_Build_Report.md` | rejected Rev A physical-failure record retained for traceability |
+
+Rev B uses the complete six-sided inlet profile defined by 27.14, 19.50, 16.00 and 14.00 mm measured datums, calculated **44.638°** angled sides, R2.00 long-flat corners and R0.40 remaining corners. **15/15 CAD checks PASS; prototype fit is still required.**
+
 ## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
 
 | File | Role |

@@ -1,5 +1,7 @@
 # Decca IEC C14 Mounting Plate — Rev A Specification
 
+> **REJECTED 2026-09-06:** Physical review showed that the rectangular Rev A opening does not properly enclose the IEC C14 profile. **Do not build or install Rev A.** The controlling design is now `Decca_IEC_C14_Mounting_Plate_Spec_revB.md`.
+
 **Status:** design inputs locked; ready for CAD build  
 **Scope:** mechanical mounting plate only  
 **Branch:** `feat/iec-c14-mounting-plate`
