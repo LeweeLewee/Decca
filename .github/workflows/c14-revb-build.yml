@@ -1,4 +1,4 @@
-name: One-time C14 Rev B build
+name: Finalise C14 Rev B documentation
 
 on:
   push:
@@ -6,15 +6,12 @@ on:
       - feat/iec-c14-mounting-plate
     paths:
       - .github/workflows/c14-revb-build.yml
-      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_cadquery.py
-      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_verify.py
-      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_drawing.py
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  finalise:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,29 +19,19 @@ jobs:
           ref: feat/iec-c14-mounting-plate
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Update Rev B indexes and status
+        run: python .github/c14_revb_finalize.py
 
-      - name: Install CAD dependencies
-        run: python -m pip install --upgrade pip cadquery==2.8.0 trimesh matplotlib
-
-      - name: Generate and verify Rev B artefacts
-        run: |
-          python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_cadquery.py
-          python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_drawing.py
-          python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_verify.py
-
-      - name: Commit generated Rev B artefacts
+      - name: Commit documentation and remove one-time helpers
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB.step \
-                  mechanical/STL/Decca_IEC_C14_Mounting_Plate_revB.stl \
-                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_views.png
-          if git diff --cached --quiet; then
-            echo 'No generated changes to commit'
-          else
-            git commit -m 'mech(c14-mount): build rev B corrected profile'
-            git push origin HEAD:feat/iec-c14-mounting-plate
-          fi
+          git rm .github/workflows/c14-revb-build.yml .github/c14_revb_finalize.py
+          git add mechanical/CAD/README.md \
+                  mechanical/STL/README.md \
+                  mechanical/Drawings/README.md \
+                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md \
+                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_Build_Report.md \
+                  'docs/Revision History.md'
+          git commit -m 'docs(c14-mount): make rev B active prototype'
+          git push origin HEAD:feat/iec-c14-mounting-plate
