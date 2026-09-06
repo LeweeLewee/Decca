@@ -47,7 +47,7 @@ this board, and twelve of the thirteen mandatory inputs are unmeasured.**
 | Usable conductor insertion depth | — | **absent from the model entirely** |
 | Terminal pitch and exact positions | **row length 53.00 mm**; pitch consistent with 3.50 | ✅ **row length MEASURED 2026-09-06**; pitch inferred, not measured |
 | Practical wire and ferrule envelope | 2.00 mm conductor Ø | **assumed** |
-| Mounting-hole diameter and centres | **60 × 57 mm centre pitch**; diameter still open | ✅ **pitch MEASURED 2026-09-06**; diameter still open |
+| Mounting-hole diameter and centres | **60 × 57 mm centre pitch; the holes take M3** | ✅ **CLOSED 2026-09-06** |
 | USB connector position | DevKit starting values | **assumed** |
 | Component-free PCB-edge regions | 3.00 mm short / 2.50 mm long | **assumed** |
 | **Complete assembly height** | **20.00 mm overall** | ✅ **MEASURED 2026-09-05** |
@@ -108,7 +108,7 @@ them.
 
 | ID | Measure | From | Feeds |
 |---|---|---|---|
-| M14 | **Mounting-hole** diameter and each hole centre | Datum B and C | ⚠ **PART-CLOSED: centre pitch 60 mm across × 57 mm along**, owner 2026-09-06 (re-measured the same day, superseding 58 × 56). **Hole diameter still open**, and it decides whether hole-based retention can replace the ledge and clamp — see §10. |
+| M14 | **Mounting-hole** diameter and each hole centre | Datum B and C | ⚠ **PART-CLOSED: centre pitch 60 mm across × 57 mm along**, owner 2026-09-06 (re-measured the same day, superseding 58 × 56). ✅ **CLOSED the same day: the holes take M3.** That is the screw size, not a calliper reading of the bore, which is recorded as a 3.20 mm starting value. It is enough to settle §10. |
 | M15 | **USB opening** centre height, width, and position along the short edge; how far the shell protrudes past the PCB edge | Datum A / Datum C | ≥14 × 9 mm opening, gate 10 |
 | M16 | **Component-free strip** along each PCB edge, **top face** | each edge | fixed ledge and clamp bearing, gate 13 |
 | M17 | **Component-free strip** along each PCB edge, **underside**, and whether the board's centreline near each short end is clear underneath | each edge | support pads and the two recessed cabinet fixings, gates 3 and 16 |
@@ -185,7 +185,7 @@ and Drawings READMEs and the Rev B build report already state at the top.
 |---|---|---|---|
 | 2026-09-05 | — | Complete assembly height **20.00 mm overall** | From the assembly's lowest underside feature (Datum A) to its highest point. Recorded in specification v1.5 §9.3. |
 | 2026-09-06 | **M8** | PCB outline **66 × 63 mm** | Confirms the supplier-stated plan envelope. **Axis corrected by the owner the same day: the 66 mm is ACROSS the board, from one connector side to the other, and the 63 mm runs ALONG the rows.** Any overhang beyond this outline is still open (M13). |
-| 2026-09-06 | **M14** (part) | Mounting-hole centre pitch **60 mm across × 57 mm along** | Re-measured the same day, superseding an earlier 58 × 56 reading. Every hole is then 3.00 mm from its nearest board edge — see below. Diameter still open. |
+| 2026-09-06 | **M14** | Mounting-hole centre pitch **60 mm across × 57 mm along**; the holes take **M3** | Re-measured the same day, superseding an earlier 58 × 56 reading. Every hole is then 3.00 mm from its nearest board edge — see below. **M14 is closed.** The exact bore is not calliper-measured and is recorded as a 3.20 mm starting value. |
 | 2026-09-06 | **M4** | Terminal blocks **55.00 mm outer face to outer face** | On the 66.00 mm across dimension this puts each block's outward face **5.50 mm inboard of its long PCB edge**. |
 | 2026-09-06 | **M5** (part) | Terminal-block row **length 53.00 mm** | 15 ways in 53.00 mm is consistent with 3.50 mm pitch. Pitch inferred, not measured. Leaves 5.00 mm of clear board beyond each end of the rows. |
 | 2026-09-06 | **M6** (part) | Terminal-block **total height 9.00 mm** | Recorded as the block's own body height. Datum to confirm. Per-block depth in Y still open. |
@@ -209,7 +209,7 @@ These are consequences of the measured numbers, not new measurements:
 
 The owner re-took the reading against a dimensioned top view and returned **60.00 mm across × 57.00 mm along**, which closes exactly — **3.00 mm from every board edge on both axes**, nothing left over. It is also the only resolution that corrects both numbers together rather than adjusting one of the four by 1.00 mm. The discrepancy is closed, not carried.
 
-**Hole diameter (M14) is still open**, and it remains the one thing that decides §10.
+**M14 is closed.** The owner reported the holes as **M3** the same day, which is what §10 was waiting on.
 
 These are recorded here as they arrive. They will be rolled into specification
 §3 in one revision when the blocking set is complete, so the specification is
@@ -253,13 +253,54 @@ terminal bore. The housing never enters the bore.
 
 Specification v1.5 §4.5–4.6 mandates a fixed ledge at one short PCB edge and an
 adjustable clamp with two M3 screws at the other, because §3 recorded no usable
-mounting-hole pattern. **A 60 mm across × 57 mm along pattern is now measured**, putting every hole 3.00 mm from its nearest board edge and 2.50 mm outboard of the nearest terminal-block face. If the hole
-diameter suits an M2.5 or M3 pillar, two or four short pillars could replace the
-fixed ledge, the adjustable clamp, its two M3 screws and its two heat-set
-inserts outright — less material, fewer parts, no clamp travel to verify, and
-retention that cannot bow the board.
+mounting-hole pattern. There now is one: **60 mm across × 57 mm along, holes
+taking M3**, every hole 3.00 mm from its nearest board edge.
 
-That is a specification decision, not a CAD one, and §4.5–4.6 currently forbid
-it. **It is raised here, not acted on.** It needs the hole diameter (M14) and an
-owner decision on whether to amend §4. The board-edge retention route remains
-fully viable if the answer is no.
+### 10.1 The clearance is better than the orthogonal margins suggest
+
+A hole centre sits 2.00 mm beyond the row end and 2.50 mm outboard of the block
+face. Neither is the binding number, because the hole is outboard on **both**
+axes at once — the nearest block material is the block's **corner**, 3.202 mm
+away diagonally.
+
+| At a corner hole | to the block corner | to the board edge |
+|---|---:|---:|
+| M3 socket cap, Ø5.50 | **+0.45 mm** | +0.25 mm |
+| M3 pan, Ø5.60 | +0.40 mm | +0.20 mm |
+| M3 countersunk, Ø6.00 | +0.20 mm | 0.00 mm |
+| M3 with a DIN 125 washer, Ø7.00 | **−0.30 mm** | −0.50 mm |
+
+A plain M3 head fits at all four corners. A washer does not, and a countersunk
+head sits exactly flush with the board edge.
+
+### 10.2 The support pads are already under the holes
+
+Not designed in — noticed. Each of the four support pads spans x 23.00–31.00,
+y 28.75–31.75, and each hole centre is at (28.50, 30.00), inside that footprint.
+A Ø2.9 post through a hole spans y 28.55–31.45, overhanging the pad's inboard
+edge by 0.20 mm; a 0.50 mm pad widening absorbs it. **The four pads that already
+carry the board are in the right place to locate it as well.**
+
+### 10.3 The decision
+
+Two routes are now open, and they are not close in cost:
+
+- **Posts, no hardware.** Four Ø2.9 posts grown off the existing pads, through
+  the mounting holes, with the lid holding the board down. This deletes the
+  fixed ledge, the adjustable clamp, its two M3 screws, its two heat-set
+  inserts, the clamp slot, the plinths and the whole clamp-travel gate — one
+  fastener family and one moving part gone, and the only unproven fastener in
+  the programme (the heat-set insert) with them.
+- **Keep §4.5–4.6.** The ledge and clamp, which work today and pass every gate.
+
+**The real trade is tolerance, not material.** The clamp forgives ±1.00 mm of
+board-length error by design; four rigid posts forgive only the hole clearance,
+about 0.15 mm per side on a Ø3.20 bore, and they must all line up at once. The
+classic mitigation is two round posts and two elongated into slots, which
+constrains position and rotation without over-constraining. That is a real
+design question and it has not been answered here.
+
+It is also a **specification decision, not a CAD one** — §4.5–4.6 currently
+forbid it, and they would have to be amended first. **It is raised here, not
+acted on.** The board-edge retention route remains fully viable if the answer
+is no.

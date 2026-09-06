@@ -48,6 +48,7 @@ The first housing revision with any measured hardware in it.
 | Terminal-block row length | **53.00 mm** | owner, 2026-09-06 |
 | Terminal-block height | **9.00 mm** | owner, 2026-09-06 |
 | Mounting-hole centre pitch | **60 mm across × 57 mm along** | owner, 2026-09-06; re-measured the same day, superseding 58 × 56 |
+| Corner mounting-hole size | **M3** | owner, 2026-09-06 |
 | Conductor entry position | just above the block base | owner, 2026-09-06 |
 
 **The 66 mm is measured across the board, from one connector side to the
@@ -105,8 +106,33 @@ are 5.50 mm inboard of the long edges.
 only — they appear in the generator's measured block and in the verifier's
 constants, and are referenced by no derivation, no body and no gate. Retention
 is the fixed ledge and the adjustable clamp on the short edges, per v1.6
-§4.5–4.6. The **hole diameter is still unmeasured**, and it is the one thing
-that decides whether hole-based retention could replace them — see §7.
+§4.5–4.6.
+
+### 2.3 The holes take M3, and the corner clearance is better than it looks
+
+Reported by the owner on 2026-09-06. That is the **screw size, not a calliper
+reading of the bore**, so `mount_hole_d` is recorded as a 3.20 mm starting value
+— Ø3.00 is equally common and nothing here distinguishes them. Nothing in this
+design uses it.
+
+The orthogonal margins understate the real clearance, and it is worth writing
+down why. A hole centre sits 2.00 mm beyond the row end and 2.50 mm outboard of
+the block face — but it is outboard on **both** axes at once, so the nearest
+block material is the block's **corner**, 3.202 mm away diagonally:
+
+| At a corner hole | to the block corner | to the board edge |
+|---|---:|---:|
+| M3 socket cap, Ø5.50 | **+0.45 mm** | +0.25 mm |
+| M3 pan, Ø5.60 | +0.40 mm | +0.20 mm |
+| M3 countersunk, Ø6.00 | +0.20 mm | 0.00 mm |
+| M3 with a DIN 125 washer, Ø7.00 | **−0.30 mm** | −0.50 mm |
+
+So a plain M3 head fits and a washer does not. Separately — and this was not
+designed in — **the four existing support pads already sit under the four
+mounting holes.** Each pad spans x 23.00–31.00, y 28.75–31.75; each hole centre
+is at (28.50, 30.00), inside that footprint. A Ø2.9 post through the hole would
+overhang the pad's inboard edge by 0.20 mm, which a 0.50 mm pad widening
+absorbs. §10 of the measurement request carries the decision that follows.
 
 ## 3. The one design move that decides everything
 
@@ -321,7 +347,8 @@ protrusion (2.50), which together set the 4.50 mm pad height; terminal-block
 depth in Y (6.50); the heat-set insert (4.00 × 5.00, still unrecorded anywhere
 in this repository); the acquired cabinet screw's head against the declared
 6.20 mm maximum envelope; the USB connector position; real conductor and ferrule
-sizes; EN and BOOT positions, so no holes are cut.
+sizes; EN and BOOT positions, so no holes are cut; and the mounting holes'
+exact bore, recorded at 3.20 from the reported M3 and used by nothing.
 
 **Behaviour nothing geometric can settle:** that nothing sits under the board
 outside the four modelled joint rows; the 0.25 mm lid fit on this printer and

@@ -92,6 +92,10 @@ MOUNT_PITCH = (57.00, 60.00)   # owner, 2026-09-06; along, across. Re-measured
                                # same day, superseding 58 x 56: 60/57 puts every
                                # hole 3.00 mm from its nearest edge on both axes.
                                # Recorded only - no gate depends on it.
+MOUNT_HOLE_D = 3.20            # the holes take M3 - owner, 2026-09-06. The
+                               # screw size, not a measured bore, so this is
+                               # a STARTING figure. Recorded only; nothing in
+                               # the current design uses the holes.
 
 X_PCB = 31.50
 Y_PCB = 33.00

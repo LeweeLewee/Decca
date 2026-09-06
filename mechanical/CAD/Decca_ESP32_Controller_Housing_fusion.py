@@ -160,6 +160,15 @@ P = {
     # Recorded only - nothing in this design uses the holes.
     "mount_pitch_x": 57.00,          # MEASURED 2026-09-06, ALONG the rows
     "mount_pitch_y": 60.00,          # MEASURED 2026-09-06, ACROSS the rows
+    # The holes take an M3 screw - owner, 2026-09-06. That is the screw
+    # size, not a calliper reading of the bore, so the bore stays STARTING
+    # at the 3.20 standard M3 clearance; 3.00 is equally common and
+    # nothing available here tells them apart. NOTHING IN THIS DESIGN USES
+    # IT - retention is the ledge and clamp of v1.6 4.5-4.6 - so it is not
+    # a prototype gate for the geometry as it stands. It is recorded
+    # because it is what decides whether hole-based retention could
+    # replace them, which is an open specification question, not a CAD one.
+    "mount_hole_d": 3.20,            # STARTING, from "M3" reported 2026-09-06
 
     # -- The adapter, STARTING ----------------------------------------------
     "adapter_pcb_t": 1.60,           # STARTING
@@ -327,6 +336,7 @@ STARTING = (
     "esp_usb_w", "esp_usb_h", "esp_usb_l",
     "wire_d", "ferrule_d", "ferrule_l",
     "insert_hole_d", "insert_depth", "cab_head_d_nom",
+    "mount_hole_d",
 )
 
 # Assumptions the owner has not confirmed, recorded so they cannot pass as
@@ -632,8 +642,8 @@ def derive(P):
     d["lid_ret_pos"] = d["x_out_pos"] - P["corner_return_l"] - P["end_wall_t"]
 
     # ---- support pads, in the clear side strip -----------------------------
-    d["pad_x"] = d["x_pcb"] - P["pad_l"] / 2.0 - 0.50        # 28.50
-    d["pad_y"] = (d["y_term_out"] + d["y_pcb"]) / 2.0        # 29.50
+    d["pad_x"] = d["x_pcb"] - P["pad_l"] / 2.0 - 0.50        # 27.00
+    d["pad_y"] = (d["y_term_out"] + d["y_pcb"]) / 2.0        # 30.25
     d["pad_margin"] = (d["clear_side"] - P["pad_w"]) / 2.0
 
     # ---- fixed ledge, -X short edge ----------------------------------------

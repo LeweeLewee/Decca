@@ -70,7 +70,7 @@ Use repository source dimensions and existing measured references as the design 
 | Mounting-hole centre pitch | **60 mm across × 57 mm along — owner-measured 2026-09-06**, re-measured the same day and superseding an earlier 58 × 56 reading that left 1.00 mm unaccounted for. On the recorded 66 × 63 board this puts every hole **3.00 mm from its nearest edge on both axes**, and 2.50 mm outboard of the nearest block face. **Hole diameter still not measured**, and it alone decides whether hole-based retention could replace §4.5–4.6. |
 | Adapter PCB thickness | 1.6 mm starting value; physically measure |
 | Terminal-port bore size and internal insertion depth | **OUT OF SCOPE, owner 2026-09-06.** They do not drive housing geometry; §5.3 clears the whole block height instead |
-| Corner mounting-hole diameter | **UNMEASURED**; do not use for retention until measured and until §4.5–4.6 are amended |
+| Corner mounting-hole size | **M3 — owner, 2026-09-06.** The screw size, not a calliper reading of the bore; Ø3.20 standard clearance is recorded as the working starting value. Hole-based retention is now geometrically possible — a plain M3 head clears the nearest block corner by 0.45 mm — but **§4.5–4.6 still forbid it** until they are amended. See the measurement request §10. |
 | Complete adapter plus fitted ESP32 height | **20 mm overall — physically measured by the owner, 2026-09-05** |
 | Required space below PCB | 2.5 mm starting value |
 | General XY fit clearance | 0.5 mm per constrained side |
