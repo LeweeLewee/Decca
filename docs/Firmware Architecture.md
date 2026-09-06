@@ -55,10 +55,11 @@ AI-assisted editing.
   4.34 seconds. `main` selects that normal target
    only when logically on and Stereo is requested; Mono and standby select zero.
    `lighting` does not read buttons or power state directly.
-- **Boot safe-off** is established before serial, settings, display or network
-  initialisation. `hardware::init()` first drives GPIO18/D18 LOW, then attaches
-  LEDC at duty 0. A required external 10 kΩ pull-down holds the DFR0457 control
-  input LOW during reset and the high-impedance interval before `setup()`.
+- **Boot safe-off** is established as early as firmware can act: before serial,
+  settings, display or network initialisation, `hardware::init()` first drives
+  GPIO18/D18 LOW and then attaches LEDC at duty 0. The owner has deferred the
+  recommended external pull-down, so firmware cannot guarantee the D18 level
+  during ROM reset or the high-impedance interval before `setup()`.
 - **`display`** drives the purchased 1.3-inch 128×64 SH1106 panel at I²C
   address 0x3C. Its presentation contract is defined by ADR-0007: a short
   non-blocking monochrome Decca-logo startup animation whose final frame shows

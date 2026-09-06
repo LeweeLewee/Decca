@@ -203,8 +203,9 @@ the user's Wi-Fi or OTA passwords.
    lamps on, then temperature and installed lamp current before closing.
 10. **Open (2026-09-06):** deploy feature firmware v0.28.0 by authenticated OTA
     while old D19/D25 wiring remains, then—only after confirmed power-off—move
-    the switch signal to D26 and DFR0457 control signal to D18. Retain a 10 kΩ
-    D18/control-input-to-GND pull-down and physically verify the new assignments.
+    the switch signal to D26 and DFR0457 control signal to D18. The owner has
+    deferred the recommended external pull-down, so specifically observe boot
+    for any lamp flash and physically verify the new assignments.
 11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -277,8 +278,9 @@ Final MOSFET/three-lamp acceptance is open under HW-LGT-01. Preserve the require
 fades to 85%; Mono and standby fade off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
-GPIO16 remains unused; GPIO18 is reserved for dial-light PWM with a permanent
-10 kΩ pull-down to GND. Preserve the final OLED loom: Brown GND,
+GPIO16 remains unused; GPIO18 is reserved for dial-light PWM. The owner deferred
+the recommended external pull-down, leaving pre-`setup()` safe-off unguaranteed.
+Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
 Keep the ESP32 control/UI-only, preserve module independence, update all affected

@@ -188,7 +188,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | HW-10  | The original source-selector **PCB shall be retained** as the mechanical carrier for the interlocked selector mechanism (ADR-0001); it shall not be discarded. |
 | HW-11  | Proposed GPIO assignments (see `docs/Wiring.md`) shall be treated as **proposed** until bench-verified, and `src/hardware.h` reconciled to them (HW-06). |
 | HW-12  | Dial lighting shall be switched by a logic-level N-channel MOSFET under ESP32 PWM, with ESP32 and lighting grounds common. |
-| HW-13  | The DFR0457 control/PWM node on GPIO18/D18 shall have a permanent 10 kΩ pull-down to common GND; firmware shall drive it LOW before other peripheral initialisation and attach LEDC initially at duty 0. |
+| HW-13  | Firmware shall drive the DFR0457 control/PWM node on GPIO18/D18 LOW before other peripheral initialisation and attach LEDC initially at duty 0. An external pull-down is recommended for reset-time protection but deferred by the owner; firmware cannot control the pin before `setup()`. |
 
 ---
 

@@ -355,7 +355,8 @@ transition and physical verification. Keep the Decca disconnected from mains.
 
 1. Check the MOSFET stage before applying power:
    - GPIO18 / board label D18 connects only to the DFR0457 control/PWM input;
-   - a 10 kΩ pull-down connects that D18/control-input node to common GND;
+   - no external D18 pull-down is currently fitted; explicitly check for any
+     reset-time lamp flash because firmware cannot control D18 before `setup()`;
    - the MOSFET source connects to GND;
    - the dial-light negative lead connects to the MOSFET drain;
    - the dial-light positive lead connects to 5 V;
@@ -397,9 +398,9 @@ wiring is confirmed still present, all builds/tests pass, `decca.local`, the
 current IP and ArduinoOTA reachability are confirmed, and the OTA password is
 confirmed to exist without printing it.
 
-1. With power off, install a 10 kΩ resistor from the DFR0457 control/PWM input
-   to common GND. This is the same node that will later connect to D18. Leave the
-   old D19/D25 signal conductors in place.
+1. Leave the old D19/D25 signal conductors in place. The owner has explicitly
+   deferred the recommended external D18 control-input pull-down; reset-time
+   safe-off before firmware starts is not guaranteed.
 2. Review the v0.28.0 feature-branch diff and obtain explicit owner approval for
    the live OTA stage.
 3. Power the unchanged old wiring. Upload v0.28.0 using authenticated
@@ -409,11 +410,11 @@ confirmed to exist without printing it.
 5. Power the ESP32 and shared 5 V rail off. Wait for explicit confirmation that
    power is off.
 6. Move the H2 switch signal D19 → D26 while retaining its GND conductor. Move
-   the DFR0457 control/PWM signal D25 → D18. Retain the 10 kΩ pull-down from
-   the D18/control-input node to GND.
+   the DFR0457 control/PWM signal D25 → D18.
 7. Inspect and confirm the wiring before requesting power-on.
 8. After power-on, confirm OTA readiness, closed/LOW = on and open/HIGH =
-   standby, no dial-light flash during boot, 1 kHz PWM, duty 217 and both
+   standby, specifically observe for any dial-light flash during boot, verify
+   1 kHz PWM, duty 217 and both
    approximately 4.34-second fade directions.
 
 Stop safely if any prerequisite is uncertain. Do not touch or adjust any

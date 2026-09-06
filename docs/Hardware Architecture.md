@@ -223,10 +223,11 @@ three-lamp current remain commissioning checks.
 
 The final switch is one **DFRobot Gravity MOSFET Power Controller, DFR0457**,
 now installed. It accepts the 5 V lamp rail and 3.3 V logic/control, with a
-specified switching range of 0–1 kHz. GPIO18/D18 is the new PWM assignment and
-requires a permanent 10 kΩ pull-down from its DFR0457 control-input node to
-common GND. GPIO18 is not a boot-strapping pin; firmware drives it LOW at the
-start of board initialisation before attaching LEDC at duty 0. The previous
+specified switching range of 0–1 kHz. GPIO18/D18 is the new PWM assignment.
+GPIO18 is not a boot-strapping pin; firmware drives it LOW at the start of board
+initialisation before attaching LEDC at duty 0. The owner has deferred the
+recommended external control-input pull-down, so pre-firmware reset-time
+safe-off is not guaranteed by the ESP32. The previous
 GPIO25/D25 assignment is the one covered by existing physical evidence.
 Firmware PWM remains set to 1 kHz. The initial
 steady-light test resolved the visible flicker. Cold startup and both

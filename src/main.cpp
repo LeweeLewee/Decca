@@ -127,7 +127,7 @@ void applyLightingState() {
 
 void setup() {
     // Establish lighting safe-off before serial, settings, display or network
-    // initialisation. The external D18 pull-down covers reset before setup().
+    // initialisation. GPIO state before setup() remains outside firmware control.
     decca::hardware::init();
     Serial.begin(115200);
     Serial.print("[SYSTEM] firmware=");

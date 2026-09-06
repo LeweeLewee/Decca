@@ -74,7 +74,7 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO18 (verification pending) | D18 | PWM (LEDC), 1 kHz | H5 | DFR0457 control input; required 10 kΩ pull-down to GND; GPIO25/D25 previously accepted |
+| Dial lighting PWM     | GPIO18 (verification pending) | D18 | PWM (LEDC), 1 kHz | H5 | DFR0457 control input; no external pull-down currently fitted; GPIO25/D25 previously accepted |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO23 and GPIO26 support the required internal pull-ups. GPIO18 and GPIO26
@@ -236,10 +236,10 @@ Yellow = SDA.
 - Wire the three validated lamps **in parallel**.
 - Installed final switch: one **DFRobot Gravity MOSFET Power Controller,
   DFR0457**. Its 3.3 V control input is assigned to ESP32 **GPIO18 / board label
-  D18** and firmware PWM remains at its 1 kHz DC switching limit. Fit a
-  **10 kΩ resistor from the DFR0457 control/PWM input (the same electrical node
-  as D18) to common GND**. It must remain installed so the controller is held
-  safely off while the ESP32 resets or D18 is high-impedance.
+  D18** and firmware PWM remains at its 1 kHz DC switching limit. A 10 kΩ
+  resistor from the DFR0457 control/PWM input to common GND is recommended for
+  defined reset-time safe-off, but the owner has elected not to fit it at this
+  time.
 - Steady-light and v0.27.1 fade testing report no flicker; cold startup and both
   approximately 4.34-second fade directions are owner-approved. Repeat
   pot-stability, temperature and lamp-current tests before closing HW-LGT-01.
@@ -260,27 +260,22 @@ the controlled transition. Subsequent 70%, 80% and 100% comparisons established
 the approved normal level is now 85%; Mono and standby are off. Final DFR0457
 integration and installed-holder checks remain open.
 
-### Safe D18 control wiring
-
-Install the pull-down with all power removed. It is connected across the logic
-input, not in series with it:
+### D18 control wiring
 
 ```text
-ESP32 D18 / GPIO18 --------+-------- DFR0457 control/PWM input
-                            |
-                           10 kΩ
-                            |
-ESP32 GND -----------------+-------- DFR0457 GND / common 5 V return
+ESP32 D18 / GPIO18 ----------------- DFR0457 control/PWM input
+ESP32 GND -------------------------- DFR0457 GND / common 5 V return
 
 5 V fused star --------------------- lamp positives / DFR0457 power path
 DFR0457 switched output ------------- three lamp negatives in parallel
 ```
 
-The 10 kΩ pull-down is required because firmware cannot control D18 during
-reset and early boot. Firmware configures D18 as output LOW before any other
-peripheral initialisation, then attaches LEDC at duty 0. Normal operation
-remains 1 kHz, duty 217/255, with 20 ms one-count fade steps. Mono and logical
-standby fade to duty 0 and hold the output LOW.
+Firmware configures D18 as output LOW before any other peripheral
+initialisation, then attaches LEDC at duty 0. Normal operation remains 1 kHz,
+duty 217/255, with 20 ms one-count fade steps. Mono and logical standby fade to
+duty 0 and hold the output LOW. Because no external pull-down is currently
+fitted, the ESP32 cannot guarantee D18 LOW during reset and before `setup()`;
+observe specifically for any lamp flash during physical verification.
 
 ### Controlled D19/D25 to D26/D18 transition
 
@@ -288,8 +283,8 @@ The known starting state is the ESP32 powered off with the switch signal still
 on D19 and the DFR0457 control signal still on D25. Do not move either conductor
 while powered.
 
-1. With all power off, install the 10 kΩ pull-down between the DFR0457
-   control/PWM input and common GND. Leave both old signal wires on D19/D25.
+1. Leave both old signal wires on D19/D25. The owner has explicitly deferred the
+   recommended external D18 control-input pull-down.
 2. After code review, successful builds/tests, hostname/IP/service checks and
    explicit owner approval, power the unchanged old wiring and upload v0.28.0
    by authenticated OTA only.
@@ -298,8 +293,7 @@ while powered.
 4. Power the ESP32 and shared 5 V rail off and confirm power-off before touching
    wiring.
 5. Move only the on/off signal conductor from D19 to D26, retaining its GND
-   conductor. Move only the DFR0457 control/PWM signal from D25 to D18. Retain
-   the 10 kΩ D18/control-input-to-GND pull-down.
+   conductor. Move only the DFR0457 control/PWM signal from D25 to D18.
 6. Inspect and confirm the wiring before restoring power. Then verify OTA,
    active-low on/off behaviour, no boot flash, 1 kHz PWM, duty 217 and both
    approximately 4.34-second fades.

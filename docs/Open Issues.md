@@ -38,9 +38,10 @@ disturbance stopped, but lamp flicker remained.
 **Locked behaviour:** firmware v0.28.0 reassigns the lighting PWM output from the
 previously accepted GPIO25/D25 to GPIO18/D18, pending controlled transition and
 physical verification. Stereo open/high requests lights on at the owner-approved
-85% / duty 217; Mono closed/low and logical standby request off. Preserve 1 kHz,
-the 20 ms/count fades and safe-off boot. Retain a 10 kΩ pull-down from the
-D18/DFR0457-control node to common GND.
+85% / duty 217; Mono closed/low and logical standby request off. Preserve 1 kHz
+and the 20 ms/count fades. Firmware drives D18 LOW at the earliest opportunity,
+but the owner has deferred the recommended external pull-down; reset-time
+safe-off before `setup()` is therefore not guaranteed and needs observation.
 
 **Device state:** the last-known installed image is firmware v0.27.1 at commit
 `d0b1d3c`, using 1 kHz PWM and an 85% / duty 217 target with approximately
