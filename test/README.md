@@ -149,3 +149,10 @@ the owner approved the 2.2-second firmware-version hold and both approximately
 4.34-second 0–85% lighting fades, with no flicker reported. HW-LGT-01 remains
 open for WAGO distribution installation plus pot-stability, temperature and
 installed-current checks.
+
+GPIO reassignment candidate (2026-09-06): v0.28.0 changes only the on/off input
+mapping from GPIO19/D19 to GPIO26/D26 and dial-light PWM from GPIO25/D25 to
+GPIO18/D18. `test_hardware` asserts the new mapping; the lighting suite continues
+to assert safe-off duty 0, LEDC channel 0, 1 kHz, 8-bit duty and unchanged 20 ms
+fade timing. GPIO19/GPIO25 results above remain historical facts. GPIO26/GPIO18
+must not be marked physically verified until the controlled transition passes.

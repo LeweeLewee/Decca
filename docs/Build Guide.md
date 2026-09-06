@@ -230,11 +230,13 @@ button panel.
 
 ### 7.3 Original on/off switch verification
 
-This procedure passed on 2026-08-30, confirming GPIO19/D19 and the retained H2
-Red/Green cable. Keep the Decca disconnected from mains and power only the
-low-voltage ESP32 controller by USB.
+Historical result: this procedure passed on 2026-08-30 on GPIO19/D19, confirming
+the retained H2 Red/Green cable and active-low polarity. Firmware v0.28.0 moves
+the input to GPIO26/D26; that new assignment awaits the controlled transition
+and physical verification. Keep the Decca disconnected from mains.
 
-1. Connect H2 Red to GPIO19 / board label D19 and H2 Green to GND. GPIO19 uses
+1. After the controlled transition in section 7.7, connect H2 Red to GPIO26 /
+   board label D26 and H2 Green to GND. GPIO26 uses
    the ESP32 internal pull-up; do not connect either conductor to 3.3 V or 5 V.
 2. Run:
 
@@ -253,8 +255,9 @@ Pass criteria:
 - returning to closed wakes the display immediately;
 - all button and power tests pass without using the switch for mains voltage.
 
-Recorded result: both switch directions were physically accepted. GPIO19 is no
-longer proposed and no logical inversion is required.
+Recorded historical result: both switch directions were physically accepted on
+GPIO19/D19 and no logical inversion is required. Record GPIO26/D26 separately
+only after the new physical test passes.
 
 ### 7.4 OLED bench verification
 
@@ -281,7 +284,7 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
    ```
 
 4. Confirm the OLED reveals the `DECCA` wordmark from left to right over roughly
-   1 s, then holds `MUSIC CENTRE v0.27.1` for roughly 2.2 s in the lower
+   1 s, then holds `MUSIC CENTRE v0.28.0` for roughly 2.2 s in the lower
    calibrated area before showing `VINYL` prominently without a legacy button
    label and a local dashboard with Volume 75% and the other three controls at
    50%.
@@ -327,7 +330,7 @@ SDA/SCL labels.
 
 ### 7.5 Stereo/Mono input verification
 
-Keep GPIO25 and the lamp load disconnected for this input-only test.
+Keep the lighting PWM signal and lamp load disconnected for this input-only test.
 
 1. Connect the Stereo contact between TX2/GPIO17 and GND. Do not connect 3.3 V
    or 5 V to the switch.
@@ -346,17 +349,18 @@ Keep GPIO25 and the lamp load disconnected for this input-only test.
 
 ### 7.6 Dial-lighting bench verification
 
-GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
-from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
-for the ESP32.
+Historical result: GPIO25/D25 passed this procedure on 2026-08-31. Firmware
+v0.28.0 moves the output to GPIO18/D18; that new assignment awaits the controlled
+transition and physical verification. Keep the Decca disconnected from mains.
 
 1. Check the MOSFET stage before applying power:
-   - GPIO25 / board label D25 connects only to the logic-level N-channel MOSFET gate;
+   - GPIO18 / board label D18 connects only to the DFR0457 control/PWM input;
+   - a 10 kΩ pull-down connects that D18/control-input node to common GND;
    - the MOSFET source connects to GND;
    - the dial-light negative lead connects to the MOSFET drain;
    - the dial-light positive lead connects to 5 V;
    - the ESP32 and 5 V lighting supply share GND.
-2. Confirm there is no direct connection from the dial-light load to GPIO25 and
+2. Confirm there is no direct connection from the dial-light load to GPIO18 and
    no connection to the Decca mains wiring.
 3. Connect the ESP32 by USB and run:
 
@@ -377,11 +381,45 @@ Pass criteria:
 - the MOSFET and wiring remain cool;
 - all seven behavioural tests pass.
 
-Recorded result (2026-08-31): GPIO25, the DAOKAI MOSFET stage and the three-lamp
+Recorded historical result (2026-08-31): GPIO25, the DAOKAI MOSFET stage and the three-lamp
 electrical load passed. Brightness comparisons at 70%, 80% and 100% resulted in
 owner approval of 90% / duty 230. The lamps fade smoothly, hold evenly and fade
 fully off with no flash, flicker, abnormal heat or smell.
 
-### 7.7 Remaining commissioning
+The installed DFR0457 was subsequently approved at 1 kHz, duty 217/255 with
+approximately 4.34-second fades on GPIO25. Do not carry that physical result
+forward to GPIO18 until the controlled transition is complete.
+
+### 7.7 Controlled GPIO reassignment and authenticated OTA
+
+Do not start this procedure until the ESP32 is powered off, the old D19/D25
+wiring is confirmed still present, all builds/tests pass, `decca.local`, the
+current IP and ArduinoOTA reachability are confirmed, and the OTA password is
+confirmed to exist without printing it.
+
+1. With power off, install a 10 kΩ resistor from the DFR0457 control/PWM input
+   to common GND. This is the same node that will later connect to D18. Leave the
+   old D19/D25 signal conductors in place.
+2. Review the v0.28.0 feature-branch diff and obtain explicit owner approval for
+   the live OTA stage.
+3. Power the unchanged old wiring. Upload v0.28.0 using authenticated
+   `esp32dev-ota` only; never use USB for this transition.
+4. Expect the rebooted firmware to read disconnected D26 HIGH (standby) and to
+   drive disconnected D18 LOW. Confirm ArduinoOTA returns after reboot.
+5. Power the ESP32 and shared 5 V rail off. Wait for explicit confirmation that
+   power is off.
+6. Move the H2 switch signal D19 → D26 while retaining its GND conductor. Move
+   the DFR0457 control/PWM signal D25 → D18. Retain the 10 kΩ pull-down from
+   the D18/control-input node to GND.
+7. Inspect and confirm the wiring before requesting power-on.
+8. After power-on, confirm OTA readiness, closed/LOW = on and open/HIGH =
+   standby, no dial-light flash during boot, 1 kHz PWM, duty 217 and both
+   approximately 4.34-second fade directions.
+
+Stop safely if any prerequisite is uncertain. Do not touch or adjust any
+potentiometer during this procedure. No temporary diagnostic firmware is
+required; if one is ever introduced separately, restore v0.28.0 afterward.
+
+### 7.8 Remaining commissioning
 
 - Confirming final holder fit and measuring the installed three-lamp current

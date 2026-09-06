@@ -10,6 +10,12 @@
 namespace decca::hardware {
 
 void init() {
+    // GPIO18 can float while the ESP32 resets. The external 10 kΩ pull-down
+    // holds the DFR0457 input off before this code runs; take active control at
+    // the first opportunity and keep it low until LEDC is attached at duty 0.
+    pinMode(kDialLightingPwm, OUTPUT);
+    digitalWrite(kDialLightingPwm, LOW);
+
     pinMode(kPotVolume, INPUT);
     pinMode(kPotBass, INPUT);
     pinMode(kPotTreble, INPUT);

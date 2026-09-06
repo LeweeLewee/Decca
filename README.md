@@ -8,7 +8,7 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Firmware version: **v0.27.1**, defined once in `src/version.h`, shown during
+- Firmware version: **v0.28.0**, defined once in `src/version.h`, shown during
   cold-start/OTA-reboot and reported over serial for deployment identification.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
@@ -21,13 +21,17 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
-- USB-to-OTA, GPIO19 power, controls, source selection and the fitted display
+- USB-to-OTA, the previously verified GPIO19 power input, controls, source
+  selection and the fitted display
   are complete. The DFR0457 replacement stage is installed and its initial
   steady-light test resolved the flicker. The v0.27.1 startup/version display
   and approximately 4.34-second fades were physically approved; WAGO
   distribution installation plus pot-stability, temperature and current checks
   remain open as HW-LGT-01. Normal Stereo
   lighting is 85%; Mono and logical standby are off.
+- Firmware now assigns on/off to GPIO26/D26 and dial-light PWM to GPIO18/D18.
+  Both new assignments await the controlled OTA/wiring transition and physical
+  verification; the ESP32 remains powered off with the old D19/D25 wiring.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work, then check [Open Issues](docs/Open%20Issues.md).
@@ -43,9 +47,9 @@ firmware work, then check [Open Issues](docs/Open%20Issues.md).
 | VHF source contact | GPIO23/D23 | Physically accepted |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO19/D19 | Bench-verified |
+| On/off | GPIO26/D26 | New assignment; physical verification pending (GPIO19/D19 previously verified) |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted |
-| Dial lighting PWM | GPIO25/D25 | DFR0457 installed; flicker/fades passed, final checks open under HW-LGT-01 |
+| Dial lighting PWM | GPIO18/D18 | New assignment; physical verification pending (GPIO25/D25 previously accepted) |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 

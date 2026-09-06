@@ -58,8 +58,9 @@ state is reliable electrically:
 
 GPIO23/D23 is the only source input. The accepted VHF-derived pair is Green to
 GPIO23 and Yellow to GND, although the two dry-contact wires may be swapped.
-GPIO16 and GPIO18 are released. GPIO17 is released from the source bank and
-assigned to the separate Stereo/Mono contact. SW, MW, LW and Gram have no individual
+GPIO16 is released. GPIO17 is released from the source bank and assigned to the
+separate Stereo/Mono contact; GPIO18 is assigned to dial-light PWM. SW, MW, LW
+and Gram have no individual
 firmware function; their interlocked release of VHF selects Vinyl. A replacement
 button panel is deferred.
 
@@ -74,9 +75,9 @@ button panel is deferred.
 | VHF source contact | GPIO23/D23 | Physically accepted |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
+| On/off | GPIO26/D26 | New assignment, verification pending; GPIO19/D19 previously verified |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted, open Stereo = on / closed Mono = off |
-| Dial-light PWM | GPIO25/D25 | Electrically accepted with MOSFET/three-lamp load |
+| Dial-light PWM | GPIO18/D18 | New assignment, verification pending; GPIO25/D25 previously accepted |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
 
@@ -101,7 +102,7 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
   service diagnostic.
 - VHF on GPIO23 was physically accepted as the only reliable active selector;
   every other interlocked position releases it and selects Vinyl.
-- GPIO19/D19 was physically verified with the retained H2 Red/Green switch.
+- Historical evidence: GPIO19/D19 was physically verified with the retained H2 Red/Green switch.
   Closed selects logical ON and open selects STANDBY; both transitions were
   accepted on the production firmware.
 - Revised button logic passed strict host compilation and its nine-case harness.
@@ -182,25 +183,31 @@ the user's Wi-Fi or OTA passwords.
 3. **Complete (2026-08-30):** fitted-Perspex display calibration, visual design
    cycle and physical acceptance.
 4. **Complete (2026-08-30):** implement the logical `power` module, bench-test
-   GPIO19 and integrate on/standby display coordination in production.
+   the previous GPIO19 assignment and integrate on/standby display coordination
+   in production. GPIO26 awaits physical verification.
 5. **Complete:** production coordinates pots, persistent VHF-derived source,
    logical power, fitted display and OTA in one non-blocking loop.
-6. **Complete (2026-08-31):** GPIO25/MOSFET/three-lamp electrical test passed:
+6. **Complete historical evidence (2026-08-31):** GPIO25/MOSFET/three-lamp electrical test passed:
    safe off, smooth fades through full duty, even illumination and fade fully off.
 7. **Complete (2026-08-31):** normal Stereo lighting approved at 90% / duty
    230 and integrated in production; Mono and logical standby fade to off.
 8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
    and GND. Physical snapshots confirmed Stereo open requests dial lights on and
-   Mono closed requests them off. GPIO25 load remained disabled during testing.
+   Mono closed requests them off. The then-current GPIO25 load remained disabled
+   during testing.
 9. **Open — HW-LGT-01:** DFR0457 is installed and the initial steady-light test
    reports no flicker. Firmware v0.27.1 at commit `d0b1d3c` is installed by
    authenticated OTA. The owner physically approved cold startup, the
    2.2-second version hold and both approximately 4.34-second 0–85% fades.
    Install the ordered WAGO star points, recheck pot/display stability with
    lamps on, then temperature and installed lamp current before closing.
-10. Add WiiM Pro integration only in Phase 2, after the hardware is available and
+10. **Open (2026-09-06):** deploy feature firmware v0.28.0 by authenticated OTA
+    while old D19/D25 wiring remains, then—only after confirmed power-off—move
+    the switch signal to D26 and DFR0457 control signal to D18. Retain a 10 kΩ
+    D18/control-input-to-GND pull-down and physically verify the new assignments.
+11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
-11. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -264,12 +271,14 @@ continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
 L50..0..R50 with centred bars and monochrome icons.
 
-TX2/GPIO17 and GPIO25 are physically accepted. Final MOSFET/three-lamp
-acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
+TX2/GPIO17 and the previous GPIO25 assignment are physically accepted. Firmware
+v0.28.0 assigns lighting PWM to GPIO18, which awaits physical verification.
+Final MOSFET/three-lamp acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
 fades to 85%; Mono and standby fade off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
-GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,
+GPIO16 remains unused; GPIO18 is reserved for dial-light PWM with a permanent
+10 kΩ pull-down to GND. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
 Keep the ESP32 control/UI-only, preserve module independence, update all affected

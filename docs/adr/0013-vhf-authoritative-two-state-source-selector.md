@@ -27,8 +27,10 @@ Use the active-low contact on GPIO23 as the sole VHF state:
 - Phase 2 maps VHF to phone-controlled digital playback and released VHF to the
   WiiM Line-In used by Vinyl.
 
-GPIO16, GPIO17 and GPIO18 remain released. The selector PCB remains the original
-mechanical carrier. A replacement button panel remains a deferred fallback.
+GPIO16, GPIO17 and GPIO18 remain released **from the source selector**. GPIO17 is
+subsequently assigned to Stereo/Mono by ADR-0014 and GPIO18 to dial-light PWM by
+the v0.28.0 hardware map. The selector PCB remains the original mechanical
+carrier. A replacement button panel remains a deferred fallback.
 
 ## Verification
 

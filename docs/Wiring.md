@@ -6,9 +6,11 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole VHF
-source input, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified; all other
-assigned pins remain proposed.
+(see Specification `HW-06`). `hardware.h` matches the status recorded below:
+the four pot inputs, sole VHF source input and OLED I²C GPIO21/22 are verified.
+On/off GPIO26 and lighting PWM GPIO18 are new assignments awaiting the
+controlled transition and physical verification; GPIO19 and GPIO25 are the
+previously verified assignments.
 
 ## Wiring Colour Standard
 
@@ -66,17 +68,19 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Bass pot wiper        | GPIO33 (bench-verified) | **D33** | ADC1        | H1      | ADC1 required                            |
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
-| On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
+| On/off switch (Red)   | GPIO26 (verification pending) | D26 | Digital in | H2 | Internal pull-up; closed = ON; GPIO19/D19 previously verified |
 | Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
 | SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
 | Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC), 1 kHz | H5 | Installed DFRobot DFR0457 control input; three-lamp bank |
+| Dial lighting PWM     | GPIO18 (verification pending) | D18 | PWM (LEDC), 1 kHz | H5 | DFR0457 control input; required 10 kΩ pull-down to GND; GPIO25/D25 previously accepted |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
-> GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
-> is bench-verified. GPIO16 and GPIO18 are released for future use. GPIO17 is
+> GPIO23 and GPIO26 support the required internal pull-ups. GPIO18 and GPIO26
+> are ordinary bidirectional GPIOs, are not ESP32 boot-strapping pins, and do
+> not conflict with any enabled peripheral in this repository. GPIO16 remains
+> released for future use. GPIO17 is
 > reserved for the separate Stereo/Mono contact and must not be connected to
 > the unreliable source-selector contacts.
 
@@ -136,8 +140,10 @@ The original Decca on/off switch is retained, including its **original solder
 joints and original cable**. It is a simple open/close switch.
 
 - Active conductors (confirmed): **Red** and **Green**.
-- Interface (bench-verified): **Red → ESP32 GPIO19 / board label D19** input
-  with **internal pull-up enabled**; **Green → GND**.
+- New interface (physical verification pending): **Red → ESP32 GPIO26 /
+  board label D26** input with **internal pull-up enabled**; **Green → GND**.
+- Historical fact: the same switch and polarity were bench-verified on
+  **GPIO19 / D19** on 2026-08-30.
 - This is a **low-voltage logic input only**. It does **not** switch 230 V mains.
 - Confirmed logic: closed/active-low = ON; open = STANDBY. Both directions were
   physically accepted with production firmware on 2026-08-30.
@@ -173,8 +179,8 @@ Authoritative source logic:
 Pressing SW, MW, LW or Gram releases VHF through the retained interlock. Those
 positions have no individual ESP32 input; the open VHF state authoritatively
 selects Vinyl. Their former conductors are disconnected and individually
-insulated at the controller end. GPIO16 and GPIO18 are not assigned; GPIO17 is
-reserved for the separate Stereo/Mono contact.
+insulated at the controller end. GPIO16 is not assigned; GPIO17 is reserved for
+the separate Stereo/Mono contact and GPIO18 is now reserved for dial-light PWM.
 
 A purpose-built replacement button panel is a deferred fallback if the two-state
 scheme later proves insufficient. No LW solder repair is required for the
@@ -193,7 +199,7 @@ internal pull-up. Wire the isolated contact only:
 Do not connect either contact to 3.3 V or 5 V. Open/HIGH means **Stereo** and
 requests dial lights on; closed/LOW means **Mono** and requests them off. This
 assignment and both physical input states were accepted on 2026-08-30.
-GPIO25 and the lamp load are commissioned separately. See ADR-0014, which
+The lighting output and lamp load are commissioned separately. See ADR-0014, which
 supersedes ADR-0005.
 
 ## H4 — OLED Display
@@ -229,8 +235,11 @@ Yellow = SDA.
   installation/commissioning checks.
 - Wire the three validated lamps **in parallel**.
 - Installed final switch: one **DFRobot Gravity MOSFET Power Controller,
-  DFR0457**. Its 3.3 V control input is driven by ESP32 **GPIO25 / board label
-  D25** and firmware PWM is set to its 1 kHz DC switching limit.
+  DFR0457**. Its 3.3 V control input is assigned to ESP32 **GPIO18 / board label
+  D18** and firmware PWM remains at its 1 kHz DC switching limit. Fit a
+  **10 kΩ resistor from the DFR0457 control/PWM input (the same electrical node
+  as D18) to common GND**. It must remain installed so the controller is held
+  safely off while the ESP32 resets or D18 is high-impedance.
 - Steady-light and v0.27.1 fade testing report no flicker; cold startup and both
   approximately 4.34-second fade directions are owner-approved. Repeat
   pot-stability, temperature and lamp-current tests before closing HW-LGT-01.
@@ -244,11 +253,59 @@ Yellow = SDA.
   not reserved permanently for lighting.
 
 Expected behaviours: fade up, fade down, stored/configurable brightness, safe
-boot state. Firmware support is implemented. GPIO25, the MOSFET stage and the
-three-lamp electrical load passed the dial-lighting bench procedure on
-2026-08-31. Subsequent 70%, 80% and 100% comparisons established the approved
-normal level is now 85%; Mono and standby are off. Final DFR0457 integration and
-installed-holder checks remain open.
+boot state. Firmware support is implemented. As a historical result, GPIO25,
+the MOSFET stage and the three-lamp electrical load passed the dial-lighting
+bench procedure on 2026-08-31. GPIO18/D18 awaits physical verification after
+the controlled transition. Subsequent 70%, 80% and 100% comparisons established
+the approved normal level is now 85%; Mono and standby are off. Final DFR0457
+integration and installed-holder checks remain open.
+
+### Safe D18 control wiring
+
+Install the pull-down with all power removed. It is connected across the logic
+input, not in series with it:
+
+```text
+ESP32 D18 / GPIO18 --------+-------- DFR0457 control/PWM input
+                            |
+                           10 kΩ
+                            |
+ESP32 GND -----------------+-------- DFR0457 GND / common 5 V return
+
+5 V fused star --------------------- lamp positives / DFR0457 power path
+DFR0457 switched output ------------- three lamp negatives in parallel
+```
+
+The 10 kΩ pull-down is required because firmware cannot control D18 during
+reset and early boot. Firmware configures D18 as output LOW before any other
+peripheral initialisation, then attaches LEDC at duty 0. Normal operation
+remains 1 kHz, duty 217/255, with 20 ms one-count fade steps. Mono and logical
+standby fade to duty 0 and hold the output LOW.
+
+### Controlled D19/D25 to D26/D18 transition
+
+The known starting state is the ESP32 powered off with the switch signal still
+on D19 and the DFR0457 control signal still on D25. Do not move either conductor
+while powered.
+
+1. With all power off, install the 10 kΩ pull-down between the DFR0457
+   control/PWM input and common GND. Leave both old signal wires on D19/D25.
+2. After code review, successful builds/tests, hostname/IP/service checks and
+   explicit owner approval, power the unchanged old wiring and upload v0.28.0
+   by authenticated OTA only.
+3. After reboot, D26 is disconnected and therefore reads HIGH/standby; D18 is
+   disconnected from the DFR0457 and is driven safely LOW. Confirm OTA returns.
+4. Power the ESP32 and shared 5 V rail off and confirm power-off before touching
+   wiring.
+5. Move only the on/off signal conductor from D19 to D26, retaining its GND
+   conductor. Move only the DFR0457 control/PWM signal from D25 to D18. Retain
+   the 10 kΩ D18/control-input-to-GND pull-down.
+6. Inspect and confirm the wiring before restoring power. Then verify OTA,
+   active-low on/off behaviour, no boot flash, 1 kHz PWM, duty 217 and both
+   approximately 4.34-second fades.
+
+Stop if any prerequisite or conductor identity is uncertain. Do not adjust any
+potentiometer as part of this transition.
 
 ## H6 — Fosi ZA3 12 V Trigger
 
@@ -294,7 +351,7 @@ The approved low-voltage controller path is:
   terminal.
 - The GND distribution branches to ESP32 GND and the lighting MOSFET source/GND.
   The lamp negatives return through the MOSFET switched output; they must never
-  be driven directly from GPIO25.
+  be driven directly from GPIO18 (or the previous GPIO25 assignment).
 - Use 22–24 AWG stranded Orange wire for +5 V and Brown wire for GND, with
   correctly sized ferrules at screw and lever terminals.
 - **No dedicated 6 V/6.3 V lighting rail** is required or planned.

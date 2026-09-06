@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. DFR0457 is installed; v0.27.1 cold-start, 85% fade-up/down and no-flicker behaviour are physically approved at 1 kHz. HW-LGT-01 remains open for WAGO distribution installation plus pot-stability, temperature and current checks. Eight on-target suites last passed 55/55. WiiM integration remains outstanding. |
-| Version  | 0.27.1                                            |
+| Status   | Draft. Firmware v0.28.0 assigns on/off to GPIO26 and dial-light PWM to GPIO18. The previous GPIO19/GPIO25 assignments retain their historical physical evidence; D26/D18 await controlled OTA, rewiring and physical verification. DFR0457 behaviour remains locked at 1 kHz, duty 217 and approximately 4.34-second fades. |
+| Version  | 0.28.0                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -188,6 +188,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | HW-10  | The original source-selector **PCB shall be retained** as the mechanical carrier for the interlocked selector mechanism (ADR-0001); it shall not be discarded. |
 | HW-11  | Proposed GPIO assignments (see `docs/Wiring.md`) shall be treated as **proposed** until bench-verified, and `src/hardware.h` reconciled to them (HW-06). |
 | HW-12  | Dial lighting shall be switched by a logic-level N-channel MOSFET under ESP32 PWM, with ESP32 and lighting grounds common. |
+| HW-13  | The DFR0457 control/PWM node on GPIO18/D18 shall have a permanent 10 kΩ pull-down to common GND; firmware shall drive it LOW before other peripheral initialisation and attach LEDC initially at duty 0. |
 
 ---
 

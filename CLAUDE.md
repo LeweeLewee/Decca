@@ -52,9 +52,11 @@ firmware. They record the current physical evidence and open work.
 
 Phase 1 module implementation is in progress. `hardware`, `settings`, `pots`,
 `buttons`, `lighting`, `display`, `power` and authenticated `ota` exist. Pot
-GPIO32–35, sole VHF source input GPIO23, OLED GPIO21/22 and on/off GPIO19 are
-physically verified. Lighting PWM GPIO25 and the three-lamp bank have prior
-electrical acceptance. DFRobot DFR0457 is installed as the final MOSFET stage;
+GPIO32–35, sole VHF source input GPIO23 and OLED GPIO21/22 are physically
+verified. On/off GPIO19 and lighting PWM GPIO25 have prior physical acceptance;
+firmware v0.28.0 reassigns them to GPIO26 and GPIO18 respectively, pending the
+controlled OTA/wiring transition and physical verification. DFRobot DFR0457 is
+installed as the final MOSFET stage;
 its initial steady-light test resolved the flicker. Firmware uses 1 kHz PWM and
 85% / duty 217. That image was uploaded successfully by authenticated OTA and
 returned at `decca.local`. The owner physically approved the v0.27.1
@@ -65,14 +67,16 @@ standby are off.
 
 Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
 closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
-requests lights off. Both input positions are physically accepted. GPIO25 and
-the lamp bank passed safe-off and smooth-fade testing through full duty; the
-current production target is 85% / duty 217.
+requests lights off. Both input positions are physically accepted. The previous
+GPIO25 assignment and lamp bank passed safe-off and smooth-fade testing through
+full duty; GPIO18 is the new unverified output. The current production target
+remains 85% / duty 217.
 
 Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
 every other selector position = Vinyl. GPIO16/17/18 remain released from the
 source selector and the sole source input remains GPIO23; GPIO17 is separately
-allocated to Stereo/Mono under ADR-0014.
+allocated to Stereo/Mono under ADR-0014 and GPIO18 is allocated to dial-light
+PWM.
 
 The production `main.cpp` coordinates power, pots, VHF source, display,
 Stereo/Mono lighting and OTA in one non-blocking loop. USB-to-OTA is physically

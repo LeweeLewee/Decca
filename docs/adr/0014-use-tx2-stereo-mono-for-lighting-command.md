@@ -21,7 +21,8 @@ the lighting module.
 - ADR-0005 is superseded.
 - No 3.3 V or 5 V wire is used at the switch.
 - GPIO17 is no longer available for other functions.
-- This decision assigns and implements the input only. GPIO25, the MOSFET and
-  the lamp load remain disabled until their separate commissioning procedure.
+- This decision assigns and implements the input only. The lighting output was
+  subsequently accepted on GPIO25 and is now reassigned to GPIO18 pending its
+  controlled transition and separate physical verification.
 - Wiring polarity and both stable states require physical acceptance before the
   input is marked bench-verified.

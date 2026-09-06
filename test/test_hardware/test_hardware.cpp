@@ -16,12 +16,12 @@ void test_hardware_pin_map_contract() {
     TEST_ASSERT_EQUAL_UINT8(33, decca::hardware::kPotBass);
     TEST_ASSERT_EQUAL_UINT8(34, decca::hardware::kPotTreble);
     TEST_ASSERT_EQUAL_UINT8(35, decca::hardware::kPotBalance);
-    TEST_ASSERT_EQUAL_UINT8(19, decca::hardware::kSwitchOnOff);
+    TEST_ASSERT_EQUAL_UINT8(26, decca::hardware::kSwitchOnOff);
     TEST_ASSERT_EQUAL_UINT8(23, decca::hardware::kButtonVhf);
     TEST_ASSERT_EQUAL_UINT8(17, decca::hardware::kSwitchStereoMono);
     TEST_ASSERT_EQUAL_UINT8(21, decca::hardware::kDisplaySda);
     TEST_ASSERT_EQUAL_UINT8(22, decca::hardware::kDisplayScl);
-    TEST_ASSERT_EQUAL_UINT8(25, decca::hardware::kDialLightingPwm);
+    TEST_ASSERT_EQUAL_UINT8(18, decca::hardware::kDialLightingPwm);
 }
 
 void test_hardware_peripheral_configuration() {

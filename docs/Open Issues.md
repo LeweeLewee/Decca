@@ -35,14 +35,22 @@ disturbance stopped, but lamp flicker remained.
   approved the 2.2-second firmware-version hold and both approximately
   4.34-second lighting fades, with no flicker reported.
 
-**Locked behaviour:** GPIO25/D25 remains the lighting PWM output. Stereo
-open/high requests lights on at the owner-approved 85% / duty 217; Mono
-closed/low and logical standby request off. Preserve fades and safe-off boot.
+**Locked behaviour:** firmware v0.28.0 reassigns the lighting PWM output from the
+previously accepted GPIO25/D25 to GPIO18/D18, pending controlled transition and
+physical verification. Stereo open/high requests lights on at the owner-approved
+85% / duty 217; Mono closed/low and logical standby request off. Preserve 1 kHz,
+the 20 ms/count fades and safe-off boot. Retain a 10 kΩ pull-down from the
+D18/DFR0457-control node to common GND.
 
 **Device state:** the last-known installed image is firmware v0.27.1 at commit
 `d0b1d3c`, using 1 kHz PWM and an 85% / duty 217 target with approximately
 4.34-second fades. Its authenticated OTA upload succeeded and the device
 returned at `decca.local`. GitHub `main` remains the source of truth.
+
+**GPIO transition state:** the ESP32 is powered off and the physical signals
+remain on D19/D25. Feature firmware v0.28.0 assigns D26/D18 but has not been
+uploaded. Do not move wiring while powered and do not upload until the owner
+explicitly approves the reviewed live OTA stage.
 
 **Acceptance required to close:**
 
