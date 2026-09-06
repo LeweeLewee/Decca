@@ -47,7 +47,7 @@ The first housing revision with any measured hardware in it.
 | Terminal blocks, outer face to outer face | **55.00 mm** | owner, 2026-09-06 |
 | Terminal-block row length | **53.00 mm** | owner, 2026-09-06 |
 | Terminal-block height | **9.00 mm** | owner, 2026-09-06 |
-| Mounting-hole centre pitch | **58 × 56 mm** | owner, 2026-09-06 |
+| Mounting-hole centre pitch | **58 mm across × 56 mm along** | owner, 2026-09-06; pairing confirmed the same day |
 | Conductor entry position | just above the block base | owner, 2026-09-06 |
 
 **The 66 mm is measured across the board, from one connector side to the
@@ -76,9 +76,30 @@ screw head — remains a **STARTING** value, tagged as such in the generator's o
 | Assumption | If it is wrong |
 |---|---|
 | The terminal rows are centred along the 63.00 mm along-row dimension | the 5.00 mm clear ends move; one parameter |
-| The 58.00 hole pitch pairs with the 66.00 across dimension, 56.00 with the 63.00 along | insets of 4.00 and 3.50 mm; nothing in this build depends on it — the holes are not used for retention |
+| One of the four hole/board numbers is out by 1.00 mm — see §2.2 | nothing in this build depends on it; the holes are not used for retention |
 | The USB connector is centred on its short edge | the notch is cut 16.00 mm wide against a 14.00 mm requirement to absorb it |
 | The 9.00 mm block height is the block's own body height | if it was taken from the resting surface the block top drops, and the long walls are unaffected either way, because they are set by the board top face |
+
+### 2.2 A 1.00 mm inconsistency in the hole pattern, unresolved and harmless
+
+The owner confirms the **58 mm is the across pitch**, on the grounds that it puts
+all four mounting holes at an equal inset from the nearest board edge. The
+pairing is right and the model already used it. The arithmetic does not quite
+close, though:
+
+| | inset from the nearest edge |
+|---|---:|
+| across — (66 − 58) ÷ 2 | **4.00 mm** |
+| along — (63 − 56) ÷ 2 | **3.50 mm** |
+
+Truly equal insets need any **one** of these to be 1.00 mm different from what
+is recorded: the along pitch at 55.00, the across pitch at 59.00, the board's
+along dimension at 64.00, or its across dimension at 65.00.
+
+It is recorded rather than resolved, because **nothing in this design uses the
+mounting holes** — retention is the fixed ledge and the adjustable clamp on the
+short edges, per v1.6 §4.5–4.6. If hole-based retention is ever adopted, this is
+the first thing to settle, and it needs one calliper reading.
 
 ## 3. The one design move that decides everything
 

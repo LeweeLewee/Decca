@@ -204,7 +204,9 @@ These are consequences of the measured numbers, not new measurements:
 
 ### Assumption flagged for confirmation
 
-With the corrected board axes, the 58 × 56 hole pitch is recorded as **58.00 mm ACROSS** (→ 4.00 mm inset from each long edge) and **56.00 mm ALONG** (→ 3.50 mm inset from each short edge). The opposite pairing is still geometrically possible. **Confirm which way round** before any hole-based retention is used — nothing in the current design depends on it.
+**RESOLVED 2026-09-06:** the owner confirms the **58.00 mm is the ACROSS pitch**, because that is what puts all four holes at an equal inset from the nearest board edge.
+
+One loose end remains, recorded rather than chased. On the numbers as measured — a 66 × 63 board with a 58 × 56 pitch — the insets come out **4.00 mm across and 3.50 mm along**, which is 0.50 mm short of equal. Equal insets need any *one* of these to be 1.00 mm different: the along pitch at 55.00, the across pitch at 59.00, the board along at 64.00, or the board across at 65.00. One calliper reading settles it. **Nothing in the current design uses the mounting holes**, so nothing is blocked.
 
 These are recorded here as they arrive. They will be rolled into specification
 §3 in one revision when the blocking set is complete, so the specification is

@@ -67,7 +67,7 @@ Use repository source dimensions and existing measured references as the design 
 | Terminal-block height | **9 mm — owner-measured 2026-09-06** |
 | Terminal width | approximately 3 mm each; consistent with 53 ÷ 15 = 3.53 mm pitch |
 | Conductor entry position | **just above the base of the terminal block — owner, 2026-09-06.** Qualitative and sufficient: see §5.3 |
-| Mounting-hole centre pitch | **58 mm across × 56 mm along — owner-measured 2026-09-06**; hole diameter not measured, and the pairing is assumed. Confirm both before any hole-based retention is used. |
+| Mounting-hole centre pitch | **58 mm across × 56 mm along — owner-measured 2026-09-06, pairing confirmed by the owner the same day.** Hole diameter still not measured. Note that on the recorded 66 × 63 board this gives insets of 4.00 mm across and 3.50 mm along, 0.50 mm short of the equal insets the confirmation is based on; one of the four numbers is out by 1.00 mm. Settle it before any hole-based retention is used. |
 | Adapter PCB thickness | 1.6 mm starting value; physically measure |
 | Terminal-port bore size and internal insertion depth | **OUT OF SCOPE, owner 2026-09-06.** They do not drive housing geometry; §5.3 clears the whole block height instead |
 | Corner mounting-hole diameter | **UNMEASURED**; do not use for retention until measured and until §4.5–4.6 are amended |
