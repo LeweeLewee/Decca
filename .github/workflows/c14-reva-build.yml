@@ -1,0 +1,128 @@
+name: One-time C14 Rev A build
+
+on:
+  push:
+    branches:
+      - feat/iec-c14-mounting-plate
+    paths:
+      - .github/workflows/c14-reva-build.yml
+      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_cadquery.py
+      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_verify.py
+      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_drawing.py
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/iec-c14-mounting-plate
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install CAD dependencies
+        run: python -m pip install --upgrade pip cadquery==2.8.0 trimesh matplotlib
+
+      - name: Generate and verify Rev A artefacts
+        run: |
+          python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_cadquery.py
+          python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_drawing.py
+          python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_verify.py
+
+      - name: Update release documentation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import re
+
+          def insert_after_heading(path, marker, block):
+              p = Path(path)
+              text = p.read_text()
+              if marker in text:
+                  return
+              first_break = text.find('\n\n')
+              if first_break < 0:
+                  raise SystemExit(f'Cannot locate heading break in {path}')
+              text = text[:first_break + 2] + block.rstrip() + '\n\n' + text[first_break + 2:]
+              p.write_text(text)
+
+          cad_block = '''## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
+
+          Rev A is a reproducible CadQuery model built from the measured purchased inlet interface. The controlling specification is `../Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md`.
+
+          | File | Role |
+          |---|---|
+          | `Decca_IEC_C14_Mounting_Plate_revA_cadquery.py` | parametric source and analytic pre-export checks |
+          | `Decca_IEC_C14_Mounting_Plate_revA_verify.py` | independent STEP/STL verifier |
+          | `Decca_IEC_C14_Mounting_Plate_revA_drawing.py` | dimensioned PNG generator |
+          | `Decca_IEC_C14_Mounting_Plate_revA.step` | neutral CAD export |
+
+          Geometry: 40.00 × 50.00 × 3.00 mm, R2 corners, centred 20.00 × 27.60 mm C14 opening, 4 × Ø2.40 Decca holes on a 31.00 × 17.00 mm grid and 2 × Ø3.40 C14 holes at 39.00 mm pitch. **12/12 CAD gates PASS.** Physical fit is still required before release.'''
+
+          stl_block = '''## IEC C14 mounting plate — Rev A — PROTOTYPE
+
+          | File | Print notes |
+          |---|---|
+          | `Decca_IEC_C14_Mounting_Plate_revA.stl` | PETG minimum; flame-retardant PETG/PC preferred. 0.20 mm layers, 4+ perimeters, 100% infill, broad face on bed, no supports. Mechanical carrier only; physical fit and rear mains-terminal clearance remain mandatory before release. |
+
+          CAD validation is complete, but this mesh is **prototype pending**, not released, until the purchased inlet and Decca cabinet interfaces pass the five physical checks in the build report.'''
+
+          drawings_block = '''## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
+
+          | File | Role |
+          |---|---|
+          | `Decca_IEC_C14_Mounting_Plate_Spec_revA.md` | controlling Rev A specification |
+          | `Decca_IEC_C14_Mounting_Plate_Work_Handover.md` | bounded build handover |
+          | `Decca_IEC_C14_Mounting_Plate_revA_Build_Report.md` | exported-geometry validation and physical release gates |
+          | `Decca_IEC_C14_Mounting_Plate_revA_views.png` | dimensioned top and side views |
+
+          Rev A CAD has passed all 12 specified validation gates. Status remains **CAD complete / prototype pending** until the physical inlet, cabinet fixing and rear-clearance checks are recorded.'''
+
+          revision_block = '''## 2026-09-06 — IEC C14 mounting plate Rev A CAD complete
+
+          - Built the dedicated 40.00 × 50.00 × 3.00 mm IEC C14 mounting plate on `feat/iec-c14-mounting-plate` from the locked measured interface specification.
+          - Added reproducible CadQuery source, neutral STEP, manifold STL, dimensioned drawing, independent verifier and build report.
+          - Exported geometry passes **12/12** CAD gates: exact 31.00 × 17.00 mm M2 grid, exact 39.00 mm M3 pitch and midpoint, centred 20.00 × 27.60 mm opening, correct through-hole diameters, one connected manifold part and minimum fixing-to-opening ligament **4.00 mm**.
+          - Status is deliberately **CAD complete / prototype pending**. Physical fit of the purchased C14, cabinet-hole alignment, flat clamping and rear terminal/wire clearance are still required before release.'''
+
+          insert_after_heading('mechanical/CAD/README.md', '## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING', cad_block)
+          insert_after_heading('mechanical/STL/README.md', '## IEC C14 mounting plate — Rev A — PROTOTYPE', stl_block)
+          insert_after_heading('mechanical/Drawings/README.md', '## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING', drawings_block)
+          insert_after_heading('docs/Revision History.md', '## 2026-09-06 — IEC C14 mounting plate Rev A CAD complete', revision_block)
+
+          report = Path('mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revA_Build_Report.md')
+          text = report.read_text()
+          files = {
+              'CadQuery source': Path('mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA_cadquery.py'),
+              'STEP': Path('mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA.step'),
+              'STL': Path('mechanical/STL/Decca_IEC_C14_Mounting_Plate_revA.stl'),
+          }
+          for label, path in files.items():
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              text = re.sub(rf'^- {re.escape(label)}: `[^`]+`$', f'- {label}: `{digest}`', text, flags=re.M)
+          report.write_text(text)
+          PY
+
+      - name: Commit generated release artefacts
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revA.step \
+                  mechanical/STL/Decca_IEC_C14_Mounting_Plate_revA.stl \
+                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revA_views.png \
+                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revA_Build_Report.md \
+                  mechanical/CAD/README.md mechanical/STL/README.md mechanical/Drawings/README.md \
+                  docs/Revision\ History.md
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit'
+          else
+            git commit -m 'mech(c14-mount): build rev A mounting plate'
+            git push origin HEAD:feat/iec-c14-mounting-plate
+          fi
