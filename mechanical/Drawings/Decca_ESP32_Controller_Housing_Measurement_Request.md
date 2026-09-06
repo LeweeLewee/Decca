@@ -47,7 +47,7 @@ this board, and twelve of the thirteen mandatory inputs are unmeasured.**
 | Usable conductor insertion depth | — | **absent from the model entirely** |
 | Terminal pitch and exact positions | **row length 53.00 mm**; pitch consistent with 3.50 | ✅ **row length MEASURED 2026-09-06**; pitch inferred, not measured |
 | Practical wire and ferrule envelope | 2.00 mm conductor Ø | **assumed** |
-| Mounting-hole diameter and centres | **58 × 56 mm centre pitch**; diameter still open | ✅ **pitch MEASURED 2026-09-06**; diameter still open |
+| Mounting-hole diameter and centres | **60 × 57 mm centre pitch**; diameter still open | ✅ **pitch MEASURED 2026-09-06**; diameter still open |
 | USB connector position | DevKit starting values | **assumed** |
 | Component-free PCB-edge regions | 3.00 mm short / 2.50 mm long | **assumed** |
 | **Complete assembly height** | **20.00 mm overall** | ✅ **MEASURED 2026-09-05** |
@@ -108,7 +108,7 @@ them.
 
 | ID | Measure | From | Feeds |
 |---|---|---|---|
-| M14 | **Mounting-hole** diameter and each hole centre | Datum B and C | ⚠ **PART-CLOSED: centre pitch 58 × 56 mm**, owner 2026-09-06. **Hole diameter still open**, and it decides whether hole-based retention can replace the ledge and clamp — see §10. |
+| M14 | **Mounting-hole** diameter and each hole centre | Datum B and C | ⚠ **PART-CLOSED: centre pitch 60 mm across × 57 mm along**, owner 2026-09-06 (re-measured the same day, superseding 58 × 56). **Hole diameter still open**, and it decides whether hole-based retention can replace the ledge and clamp — see §10. |
 | M15 | **USB opening** centre height, width, and position along the short edge; how far the shell protrudes past the PCB edge | Datum A / Datum C | ≥14 × 9 mm opening, gate 10 |
 | M16 | **Component-free strip** along each PCB edge, **top face** | each edge | fixed ledge and clamp bearing, gate 13 |
 | M17 | **Component-free strip** along each PCB edge, **underside**, and whether the board's centreline near each short end is clear underneath | each edge | support pads and the two recessed cabinet fixings, gates 3 and 16 |
@@ -185,9 +185,9 @@ and Drawings READMEs and the Rev B build report already state at the top.
 |---|---|---|---|
 | 2026-09-05 | — | Complete assembly height **20.00 mm overall** | From the assembly's lowest underside feature (Datum A) to its highest point. Recorded in specification v1.5 §9.3. |
 | 2026-09-06 | **M8** | PCB outline **66 × 63 mm** | Confirms the supplier-stated plan envelope. **Axis corrected by the owner the same day: the 66 mm is ACROSS the board, from one connector side to the other, and the 63 mm runs ALONG the rows.** Any overhang beyond this outline is still open (M13). |
-| 2026-09-06 | **M14** (part) | Mounting-hole centre pitch **58 × 56 mm** | Diameter still open. |
-| 2026-09-06 | **M4** | Terminal blocks **55.00 mm outer face to outer face** | On a 63.00 mm board this puts each block's outward face **4.00 mm inboard of its long PCB edge**. |
-| 2026-09-06 | **M5** (part) | Terminal-block row **length 53.00 mm** | 15 ways in 53.00 mm is consistent with 3.50 mm pitch. Pitch inferred, not measured. Leaves 6.50 mm of clear board beyond each end of the rows. |
+| 2026-09-06 | **M14** (part) | Mounting-hole centre pitch **60 mm across × 57 mm along** | Re-measured the same day, superseding an earlier 58 × 56 reading. Every hole is then 3.00 mm from its nearest board edge — see below. Diameter still open. |
+| 2026-09-06 | **M4** | Terminal blocks **55.00 mm outer face to outer face** | On the 66.00 mm across dimension this puts each block's outward face **5.50 mm inboard of its long PCB edge**. |
+| 2026-09-06 | **M5** (part) | Terminal-block row **length 53.00 mm** | 15 ways in 53.00 mm is consistent with 3.50 mm pitch. Pitch inferred, not measured. Leaves 5.00 mm of clear board beyond each end of the rows. |
 | 2026-09-06 | **M6** (part) | Terminal-block **total height 9.00 mm** | Recorded as the block's own body height. Datum to confirm. Per-block depth in Y still open. |
 | 2026-09-06 | **M1** | Wire hole sits **just above the base of the terminal block** | Qualitative. Designed out rather than dimensioned — see §11. |
 | 2026-09-06 | **M2** | Terminal width **approximately 3 mm** each; hole itself small | Consistent with 53.00 mm ÷ 15 = 3.53 mm pitch. Owner ruled the hole size out of scope. |
@@ -200,13 +200,16 @@ These are consequences of the measured numbers, not new measurements:
 - Each terminal block's outward face is **5.50 mm inboard** of its long PCB edge — (66.00 − 55.00) ÷ 2, using the corrected across dimension.
 - The rows are 53.00 mm long on the 63.00 mm along dimension, leaving **5.00 mm of clear board beyond each end of the rows**, which is where the corner mounting holes and every retention feature sit.
 - Both margins land near 5 mm, which is what a real board looks like. The wrong axis assignment gave 4.00 and 6.50 — the asymmetry was the tell.
-- Rev B was wrong on all three: it modelled the blocks starting **at** the PCB edge, 10.00 mm tall, spanning 49.00 mm. Measured: 4.00 mm inboard, 9.00 mm tall, 53.00 mm long.
+- Rev B was wrong on all three: it modelled the blocks starting **at** the PCB edge, 10.00 mm tall, spanning 49.00 mm. Measured: 5.50 mm inboard, 9.00 mm tall, 53.00 mm long.
+- On the re-measured 60 × 57 hole pitch every mounting hole sits **3.00 mm in from its nearest board edge**, which puts each hole centre 2.50 mm outboard of the nearest block face — clear of the blocks in both directions.
 
-### Assumption flagged for confirmation
+### The hole pitch, re-measured and now closed
 
-**RESOLVED 2026-09-06:** the owner confirms the **58.00 mm is the ACROSS pitch**, because that is what puts all four holes at an equal inset from the nearest board edge.
+**CLOSED 2026-09-06.** The pitch was first returned as 58 × 56, with the reason given that it put all four holes at an equal inset from the nearest edge. On a 66 × 63 board it did not: 4.00 mm across and 3.50 mm along, 0.50 mm short. That meant one of the four numbers was 1.00 mm out, and rather than pick one, the discrepancy was recorded as open.
 
-One loose end remains, recorded rather than chased. On the numbers as measured — a 66 × 63 board with a 58 × 56 pitch — the insets come out **4.00 mm across and 3.50 mm along**, which is 0.50 mm short of equal. Equal insets need any *one* of these to be 1.00 mm different: the along pitch at 55.00, the across pitch at 59.00, the board along at 64.00, or the board across at 65.00. One calliper reading settles it. **Nothing in the current design uses the mounting holes**, so nothing is blocked.
+The owner re-took the reading against a dimensioned top view and returned **60.00 mm across × 57.00 mm along**, which closes exactly — **3.00 mm from every board edge on both axes**, nothing left over. It is also the only resolution that corrects both numbers together rather than adjusting one of the four by 1.00 mm. The discrepancy is closed, not carried.
+
+**Hole diameter (M14) is still open**, and it remains the one thing that decides §10.
 
 These are recorded here as they arrive. They will be rolled into specification
 §3 in one revision when the blocking set is complete, so the specification is
@@ -250,7 +253,7 @@ terminal bore. The housing never enters the bore.
 
 Specification v1.5 §4.5–4.6 mandates a fixed ledge at one short PCB edge and an
 adjustable clamp with two M3 screws at the other, because §3 recorded no usable
-mounting-hole pattern. **A 58 × 56 mm pattern is now measured.** If the hole
+mounting-hole pattern. **A 60 mm across × 57 mm along pattern is now measured**, putting every hole 3.00 mm from its nearest board edge and 2.50 mm outboard of the nearest terminal-block face. If the hole
 diameter suits an M2.5 or M3 pillar, two or four short pillars could replace the
 fixed ledge, the adjustable clamp, its two M3 screws and its two heat-set
 inserts outright — less material, fewer parts, no clamp travel to verify, and

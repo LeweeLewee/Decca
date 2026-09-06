@@ -150,12 +150,16 @@ P = {
     "term_block_h": 9.00,            # MEASURED 2026-09-06, above the PCB top face
     "assembly_h": 20.00,             # MEASURED 2026-09-05, lowest underside to top
     "term_per_side": 15,             # supplier topology, visible on the board
-    # Pairing CONFIRMED by the owner 2026-09-06: the 58.00 is the ACROSS
-    # pitch, which is what puts all four holes at a near-equal inset from
-    # the nearest board edge. See ASSUMED below for the 0.50 mm wrinkle
-    # that reading still leaves.
-    "mount_pitch_x": 56.00,          # MEASURED 2026-09-06, ALONG the rows
-    "mount_pitch_y": 58.00,          # MEASURED 2026-09-06, ACROSS the rows
+    # RE-MEASURED by the owner 2026-09-06, superseding the 58 x 56 recorded
+    # earlier the same day. This pair closes the inset arithmetic exactly,
+    # which is the equal-inset condition the owner described:
+    #     across  (66.00 - 60.00) / 2 = 3.00 mm from each long edge
+    #     along   (63.00 - 57.00) / 2 = 3.00 mm from each short edge
+    # 58 x 56 gave 4.00 and 3.50 and left 1.00 mm unaccounted for. Checked
+    # against a dimensioned top view before the record was changed.
+    # Recorded only - nothing in this design uses the holes.
+    "mount_pitch_x": 57.00,          # MEASURED 2026-09-06, ALONG the rows
+    "mount_pitch_y": 60.00,          # MEASURED 2026-09-06, ACROSS the rows
 
     # -- The adapter, STARTING ----------------------------------------------
     "adapter_pcb_t": 1.60,           # STARTING
@@ -331,13 +335,6 @@ ASSUMED = (
     ("terminal rows centred along the 63.00 mm ALONG-row dimension",
      "leaves 5.00 mm of clear board beyond each row end, which is where the "
      "ledge, the clamp, the lid screws and the locating lugs all live"),
-    ("one of the four hole/board numbers is out by 1.00 mm",
-     "the owner confirms the 58.00 is the ACROSS pitch because it puts all "
-     "four holes at an equal inset from the nearest edge - but on the recorded "
-     "66 x 63 board, 58 x 56 gives 4.00 mm across and 3.50 mm along, which is "
-     "0.50 mm short of equal. Equal insets need any ONE of: along pitch 55.00, "
-     "across pitch 59.00, board along 64.00, or board across 65.00. Nothing in "
-     "this design uses the holes, so nothing depends on the resolution"),
     ("the USB connector is centred on its short edge",
      "the opening is cut oversize at 16.00 mm to absorb the error"),
     ("term_block_h 9.00 was taken as the block's own body height",

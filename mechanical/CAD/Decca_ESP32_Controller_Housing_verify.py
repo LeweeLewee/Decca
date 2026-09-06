@@ -88,7 +88,10 @@ TERM_ROW_L = 53.00             # owner, 2026-09-06
 TERM_BLOCK_H = 9.00            # owner, 2026-09-06
 ASSEMBLY_H = 20.00             # owner, 2026-09-05, overall from datum A
 TERM_PER_SIDE = 15
-MOUNT_PITCH = (56.00, 58.00)   # owner, 2026-09-06; along, across. Pairing ASSUMED
+MOUNT_PITCH = (57.00, 60.00)   # owner, 2026-09-06; along, across. Re-measured
+                               # same day, superseding 58 x 56: 60/57 puts every
+                               # hole 3.00 mm from its nearest edge on both axes.
+                               # Recorded only - no gate depends on it.
 
 X_PCB = 31.50
 Y_PCB = 33.00
@@ -1136,10 +1139,8 @@ def main():
     proto("PETG print quality with no support on any part")
     print("")
     print("ASSUMPTIONS - recorded so they cannot pass as measurements")
-    proto("terminal rows centred along the 66.00 mm length",
-          "leaves the 6.50 mm of clear board the retention features use")
-    proto("58.00 runs along the 66.00 axis and 56.00 across the 63.00",
-          "the holes are not used for retention, so nothing here depends on it")
+    proto("terminal rows centred along the 63.00 mm along-row length",
+          "leaves the 5.00 mm of clear board the retention features use")
     proto("the USB connector is centred on its short edge")
     proto("the 9.00 mm block height is the block's own body height")
 

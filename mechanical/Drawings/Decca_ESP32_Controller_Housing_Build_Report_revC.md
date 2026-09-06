@@ -47,7 +47,7 @@ The first housing revision with any measured hardware in it.
 | Terminal blocks, outer face to outer face | **55.00 mm** | owner, 2026-09-06 |
 | Terminal-block row length | **53.00 mm** | owner, 2026-09-06 |
 | Terminal-block height | **9.00 mm** | owner, 2026-09-06 |
-| Mounting-hole centre pitch | **58 mm across × 56 mm along** | owner, 2026-09-06; pairing confirmed the same day |
+| Mounting-hole centre pitch | **60 mm across × 57 mm along** | owner, 2026-09-06; re-measured the same day, superseding 58 × 56 |
 | Conductor entry position | just above the block base | owner, 2026-09-06 |
 
 **The 66 mm is measured across the board, from one connector side to the
@@ -71,35 +71,42 @@ the USB position, conductor and ferrule sizes, the heat-set insert, the cabinet
 screw head — remains a **STARTING** value, tagged as such in the generator's own
 `STARTING` tuple and listed in §7.
 
-### 2.1 Four assumptions, recorded so they cannot pass as measurements
+### 2.1 Three assumptions, recorded so they cannot pass as measurements
 
 | Assumption | If it is wrong |
 |---|---|
 | The terminal rows are centred along the 63.00 mm along-row dimension | the 5.00 mm clear ends move; one parameter |
-| One of the four hole/board numbers is out by 1.00 mm — see §2.2 | nothing in this build depends on it; the holes are not used for retention |
 | The USB connector is centred on its short edge | the notch is cut 16.00 mm wide against a 14.00 mm requirement to absorb it |
 | The 9.00 mm block height is the block's own body height | if it was taken from the resting surface the block top drops, and the long walls are unaffected either way, because they are set by the board top face |
 
-### 2.2 A 1.00 mm inconsistency in the hole pattern, unresolved and harmless
+### 2.2 The hole pitch, first recorded as 58 × 56, re-measured as 60 × 57
 
-The owner confirms the **58 mm is the across pitch**, on the grounds that it puts
-all four mounting holes at an equal inset from the nearest board edge. The
-pairing is right and the model already used it. The arithmetic does not quite
-close, though:
+The pitch was first given as 58 across × 56 along, on the grounds that it put
+all four mounting holes at an equal inset from the nearest board edge. It did
+not quite: on a 66 × 63 board that pair gives 4.00 mm across and 3.50 mm along,
+0.50 mm short of equal, which meant one of the four numbers had to be 1.00 mm
+out. Rather than pick one, the discrepancy was recorded and the owner re-took
+the reading against a dimensioned top view.
+
+**60.00 mm across × 57.00 mm along.** It closes exactly:
 
 | | inset from the nearest edge |
 |---|---:|
-| across — (66 − 58) ÷ 2 | **4.00 mm** |
-| along — (63 − 56) ÷ 2 | **3.50 mm** |
+| across — (66 − 60) ÷ 2 | **3.00 mm** |
+| along — (63 − 57) ÷ 2 | **3.00 mm** |
 
-Truly equal insets need any **one** of these to be 1.00 mm different from what
-is recorded: the along pitch at 55.00, the across pitch at 59.00, the board's
-along dimension at 64.00, or its across dimension at 65.00.
+Equal on both axes with nothing left over — and it is the only resolution that
+corrects both numbers at once instead of adjusting one of the four by 1.00 mm.
+The holes also land clear of the terminal blocks in both directions: each hole
+centre sits 2.50 mm outboard of the nearest block face, since the block faces
+are 5.50 mm inboard of the long edges.
 
-It is recorded rather than resolved, because **nothing in this design uses the
-mounting holes** — retention is the fixed ledge and the adjustable clamp on the
-short edges, per v1.6 §4.5–4.6. If hole-based retention is ever adopted, this is
-the first thing to settle, and it needs one calliper reading.
+**No geometry moved.** `mount_pitch_x` and `mount_pitch_y` are recorded values
+only — they appear in the generator's measured block and in the verifier's
+constants, and are referenced by no derivation, no body and no gate. Retention
+is the fixed ledge and the adjustable clamp on the short edges, per v1.6
+§4.5–4.6. The **hole diameter is still unmeasured**, and it is the one thing
+that decides whether hole-based retention could replace them — see §7.
 
 ## 3. The one design move that decides everything
 
@@ -253,8 +260,8 @@ suite reads **only** the exported STLs and re-derives every claim from triangles
 against values typed in by hand. Neither imports the other's numbers.
 
 ```
-30 CAD checks,  0 failed, 15 prototype gates open
-29 mesh checks, 0 failed, 15 prototype, 3 installation
+30 CAD checks,  0 failed, 14 prototype gates open
+29 mesh checks, 0 failed, 14 prototype, 3 installation
 ```
 
 Together they cover all thirty v1.6 §13 gates.
@@ -321,7 +328,7 @@ outside the four modelled joint rows; the 0.25 mm lid fit on this printer and
 filament; the 0.12 mm cap nib interference; PETG print quality with no support;
 antenna performance with the lid fitted.
 
-**Plus the four assumptions in §2.1.**
+**Plus the three assumptions in §2.1.**
 
 **Installation gates:** cabinet fixing centres and the surface behind them; that
 the grouped cabinet wiring is secured outside the housing; antenna performance.
