@@ -66,10 +66,15 @@ axes, so an M3 cap head clears the block corner by 0.45 mm. The obstacle is the
 | `ESP32_Controller_Housing_Lid.step` | Lid. |
 | `ESP32_Controller_Cabinet_Fastener_Cap.step` | The insulating cap. Print 2 off. |
 
-**Result:** 74.50 × 73.10 × 27.20 mm, **26.71 cm³ / 33.9 g** on solid volume,
+**Result:** 75.50 × 73.10 × 27.20 mm, **27.39 cm³ / 34.8 g** on solid volume,
 against mandatory limits of 85 × 75 × 36 mm, 35 cm³ and 45 g and preferred
 targets of 30 cm³ and 38 g. Three production parts. Sliced for real on a P1S in
-PETG-HF at **31.73 g and 1 h 34 m 37 s**, zero support features.
+PETG-HF at **32.26 g and 1 h 35 m 11 s**, zero support features.
+
+Each lid-screw boss is **7.00 mm deep with its screw centred**, leaving 1.50 mm
+of wall around the insert bore in every direction — v1.7 §4.12, gated in gate
+12. At 6.00 mm with the screw off-centre it was 0.50 mm on the inboard face,
+which is where a heat-set insert splits a boss.
 
 **Verification:** two independent suites, neither importing the other's
 numbers — **30 CAD checks and 29 mesh checks over all thirty v1.7 §13 gates, 0

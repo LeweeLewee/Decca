@@ -190,25 +190,41 @@ envelope follows the wire and ferrule actually installed, not the terminal bore.
 
 | Metric | Rev A | Rev B | Rev C, clamped | **Rev C, v1.7** | limit | preferred |
 |---|---:|---:|---:|---:|---:|---:|
-| Outside length | 105.00 | 81.60 | 78.10 | **74.50 mm** | ≤85 | — |
+| Outside length | 105.00 | 81.60 | 78.10 | **75.50 mm** | ≤85 | — |
 | Outside width | 77.00 | 70.10 | 73.10 | **73.10 mm** | ≤75 | — |
 | Closed height | 38.30 | 35.30 | 27.20 | **27.20 mm** | ≤36 | — |
-| Housing_Base | 49.66 | 16.85 | 18.65 | **17.41 cm³** | — | ≤15 |
-| Housing_Lid | 14.84 | 16.07 | 9.56 | **9.14 cm³** | — | ≤18 |
+| Housing_Base | 49.66 | 16.85 | 18.65 | **17.98 cm³** | — | ≤15 |
+| Housing_Lid | 14.84 | 16.07 | 9.56 | **9.25 cm³** | — | ≤18 |
 | PCB_Clamp_Adjustable | 1.58 | 1.12 | 0.99 | **deleted** | — | — |
 | Cabinet_Fastener_Cap × 2 | — | 0.16 | 0.16 | **0.16 cm³** | — | — |
-| **Production total** | **67.93** | **34.20** | 29.36 | **26.71 cm³** | **≤35** | **≤30** |
-| **Full-solid PETG mass** | **86.3** | **43.4** | 37.3 | **33.9 g** | **≤45** | **≤38** |
+| **Production total** | **67.93** | **34.20** | 29.36 | **27.39 cm³** | **≤35** | **≤30** |
+| **Full-solid PETG mass** | **86.3** | **43.4** | 37.3 | **34.8 g** | **≤45** | **≤38** |
 
 **Three production parts, not four**, and comfortably inside the preferred
-targets rather than scraping them: 26.71 cm³ against a 30 cm³ preference and
-33.9 g against 38 g. Rev A's 68 cm³ is down by 61%.
+targets rather than scraping them: 27.39 cm³ against a 30 cm³ preference and
+34.8 g against 38 g. Rev A's 68 cm³ is down by 60%.
 
-The last 3.60 mm of length came from deleting the clamp. The +X floor beyond the
-board was a 7.50 mm clamp zone sized by a slot, the material beyond it, wall
-clearance at full travel and an insert bore. With the clamp gone it carries
-nothing but the two lid-screw bosses, so it is 4.40 mm — the depth those bosses
-actually reach — and nothing else.
+The length came from deleting the clamp. The +X floor beyond the board was a
+7.50 mm clamp zone sized by a slot, the material beyond it, wall clearance at
+full travel and an insert bore. With the clamp gone it carries nothing but the
+two lid-screw bosses, so it is sized by **them** and nothing else — 5.40 mm, the
+7.00 mm boss less the 1.60 mm end wall it merges into.
+
+### 4.3 The 0.50 mm that was hiding in the lid-screw boss
+
+Found while answering a question about the heat-set insert, and **it predates
+the retention change** — Rev C carried it from the day it was built.
+
+The boss was 6.00 mm deep with its screw 3.50 mm in from the outer face. That
+leaves 1.50 mm of wall outboard of a Ø4.00 insert bore and **0.50 mm inboard** —
+about one extrusion width, on the boss's free face. A heat-set insert expands
+the plastic radially as it is driven in, so that face is exactly where the boss
+splits, and this is the least proven fastener in the design.
+
+The screw is now **centred** in a **7.00 mm** boss: **1.50 mm of wall in every
+direction**, against a new v1.7 §4.12 minimum of 1.20 mm, gated in gate 12. It
+costs 1.00 mm of enclosure length — 74.50 to 75.50 mm — against 9.50 mm of
+remaining headroom to the 85 mm limit. Cheap.
 
 The width is still the tightest dimension at 73.10 mm against a 75 mm limit,
 because the 66 mm runs across the board and the terminal corridors are on that
@@ -243,10 +259,10 @@ orientation.
 
 | Part | Qty | Filament each | g total | Print time each |
 |---|---:|---:|---:|---:|
-| Housing_Base | 1 | 20.19 g | 20.19 | 1 h 7 m 4 s |
-| Housing_Lid | 1 | 11.16 g | 11.16 | 22 m 49 s |
+| Housing_Base | 1 | 20.58 g | 20.58 | 1 h 7 m 30 s |
+| Housing_Lid | 1 | 11.30 g | 11.30 | 22 m 57 s |
 | Cabinet_Fastener_Cap | 2 | 0.19 g | 0.38 | 2 m 22 s |
-| **Production total** | | | **31.73 g** | **1 h 34 m 37 s** |
+| **Production total** | | | **32.26 g** | **1 h 35 m 11 s** |
 
 **Support usage: none.** `enable_support = 0` and the slicer emitted **zero
 support features on all three parts**, which is the operational confirmation of
@@ -266,7 +282,7 @@ and a numbered gate. There is nothing else on the part.
 | 4 | Four support pads at (±28.50, ±30.00) | carry the board, **centred on the measured mounting holes** | 3, 13 |
 | 5 | One integral fixed ledge, −X, 2.00 mm grip | retains the −X short edge | 13, 15 |
 | 6 | **Two Ø2.60 locating posts, +X** | locate the carrier by its own mounting holes | 5, 13, 14, 15 |
-| 7 | Two lid-screw bosses, **vertical** M3 inserts | lid retention at +X | 12, 17 |
+| 7 | Two lid-screw bosses, **vertical** M3 inserts, screw **centred**, 1.50 mm wall | lid retention at +X | 12, 17 |
 | 8 | Two locating rebates, −X | lid location and capture | 17 |
 | 9 | USB notch, open to the end-wall top | ≥14 × 9 service access with no bridge | 10 |
 | 10 | Two recessed, capped cabinet fixings | cabinet mounting inside the footprint | 2, 16, 25, 26 |
@@ -430,8 +446,8 @@ the grouped cabinet wiring is secured outside the housing; antenna performance.
 
 | Part | Orientation | Filament | Time |
 |---|---|---:|---:|
-| Housing_Base | **floor down** | 20.19 g | 1 h 7 m 4 s |
-| Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.16 g | 22 m 49 s |
+| Housing_Base | **floor down** | 20.58 g | 1 h 7 m 30 s |
+| Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.30 g | 22 m 57 s |
 | Cabinet_Fastener_Cap | flat, **2 off** | 0.19 g ea | 2 m 22 s ea |
 
 No supports on any part. Worst unsupported reach 1.25 mm (CAD) / 0.75 mm (mesh)

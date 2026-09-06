@@ -269,10 +269,15 @@ P = {
     # 1.17 mm, which no screw head does.
     "post_d": 2.60,
     "post_h": 3.00,                  # above the carrier underside, not the board
-    # 4.40: the floor beyond the board at +X now carries nothing but the two
-    # lid-screw bosses, which reach 4.40 mm in from the outer face. The 7.50 mm
-    # clamp zone it replaces is gone with the clamp.
-    "boss_zone": 4.40,
+    # 7.00, not 6.00. At 6.00 with the screw 3.50 in from the outer face the
+    # boss kept 1.50 mm of wall outboard of the insert bore and only 0.50 mm
+    # inboard - about one extrusion width, on the free face, which is exactly
+    # where a heat-set insert splits a boss as it expands radially going in.
+    # 7.00 with the screw CENTRED gives 1.50 mm on both sides. It costs 1.00 mm
+    # of enclosure length, against 10.50 mm of headroom to the v1.7 9 limit,
+    # for the least proven fastener in this design.
+    "lid_boss_l": 7.00,
+    "boss_wall_min": 1.20,           # gate 12
     # The part is IDENTIFIED - Hanglife M3 threaded heat-set inserts, owner
     # 2026-09-06 - which is the first time this fastener has had a name
     # anywhere in this repository. The two numbers below are still not
@@ -618,7 +623,9 @@ def derive(P):
     # The +X floor beyond the board used to be a 7.50 mm clamp zone. With the
     # clamp gone it carries nothing but the two lid-screw bosses, so it is
     # sized by them and by nothing else.
-    d["x_cav_pos"] = d["x_pcb"] + P["pcb_xy_clear"] + P["boss_zone"]  # 36.40
+    # the +X floor beyond the board is exactly what the lid-screw bosses need
+    d["boss_zone"] = P["lid_boss_l"] - P["end_wall_t"]        # 5.40
+    d["x_cav_pos"] = d["x_pcb"] + P["pcb_xy_clear"] + d["boss_zone"]  # 37.40
     d["y_cav"] = d["y_pcb"] + P["pcb_xy_clear"]              # 32.00
     d["x_out_neg"] = d["x_cav_neg"] - P["end_wall_t"]
     d["x_out_pos"] = d["x_cav_pos"] + P["end_wall_t"]
@@ -692,8 +699,13 @@ def derive(P):
     d["ledge_flat"] = d["ledge_proj"] - P["ledge_lead"]
 
     # ---- lid screws and locating lugs --------------------------------------
-    d["lid_boss_x0"] = d["x_out_pos"] - 6.00
-    d["lid_screw_x"] = d["x_out_pos"] - 3.50
+    d["lid_boss_x0"] = d["x_out_pos"] - P["lid_boss_l"]      # 32.00
+    # CENTRED in the boss. Off-centre is what left 0.50 mm of wall on the
+    # inboard face; the insert has to be able to expand into whatever is there.
+    d["lid_screw_x"] = (d["lid_boss_x0"] + d["x_out_pos"]) / 2.0     # 35.50
+    d["boss_wall"] = min(d["lid_screw_x"] - d["lid_boss_x0"],
+                         d["x_out_pos"] - d["lid_screw_x"],
+                         P["lid_boss_half_w"]) - P["insert_hole_d"] / 2.0
     d["z_lid_ins_bot"] = d["z_cav_top"] - P["insert_depth"]
     d["hook_z1"] = d["z_cav_top"] - P["lid_overlap"] + P["hook_drop"]
     d["hook_z0"] = d["hook_z1"] - P["hook_drop"]
@@ -1861,13 +1873,19 @@ def validate(_context=None):
     # -- 12 ------------------------------------------------------------------
     hi = _hit(B, base, lid)
     gate(hi <= 0.001
-         and abs(d["z_cav_top"] - d["z_skirt_bot"] - P["lid_overlap"]) < 1e-9,
-         "12 lid overlap and fit allowance as specified",
+         and abs(d["z_cav_top"] - d["z_skirt_bot"] - P["lid_overlap"]) < 1e-9
+         and d["boss_wall"] >= P["boss_wall_min"],
+         "12 lid overlap, fit allowance and screw-boss walls as specified",
          "overlap %.2f (spec %.2f) at the SHORT ENDS AND CORNERS ONLY, gap "
          "%.2f per face, skirt %.2f; no long-side skirt at all, because one "
-         "would foul the fitted conductors; lid/base interference %.3f mm3"
+         "would foul the fitted conductors; lid/base interference %.3f mm3; "
+         "the screw is CENTRED in a %.2f mm boss, leaving %.2f mm of wall "
+         "around the %.2f insert bore in every direction against a %.2f "
+         "minimum - off-centre it was 0.50, which is where a heat-set insert "
+         "splits a boss"
          % (P["lid_overlap"], P["lid_overlap"], P["lid_fit_clear"],
-            P["lid_skirt_t"], hi))
+            P["lid_skirt_t"], hi, P["lid_boss_l"], d["boss_wall"],
+            P["insert_hole_d"], P["boss_wall_min"]))
 
     # -- 13 ------------------------------------------------------------------
     ncc = K["KEEPOUT_NO_CONTACT_COMPONENTS"]

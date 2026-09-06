@@ -325,7 +325,9 @@ a starting value, and the post must not depend on which it is.
 **Deleted with the clamp:** the whole `PCB_Clamp_Adjustable` part, two plinths,
 two slotted M3 screws, two heat-set inserts, the clamp slot, the clamp travel,
 the carrier-width range, and 3.60 mm of enclosure length. The envelope falls
-from 78.10 to **74.50 mm** and the production set from 29.36 to **26.71 cm³**.
+from 78.10 to 74.50 mm and the production set from 29.36 to 26.71 cm³ — and
+then to **75.50 mm** and **27.39 cm³** when the lid-screw boss was deepened to
+give its insert a 1.50 mm wall instead of 0.50.
 
 Two heat-set inserts remain, for the two lid screws. That fastener is still the
 least proven in this design and still an open gate — the clamp's pair is simply

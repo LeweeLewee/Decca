@@ -27,11 +27,11 @@ each part's stated orientation. Worst case on any part is **1.25 mm** (CAD) or
 
 | File | Print notes |
 |---|---|
-| `ESP32_Controller_Housing_Base.stl` | **DO NOT PRINT YET — see the release gate below.** Floor flat on the bed, no supports. 71.60 × 70.20 × 25.60 mm, 17.41 cm³, **20.19 g, 1 h 7 m 4 s**. Carries the fixed ledge, the two Ø2.60 locating posts, four support pads, both lid-screw bosses and the two recessed cabinet fixings. |
-| `ESP32_Controller_Housing_Lid.stl` | **DO NOT PRINT YET.** **Top face flat on the bed**, skirt pointing up, no supports — that orientation is what makes the USB notch and the vents print with no bridge. 74.50 × 73.10 × 5.60 mm, 9.14 cm³, **11.16 g, 22 m 49 s**. No long-side skirt: one would foul the fitted conductors. |
+| `ESP32_Controller_Housing_Base.stl` | **DO NOT PRINT YET — see the release gate below.** Floor flat on the bed, no supports. 72.60 × 70.20 × 25.60 mm, 17.97 cm³, **20.58 g, 1 h 7 m 30 s**. Carries the fixed ledge, the two Ø2.60 locating posts, four support pads, both lid-screw bosses and the two recessed cabinet fixings. |
+| `ESP32_Controller_Housing_Lid.stl` | **DO NOT PRINT YET.** **Top face flat on the bed**, skirt pointing up, no supports — that orientation is what makes the USB notch and the vents print with no bridge. 75.50 × 73.10 × 5.60 mm, 9.25 cm³, **11.30 g, 22 m 57 s**. No long-side skirt: one would foul the fitted conductors. |
 | `ESP32_Controller_Cabinet_Fastener_Cap.stl` | **PRINT 2 OFF.** Flat. 0.08 cm³, **0.19 g, 2 m 22 s** each. Presses into each cabinet-fixing recess over the countersunk head, retained by three compliant nibs at +0.12 mm interference per side — not a clearance fit. |
 
-**Production set: 31.73 g, 1 h 34 m 37 s.** Every slice returned
+**Production set: 32.26 g, 1 h 35 m 11 s.** Every slice returned
 `return_code 0, "Success."` with no warnings.
 
 > **Removed as obsolete:** `ESP32_Controller_PCB_Clamp_Adjustable.stl`, deleted

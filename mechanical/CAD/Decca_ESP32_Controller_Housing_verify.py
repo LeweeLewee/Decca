@@ -125,12 +125,12 @@ TOP_CLEAR = 2.00
 # -- plan chain --------------------------------------------------------------
 X_CAV_NEG = -32.00
 X_ADJ_FACE = 32.50
-X_CAV_POS = 36.40
+X_CAV_POS = 37.40
 Y_CAV = 33.50
 X_OUT_NEG = -33.60
-X_OUT_POS = 38.00
+X_OUT_POS = 39.00
 Y_OUT = 35.10
-BODY_L = 71.60
+BODY_L = 72.60
 BODY_W = 70.20
 WALL_T = 1.60
 OUTER_CORNER_R = 3.00
@@ -138,7 +138,7 @@ OUTER_CORNER_R = 3.00
 # the long walls stop at the board top face; full height only in the returns
 Z_LONG_WALL_TOP = 6.10
 X_RET_NEG = -28.00
-X_RET_POS = 32.40
+X_RET_POS = 33.40
 SIDE_OPEN_H = 17.90
 
 # -- terminal entry, the whole point -----------------------------------------
@@ -154,9 +154,9 @@ TERM_SCREW_Y = 24.50           # Y_TERM_OUT - 3.00
 
 # -- lid ---------------------------------------------------------------------
 LID_X_NEG = -35.05
-LID_X_POS = 39.45
+LID_X_POS = 40.45
 LID_Y = 36.55
-LID_L = 74.50
+LID_L = 75.50
 LID_W = 73.10
 LID_TOP_T = 1.60
 LID_SKIRT_T = 1.20
@@ -166,7 +166,7 @@ Z_SKIRT_BOT = 20.00
 SKIRT_IN_NEG = -33.85
 SKIRT_IN_Y = 35.35
 LID_RET_NEG = -28.00
-LID_RET_POS = 32.40
+LID_RET_POS = 33.40
 
 # -- retention ---------------------------------------------------------------
 # The pads are centred on the MEASURED mounting holes now, and the +X pair
@@ -188,7 +188,9 @@ INSERT_HOLE_D = 4.00
 INSERT_DEPTH = 5.00
 
 # -- lid screws and locating lugs --------------------------------------------
-LID_SCREW_X = 34.50
+LID_SCREW_X = 35.50
+LID_BOSS_L = 7.00
+BOSS_WALL_MIN = 1.20
 LID_SCREW_Y = 26.00
 LID_SCREW_CLEAR_D = 3.40
 HOOK_Y = 22.00
