@@ -26,6 +26,11 @@ its original conductors, **Red** and **Green**. These are pre-existing and are
 **not** to be recoloured or reinterpreted under the general loom standard above.
 See the on/off section.
 
+**Exception — H3 VHF dry-contact pair.** The installed VHF source-selector pair
+uses **two Black conductors**. They form an isolated dry contact, so colour does
+not distinguish signal from return and either Black conductor may be connected
+to GPIO23 with the other connected to GND. See the H3 section.
+
 **Exception — H4 OLED harness.** The installed and bench-verified screen loom
 uses **Orange for SCL** and **Yellow for SDA**. These are signal conductors in H4
 and must **never** be connected to the 5 V rail. H4 retains Red for 3.3 V and
@@ -146,15 +151,15 @@ The original PCB and interlocked selector mechanism are retained mechanically
 (ADR-0001). Repeated soldering and contact tests showed that multi-button
 electrical reuse is not reliable. ADR-0013 supersedes ADR-0011 and ADR-0004.
 
-Only the physically accepted **VHF-derived Green/Yellow dry-contact pair** is
+Only the physically accepted **VHF-derived two-Black-wire dry-contact pair** is
 connected:
 
 | VHF-derived pair | ESP32 termination | Status |
 |-----------|-------------------|--------|
-| Green | GPIO23 / board label D23 | Bench-verified input |
-| Yellow | GND | Bench-verified return |
+| Black conductor | GPIO23 / board label D23 | Bench-verified input |
+| Black conductor | GND | Bench-verified return |
 
-The two conductors may be swapped because this is an isolated dry contact.
+The two Black conductors may be swapped because this is an isolated dry contact.
 GPIO23 uses the ESP32 internal pull-up and 25 ms software debounce. Do not connect
 either conductor to 3.3 V or 5 V.
 
