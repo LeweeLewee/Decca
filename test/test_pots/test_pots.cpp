@@ -86,6 +86,8 @@ void test_pots_smooth_step_changes() {
     waitForSample();
     decca::pots::update();
 
+    TEST_ASSERT_EQUAL_UINT16(
+        4095, decca::pots::instantRawValue(Pot::Volume));
     TEST_ASSERT_UINT16_WITHIN(1, 125, decca::pots::value(Pot::Volume));
     TEST_ASSERT_LESS_THAN_UINT16(4095,
                                  decca::pots::rawValue(Pot::Volume));

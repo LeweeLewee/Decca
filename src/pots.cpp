@@ -24,6 +24,7 @@ constexpr uint8_t kPins[kPotCount] = {
 
 struct PotState {
     Calibration calibration{};
+    uint16_t instantRaw = 0;
     uint16_t filteredRaw = 0;
     uint16_t normalised = 0;
     bool hasSample = false;
@@ -79,6 +80,7 @@ uint16_t normalise(uint16_t raw, const Calibration& calibration) {
 
 void sample(PotState& state, uint8_t pin) {
     const uint16_t raw = readRaw(pin);
+    state.instantRaw = raw;
     const bool firstSample = !state.hasSample;
 
     if (firstSample) {
@@ -137,6 +139,11 @@ uint16_t rawValue(Pot pot) {
     return indexFor(pot, index) ? g_states[index].filteredRaw : 0;
 }
 
+uint16_t instantRawValue(Pot pot) {
+    uint8_t index = 0;
+    return indexFor(pot, index) ? g_states[index].instantRaw : 0;
+}
+
 bool setCalibration(Pot pot, const Calibration& calibration) {
     uint8_t index = 0;
     if (!indexFor(pot, index) || calibration.rawMin >= calibration.rawMax ||
@@ -146,6 +153,7 @@ bool setCalibration(Pot pot, const Calibration& calibration) {
     }
 
     g_states[index].calibration = calibration;
+    g_states[index].instantRaw = 0;
     g_states[index].filteredRaw = 0;
     g_states[index].normalised = 0;
     g_states[index].hasSample = false;

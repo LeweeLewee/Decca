@@ -1,6 +1,9 @@
 /** Phase 1 coordinator: logical power/display state plus continuous OTA. */
 #include <Arduino.h>
 #ifndef PIO_UNIT_TESTING
+#ifdef DECCA_ADC_DIAGNOSTIC
+#include "adc_diagnostic.h"
+#endif
 #include "buttons.h"
 #include "display.h"
 #include "hardware.h"
@@ -145,6 +148,9 @@ void setup() {
     applyPowerState();
     applyLightingState();
     decca::ota::init();
+#ifdef DECCA_ADC_DIAGNOSTIC
+    decca::adc_diagnostic::init();
+#endif
 }
 
 void loop() {
@@ -158,9 +164,18 @@ void loop() {
     if (sourceMode != g_sourceMode) {
         applySourceState(true);
     }
+#ifdef DECCA_ADC_DIAGNOSTIC
+    if (!decca::adc_diagnostic::ownsLighting()) {
+        applyLightingState();
+    }
+#else
     applyLightingState();
+#endif
     decca::lighting::update();
     decca::display::update();
     decca::ota::update();
+#ifdef DECCA_ADC_DIAGNOSTIC
+    decca::adc_diagnostic::update();
+#endif
 }
 #endif

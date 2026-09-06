@@ -105,6 +105,29 @@ uint8_t targetBrightness(Zone zone) {
     return isDial(zone) ? g_targetBrightness : 0;
 }
 
+#ifdef DECCA_ADC_DIAGNOSTIC
+void diagnosticConstantFullOn() {
+    // Phase B must be electrically meaningful: detach LEDC before holding the
+    // MOSFET control input high, so no timer edges remain at nominal 100%.
+    ledcDetachPin(hardware::kDialLightingPwm);
+    pinMode(hardware::kDialLightingPwm, OUTPUT);
+    digitalWrite(hardware::kDialLightingPwm, HIGH);
+    g_brightness = 255;
+    g_targetBrightness = 255;
+}
+
+void diagnosticRestorePwm(uint8_t appliedDuty, uint8_t targetDuty) {
+    // Re-establish a known low level before returning GPIO25 to LEDC control.
+    digitalWrite(hardware::kDialLightingPwm, LOW);
+    ledcAttachPin(hardware::kDialLightingPwm,
+                  hardware::kDialLightingPwmChannel);
+    g_brightness = appliedDuty;
+    g_targetBrightness = targetDuty;
+    g_lastStepMs = nowMs();
+    writeDuty(g_brightness);
+}
+#endif
+
 #ifdef PIO_UNIT_TESTING
 namespace testing {
 

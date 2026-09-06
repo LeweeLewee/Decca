@@ -72,6 +72,13 @@ uint16_t value(Pot pot);
 uint16_t rawValue(Pot pot);
 
 /**
+ * @brief Read the most recent unfiltered 12-bit ADC sample.
+ * @param pot  Which control to read.
+ * @return Most recent instantaneous ADC reading in the range 0–4095.
+ */
+uint16_t instantRawValue(Pot pot);
+
+/**
  * @brief Apply calibration to one control and reset its filter state.
  * @return true when the calibration is valid and has been accepted.
  */

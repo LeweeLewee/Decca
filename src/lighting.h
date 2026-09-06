@@ -58,6 +58,14 @@ uint8_t brightness(Zone zone);
  */
 uint8_t targetBrightness(Zone zone);
 
+#ifdef DECCA_ADC_DIAGNOSTIC
+/** Drive GPIO25 continuously high with LEDC detached, guaranteeing no PWM. */
+void diagnosticConstantFullOn();
+
+/** Restore LEDC PWM at the supplied applied and target duties. */
+void diagnosticRestorePwm(uint8_t appliedDuty, uint8_t targetDuty);
+#endif
+
 #ifdef PIO_UNIT_TESTING
 namespace testing {
 
