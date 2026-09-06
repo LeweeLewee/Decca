@@ -1,6 +1,6 @@
 # Decca IEC C14 Mounting Plate Rev B — CAD Build Report
 
-**Status:** CAD PASS / prototype pending  
+**Status:** CAD PASS / physical prototype fit pending  
 **Supersedes:** Rev A, rejected for incorrect rectangular inlet opening  
 **Build date:** 2026-09-06
 
@@ -43,9 +43,9 @@ The production opening is the measured profile offset outward by **0.25 mm norma
 - `mechanical/STL/Decca_IEC_C14_Mounting_Plate_revB.stl`
 - `mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_views.png`
 
-## 4. Exported-geometry validation
+## 4. Clean exported-geometry validation
 
-Independent STEP/STL verification results:
+The committed Rev B source was rebuilt in GitHub Actions using CadQuery 2.8.0. The generated STEP and STL were then independently verified.
 
 | Gate | Result | Evidence |
 |---|---|---|
@@ -62,17 +62,28 @@ Independent STEP/STL verification results:
 | STL envelope | **PASS** | 40 × 50 × 3 mm |
 | STL manifold | **PASS** | watertight and winding-consistent |
 | STL body count | **PASS** | 1 |
-| Hidden/support features | **PASS** | none; broad-face no-support print |
+| Hidden fastening features | **PASS** | none |
+| Support-dependent geometry | **PASS** | none; broad-face no-support print |
+
+**Result: 15/15 Rev B CAD checks PASS.**
 
 STEP volume: **4325.997401 mm³**  
 STL volume: **4326.486776 mm³**
 
-## 5. Local build checksums
+## 5. Clean-build checksums
 
 - CadQuery source: `9059de6e1bbab96b47661f52f4956d324f0525bc6c3a7dd28f094467b303c1b3`
 - STEP: `88490a052b2ffc9eee2647a45866b8bced727ce17cc5107601133e631fd2de1e`
 - STL: `f8f2b5cd85442c2af8480e3f829a39a151d1d11ab3b5c1a89496b39c6e7720e2`
 
-## 6. Physical gate
+## 6. Physical release gate
 
-Rev B is **not released** until a printed part confirms the actual socket profile is enclosed correctly, both M3 fixings and four M2 cabinet fixings align without forcing, the plate clamps flat and rear mains-terminal clearance is acceptable.
+Rev B is **not released** until a printed part confirms:
+
+1. the complete C14 profile enters without forcing and the plate visibly encloses the socket profile as intended;
+2. both M3 fixings align without slotting;
+3. all four Decca M2 holes align without forcing;
+4. the plate clamps flat without cracking or distortion;
+5. rear terminal and wire clearance is acceptable before mains energisation.
+
+If Rev B fails, record the failed physical interface and amend the measured-profile model. Do not file, slot or drill the reference part to make a failure appear to pass.
