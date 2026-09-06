@@ -81,22 +81,22 @@ FORBIDDEN_FILES = (
 # ===========================================================================
 
 # -- MEASURED off the acquired hardware, with the date ----------------------
-ADAPTER_L = 66.00              # owner, 2026-09-06
-ADAPTER_W = 63.00              # owner, 2026-09-06
+ADAPTER_L = 63.00              # owner, 2026-09-06, ALONG the rows
+ADAPTER_W = 66.00              # owner, 2026-09-06, ACROSS the rows
 TERM_OUTER_SPAN = 55.00        # owner, 2026-09-06
 TERM_ROW_L = 53.00             # owner, 2026-09-06
 TERM_BLOCK_H = 9.00            # owner, 2026-09-06
 ASSEMBLY_H = 20.00             # owner, 2026-09-05, overall from datum A
 TERM_PER_SIDE = 15
-MOUNT_PITCH = (58.00, 56.00)   # owner, 2026-09-06; axis assignment ASSUMED
+MOUNT_PITCH = (56.00, 58.00)   # owner, 2026-09-06; along, across. Pairing ASSUMED
 
-X_PCB = 33.00
-Y_PCB = 31.50
+X_PCB = 31.50
+Y_PCB = 33.00
 Y_TERM_OUT = 27.50
 X_TERM = 26.50
 TERM_PITCH = TERM_ROW_L / float(TERM_PER_SIDE)      # 3.5333
-CLEAR_END = 6.50               # clear board beyond each row end
-CLEAR_SIDE = 4.00              # clear board outboard of each block face
+CLEAR_END = 5.00               # clear board beyond each row end
+CLEAR_SIDE = 5.50              # clear board outboard of each block face
 
 # -- vertical chain, anchored on the MEASURED 20.00 mm overall --------------
 FLOOR_T = 1.60
@@ -115,22 +115,22 @@ UNDER_CLEAR = 2.00
 TOP_CLEAR = 2.00
 
 # -- plan chain --------------------------------------------------------------
-X_CAV_NEG = -33.50
-X_ADJ_FACE = 34.00
-X_CAV_POS = 41.50
-Y_CAV = 32.00
-X_OUT_NEG = -35.10
-X_OUT_POS = 43.10
-Y_OUT = 33.60
-BODY_L = 78.20
-BODY_W = 67.20
+X_CAV_NEG = -32.00
+X_ADJ_FACE = 32.50
+X_CAV_POS = 40.00
+Y_CAV = 33.50
+X_OUT_NEG = -33.60
+X_OUT_POS = 41.60
+Y_OUT = 35.10
+BODY_L = 75.20
+BODY_W = 70.20
 WALL_T = 1.60
 OUTER_CORNER_R = 3.00
 
 # the long walls stop at the board top face; full height only in the returns
 Z_LONG_WALL_TOP = 6.10
-X_RET_NEG = -27.50
-X_RET_POS = 35.50
+X_RET_NEG = -28.00
+X_RET_POS = 36.00
 SIDE_OPEN_H = 17.90
 
 # -- terminal entry, the whole point -----------------------------------------
@@ -145,46 +145,46 @@ DRIVER_D = 6.00
 TERM_SCREW_Y = 24.50           # Y_TERM_OUT - 3.00
 
 # -- lid ---------------------------------------------------------------------
-LID_X_NEG = -36.55
-LID_X_POS = 44.55
-LID_Y = 35.05
-LID_L = 81.10
-LID_W = 70.10
+LID_X_NEG = -35.05
+LID_X_POS = 43.05
+LID_Y = 36.55
+LID_L = 78.10
+LID_W = 73.10
 LID_TOP_T = 1.60
 LID_SKIRT_T = 1.20
 LID_OVERLAP = 4.00
 LID_FIT_CLEAR = 0.25
 Z_SKIRT_BOT = 20.00
-SKIRT_IN_NEG = -35.35
-SKIRT_IN_Y = 33.85
-LID_RET_NEG = -27.90
-LID_RET_POS = 35.50
+SKIRT_IN_NEG = -33.85
+SKIRT_IN_Y = 35.35
+LID_RET_NEG = -28.00
+LID_RET_POS = 36.00
 
 # -- retention ---------------------------------------------------------------
 PAD_L = 8.00
 PAD_W = 3.00
-PAD_X = 28.50
-PAD_Y = 29.50
-LEDGE_X1 = -31.00
+PAD_X = 27.00
+PAD_Y = 30.25
+LEDGE_X1 = -29.50
 LEDGE_GRIP = 2.00
 LEDGE_LEAD = 1.40
 LEDGE_Z0 = 6.30
 CLAMP_GRIP = 2.00
 CLAMP_T = 3.00
 CLAMP_Z = (6.30, 9.30)
-CLAMP_SCREW_X = 36.60
+CLAMP_SCREW_X = 35.10
 CLAMP_SCREW_Y = 16.00
 CLAMP_SLOT_L = 5.40
 CLAMP_SLOT_W = 3.40
-BAR_X0 = 31.00
-BAR_X1 = 39.80
-PLINTH_X = (34.00, 41.50)
+BAR_X0 = 29.50
+BAR_X1 = 38.30
+PLINTH_X = (32.50, 40.00)
 INSERT_HOLE_D = 4.00
 INSERT_DEPTH = 5.00
-CARRIER_RANGE = (65.00, 67.00)
+CARRIER_RANGE = (62.00, 64.00)
 
 # -- lid screws and locating lugs --------------------------------------------
-LID_SCREW_X = 39.60
+LID_SCREW_X = 38.10
 LID_SCREW_Y = 26.00
 LID_SCREW_CLEAR_D = 3.40
 HOOK_Y = 22.00
@@ -207,7 +207,7 @@ ANT_KEEPOUT_X = (0.75, 35.75)
 ANT_KEEPOUT_Y = 19.00
 
 # -- recessed cabinet fixings --------------------------------------------------
-CAB_X = 26.00
+CAB_X = 24.00
 CAB_PAD_D = 13.00
 CAB_PAD_H = 2.40
 CAB_SCREW_D = 3.40

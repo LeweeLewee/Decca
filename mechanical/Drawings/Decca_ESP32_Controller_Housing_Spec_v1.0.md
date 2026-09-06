@@ -58,16 +58,16 @@ Use repository source dimensions and existing measured references as the design 
 | Item | Requirement |
 |---|---:|
 | Selected terminal adapter | DORHEA 30-pin GPIO breakout / 1-into-2 terminal adapter |
-| PCB plan outline | **66 × 63 mm — owner-measured 2026-09-06** (confirms the supplier figure) |
+| PCB plan outline | **63 mm ALONG the rows × 66 mm ACROSS them — owner-measured 2026-09-06**, axis assignment corrected by the owner the same day. The 66 mm is measured from one connector side to the other. |
 | Terminal arrangement | 15 green screw terminals on each long side; screws operated from above; conductors enter horizontally through the outward-facing side ports |
 | ESP32 connection | Two black vertical 15-pin sockets accept the ESP32 DevKit; these sockets are not external wiring points |
 | Supplier image's additional dimension | 25 mm, reference only; datums are ambiguous and the value shall not drive CAD |
-| Terminal blocks, outer face to outer face | **55 mm — owner-measured 2026-09-06**, so each block face sits **4.0 mm inboard** of its long PCB edge |
-| Terminal-block row length | **53 mm — owner-measured 2026-09-06**, leaving 6.5 mm of clear board beyond each row end |
+| Terminal blocks, outer face to outer face | **55 mm — owner-measured 2026-09-06**, so each block face sits **5.5 mm inboard** of its long PCB edge |
+| Terminal-block row length | **53 mm — owner-measured 2026-09-06**, leaving 5.0 mm of clear board beyond each row end |
 | Terminal-block height | **9 mm — owner-measured 2026-09-06** |
 | Terminal width | approximately 3 mm each; consistent with 53 ÷ 15 = 3.53 mm pitch |
 | Conductor entry position | **just above the base of the terminal block — owner, 2026-09-06.** Qualitative and sufficient: see §5.3 |
-| Mounting-hole centre pitch | **58 × 56 mm — owner-measured 2026-09-06**; hole diameter not measured, axis assignment to confirm before any hole-based retention is used |
+| Mounting-hole centre pitch | **58 mm across × 56 mm along — owner-measured 2026-09-06**; hole diameter not measured, and the pairing is assumed. Confirm both before any hole-based retention is used. |
 | Adapter PCB thickness | 1.6 mm starting value; physically measure |
 | Terminal-port bore size and internal insertion depth | **OUT OF SCOPE, owner 2026-09-06.** They do not drive housing geometry; §5.3 clears the whole block height instead |
 | Corner mounting-hole diameter | **UNMEASURED**; do not use for retention until measured and until §4.5–4.6 are amended |
@@ -77,7 +77,7 @@ Use repository source dimensions and existing measured references as the design 
 | Minimum top clearance | 2.0 mm |
 | Minimum clearance below lowest component/solder feature | 2.0 mm |
 | Minimum USB opening | 14 × 9 mm |
-| Adjustable carrier-width range | 65–67 mm |
+| Adjustable carrier range, along the rows | **62–64 mm**, re-centred on the measured 63 mm. The former 65–67 predates any measurement of this board. |
 
 Supplier dimensions and repository dimensions remain assumptions until checked against the acquired board. Do not infer the terminal-port centre height, mounting-hole pitch, precise EN/BOOT positions or underside keep-outs from the listing photograph.
 

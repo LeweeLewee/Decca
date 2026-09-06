@@ -43,22 +43,28 @@ The first housing revision with any measured hardware in it.
 | Dimension | Value | Source |
 |---|---:|---|
 | Complete adapter + fitted ESP32, overall height | **20.00 mm** | owner, 2026-09-05 |
-| Adapter PCB outline | **66 × 63 mm** | owner, 2026-09-06 |
+| Adapter PCB outline | **63 mm along the rows × 66 mm across them** | owner, 2026-09-06, axis corrected same day |
 | Terminal blocks, outer face to outer face | **55.00 mm** | owner, 2026-09-06 |
 | Terminal-block row length | **53.00 mm** | owner, 2026-09-06 |
 | Terminal-block height | **9.00 mm** | owner, 2026-09-06 |
 | Mounting-hole centre pitch | **58 × 56 mm** | owner, 2026-09-06 |
 | Conductor entry position | just above the block base | owner, 2026-09-06 |
 
-Two facts fall out arithmetically and drive the whole design:
+**The 66 mm is measured across the board, from one connector side to the
+other**, and the 63 mm runs along the rows. Rev C as first built had these two
+the wrong way round; the owner corrected it the same day, and the corrected
+reading is also the self-consistent one:
 
-- **Each block's outward face sits 4.00 mm inboard of its long PCB edge** —
-  (63.00 − 55.00) ÷ 2.
-- **The 53.00 mm rows leave 6.50 mm of clear board beyond each end** —
-  (66.00 − 53.00) ÷ 2.
+| | correct | the wrong way round |
+|---|---:|---:|
+| Clear board outboard of each block face | (66 − 55) ÷ 2 = **5.50 mm** | (63 − 55) ÷ 2 = 4.00 mm |
+| Clear board beyond each row end | (63 − 53) ÷ 2 = **5.00 mm** | (66 − 53) ÷ 2 = 6.50 mm |
 
-Rev B had all three wrong: blocks starting *at* the edge, 10.00 mm tall,
-spanning 49.00 mm.
+Two ~5 mm margins is what a real board looks like. One 4.00 and one 6.50 was the
+tell, and it was there to be noticed before the correction arrived.
+
+Rev B had all three of these wrong anyway: blocks starting *at* the edge,
+10.00 mm tall, spanning 49.00 mm.
 
 Everything else — PCB thickness, the below-board protrusion, block depth in Y,
 the USB position, conductor and ferrule sizes, the heat-set insert, the cabinet
@@ -69,8 +75,8 @@ screw head — remains a **STARTING** value, tagged as such in the generator's o
 
 | Assumption | If it is wrong |
 |---|---|
-| The terminal rows are centred along the 66.00 mm length | the 6.50 mm clear ends move; one parameter |
-| 58.00 runs along the 66.00 axis, 56.00 across the 63.00 | nothing in this build depends on it — the holes are not used for retention |
+| The terminal rows are centred along the 63.00 mm along-row dimension | the 5.00 mm clear ends move; one parameter |
+| The 58.00 hole pitch pairs with the 66.00 across dimension, 56.00 with the 63.00 along | insets of 4.00 and 3.50 mm; nothing in this build depends on it — the holes are not used for retention |
 | The USB connector is centred on its short edge | the notch is cut 16.00 mm wide against a 14.00 mm requirement to absorb it |
 | The 9.00 mm block height is the block's own body height | if it was taken from the resting surface the block top drops, and the long walls are unaffected either way, because they are set by the board top face |
 
@@ -99,7 +105,7 @@ Everything else follows:
 - the lid carries **no long-side skirt** — one would have to be dragged through
   the fitted conductors to get the lid off;
 - **all** retention, fastening and lid support move to the two short ends, into
-  the 6.50 mm of clear board the measured rows leave there.
+  the 5.00 mm of clear board the measured rows leave there.
 
 What replaces the port measurement is a **declared routing value** this design
 owns: `straight_run` = **12.00 mm** from the block's outward face before a
@@ -110,24 +116,26 @@ envelope follows the wire and ferrule actually installed, not the terminal bore.
 
 | Metric | Rev A | Rev B | **Rev C** | v1.6 limit | preferred |
 |---|---:|---:|---:|---:|---:|
-| Outside length | 105.00 | 81.60 | **81.10 mm** | ≤85 | — |
-| Outside width | 77.00 | 70.10 | **70.10 mm** | ≤75 | — |
+| Outside length | 105.00 | 81.60 | **78.10 mm** | ≤85 | — |
+| Outside width | 77.00 | 70.10 | **73.10 mm** | ≤75 | — |
 | Closed height | 38.30 | 35.30 | **27.20 mm** | ≤36 | — |
-| Housing_Base | 49.66 | 16.85 | **18.67 cm³** | — | ≤15 |
-| Housing_Lid | 14.84 | 16.07 | **9.53 cm³** | — | ≤18 |
+| Housing_Base | 49.66 | 16.85 | **18.65 cm³** | — | ≤15 |
+| Housing_Lid | 14.84 | 16.07 | **9.56 cm³** | — | ≤18 |
 | PCB_Clamp_Adjustable | 1.58 | 1.12 | **0.99 cm³** | — | ≤2 |
 | Cabinet_Fastener_Cap × 2 | — | 0.16 | **0.16 cm³** | — | — |
-| **Production total** | **67.93** | **34.20** | **29.35 cm³** | **≤35** | **≤30** |
+| **Production total** | **67.93** | **34.20** | **29.36 cm³** | **≤35** | **≤30** |
 | **Full-solid PETG mass** | **86.3** | **43.4** | **37.3 g** | **≤45** | **≤38** |
 
 **Rev C is the first revision to meet the preferred targets as well as the
-mandatory limits.** 29.35 cm³ against a 30 cm³ preference and 37.3 g against
-38 g. Rev A's 68 cm³ is down by 57%.
+mandatory limits.** 29.36 cm³ against a 30 cm³ preference and 37.3 g against
+38 g. Rev A's 68 cm³ is down by 57%. The width is the tightest of the three
+dimensions at 73.10 mm against a 75 mm limit, because the 66 mm now runs across
+the board and the terminal corridors are on that axis.
 
 The height did it. Rev B's 35.30 mm closed height came from an unverified
 24.00 mm "above PCB" assumption; the measured 20.00 mm overall, applied from the
 assembly's own lowest underside feature, gives **27.20 mm** — 8.10 mm shorter,
-and the lid falls from 16.07 to 9.53 cm³ because it is a flat cover instead of a
+and the lid falls from 16.07 to 9.56 cm³ because it is a flat cover instead of a
 deep box.
 
 ### 4.1 Height chain, from the measured 20.00 mm
@@ -153,11 +161,11 @@ orientation.
 
 | Part | Qty | Filament each | g total | Print time each |
 |---|---:|---:|---:|---:|
-| Housing_Base | 1 | 21.53 g | 21.53 | 1 h 8 m 49 s |
-| Housing_Lid | 1 | 11.64 g | 11.64 | 23 m 20 s |
+| Housing_Base | 1 | 21.58 g | 21.58 | 1 h 9 m 8 s |
+| Housing_Lid | 1 | 11.67 g | 11.67 | 23 m 23 s |
 | PCB_Clamp_Adjustable | 1 | 1.07 g | 1.07 | 7 m 24 s |
 | Cabinet_Fastener_Cap | 2 | 0.19 g | 0.38 | 2 m 22 s |
-| **Production total** | | | **34.62 g** | **1 h 44 m 17 s** |
+| **Production total** | | | **34.70 g** | **1 h 44 m 39 s** |
 
 **Support usage: none.** `enable_support = 0` and the slicer emitted **zero
 support features on all four parts**, which is the operational confirmation of
@@ -174,7 +182,7 @@ and a numbered gate. There is nothing else on the part.
 | 1 | Continuous 1.60 mm insulating floor | isolates the carrier from the cabinet | 2 |
 | 2 | **Low long walls, stopping at z 6.10** | the whole architecture: nothing in front of a terminal mouth | 7, 8, 22 |
 | 3 | Full-height short end walls + four corner returns | carry the lid, clear of the rows by 1.00 mm | 12, 17 |
-| 4 | Four support pads at (±28.50, ±29.50) | carry the board in the 4.00 mm clear side strip | 3, 13 |
+| 4 | Four support pads at (±27.00, ±30.25) | carry the board in the 5.50 mm clear side strip, 1.25 mm to spare | 3, 13 |
 | 5 | One integral fixed ledge, −X, 2.00 mm grip | retains the −X short edge | 13, 15 |
 | 6 | Two clamp plinths, vertical M3 inserts | hard stop for the clamp | 13, 14, 15 |
 | 7 | Two lid-screw bosses, **vertical** M3 inserts | lid retention at +X | 12, 17 |
@@ -196,10 +204,10 @@ proven fastener in the whole programme is simply not needed.
 | | |
 |---|---|
 | Terminals | 15 per side, **3.533 mm pitch** over a measured 53.00 mm row |
-| Block faces | 4.00 mm inboard of the long PCB edge, measured |
+| Block faces | 5.50 mm inboard of the long PCB edge, from the measured 55.00 mm across a 66.00 mm board |
 | Corridor | the **whole** 9.00 mm block height, z 6.10 → 15.10, over the **whole** row, from the block face out past the enclosure |
 | Long wall top | z 6.10, the board top face, leaving 17.90 mm of open side |
-| Declared straight run | 12.00 mm to y 39.50; the outermost enclosure face is at 35.05, so a conductor is clear of the housing after **7.55 mm** and free for the remaining 4.45 |
+| Declared straight run | 12.00 mm to y 39.50; the outermost enclosure face is at 36.55, so a conductor is clear of the housing after **9.05 mm** and free for the remaining 2.95 |
 | Grouping | conductors stay individual to y ±39.50; the four named bundles begin only beyond that |
 | Screw access | 30 Ø6.00 mm corridors from z 15.10 upward, none obstructed, with representative wires fitted |
 
@@ -269,6 +277,17 @@ a threshold.
 
 ## 7. Prototype gates — every one of these is still open
 
+**The axis correction.** Rev C was first built with the 66 mm along the rows
+and the 63 mm across. The owner corrected it the same day. The parametric model
+absorbed it in one edit and every gate was re-run; the envelope changed from
+81.10 × 70.10 to 78.10 × 73.10 mm and the volume by 0.01 cm³. It also improved
+two clearances — the support pads gained 0.75 mm of margin in their strip — and
+forced two consequential changes: the corner returns shortened from 6.00 to
+4.00 mm to stay clear of the row ends, and the cabinet fixings moved from
+x ±26.00 to ±24.00 to stay off the −X cavity wall. **The clamp's adjustable
+range was also re-centred from the legacy 65–67 mm to 62–64 mm**, because it
+works along the measured 63.00 mm dimension.
+
 **Hardware still unmeasured:** PCB thickness (1.60) and the below-board
 protrusion (2.50), which together set the 4.50 mm pad height; terminal-block
 depth in Y (6.50); the heat-set insert (4.00 × 5.00, still unrecorded anywhere
@@ -290,8 +309,8 @@ the grouped cabinet wiring is secured outside the housing; antenna performance.
 
 | Part | Orientation | Filament | Time |
 |---|---|---:|---:|
-| Housing_Base | **floor down** | 21.53 g | 1 h 8 m 49 s |
-| Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.64 g | 23 m 20 s |
+| Housing_Base | **floor down** | 21.58 g | 1 h 9 m 8 s |
+| Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.67 g | 23 m 23 s |
 | PCB_Clamp_Adjustable | flat, loaded section across the layers | 1.07 g | 7 m 24 s |
 | Cabinet_Fastener_Cap | flat, **2 off** | 0.19 g ea | 2 m 22 s ea |
 

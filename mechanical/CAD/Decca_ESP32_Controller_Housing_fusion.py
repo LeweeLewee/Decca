@@ -138,15 +138,20 @@ P = {
     # -- The acquired DORHEA adapter, MEASURED ------------------------------
     # Owner measurements. These are the first hardware figures in the whole
     # housing programme that are not assumptions.
-    "adapter_pcb_l": 66.00,          # MEASURED 2026-09-06, along the rows
-    "adapter_pcb_w": 63.00,          # MEASURED 2026-09-06, across the rows
+    # 63.00 ALONG the rows and 66.00 ACROSS them. Owner correction
+    # 2026-09-06: the 66.00 is measured from one connector side to the other.
+    # It is also the self-consistent reading - it leaves 5.50 mm of clear board
+    # outboard of each block face and 5.00 mm beyond each row end, against the
+    # lopsided 4.00 and 6.50 the other way round gives.
+    "adapter_pcb_l": 63.00,          # MEASURED 2026-09-06, ALONG the rows
+    "adapter_pcb_w": 66.00,          # MEASURED 2026-09-06, ACROSS the rows
     "term_outer_span": 55.00,        # MEASURED 2026-09-06, outer face to outer face
     "term_row_l": 53.00,             # MEASURED 2026-09-06, length of one row
     "term_block_h": 9.00,            # MEASURED 2026-09-06, above the PCB top face
     "assembly_h": 20.00,             # MEASURED 2026-09-05, lowest underside to top
     "term_per_side": 15,             # supplier topology, visible on the board
-    "mount_pitch_x": 58.00,          # MEASURED 2026-09-06 (axis assignment ASSUMED)
-    "mount_pitch_y": 56.00,          # MEASURED 2026-09-06 (axis assignment ASSUMED)
+    "mount_pitch_x": 56.00,          # MEASURED 2026-09-06, ALONG the rows (ASSUMED pairing)
+    "mount_pitch_y": 58.00,          # MEASURED 2026-09-06, ACROSS the rows (ASSUMED pairing)
 
     # -- The adapter, STARTING ----------------------------------------------
     "adapter_pcb_t": 1.60,           # STARTING
@@ -195,8 +200,11 @@ P = {
     "pcb_xy_clear": 0.50,
     "pcb_under_clear": 2.00,
     "component_top_clear": 2.00,
-    "carrier_len_min": 65.00,
-    "carrier_len_max": 67.00,
+    # Re-centred on the MEASURED 63.00 mm along-row dimension. The 65-67 range
+    # in v1.1 predates any measurement of this board; +-1.00 mm of adjustment
+    # around a measured value is what the clamp is actually for.
+    "carrier_len_min": 62.00,
+    "carrier_len_max": 64.00,
 
     # -- Shell, DESIGN -------------------------------------------------------
     "base_floor_t": 1.60,
@@ -206,7 +214,10 @@ P = {
     "lid_skirt_t": 1.20,
     "lid_overlap": 4.00,
     "lid_fit_clear": 0.25,
-    "corner_return_l": 6.00,         # long-side lid landing, from each corner
+    # 4.00, not 6.00: the corrected board leaves 5.00 mm of clear board
+    # beyond each row end, and a 6.00 mm return would stand in the last
+    # terminal's conductor corridor.
+    "corner_return_l": 4.00,         # long-side lid landing, from each corner
     "outer_corner_r": 3.00,
 
     # -- Support pads, DESIGN ------------------------------------------------
@@ -262,11 +273,12 @@ P = {
     "vent_x": -15.00,
 
     # -- Recessed cabinet fixings, DESIGN -----------------------------------
-    # 26.00, not 27.00: at 27.00 the 13.00 dia pad was exactly tangent to
-    # the cavity wall at x -33.50. Fusion reported a valid solid and the
-    # exported mesh had a non-manifold edge there - the same tangency trap
-    # the Rev B chamfer hit. 1.00 mm of clearance designs it out.
-    "cab_x": 26.00,
+    # 24.00. The 13.00 dia pad must not touch the -X cavity wall: at 27.00 it
+    # was exactly tangent to it, which Fusion accepted as a valid solid and the
+    # exporter turned into a non-manifold edge - the same tangency trap the
+    # Rev B chamfer hit. The axis correction moved that wall 1.50 mm inboard,
+    # so the fixings moved with it.
+    "cab_x": 24.00,
     "cab_screw_d": 3.40,
     "cab_head_d_nom": 6.00,          # STARTING - ISO 10642 M3, not measured
     "cab_head_d_max": 6.20,          # DESIGN, declared maximum head envelope
@@ -312,12 +324,14 @@ STARTING = (
 # Assumptions the owner has not confirmed, recorded so they cannot pass as
 # measurements. Each is a one-parameter change if it turns out to be wrong.
 ASSUMED = (
-    ("terminal rows centred along the 66.00 mm length",
-     "leaves 6.50 mm of clear board beyond each row end"),
-    ("mount_pitch_x 58.00 runs along the 66.00 mm axis, "
-     "mount_pitch_y 56.00 across the 63.00 mm axis",
-     "the opposite assignment is equally possible; the holes are not used "
-     "for retention, so nothing in this build depends on it"),
+    ("terminal rows centred along the 63.00 mm ALONG-row dimension",
+     "leaves 5.00 mm of clear board beyond each row end, which is where the "
+     "ledge, the clamp, the lid screws and the locating lugs all live"),
+    ("the 58.00 hole pitch pairs with the 66.00 ACROSS dimension and the "
+     "56.00 with the 63.00 ALONG dimension",
+     "insets of 4.00 and 3.50 mm respectively; the opposite pairing is "
+     "possible, but the holes are not used for retention so nothing in this "
+     "build depends on it"),
     ("the USB connector is centred on its short edge",
      "the opening is cut oversize at 16.00 mm to absorb the error"),
     ("term_block_h 9.00 was taken as the block's own body height",

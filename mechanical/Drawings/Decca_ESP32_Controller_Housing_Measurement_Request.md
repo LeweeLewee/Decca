@@ -184,7 +184,7 @@ and Drawings READMEs and the Rev B build report already state at the top.
 | Date | ID | Value | Notes |
 |---|---|---|---|
 | 2026-09-05 | — | Complete assembly height **20.00 mm overall** | From the assembly's lowest underside feature (Datum A) to its highest point. Recorded in specification v1.5 §9.3. |
-| 2026-09-06 | **M8** | PCB outline **66 × 63 mm** | Confirms the supplier-stated plan envelope as a measured PCB outline. 66 mm runs along the terminal rows, 63 mm across them. Any overhang beyond this outline is still open (M13). |
+| 2026-09-06 | **M8** | PCB outline **66 × 63 mm** | Confirms the supplier-stated plan envelope. **Axis corrected by the owner the same day: the 66 mm is ACROSS the board, from one connector side to the other, and the 63 mm runs ALONG the rows.** Any overhang beyond this outline is still open (M13). |
 | 2026-09-06 | **M14** (part) | Mounting-hole centre pitch **58 × 56 mm** | Diameter still open. |
 | 2026-09-06 | **M4** | Terminal blocks **55.00 mm outer face to outer face** | On a 63.00 mm board this puts each block's outward face **4.00 mm inboard of its long PCB edge**. |
 | 2026-09-06 | **M5** (part) | Terminal-block row **length 53.00 mm** | 15 ways in 53.00 mm is consistent with 3.50 mm pitch. Pitch inferred, not measured. Leaves 6.50 mm of clear board beyond each end of the rows. |
@@ -197,13 +197,14 @@ and Drawings READMEs and the Rev B build report already state at the top.
 
 These are consequences of the measured numbers, not new measurements:
 
-- Each terminal block's outward face is **4.00 mm inboard** of its long PCB edge — (63.00 − 55.00) ÷ 2.
-- The rows are 53.00 mm long on a 66.00 mm board, leaving **6.50 mm of clear board beyond each end of the rows**, which is where the corner mounting holes must sit.
+- Each terminal block's outward face is **5.50 mm inboard** of its long PCB edge — (66.00 − 55.00) ÷ 2, using the corrected across dimension.
+- The rows are 53.00 mm long on the 63.00 mm along dimension, leaving **5.00 mm of clear board beyond each end of the rows**, which is where the corner mounting holes and every retention feature sit.
+- Both margins land near 5 mm, which is what a real board looks like. The wrong axis assignment gave 4.00 and 6.50 — the asymmetry was the tell.
 - Rev B was wrong on all three: it modelled the blocks starting **at** the PCB edge, 10.00 mm tall, spanning 49.00 mm. Measured: 4.00 mm inboard, 9.00 mm tall, 53.00 mm long.
 
 ### Assumption flagged for confirmation
 
-The 58 × 56 hole pitch is recorded as **58.00 mm along the 66.00 mm axis** (→ 4.00 mm inset from each short edge) and **56.00 mm across the 63.00 mm axis** (→ 3.50 mm inset from each long edge). The opposite assignment is also geometrically possible. **Confirm which way round**, or the four holes land in the wrong places.
+With the corrected board axes, the 58 × 56 hole pitch is recorded as **58.00 mm ACROSS** (→ 4.00 mm inset from each long edge) and **56.00 mm ALONG** (→ 3.50 mm inset from each short edge). The opposite pairing is still geometrically possible. **Confirm which way round** before any hole-based retention is used — nothing in the current design depends on it.
 
 These are recorded here as they arrive. They will be rolled into specification
 §3 in one revision when the blocking set is complete, so the specification is
