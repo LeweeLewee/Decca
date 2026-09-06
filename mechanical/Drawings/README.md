@@ -1,5 +1,16 @@
 # Drawings
 
+## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
+
+| File | Role |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_Spec_revA.md` | controlling Rev A specification |
+| `Decca_IEC_C14_Mounting_Plate_Work_Handover.md` | bounded build handover |
+| `Decca_IEC_C14_Mounting_Plate_revA_Build_Report.md` | exported-geometry validation and physical release gates |
+| `Decca_IEC_C14_Mounting_Plate_revA_views.png` | dimensioned top and side views |
+
+Rev A CAD has passed all 12 specified validation gates. Status remains **CAD complete / prototype pending** until the physical inlet, cabinet fixing and rear-clearance checks are recorded.
+
 Dimensioned engineering drawings for fabrication, measurement, and reference.
 
 **Intended contents**

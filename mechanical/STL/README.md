@@ -1,5 +1,13 @@
 # STL
 
+## IEC C14 mounting plate — Rev A — PROTOTYPE
+
+| File | Print notes |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_revA.stl` | PETG minimum; flame-retardant PETG/PC preferred. 0.20 mm layers, 4+ perimeters, 100% infill, broad face on bed, no supports. Mechanical carrier only; physical fit and rear mains-terminal clearance remain mandatory before release. |
+
+CAD validation is complete, but this mesh is **prototype pending**, not released, until the purchased inlet and Decca cabinet interfaces pass the five physical checks in the build report.
+
 Print-ready meshes exported from the CAD sources.
 
 **Intended contents**

@@ -1,5 +1,18 @@
 # CAD
 
+## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
+
+Rev A is a reproducible CadQuery model built from the measured purchased inlet interface. The controlling specification is `../Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md`.
+
+| File | Role |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_revA_cadquery.py` | parametric source and analytic pre-export checks |
+| `Decca_IEC_C14_Mounting_Plate_revA_verify.py` | independent STEP/STL verifier |
+| `Decca_IEC_C14_Mounting_Plate_revA_drawing.py` | dimensioned PNG generator |
+| `Decca_IEC_C14_Mounting_Plate_revA.step` | neutral CAD export |
+
+Geometry: 40.00 × 50.00 × 3.00 mm, R2 corners, centred 20.00 × 27.60 mm C14 opening, 4 × Ø2.40 Decca holes on a 31.00 × 17.00 mm grid and 2 × Ø3.40 C14 holes at 39.00 mm pitch. **12/12 CAD gates PASS.** Physical fit is still required before release.
+
 Source (editable, parametric) mechanical design files.
 
 **Intended contents**

@@ -1,5 +1,12 @@
 # Revision History
 
+## 2026-09-06 — IEC C14 mounting plate Rev A CAD complete
+
+- Built the dedicated 40.00 × 50.00 × 3.00 mm IEC C14 mounting plate on `feat/iec-c14-mounting-plate` from the locked measured interface specification.
+- Added reproducible CadQuery source, neutral STEP, manifold STL, dimensioned drawing, independent verifier and build report.
+- Exported geometry passes **12/12** CAD gates: exact 31.00 × 17.00 mm M2 grid, exact 39.00 mm M3 pitch and midpoint, centred 20.00 × 27.60 mm opening, correct through-hole diameters, one connected manifold part and minimum fixing-to-opening ligament **4.00 mm**.
+- Status is deliberately **CAD complete / prototype pending**. Physical fit of the purchased C14, cabinet-hole alignment, flat clamping and rear terminal/wire clearance are still required before release.
+
 Chronological log of meaningful changes across firmware, hardware, and
 mechanical design. Firmware release detail belongs in Git tags/releases; this
 document captures cross-cutting milestones and hardware/mechanical revisions

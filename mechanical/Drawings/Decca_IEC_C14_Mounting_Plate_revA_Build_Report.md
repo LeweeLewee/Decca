@@ -90,9 +90,9 @@ The small mesh-volume delta is the expected tessellation approximation of the ex
 
 SHA-256 values at this build:
 
-- CadQuery source: `pending-workflow-generation`
-- STEP: `pending-workflow-generation`
-- STL: `pending-workflow-generation`
+- CadQuery source: `15e5f76a40abd17572a3993bd375387b0677003fc396d91efcf562397f987232`
+- STEP: `2b389b17fde813d7cbb8f438a507a25abd73ed8cc5299da8b32592de5a7ed041`
+- STL: `13864c22977d82af3e72156815db1adc1498c7b232e3abfb2c29d55fe93f49a2`
 
 These values are replaced from the generated files by the one-time branch build before the draft PR is opened.
 
