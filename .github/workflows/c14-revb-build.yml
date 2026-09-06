@@ -4,118 +4,47 @@ on:
   push:
     branches:
       - feat/iec-c14-mounting-plate
+    paths:
+      - .github/workflows/c14-revb-build.yml
+      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_cadquery.py
+      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_verify.py
+      - mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_drawing.py
 
 permissions:
   contents: write
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feat/iec-c14-mounting-plate
           fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install CAD dependencies
         run: python -m pip install --upgrade pip cadquery==2.8.0 trimesh matplotlib
+
       - name: Generate and verify Rev B artefacts
         run: |
           python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_cadquery.py
           python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_drawing.py
           python mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_verify.py
-      - name: Update release documentation
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import hashlib, re
 
-          def add_after_title(path, marker, block):
-              p=Path(path); text=p.read_text()
-              if marker in text: return
-              i=text.find('\n\n')
-              if i<0: raise SystemExit(f'Cannot find title break in {path}')
-              p.write_text(text[:i+2]+block.rstrip()+'\n\n'+text[i+2:])
-
-          cad='''## IEC C14 mounting plate — Rev B — CAD PASS / PROTOTYPE PENDING
-
-Rev A is rejected. Rev B replaces its rectangular opening with the measured six-sided C14 profile: 27.14 × 19.50 overall, 16.00 short flat, 14.00 straight side, calculated 44.638° angled sections, R2.00 at the long-flat corners and R0.40 at the other four corners. The production cut-out applies 0.25 mm normal clearance and is rotated 90° in the plate.
-
-| File | Role |
-|---|---|
-| `Decca_IEC_C14_Mounting_Plate_revB_cadquery.py` | controlling parametric Rev B source |
-| `Decca_IEC_C14_Mounting_Plate_revB_verify.py` | independent STEP/STL verifier |
-| `Decca_IEC_C14_Mounting_Plate_revB_drawing.py` | drawing generator |
-| `Decca_IEC_C14_Mounting_Plate_revB.step` | neutral Rev B CAD export |
-
-**15/15 Rev B exported-geometry checks PASS.** Physical fit remains mandatory before release.'''
-
-          stl='''## IEC C14 mounting plate — Rev B — PROTOTYPE
-
-| File | Print notes |
-|---|---|
-| `Decca_IEC_C14_Mounting_Plate_revB.stl` | **Use this prototype; Rev A is rejected.** PETG minimum, 0.20 mm layers, 4+ perimeters, 100% infill, broad face on bed, no supports. The opening follows the measured six-sided C14 profile rather than the rejected rectangular Rev A opening. |
-
-Physical C14 profile fit, fixing alignment, flat clamping and rear-terminal clearance remain release gates.'''
-
-          drawings='''## IEC C14 mounting plate — Rev B — CAD PASS / PROTOTYPE PENDING
-
-Rev A is **REJECTED** after physical review because its rectangular opening did not properly enclose the actual IEC C14 shape. Rev B is the active design.
-
-| File | Role |
-|---|---|
-| `Decca_IEC_C14_Mounting_Plate_Spec_revB.md` | controlling corrected-profile specification |
-| `Decca_IEC_C14_Mounting_Plate_revB_Build_Report.md` | Rev B validation record |
-| `Decca_IEC_C14_Mounting_Plate_revB_views.png` | measured native profile and installed plate view |
-| `Decca_IEC_C14_Mounting_Plate_revA_Build_Report.md` | rejected Rev A record retained for traceability |
-'''
-
-          revision='''## 2026-09-06 — IEC C14 mounting plate Rev B corrects rejected Rev A
-
-- Owner physical review rejected Rev A: its rectangular cut-out did not properly enclose the C14 inlet profile even though it passed its incomplete CAD specification.
-- Promoted the previously recorded 16.00 mm and 14.00 mm readings to governing profile datums alongside 27.14 × 19.50 mm overall measurements.
-- Derived each angled section as 5.57 mm run × 5.50 mm rise = 7.828 mm at 44.638°; long-flat corners R2.00, remaining four corners R0.40.
-- Built Rev B with 0.25 mm normal profile clearance, exact 31 × 17 mm Decca grid and 39 mm C14 fixing pitch retained. Exported STEP/STL pass 15/15 checks; minimum fixing-to-opening ligament is 3.98 mm.
-- Status: **Rev A rejected; Rev B CAD PASS / prototype pending**.'''
-
-          add_after_title('mechanical/CAD/README.md','## IEC C14 mounting plate — Rev B — CAD PASS / PROTOTYPE PENDING',cad)
-          add_after_title('mechanical/STL/README.md','## IEC C14 mounting plate — Rev B — PROTOTYPE',stl)
-          add_after_title('mechanical/Drawings/README.md','## IEC C14 mounting plate — Rev B — CAD PASS / PROTOTYPE PENDING',drawings)
-          add_after_title('docs/Revision History.md','## 2026-09-06 — IEC C14 mounting plate Rev B corrects rejected Rev A',revision)
-
-          # Mark the old controlling spec as rejected at its top.
-          p=Path('mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md')
-          t=p.read_text()
-          warning='> **REJECTED 2026-09-06:** Physical review showed the rectangular Rev A opening does not properly enclose the IEC C14 profile. Do not build Rev A. See `Decca_IEC_C14_Mounting_Plate_Spec_revB.md`.\n\n'
-          if warning not in t:
-              i=t.find('\n\n'); p.write_text(t[:i+2]+warning+t[i+2:])
-
-          # Replace local hashes with hashes from this clean branch build.
-          report=Path('mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_Build_Report.md')
-          text=report.read_text()
-          files={
-              'CadQuery source':Path('mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB_cadquery.py'),
-              'STEP':Path('mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB.step'),
-              'STL':Path('mechanical/STL/Decca_IEC_C14_Mounting_Plate_revB.stl'),
-          }
-          for label,path in files.items():
-              digest=hashlib.sha256(path.read_bytes()).hexdigest()
-              text=re.sub(rf'^- {re.escape(label)}: `[^`]+`$',f'- {label}: `{digest}`',text,flags=re.M)
-          report.write_text(text)
-          PY
-      - name: Commit Rev B release artefacts
+      - name: Commit generated Rev B artefacts
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git rm .github/workflows/c14-revb-build.yml
           git add mechanical/CAD/Decca_IEC_C14_Mounting_Plate_revB.step \
                   mechanical/STL/Decca_IEC_C14_Mounting_Plate_revB.stl \
-                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_views.png \
-                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_Build_Report.md \
-                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md \
-                  mechanical/CAD/README.md mechanical/STL/README.md mechanical/Drawings/README.md \
-                  'docs/Revision History.md'
-          git commit -m 'mech(c14-mount): build rev B corrected profile'
-          git push origin HEAD:feat/iec-c14-mounting-plate
+                  mechanical/Drawings/Decca_IEC_C14_Mounting_Plate_revB_views.png
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit'
+          else
+            git commit -m 'mech(c14-mount): build rev B corrected profile'
+            git push origin HEAD:feat/iec-c14-mounting-plate
+          fi
