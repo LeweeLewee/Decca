@@ -2,9 +2,11 @@
 
 Print-ready meshes exported from the CAD sources.
 
-> **ESP32 housing warning:** all Rev B controller-housing meshes and coupons are
-> superseded and must not be printed. They model wiring above the terminal blocks
-> rather than through the DORHEA adapter's horizontal side-entry terminals.
+> **ESP32 housing:** the meshes here are **Rev C**, built to the DORHEA
+> adapter's measured geometry with horizontal side-entry terminals. All Rev A
+> and Rev B housing meshes and coupons are superseded and have been removed.
+> **Rev C is not approved for printing either** — see the open prototype gates
+> in `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md` §7.
 
 **Intended contents**
 - `.stl` (or `.3mf`) files ready to slice and print.

@@ -1,6 +1,6 @@
 # Decca ESP32 Controller Housing Specification v1.6
 
-**Status:** **REDESIGN IN PROGRESS — measurement gate CLOSED 2026-09-06.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
+**Status:** **REV C BUILT to this specification, 2026-09-06. Prototype gates remain open; nothing is approved for printing.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
 
 **Scope:** Enclosure for the selected 30-pin ESP32 DevKit fitted to the acquired DORHEA 30-pin screw-terminal adapter only. The MOSFET board is excluded and remains separately mounted.
 
@@ -210,8 +210,10 @@ Decca_ESP32_Controller_Housing
 - Housing_Lid
 - PCB_Clamp_Adjustable
 - Cabinet_Fastener_Caps
-- Carrier_Fit_Coupon
-- Insert_Fastener_Coupon
+
+Rev C defines no prototype coupons: §2.1 requires a coupon to reproduce
+*replacement* production geometry, and the Rev B coupons are superseded. One is
+defined only when the owner elects to print it.
 
 Keep reference bodies visibly distinct from printable bodies. Do not export reference bodies as production meshes.
 

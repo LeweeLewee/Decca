@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Decca ESP32 Controller Housing - Rev B slicer evidence harness
+Decca ESP32 Controller Housing - Rev C slicer evidence harness
 ===============================================================
 
 Slices the production set and the two prototype coupons with the Bambu Studio
@@ -105,15 +105,11 @@ PARTS = [
      "as-modelled"),
 ]
 
-GAUGES = [
-    ("Carrier_Fit_Coupon", "ESP32_Controller_Carrier_Fit_Coupon.stl", 1,
-     "as-modelled"),
-    ("Insert_Fastener_Coupon", "ESP32_Controller_Insert_Fastener_Coupon.stl", 1,
-     "as-modelled"),
-]
+# Rev C defines no prototype coupons. The Rev B coupons are superseded and
+# their meshes have been removed from the repository.
+GAUGES = []
 
 
-# ---------------------------------------------------------------------------
 def flatten(kind, name, seen=None):
     """Resolve a preset's `inherits` chain into one flat dict."""
     seen = seen or []

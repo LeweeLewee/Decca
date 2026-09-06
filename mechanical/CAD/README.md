@@ -2,10 +2,10 @@
 
 Source (editable, parametric) mechanical design files.
 
-> **ESP32 housing warning:** the Rev B controller-housing CAD is superseded and
-> must not be printed or released. It models the wrong cable topology for the
-> DORHEA adapter's horizontal side-entry screw terminals. See specification
-> v1.5 before any replacement modelling.
+> **ESP32 housing:** **Rev C** replaces Rev B, which modelled the wrong cable
+> topology. Rev C is built to the DORHEA adapter's measured geometry and its
+> horizontal side-entry screw terminals. Rev A and Rev B are superseded and
+> must not be printed. Controlling document: specification **v1.6**.
 
 **Intended contents**
 - Fusion 360 archives (`.f3d`) and/or OpenSCAD (`.scad`) source.
@@ -16,7 +16,7 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## ESP32 controller housing — revision B: **SUPERSEDED, DO NOT PRINT**
+## ESP32 controller housing — revision **C**: PROTOTYPE CAD, not yet printed
 
 Built to `../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`, whose
 content is now specification revision **v1.5**. Full historical write-up:
