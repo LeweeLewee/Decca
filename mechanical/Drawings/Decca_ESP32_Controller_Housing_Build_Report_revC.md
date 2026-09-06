@@ -6,7 +6,7 @@
 > and every one is an open prototype gate. §7 lists them.
 
 **Controlling document:** `Decca_ESP32_Controller_Housing_Spec_v1.0.md` — whose
-content is specification revision **v1.6**. The filename is retained for link
+content is specification revision **v1.7**. The filename is retained for link
 stability.
 **Generator:** `../CAD/Decca_ESP32_Controller_Housing_fusion.py`
 **Independent verifier:** `../CAD/Decca_ESP32_Controller_Housing_verify.py`
@@ -105,8 +105,9 @@ are 5.50 mm inboard of the long edges.
 **No geometry moved.** `mount_pitch_x` and `mount_pitch_y` are recorded values
 only — they appear in the generator's measured block and in the verifier's
 constants, and are referenced by no derivation, no body and no gate. Retention
-is the fixed ledge and the adjustable clamp on the short edges, per v1.6
-§4.5–4.6.
+was the fixed ledge and an adjustable clamp on the short edges. Under v1.7
+§4.6 the clamp is gone and the +X end is located by two posts through these
+holes — see §2.4 and §5.3.
 
 ### 2.3 The holes take M3, and the corner clearance is better than it looks
 
@@ -130,9 +131,28 @@ block material is the block's **corner**, 3.202 mm away diagonally:
 So a plain M3 head fits and a washer does not. Separately — and this was not
 designed in — **the four existing support pads already sit under the four
 mounting holes.** Each pad spans x 23.00–31.00, y 28.75–31.75; each hole centre
-is at (28.50, 30.00), inside that footprint. A Ø2.9 post through the hole would
-overhang the pad's inboard edge by 0.20 mm, which a 0.50 mm pad widening
-absorbs. §10 of the measurement request carries the decision that follows.
+is at (28.50, 30.00), inside that footprint. §2.4 is what was done about it.
+
+### 2.4 The clearance that actually decided it — and it is not the block
+
+The M3 reading made screw-down retention look obvious, and the terminal block
+does not stop it. What stops it is the **outermost conductor**.
+
+The last terminal in each row sits at x 24.733 and the corner hole at 28.500 —
+**3.767 mm apart**. Against the declared 2.60 mm ferrule:
+
+| At a corner hole | clear of the outermost conductor |
+|---|---:|
+| M3 pan head, r 2.80 | **−0.33 mm** |
+| M3 socket cap, r 2.75 | **−0.28 mm** |
+| M2.5 socket cap, r 2.25 | +0.22 mm |
+| **Ø2.60 locating post, r 1.30** | **+1.17 mm** |
+
+No M3 head fits, and the M2.5 margin of 0.22 mm is not a margin at all when the
+wire and ferrule sizes are themselves starting values. A post does fit, with
+room to spare. So **the holes are used for location, not fastening** — v1.7
+§4.6a now records the prohibition and the reason, so nobody re-proposes screws
+without re-deriving this number against the conductors actually installed.
 
 ## 3. The one design move that decides everything
 
@@ -146,7 +166,7 @@ wall rise before it stands in front of a terminal mouth*. "Just above the base"
 answers it: **no useful wall height exists above the board on the long sides at
 all.**
 
-So v1.6 §5.3 requires the housing to clear the **entire 9.00 mm block height,
+So v1.7 §5.3 requires the housing to clear the **entire 9.00 mm block height,
 across the full 53.00 mm row, on both long sides.** Wherever the port actually
 sits inside that block, nothing this housing owns is ever in front of it. **A
 later port measurement cannot invalidate the geometry**, and the cost is nil,
@@ -168,23 +188,31 @@ envelope follows the wire and ferrule actually installed, not the terminal bore.
 
 ## 4. Envelope and material
 
-| Metric | Rev A | Rev B | **Rev C** | v1.6 limit | preferred |
-|---|---:|---:|---:|---:|---:|
-| Outside length | 105.00 | 81.60 | **78.10 mm** | ≤85 | — |
-| Outside width | 77.00 | 70.10 | **73.10 mm** | ≤75 | — |
-| Closed height | 38.30 | 35.30 | **27.20 mm** | ≤36 | — |
-| Housing_Base | 49.66 | 16.85 | **18.65 cm³** | — | ≤15 |
-| Housing_Lid | 14.84 | 16.07 | **9.56 cm³** | — | ≤18 |
-| PCB_Clamp_Adjustable | 1.58 | 1.12 | **0.99 cm³** | — | ≤2 |
-| Cabinet_Fastener_Cap × 2 | — | 0.16 | **0.16 cm³** | — | — |
-| **Production total** | **67.93** | **34.20** | **29.36 cm³** | **≤35** | **≤30** |
-| **Full-solid PETG mass** | **86.3** | **43.4** | **37.3 g** | **≤45** | **≤38** |
+| Metric | Rev A | Rev B | Rev C, clamped | **Rev C, v1.7** | limit | preferred |
+|---|---:|---:|---:|---:|---:|---:|
+| Outside length | 105.00 | 81.60 | 78.10 | **74.50 mm** | ≤85 | — |
+| Outside width | 77.00 | 70.10 | 73.10 | **73.10 mm** | ≤75 | — |
+| Closed height | 38.30 | 35.30 | 27.20 | **27.20 mm** | ≤36 | — |
+| Housing_Base | 49.66 | 16.85 | 18.65 | **17.41 cm³** | — | ≤15 |
+| Housing_Lid | 14.84 | 16.07 | 9.56 | **9.14 cm³** | — | ≤18 |
+| PCB_Clamp_Adjustable | 1.58 | 1.12 | 0.99 | **deleted** | — | — |
+| Cabinet_Fastener_Cap × 2 | — | 0.16 | 0.16 | **0.16 cm³** | — | — |
+| **Production total** | **67.93** | **34.20** | 29.36 | **26.71 cm³** | **≤35** | **≤30** |
+| **Full-solid PETG mass** | **86.3** | **43.4** | 37.3 | **33.9 g** | **≤45** | **≤38** |
 
-**Rev C is the first revision to meet the preferred targets as well as the
-mandatory limits.** 29.36 cm³ against a 30 cm³ preference and 37.3 g against
-38 g. Rev A's 68 cm³ is down by 57%. The width is the tightest of the three
-dimensions at 73.10 mm against a 75 mm limit, because the 66 mm now runs across
-the board and the terminal corridors are on that axis.
+**Three production parts, not four**, and comfortably inside the preferred
+targets rather than scraping them: 26.71 cm³ against a 30 cm³ preference and
+33.9 g against 38 g. Rev A's 68 cm³ is down by 61%.
+
+The last 3.60 mm of length came from deleting the clamp. The +X floor beyond the
+board was a 7.50 mm clamp zone sized by a slot, the material beyond it, wall
+clearance at full travel and an insert bore. With the clamp gone it carries
+nothing but the two lid-screw bosses, so it is 4.40 mm — the depth those bosses
+actually reach — and nothing else.
+
+The width is still the tightest dimension at 73.10 mm against a 75 mm limit,
+because the 66 mm runs across the board and the terminal corridors are on that
+axis.
 
 The height did it. Rev B's 35.30 mm closed height came from an unverified
 24.00 mm "above PCB" assumption; the measured 20.00 mm overall, applied from the
@@ -215,14 +243,13 @@ orientation.
 
 | Part | Qty | Filament each | g total | Print time each |
 |---|---:|---:|---:|---:|
-| Housing_Base | 1 | 21.58 g | 21.58 | 1 h 9 m 8 s |
-| Housing_Lid | 1 | 11.67 g | 11.67 | 23 m 23 s |
-| PCB_Clamp_Adjustable | 1 | 1.07 g | 1.07 | 7 m 24 s |
+| Housing_Base | 1 | 20.19 g | 20.19 | 1 h 7 m 4 s |
+| Housing_Lid | 1 | 11.16 g | 11.16 | 22 m 49 s |
 | Cabinet_Fastener_Cap | 2 | 0.19 g | 0.38 | 2 m 22 s |
-| **Production total** | | | **34.70 g** | **1 h 44 m 39 s** |
+| **Production total** | | | **31.73 g** | **1 h 34 m 37 s** |
 
 **Support usage: none.** `enable_support = 0` and the slicer emitted **zero
-support features on all four parts**, which is the operational confirmation of
+support features on all three parts**, which is the operational confirmation of
 the geometric claim in §6. Every slice returned `return_code 0, "Success."` with
 no warnings.
 
@@ -236,13 +263,44 @@ and a numbered gate. There is nothing else on the part.
 | 1 | Continuous 1.60 mm insulating floor | isolates the carrier from the cabinet | 2 |
 | 2 | **Low long walls, stopping at z 6.10** | the whole architecture: nothing in front of a terminal mouth | 7, 8, 22 |
 | 3 | Full-height short end walls + four corner returns | carry the lid, clear of the rows by 1.00 mm | 12, 17 |
-| 4 | Four support pads at (±27.00, ±30.25) | carry the board in the 5.50 mm clear side strip, 1.25 mm to spare | 3, 13 |
+| 4 | Four support pads at (±28.50, ±30.00) | carry the board, **centred on the measured mounting holes** | 3, 13 |
 | 5 | One integral fixed ledge, −X, 2.00 mm grip | retains the −X short edge | 13, 15 |
-| 6 | Two clamp plinths, vertical M3 inserts | hard stop for the clamp | 13, 14, 15 |
+| 6 | **Two Ø2.60 locating posts, +X** | locate the carrier by its own mounting holes | 5, 13, 14, 15 |
 | 7 | Two lid-screw bosses, **vertical** M3 inserts | lid retention at +X | 12, 17 |
 | 8 | Two locating rebates, −X | lid location and capture | 17 |
 | 9 | USB notch, open to the end-wall top | ≥14 × 9 service access with no bridge | 10 |
 | 10 | Two recessed, capped cabinet fixings | cabinet mounting inside the footprint | 2, 16, 25, 26 |
+
+### 5.3 Retention: one ledge, two posts, and no fastener at all
+
+The −X short edge sits under the fixed ledge, 0.20 mm clear of the board top.
+The +X end drops onto **two Ø2.60 posts through the two measured mounting
+holes**. That is the whole retention system.
+
+| | |
+|---|---:|
+| Post diameter in a bore reported as M3 | Ø2.60, **0.30 mm** radial clearance at 3.20 — and 0.20 at 3.00 |
+| Engagement through the carrier | 1.60 mm, its full thickness |
+| Proud of the carrier top | 1.40 mm |
+| Clear of the outermost conductor | **1.17 mm** |
+| Fitting tilt needed to clear the posts | 2.73°, lifting the ledge end **0.095 mm** inside its 0.20 mm gap |
+
+**Only the +X pair carries a post, and that is not an economy.** The −X edge has
+to slide in under the ledge at its final height, and it cannot do that with a
+post already standing in a hole. The two −X holes are left empty, and the
+assembly keep-out over them is left solid on purpose, so a stray feature there
+still fails gate 5. The posts are bored out of that keep-out only where the
+design is permitted to occupy it.
+
+Fitting is: tilt the +X end up about 3 mm, slide the −X edge under the ledge,
+lower the +X end onto the posts. Removal is the reverse — a deliberate two-part
+motion, which is why the board is not going to walk off the posts on its own.
+
+**What this deleted:** the whole `PCB_Clamp_Adjustable` part, two plinths, two
+slotted M3 screws, two heat-set inserts, the clamp slot, the clamp travel, the
+carrier-width range and 3.60 mm of enclosure length. Gate 15 is now a stronger
+statement than it was: no fastener bears on this board anywhere, so there is
+nothing left that could be over-tightened onto it.
 
 **Housing_Lid**, printed **top-face-down**: flat 1.60 mm cover, skirts at the
 **short ends and corners only**, two vertical M3 screws at +X (y ±26.00), two
@@ -272,7 +330,7 @@ choosing convenient terminals.
 
 ### 5.2 Strain relief: none, and none justified
 
-v1.6 §5.9 requires housing-mounted restraint to be shown unnecessary before it is
+v1.7 §5.9 requires housing-mounted restraint to be shown unnecessary before it is
 omitted. It is: the grouped cabinet wiring is secured immediately outside the
 housing, nothing printed sits between a terminal mouth and the exterior, and
 gate 22's 5 022 probes find **no printed feature of any kind** above the board
@@ -286,13 +344,17 @@ suite reads **only** the exported STLs and re-derives every claim from triangles
 against values typed in by hand. Neither imports the other's numbers.
 
 ```
-30 CAD checks,  0 failed, 14 prototype gates open
-29 mesh checks, 0 failed, 14 prototype, 3 installation
+30 CAD checks,  0 failed, 15 prototype gates open
+29 mesh checks, 0 failed, 15 prototype, 3 installation
 ```
 
-Together they cover all thirty v1.6 §13 gates.
+Together they cover all thirty v1.7 §13 gates.
 
 ### 6.1 What verification caught, and it was a lot
+
+Three of the six below concern the adjustable clamp, which v1.7 has since
+deleted. They are kept as history: they are why the clamp cost what it cost, and
+that is part of the case for replacing it.
 
 Every item below is a design change the checks forced. None was fixed by moving
 a threshold.
@@ -338,9 +400,10 @@ absorbed it in one edit and every gate was re-run; the envelope changed from
 two clearances — the support pads gained 0.75 mm of margin in their strip — and
 forced two consequential changes: the corner returns shortened from 6.00 to
 4.00 mm to stay clear of the row ends, and the cabinet fixings moved from
-x ±26.00 to ±24.00 to stay off the −X cavity wall. **The clamp's adjustable
-range was also re-centred from the legacy 65–67 mm to 62–64 mm**, because it
-works along the measured 63.00 mm dimension.
+x ±26.00 to ±24.00 to stay off the −X cavity wall. The clamp's adjustable range
+was re-centred at that point from the legacy 65–67 mm to 62–64 mm; v1.7 has
+since deleted the clamp and the range with it, because a measured board and a
+measured hole pitch leave nothing for an adjustment to absorb.
 
 **Hardware still unmeasured:** PCB thickness (1.60) and the below-board
 protrusion (2.50), which together set the 4.50 mm pad height; terminal-block
@@ -364,9 +427,8 @@ the grouped cabinet wiring is secured outside the housing; antenna performance.
 
 | Part | Orientation | Filament | Time |
 |---|---|---:|---:|
-| Housing_Base | **floor down** | 21.58 g | 1 h 9 m 8 s |
-| Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.67 g | 23 m 23 s |
-| PCB_Clamp_Adjustable | flat, loaded section across the layers | 1.07 g | 7 m 24 s |
+| Housing_Base | **floor down** | 20.19 g | 1 h 7 m 4 s |
+| Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.16 g | 22 m 49 s |
 | Cabinet_Fastener_Cap | flat, **2 off** | 0.19 g ea | 2 m 22 s ea |
 
 No supports on any part. Worst unsupported reach 1.25 mm (CAD) / 0.75 mm (mesh)
@@ -378,11 +440,13 @@ and the below-board protrusion against the real board.
 
 ## 9. Files
 
-**Current:** `../CAD/Decca_ESP32_Controller_Housing.f3d`, the assembly STEP, four
-part STEPs, four print-ready STLs, this report, and twenty
-`..._revC_*.png` renders.
+**Current:** `../CAD/Decca_ESP32_Controller_Housing.f3d`, the assembly STEP,
+three part STEPs, three print-ready STLs, this report, and twenty-one
+`..._revC_*.png` renders — including `..._14b_locating_posts.png`, the two posts
+standing in the two +X mounting holes with the two −X holes left empty.
 
-**Removed as superseded:** all Rev B STLs and STEPs for the two prototype
-coupons, and all twenty-three `..._revB_*.png` renders. The generator deletes
+**Removed as superseded:** `ESP32_Controller_PCB_Clamp_Adjustable.step` and
+`.stl`, all Rev B STLs and STEPs for the two prototype coupons, and all
+twenty-three `..._revB_*.png` renders. The generator deletes
 them on every run, and both verifiers fail if a forbidden mesh reappears. The
 Rev A and Rev B build reports are retained as history with superseded banners.

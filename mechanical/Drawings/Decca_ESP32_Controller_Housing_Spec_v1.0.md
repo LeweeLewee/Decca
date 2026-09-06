@@ -1,4 +1,4 @@
-# Decca ESP32 Controller Housing Specification v1.6
+# Decca ESP32 Controller Housing Specification v1.7
 
 **Status:** **REV C BUILT to this specification, 2026-09-06. Prototype gates remain open; nothing is approved for printing.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
 
@@ -15,6 +15,7 @@
 | v1.4 | Identifies the acquired adapter as the DORHEA 30-pin terminal adapter shown at 66 × 63 mm. Rejects Rev B after confirming that its harness and tie geometry is based on the wrong connection path. External conductors enter the green screw-terminal blocks horizontally through their outward-facing long-side ports; the black vertical sockets are only for the ESP32 module. Replaces the elevated cable-window and tie-tower requirements with direct terminal-entry corridors, installed-wire and ferrule keep-outs, a cover removable with the wiring connected, and optional low-profile strain relief only after the conductors have cleared the terminal mouths. Existing envelope and material limits remain design targets, but all Rev B production and coupon geometry is superseded. |
 | v1.5 | Records the owner's physical measurement of **20 mm overall height** for the complete DORHEA adapter plus fitted ESP32. This supersedes Rev B's unverified 24 mm “above PCB” assumption and closes the gross assembled-height measurement gate. The 20 mm value is an overall envelope, not an above-PCB dimension; replacement CAD shall reference it from the assembly's actual lowest underside feature to its highest point. Terminal-port and underside measurements remain open. |
 | v1.6 | Records the owner's macro measurements of 2026-09-06 — PCB outline 66 × 63 mm, mounting-hole centre pitch 58 × 56 mm *(re-measured the same day as **60 mm across × 57 mm along** — see §3; the 58 × 56 pair left 1.00 mm unaccounted for)*, terminal blocks 55 mm outer face to outer face, row length 53 mm, block height 9 mm, and the wire entry sitting just above the base of the block. **Closes the §15 measurement gate and releases replacement CAD.** Supersedes the v1.5 §5.3 requirement for dimensioned port geometry: the terminal-port bore size and internal insertion depth do not drive housing geometry and are out of scope. In their place §5.3 now requires the housing to clear the **entire terminal-block height** across the full row length on both long sides, which is conservative whatever the port position, and to declare its own straight external run as a routing value. Envelope, volume and mass limits are unchanged. |
+| v1.7 | **Replaces the adjustable clamp with hole-located retention.** The owner's 2026-09-06 measurements close the last gap: a 60 × 57 mm mounting-hole pitch with M3 holes, every hole 3.00 mm from its nearest board edge. §4.6 now requires the carrier to be located by features engaging its own mounting holes rather than gripped by its opposite short edge, and §4.5's fixed ledge is retained unchanged. Screws through those holes are **prohibited** and the reason is recorded in §4.6: the binding clearance is not the terminal block but the outermost conductor, 3.767 mm from the hole centre, which an M3 head of radius 2.75 fouls by 0.28 mm against a 2.60 mm ferrule. The adjustable-carrier-range requirement, the clamp's volume allowance, its print orientation, its STEP and STL deliverables and gate 14 all go with it; gate 14 becomes the hole-location gate. Envelope, volume and mass limits are unchanged, and the design moves further inside them. |
 
 ## 1. Design intent
 
@@ -28,7 +29,6 @@ Neither Rev A nor Rev B is the geometry baseline. A replacement design may reuse
 
 - **Housing_Base:** material-efficient tray with a continuous insulating floor, local PCB supports and retention, and internal cabinet mounting points. Its long-side geometry shall leave every required terminal mouth, ferrule and straight conductor approach unobstructed. It shall not place walls, tie towers or other features between a terminal mouth and the exterior.
 - **Housing_Lid:** removable top cover providing top protection, USB service access and only the side coverage compatible with the horizontal terminal-entry corridors. It shall be removable and refittable while the terminal wiring remains connected.
-- **PCB_Clamp_Adjustable:** one short adjustable edge clamp retained by two M3 screws.
 - **Cabinet_Fastener_Caps:** only if separate caps are required to insulate the recessed cabinet screw heads.
 - **Prototype coupons:** define only after the replacement production geometry exists. Reuse a coupon only if it reproduces unchanged production geometry. The Rev B coupons are superseded and shall not be printed as evidence for the replacement design.
 
@@ -77,7 +77,7 @@ Use repository source dimensions and existing measured references as the design 
 | Minimum top clearance | 2.0 mm |
 | Minimum clearance below lowest component/solder feature | 2.0 mm |
 | Minimum USB opening | 14 × 9 mm |
-| Adjustable carrier range, along the rows | **62–64 mm**, re-centred on the measured 63 mm. The former 65–67 predates any measurement of this board. |
+| Carrier location | **By the measured mounting holes — §4.6.** No adjustable range is required or permitted: the board's plan dimensions and its hole pitch are both measured, so there is nothing left for an adjustment to absorb. |
 
 Supplier dimensions and repository dimensions remain assumptions until checked against the acquired board. Do not infer the terminal-port centre height, mounting-hole pitch, precise EN/BOOT positions or underside keep-outs from the listing photograph.
 
@@ -88,8 +88,10 @@ Supplier dimensions and repository dimensions remain assumptions until checked a
 3. Maintain at least 2.0 mm clearance from the lowest PCB, solder, or pin feature to the enclosure floor or insulated fastener cover.
 4. Support the board at four local edge/corner regions.
 5. Retain one short PCB edge beneath an integral fixed ledge.
-6. Retain the opposite short edge with one adjustable clamp and two M3 screws.
-7. The ledge and clamp shall bear only on clear PCB-edge regions. They shall not load the ESP32 module, sockets, terminal blocks, solder joints, or components.
+6. Locate the carrier at the opposite short end by **integral posts engaging its own mounting holes**. The posts shall be sized to fit the reported M3 bore with at least 0.20 mm of radial clearance whether that bore is 3.00 or 3.20 mm, shall engage the full carrier thickness and stand at least 1.00 mm proud of it, and shall carry no fastener of any kind.
+6a. **No screw shall pass through a carrier mounting hole.** The constraint is not the terminal block, which a head clears: a corner hole is outboard of the block on both axes, so a head meets the block's corner at 3.202 mm and an M3 cap head of radius 2.75 clears it by 0.45 mm. The constraint is the **outermost conductor**, whose axis lies 3.767 mm from the hole centre; against the declared 2.60 mm ferrule the same head fouls it by 0.28 mm. A 2.60 mm post clears it by 1.17 mm. Any future proposal to fasten through these holes shall re-derive this clearance against the conductor and ferrule actually installed.
+6b. Posts shall be placed only where the carrier can be fitted and removed. Where a fixed ledge requires the carrier to translate at its final height, that end shall carry no post, and the tilt needed to clear the posts at the opposite end shall be shown not to bind the carrier beneath the ledge.
+7. The ledge and posts shall bear only on clear PCB-edge regions and the bores of the mounting holes. They shall not load the ESP32 module, sockets, terminal blocks, solder joints, or components.
 8. Provide two recessed cabinet fixing points within the enclosure footprint, positioned near the short ends and outside electronics keep-outs.
 9. Do not use external mounting ears.
 10. Cabinet fastener heads shall remain below the PCB support plane and shall be electrically isolated by integral geometry or printed insulating caps.
@@ -150,9 +152,8 @@ The Rev A envelope of approximately 105 × 77 × 38.3 mm and approximately 68 cm
 | Estimated PETG mass at 1.27 g/cm³ | ≤45 g | ≤38 g |
 | Base solid volume | — | ≤15 cm³ |
 | Lid solid volume | — | ≤18 cm³ |
-| Adjustable clamp solid volume | — | ≤2 cm³ |
 
-The production-part total includes the base, lid, adjustable clamp, and mandatory fastener caps. It excludes the prototype coupons and non-printing reference bodies.
+The production-part total includes the base, lid, and mandatory fastener caps. It excludes the prototype coupons and non-printing reference bodies.
 
 No external feature may project beyond the main body envelope.
 
@@ -195,7 +196,6 @@ underside allowance to manufacture a new “above PCB” value.
 - No internal support material shall be required.
 - Print the base floor-down.
 - Choose the cover orientation from the replacement geometry and verify it needs no support. Do not retain Rev B's top-face-down orientation merely to preserve its obsolete elevated cable windows.
-- Orient the adjustable clamp for strength across its loaded section.
 
 ## 11. CAD component structure
 
@@ -225,16 +225,16 @@ Required:
 
 - editable Fusion source;
 - assembled housing STEP;
-- separate base, lid, and adjustable-clamp STEP files;
+- separate base and lid STEP files;
 - parametric generator and verification scripts;
-- print-ready base, lid, adjustable-clamp, cap and any justified prototype-coupon STL files;
+- print-ready base, lid, cap and any justified prototype-coupon STL files;
 - a cabinet-fastener-cap STL, which is mandatory because a recessed metal head installed after printing cannot be insulated by integral geometry;
 - the slicer harness and its recorded output where a slicer CLI is available;
 - updated build/verification report;
 - updated review renders showing closed, open and exploded views; direct long-side terminal entry with representative fitted wires and ferrules; terminal screwdriver access; cover removal with wiring connected; USB access; cabinet fixings; and any justified downstream strain relief;
 - a material table showing every production part's volume and estimated PETG mass.
 
-Remove or clearly quarantine obsolete Rev A and Rev B production artefacts that could be mistaken for current deliverables. Do not deliver a fixed-clamp STL, USB-plug STL or Rev B tie-anchor geometry.
+Remove or clearly quarantine obsolete Rev A and Rev B production artefacts that could be mistaken for current deliverables. Do not deliver a fixed-clamp STL, an adjustable-clamp STL, a USB-plug STL or Rev B tie-anchor geometry.
 
 ## 13. Automated verification gates
 
@@ -252,9 +252,9 @@ The verifier shall fail the build unless all applicable checks pass:
 10. The USB service envelope is clear through the opening.
 11. The ESP32 antenna keep-out is clear of metal, inserts, and thick structure.
 12. Lid overlap and fit allowance meet specification.
-13. The fixed ledge and adjustable clamp contact only approved PCB-edge regions.
-14. The clamp accommodates carrier widths from 65 to 67 mm.
-15. The retention system does not load the ESP32, sockets, terminals, solder joints, or components.
+13. The fixed ledge, the locating posts and the support pads contact only approved PCB-edge regions and mounting-hole bores.
+14. The carrier is located by its measured mounting holes: post diameter against the reported bore, engagement and proud height against the carrier, clearance to the outermost conductor, the holes that must be left empty, and the fitting tilt against the ledge gap.
+15. The retention system does not load the ESP32, sockets, terminals, solder joints, or components, and carries no fastener that could be tightened onto the carrier.
 16. Both cabinet fastener heads are recessed, insulated, and outside electronics keep-outs.
 17. The complete cover installation and removal sequence clears all fitted conductors, ferrules and harnesses without disconnecting them.
 18. No production part requires slicer support.
@@ -313,5 +313,5 @@ Record the results in the build report before release.
 - The measurement gate is **CLOSED** as of 2026-09-06 and replacement production CAD is released. The macro geometry in §3 is owner-measured; the terminal-port bore and internal depth are out of scope under §5.3. A supplier photograph still establishes topology, not manufacturing dimensions, and no remaining assumption may be presented as a measurement.
 - Do not merge the housing PR during the amendment sprint.
 - Avoid unrelated wiring, firmware, or printing-work changes.
-- This v1.5 specification and hardware-identification correction may precede replacement CAD. Once replacement modelling begins, update the generated CAD, verification scripts, exported artefacts, renders, build report and PR description together.
+- A specification and hardware-identification correction may precede replacement CAD. Once replacement modelling begins, update the generated CAD, verification scripts, exported artefacts, renders, build report and PR description together.
 - If any mandatory envelope or material gate cannot coexist with the clearance and service requirements, stop and document the conflict rather than silently relaxing the gate.

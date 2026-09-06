@@ -13,7 +13,7 @@ It is deliberately NOT a second run of the generator. The generator knows what
 it meant to build; this knows only what came out of the exporter. Every
 expected number below is TYPED IN BY HAND from
 mechanical/Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md - whose content
-is specification revision v1.6 - and from the derivation chain in the build
+is specification revision v1.7 - and from the derivation chain in the build
 report. Nothing is imported from Decca_ESP32_Controller_Housing_fusion.py. If
 the generator and this file disagree, that disagreement is the whole point.
 
@@ -27,7 +27,7 @@ superseded.
 
 The one measurement that mattered turned out not to be a measurement. The owner
 reported the entry as "just above the base of the terminal block" and ruled the
-port bore out of scope, so v1.6 section 5.3 requires the housing to clear the
+port bore out of scope, so v1.7 section 5.3 requires the housing to clear the
 ENTIRE measured 9.00 mm block height across the whole 53.00 mm row. This file
 checks that, not a port position - which is why no later port measurement can
 invalidate it.
@@ -61,14 +61,15 @@ STL = os.path.join(HERE, "..", "STL")
 MESHES = {
     "base": "ESP32_Controller_Housing_Base.stl",
     "lid": "ESP32_Controller_Housing_Lid.stl",
-    "clamp": "ESP32_Controller_PCB_Clamp_Adjustable.stl",
     "cap": "ESP32_Controller_Cabinet_Fastener_Cap.stl",
 }
 
-PRODUCTION = (("base", 1), ("lid", 1), ("clamp", 1), ("cap", 2))
+PRODUCTION = (("base", 1), ("lid", 1), ("cap", 2))
 
 # Rev A and Rev B meshes that must not be on disk. Their absence is gate 22.
 FORBIDDEN_FILES = (
+    # superseded by the two locating posts, v1.7 4.6
+    "ESP32_Controller_PCB_Clamp_Adjustable.stl",
     "ESP32_Controller_PCB_Clamp_Fixed.stl",
     "ESP32_Controller_USB_Plug.stl",
     "ESP32_Controller_Carrier_Fit_Gauge.stl",
@@ -124,12 +125,12 @@ TOP_CLEAR = 2.00
 # -- plan chain --------------------------------------------------------------
 X_CAV_NEG = -32.00
 X_ADJ_FACE = 32.50
-X_CAV_POS = 40.00
+X_CAV_POS = 36.40
 Y_CAV = 33.50
 X_OUT_NEG = -33.60
-X_OUT_POS = 41.60
+X_OUT_POS = 38.00
 Y_OUT = 35.10
-BODY_L = 75.20
+BODY_L = 71.60
 BODY_W = 70.20
 WALL_T = 1.60
 OUTER_CORNER_R = 3.00
@@ -137,7 +138,7 @@ OUTER_CORNER_R = 3.00
 # the long walls stop at the board top face; full height only in the returns
 Z_LONG_WALL_TOP = 6.10
 X_RET_NEG = -28.00
-X_RET_POS = 36.00
+X_RET_POS = 32.40
 SIDE_OPEN_H = 17.90
 
 # -- terminal entry, the whole point -----------------------------------------
@@ -153,9 +154,9 @@ TERM_SCREW_Y = 24.50           # Y_TERM_OUT - 3.00
 
 # -- lid ---------------------------------------------------------------------
 LID_X_NEG = -35.05
-LID_X_POS = 43.05
+LID_X_POS = 39.45
 LID_Y = 36.55
-LID_L = 78.10
+LID_L = 74.50
 LID_W = 73.10
 LID_TOP_T = 1.60
 LID_SKIRT_T = 1.20
@@ -165,33 +166,29 @@ Z_SKIRT_BOT = 20.00
 SKIRT_IN_NEG = -33.85
 SKIRT_IN_Y = 35.35
 LID_RET_NEG = -28.00
-LID_RET_POS = 36.00
+LID_RET_POS = 32.40
 
 # -- retention ---------------------------------------------------------------
-PAD_L = 8.00
-PAD_W = 3.00
-PAD_X = 27.00
-PAD_Y = 30.25
+# The pads are centred on the MEASURED mounting holes now, and the +X pair
+# carries a locating post. There is no clamp, no bar, no slot, no plinth and
+# no carrier-width range: v1.7 4.6 replaced all of it.
+PAD_L = 5.60
+PAD_W = 3.60
+PAD_X = 28.50                  # = MOUNT_PITCH[0] / 2, MEASURED
+PAD_Y = 30.00                  # = MOUNT_PITCH[1] / 2, MEASURED
 LEDGE_X1 = -29.50
 LEDGE_GRIP = 2.00
 LEDGE_LEAD = 1.40
 LEDGE_Z0 = 6.30
-CLAMP_GRIP = 2.00
-CLAMP_T = 3.00
-CLAMP_Z = (6.30, 9.30)
-CLAMP_SCREW_X = 35.10
-CLAMP_SCREW_Y = 16.00
-CLAMP_SLOT_L = 5.40
-CLAMP_SLOT_W = 3.40
-BAR_X0 = 29.50
-BAR_X1 = 38.30
-PLINTH_X = (32.50, 40.00)
+RETAIN_CLEAR = 0.20
+POST_D = 2.60
+POST_Z1 = 7.50                 # Z_PCB_BOT + 3.00
+POST_PROUD = 1.40              # above Z_PCB_TOP
 INSERT_HOLE_D = 4.00
 INSERT_DEPTH = 5.00
-CARRIER_RANGE = (62.00, 64.00)
 
 # -- lid screws and locating lugs --------------------------------------------
-LID_SCREW_X = 38.10
+LID_SCREW_X = 34.50
 LID_SCREW_Y = 26.00
 LID_SCREW_CLEAR_D = 3.40
 HOOK_Y = 22.00
@@ -202,7 +199,7 @@ LUG_PROJ = 0.85
 HOOK_ENGAGE = 0.60
 
 # -- USB, vents, antenna ------------------------------------------------------
-USB_OPEN = (14.00, 9.00)       # the v1.6 minimum
+USB_OPEN = (14.00, 9.00)       # the v1.7 minimum
 USB_SLOT_W = 16.00             # cut oversize; the USB position is STARTING
 USB_Z0 = 13.05
 USB_CLEAR_H = 10.95
@@ -628,7 +625,7 @@ def angular_runs(flags):
 def main():
     print("=" * 78)
     print("Decca ESP32 Controller Housing Rev C - offline mesh verifier")
-    print("specification v1.6 section 13, measured from the exported "
+    print("specification v1.7 section 13, measured from the exported "
           "triangles only")
     print("=" * 78)
 
@@ -653,7 +650,7 @@ def main():
                  bb[1] - bb[0], bb[3] - bb[2], bb[5] - bb[4], MESHES[key]))
     print("")
 
-    base, lid, clamp, cap = M["base"], M["lid"], M["clamp"], M["cap"]
+    base, lid, cap = M["base"], M["lid"], M["cap"]
     TX = term_x()
 
     # -- 1 -------------------------------------------------------------------
@@ -721,22 +718,29 @@ def main():
 
     # -- 5 -------------------------------------------------------------------
     intr = 0
-    # the measured 20.00 mm envelope, minus the two approved short-edge grips
-    intr += count_in(base, box_pts(-X_PCB + LEDGE_GRIP, X_PCB - CLAMP_GRIP, 25,
-                                   -Y_PCB, Y_PCB, 17, Z_PCB_TOP, Z_ASSY_TOP, 9))
-    intr += count_in(lid, box_pts(-X_PCB + LEDGE_GRIP, X_PCB - CLAMP_GRIP, 25,
-                                  -Y_PCB, Y_PCB, 17, Z_PCB_TOP, Z_ASSY_TOP, 9))
-    intr += count_in(clamp, box_pts(-X_PCB + LEDGE_GRIP, X_PCB - CLAMP_GRIP, 25,
-                                    -Y_PCB, Y_PCB, 17, Z_PCB_TOP, Z_ASSY_TOP, 9))
+    # The measured 20.00 mm envelope. Bounded at -X by the ledge grip and at +X
+    # by the board edge, because nothing touches the +X top strip any more -
+    # and MINUS the two +X mounting-hole bores, which v1.7 4.6 lets the housing
+    # occupy. The two -X bores are NOT excluded: nothing is allowed there, and
+    # leaving them in keeps a stray feature catchable.
+    def outside_bore(pts):
+        r2 = (MOUNT_HOLE_D / 2.0) ** 2
+        return [(x, y, z) for (x, y, z) in pts
+                if (x - PAD_X) ** 2 + (abs(y) - PAD_Y) ** 2 > r2]
+
+    env = outside_bore(box_pts(-X_PCB + LEDGE_GRIP, X_PCB, 25,
+                               -Y_PCB, Y_PCB, 17, Z_PCB_TOP, Z_ASSY_TOP, 9))
+    intr += count_in(base, env) + count_in(lid, env)
     # the terminal blocks themselves
     for s in (-1, 1):
         pts = box_pts(-X_TERM, X_TERM, 21, min(s * 21.0, s * Y_TERM_OUT),
                       max(s * 21.0, s * Y_TERM_OUT), 5, Z_PCB_TOP, Z_BLOCK_TOP, 7)
-        intr += count_in(base, pts) + count_in(lid, pts) + count_in(clamp, pts)
+        intr += count_in(base, pts) + count_in(lid, pts)
     gate(intr == 0, "5  no part enters an electronics keep-out",
-         "%d probes over the measured 20.00 mm assembly envelope and both "
-         "terminal blocks, %d intrusions" % (25 * 17 * 9 * 3 + 2 * 21 * 5 * 7 * 3,
-                                             intr))
+         "%d probes over the measured 20.00 mm assembly envelope, less the two "
+         "+X mounting-hole bores the posts are allowed to occupy, and both "
+         "terminal blocks; %d intrusions"
+         % (2 * len(env) + 2 * 21 * 5 * 7 * 2, intr))
 
     # -- 6 -------------------------------------------------------------------
     blocked = 0
@@ -747,7 +751,7 @@ def main():
                     ang = 2.0 * math.pi * a / 6.0
                     px = tx + math.cos(ang) * DRIVER_D / 2.0 * 0.9
                     py = s * TERM_SCREW_Y + math.sin(ang) * DRIVER_D / 2.0 * 0.9
-                    if base.inside(px, py, z) or clamp.inside(px, py, z):
+                    if base.inside(px, py, z):
                         blocked += 1
     gate(blocked == 0,
          "6  every terminal screw reachable from above, cover removed",
@@ -763,8 +767,7 @@ def main():
                       min(s * Y_TERM_OUT, s * (LID_Y + 6.0)),
                       max(s * Y_TERM_OUT, s * (LID_Y + 6.0)), 13,
                       CORR_Z[0], CORR_Z[1], 9)
-        obstructed += count_in(base, pts) + count_in(lid, pts) \
-            + count_in(clamp, pts)
+        obstructed += count_in(base, pts) + count_in(lid, pts)
     per_term = 0
     for s in (-1, 1):
         for tx in TX:
@@ -797,8 +800,7 @@ def main():
                     r = (FERRULE_D if abs(y) < Y_TERM_OUT else WIRE_D) / 2.0
                     px = tx + math.cos(ang) * r * 0.92
                     pz = Z_PORT + math.sin(ang) * r * 0.92
-                    if base.inside(px, s * y, pz) or lid.inside(px, s * y, pz) \
-                            or clamp.inside(px, s * y, pz):
+                    if base.inside(px, s * y, pz) or lid.inside(px, s * y, pz):
                         hit += 1
     gate(hit == 0,
          "9  fitted wire and ferrule envelopes insert and withdraw clear",
@@ -828,9 +830,6 @@ def main():
     n_ant = count_in(base, box_pts(ANT_KEEPOUT_X[0], ANT_KEEPOUT_X[1], 21,
                                    -ANT_KEEPOUT_Y, ANT_KEEPOUT_Y, 13,
                                    Z_PCB_TOP + 10.0, Z_CAV_TOP, 9))
-    n_ant += count_in(clamp, box_pts(ANT_KEEPOUT_X[0], ANT_KEEPOUT_X[1], 21,
-                                     -ANT_KEEPOUT_Y, ANT_KEEPOUT_Y, 13,
-                                     Z_PCB_TOP + 10.0, Z_CAV_TOP, 9))
     skin = 0
     for x in grid(ANT_KEEPOUT_X[0] + 1.0, ANT_KEEPOUT_X[1] - 1.0, 9):
         for y in grid(-ANT_KEEPOUT_Y + 1.0, ANT_KEEPOUT_Y - 1.0, 7):
@@ -874,52 +873,68 @@ def main():
         for sy in (-1, 1):
             if base.inside(sx * PAD_X, sy * PAD_Y, PAD_H - 0.3):
                 pads += 1
-    gate(ledge and ledge_gap and pads == 4,
-         "13 ledge, clamp and pads bear on approved bare regions only",
+    gate(ledge and ledge_gap and pads == 4
+         and abs(PAD_X - MOUNT_PITCH[0] / 2.0) < 1e-9
+         and abs(PAD_Y - MOUNT_PITCH[1] / 2.0) < 1e-9,
+         "13 ledge, posts and pads bear on approved bare regions only",
          "ledge present and clear of the board top; %d/4 support pads at "
-         "(+-%.2f, +-%.2f), inside the %.2f mm clear strip outboard of the "
-         "blocks; grips reach %.2f mm into the %.2f mm of clear board beyond "
-         "each row end" % (pads, PAD_X, PAD_Y, CLEAR_SIDE, LEDGE_GRIP,
-                           CLEAR_END))
+         "(+-%.2f, +-%.2f), which is the MEASURED %.2f x %.2f hole pitch "
+         "halved - the pads are centred on the holes; inside the %.2f mm strip "
+         "outboard of the blocks; the ledge grip reaches %.2f mm into the "
+         "%.2f mm of clear board beyond the -X row end"
+         % (pads, PAD_X, PAD_Y, MOUNT_PITCH[1], MOUNT_PITCH[0], CLEAR_SIDE,
+            LEDGE_GRIP, CLEAR_END))
 
     # -- 14 ------------------------------------------------------------------
-    slot = 0.0
-    zc = (CLAMP_Z[0] + CLAMP_Z[1]) / 2.0
-    for y in (CLAMP_SCREW_Y, -CLAMP_SCREW_Y):
-        # the longest continuous run of AIR strictly inside the bar - scanning
-        # past its ends measures the scan, not the slot
-        run = best = 0.0
-        step = (BAR_X1 - BAR_X0) / 400.0
-        x = BAR_X0 + step
-        while x < BAR_X1:
-            if clamp.inside(x, y, zc):
-                run = 0.0
-            else:
-                run += step
-                best = max(best, run)
-            x += step
-        slot = max(slot, best)
-    travel = (CLAMP_SLOT_L - CLAMP_SLOT_W) / 2.0
-    gate(abs(slot - CLAMP_SLOT_L) < 0.15,
-         "14 clamp accommodates carrier widths %.2f-%.2f mm" % CARRIER_RANGE,
-         "measured slot %.2f long against %.2f, travel +-%.2f; grip %.2f mm "
-         "at every length in the range" % (slot, CLAMP_SLOT_L, travel,
-                                           CLAMP_GRIP))
+    # The two locating posts, measured off the triangles rather than trusted
+    # from the recipe: diameter marched outward from inside each post, top
+    # found on the vertical line, and the two -X holes confirmed EMPTY.
+    dias, tops = [], []
+    for sy in (-1, 1):
+        prof = radial_profile(base, PAD_X, sy * PAD_Y, POST_Z1 - 0.60,
+                              4.0, 72, outward=True)
+        vals = sorted(prof)
+        dias.append(2.0 * vals[len(vals) // 2])
+        tops.append(top_of(base, PAD_X, sy * PAD_Y, POST_Z1 + 3.0) or 0.0)
+    empty = sum(1 for sy in (-1, 1)
+                if not base.inside(-PAD_X, sy * PAD_Y, Z_PCB_TOP + 0.50))
+    to_wire = PAD_X - max(TX) - POST_D / 2.0 - FERRULE_D / 2.0
+    gate(all(abs(v - POST_D) <= 0.15 for v in dias)
+         and all(abs(t - POST_Z1) <= 0.10 for t in tops)
+         and empty == 2 and to_wire >= 0.50
+         and (MOUNT_HOLE_D - POST_D) / 2.0 >= 0.20,
+         "14 the carrier is located by its MEASURED mounting holes",
+         "2 posts measured %.2f and %.2f dia against %.2f, topping at %.2f "
+         "and %.2f against %.2f; %.2f mm radial clearance in the reported M3 "
+         "bore and %.2f mm proud of the board; %d/2 -X holes correctly EMPTY, "
+         "because the board slides under the ledge there; %.2f mm clear of the "
+         "OUTERMOST conductor, which is what no M3 head is"
+         % (dias[0], dias[1], POST_D, tops[0], tops[1], POST_Z1,
+            (MOUNT_HOLE_D - POST_D) / 2.0, POST_PROUD, empty, to_wire))
 
     # -- 15 ------------------------------------------------------------------
-    bar_bot = 99.0
-    for z in grid(Z_PCB_TOP - 1.0, CLAMP_Z[1], 60):
-        if clamp.inside(BAR_X0 + 1.0, 0.0, z):
-            bar_bot = z
+    # Nothing bears on the board except the ledge, and the ledge is measured to
+    # stand off it. There is no fastener left anywhere near this board.
+    ledge_bot = None
+    for z in grid(Z_PCB_TOP - 0.60, LEDGE_Z0 + 2.0, 120):
+        if base.inside(X_CAV_NEG + 1.0, 15.0, z):
+            ledge_bot = z
             break
-    # off the insert bore, or the probe finds the bottom of the bore
-    plinth_top = top_of(base, CLAMP_SCREW_X + 3.20, CLAMP_SCREW_Y,
-                        CLAMP_Z[1])
-    gate(bar_bot >= Z_PCB_TOP - 0.02 and abs(plinth_top - CLAMP_Z[0]) < 0.1,
+    on_board = 0
+    for x in grid(LEDGE_X1 + 0.5, X_PCB - 0.5, 45):
+        for y in grid(-Y_PCB + 0.5, Y_PCB - 0.5, 31):
+            if (x - PAD_X) ** 2 + (abs(y) - PAD_Y) ** 2 <= (MOUNT_HOLE_D / 2.0) ** 2:
+                continue
+            if base.inside(x, y, Z_PCB_TOP + 0.05):
+                on_board += 1
+    gate(ledge_bot is not None and ledge_bot >= Z_PCB_TOP - 0.02
+         and on_board == 0,
          "15 retention loads nothing on the carrier",
-         "clamp underside measured z %.2f and the plinth it bottoms on z %.2f, "
-         "both above a carrier top at %.2f; tightening cannot close the "
-         "%.2f mm gap" % (bar_bot, plinth_top, Z_PCB_TOP, bar_bot - Z_PCB_TOP))
+         "ledge underside measured z %.2f, %.2f mm above a carrier top at "
+         "%.2f; %d of %d probes across the whole board top inboard of the "
+         "ledge find housing material outside the two hole bores - the posts "
+         "carry no fastener, so there is nothing left to over-tighten"
+         % (ledge_bot, ledge_bot - Z_PCB_TOP, Z_PCB_TOP, on_board, 45 * 31))
 
     # -- 16 / 25 / 26 --------------------------------------------------------
     heads = []
@@ -992,7 +1007,6 @@ def main():
     # -- 18 ------------------------------------------------------------------
     orient = (("base", Z_FLOOR_BOT, +1, "floor-down"),
               ("lid", Z_LID_TOP, -1, "TOP-FACE-DOWN"),
-              ("clamp", CLAMP_Z[0], +1, "flat"),
               ("cap", 0.0, +1, "flat"))
     worst = 0.0
     lines = []
@@ -1056,7 +1070,7 @@ def main():
          "%d of %d deleted meshes still on disk; %d probes above the board "
          "plane across both terminal rows, %d find base material - no lacing "
          "rails, ears, sawtooth roofs, USB plug, tie towers, elevated cable "
-         "windows, per-terminal guides, second clamp or corner screws"
+         "windows, per-terminal guides, corner screws, or the superseded clamp"
          % (len(present), len(FORBIDDEN_FILES), 2 * 31 * 9 * 9, tower))
 
     # -- 23 ------------------------------------------------------------------
@@ -1085,7 +1099,7 @@ def main():
     # -- 27 ------------------------------------------------------------------
     gate(True, "27 prototype coupons: none defined for Rev C",
          "the Rev B coupons are superseded and their meshes are removed. "
-         "v1.6 2.1 requires a coupon to reproduce REPLACEMENT production "
+         "v1.7 2.1 requires a coupon to reproduce REPLACEMENT production "
          "geometry, so one is defined only when the owner elects to print it. "
          "No anchor or pull-test coupon is required.")
 
@@ -1124,6 +1138,10 @@ def main():
           "STARTING; 55.00 outer-to-outer does not give it")
     proto("nothing under the board outside the four modelled joint rows",
           "this is what lets the two cabinet fixings sit on the centreline")
+    proto("the mounting-hole bore, taken at %.2f from the reported M3"
+          % MOUNT_HOLE_D,
+          "the post is 2.60 so it works at 3.00 too, but no post has been in a "
+          "real hole yet")
     proto("heat-set insert 4.00 dia x 5.00 deep",
           "the exact part is still not recorded anywhere in the repository")
     proto("the acquired cabinet screw's real head diameter",
@@ -1135,7 +1153,7 @@ def main():
     proto("real conductor and ferrule sizes",
           "%.2f mm wire over a %.2f x %.2f ferrule are STARTING"
           % (WIRE_D, FERRULE_D, FERRULE_L))
-    proto("EN and BOOT positions", "v1.6 6.4 forbids holes until measured")
+    proto("EN and BOOT positions", "v1.7 6.4 forbids holes until measured")
     proto("lid fit %.2f mm per face on this printer and filament"
           % LID_FIT_CLEAR)
     proto("cap nib interference %.2f mm per side on this printer"
@@ -1155,7 +1173,7 @@ def main():
     install("antenna performance with the lid fitted")
 
     print("")
-    print("%d checks covering all 30 v1.6 section 13 gates, %d failed, "
+    print("%d checks covering all 30 v1.7 section 13 gates, %d failed, "
           "%d prototype, %d installation"
           % (CHECKS, len(FAILS), len(PROTOS), len(INSTALLS)))
     if FAILS:
@@ -1163,7 +1181,7 @@ def main():
             print("  FAILED: %s" % f)
         return 1
     print("")
-    print("All specification v1.6 section 13 gates pass on the exported "
+    print("All specification v1.7 section 13 gates pass on the exported "
           "meshes. This is NOT physical validation.")
     return 0
 

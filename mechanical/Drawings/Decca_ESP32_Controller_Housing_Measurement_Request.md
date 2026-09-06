@@ -249,11 +249,11 @@ the block's outward face to the enclosure exterior and beyond.
 installer actually uses (M18, M19 — the installer's own hardware), not by the
 terminal bore. The housing never enters the bore.
 
-## 10. A question the mounting holes now raise
+## 10. The decision the mounting holes forced — DECIDED 2026-09-06
 
-Specification v1.5 §4.5–4.6 mandates a fixed ledge at one short PCB edge and an
+Specification v1.5 §4.5–4.6 mandated a fixed ledge at one short PCB edge and an
 adjustable clamp with two M3 screws at the other, because §3 recorded no usable
-mounting-hole pattern. There now is one: **60 mm across × 57 mm along, holes
+mounting-hole pattern. **§10.4 records what replaced the clamp under v1.7.** There now is one: **60 mm across × 57 mm along, holes
 taking M3**, every hole 3.00 mm from its nearest board edge.
 
 ### 10.1 The clearance is better than the orthogonal margins suggest
@@ -281,26 +281,52 @@ A Ø2.9 post through a hole spans y 28.55–31.45, overhanging the pad's inboard
 edge by 0.20 mm; a 0.50 mm pad widening absorbs it. **The four pads that already
 carry the board are in the right place to locate it as well.**
 
-### 10.3 The decision
+### 10.3 What the outermost conductor did to the obvious answer
 
-Two routes are now open, and they are not close in cost:
+The obvious answer was four screws down through the holes. It does not survive
+its own arithmetic, and the reason is not the one §10.1 looks at.
 
-- **Posts, no hardware.** Four Ø2.9 posts grown off the existing pads, through
-  the mounting holes, with the lid holding the board down. This deletes the
-  fixed ledge, the adjustable clamp, its two M3 screws, its two heat-set
-  inserts, the clamp slot, the plinths and the whole clamp-travel gate — one
-  fastener family and one moving part gone, and the only unproven fastener in
-  the programme (the heat-set insert) with them.
-- **Keep §4.5–4.6.** The ledge and clamp, which work today and pass every gate.
+The last terminal in each row sits at x 24.733 and the corner hole at 28.500 —
+**3.767 mm apart**. Against the declared 2.60 mm ferrule an M3 socket-cap head
+of radius 2.75 **fouls the outermost conductor by 0.28 mm**; a pan head by 0.33.
+An M2.5 cap clears by 0.22 mm, which is not a margin when the wire and ferrule
+sizes are themselves starting values. A Ø2.60 post clears by **1.17 mm**.
 
-**The real trade is tolerance, not material.** The clamp forgives ±1.00 mm of
-board-length error by design; four rigid posts forgive only the hole clearance,
-about 0.15 mm per side on a Ø3.20 bore, and they must all line up at once. The
-classic mitigation is two round posts and two elongated into slots, which
-constrains position and rotation without over-constraining. That is a real
-design question and it has not been answered here.
+So the holes are used for **location, not fastening**, and specification v1.7
+§4.6a now records the prohibition together with this number, so that nobody
+re-proposes screws without re-deriving it against the conductors actually
+installed.
 
-It is also a **specification decision, not a CAD one** — §4.5–4.6 currently
-forbid it, and they would have to be amended first. **It is raised here, not
-acted on.** The board-edge retention route remains fully viable if the answer
-is no.
+### 10.4 What was done — v1.7 §4.6
+
+**The adjustable clamp is deleted.** The −X short edge keeps its fixed ledge;
+the +X end drops onto **two Ø2.60 locating posts** through the two +X mounting
+holes.
+
+| | |
+|---|---:|
+| Radial clearance in a bore reported as M3 | **0.30 mm** at Ø3.20, 0.20 at Ø3.00 |
+| Engagement through the carrier | 1.60 mm, its full thickness |
+| Proud of the carrier top | 1.40 mm |
+| Clear of the outermost conductor | **1.17 mm** |
+| Fitting tilt to clear the posts | 2.73°, lifting the ledge end 0.095 mm inside its 0.20 mm gap |
+
+**Only two posts, and only at +X.** The −X edge must slide in under the ledge at
+its final height and cannot do that with a post already standing in a hole. The
+two −X holes stay empty, and the assembly keep-out over them stays solid on
+purpose, so a stray feature there still fails.
+
+**The tolerance objection is answered by not creating it.** One tight post and
+three loose ones, or two rigid posts on a diagonal, would have had to match the
+hole pitch across the board. Two posts do not over-constrain anything, and Ø2.60
+was chosen so the fit works whether the bore is 3.00 or 3.20 — the bore is still
+a starting value, and the post must not depend on which it is.
+
+**Deleted with the clamp:** the whole `PCB_Clamp_Adjustable` part, two plinths,
+two slotted M3 screws, two heat-set inserts, the clamp slot, the clamp travel,
+the carrier-width range, and 3.60 mm of enclosure length. The envelope falls
+from 78.10 to **74.50 mm** and the production set from 29.36 to **26.71 cm³**.
+
+Two heat-set inserts remain, for the two lid screws. That fastener is still the
+least proven in this design and still an open gate — the clamp's pair is simply
+no longer part of the count.

@@ -3,7 +3,7 @@
 Decca ESP32 Controller Housing - Rev C parametric generator (Autodesk Fusion).
 
 Controlling document: mechanical/Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md
-                      (its content is specification revision v1.6)
+                      (its content is specification revision v1.7)
 
 WHY REV C EXISTS
 ----------------
@@ -29,7 +29,7 @@ THE ONE DESIGN MOVE THAT MATTERS
 --------------------------------
 The owner reported the conductor entry as "just above the base of the terminal
 block" and ruled the port bore and internal depth out of scope, because they do
-not drive housing geometry. That is right, and v1.6 section 5.3 turns it into a
+not drive housing geometry. That is right, and v1.7 section 5.3 turns it into a
 stronger requirement than a measurement would have been:
 
     the housing clears the ENTIRE 9.00 mm block height, across the full
@@ -49,28 +49,45 @@ all fastening and all lid support therefore live at the two SHORT ends, in the
 REV C ARCHITECTURE
 ------------------
     Housing_Base        1.60 mm continuous insulating floor; four local support
-                        pads; one integral fixed ledge on the -X short edge; one
-                        adjustable clamp on two M3 screws at the +X end; two
-                        full-height short end walls with four corner returns
-                        that carry the lid; long walls stopping at the adapter
-                        top face; two recessed, capped cabinet fixings.
+                        pads centred on the MEASURED mounting holes; one
+                        integral fixed ledge on the -X short edge; TWO LOCATING
+                        POSTS through the two +X mounting holes, which is what
+                        replaces Rev C's adjustable clamp; two full-height short
+                        end walls with four corner returns that carry the lid;
+                        long walls stopping at the adapter top face; two
+                        recessed, capped cabinet fixings.
     Housing_Lid         flat cover on the corner returns and end walls, with
                         skirts at the SHORT ENDS AND CORNERS ONLY, two M3
                         screws at +X, two locating lugs at -X, a USB notch open
                         at the skirt's free edge, and modest top vents.
-    PCB_Clamp_Adjustable   one flat bar on two slotted M3 screws.
     Cabinet_Fastener_Caps  two insulating discs over the recessed M3 heads.
+
+RETENTION, AND WHY IT IS NOT SCREWS
+-----------------------------------
+The owner reported the corner mounting holes as M3 on 2026-09-06, and the
+obvious move - four screws down through the board - does not survive its own
+arithmetic. The terminal block is not the obstacle: a corner hole is outboard of
+the block on BOTH axes, so a screw head meets the block's CORNER at 3.202 mm and
+an M3 cap head clears it by 0.45 mm. The obstacle is the OUTERMOST CONDUCTOR.
+The last terminal in each row sits at x 24.733 and the hole at 28.500, so the
+gap is 3.767 mm; against a 2.60 mm ferrule an M3 head of radius 2.75 fouls it by
+0.28 mm. A 2.60 mm post clears the same conductor by 1.17 mm.
+
+So the holes are used for LOCATION, not fastening, and only at the +X end. The
+-X end keeps the fixed ledge, because the board must slide -x under it at final
+height and could not do that with a post already in a hole. Fitting is a 2.7
+degree tilt, which lifts the ledge end by 0.10 mm inside its 0.20 mm gap.
 
 PRINTING
 --------
 PETG / PETG-HF, 0.40 mm nozzle, 0.20 mm layers, no support material.
 Base floor-down. Lid TOP-FACE-DOWN, which is what makes the USB notch and the
-vents print with no bridge. Clamp flat.
+vents print with no bridge. Three production parts, not four.
 
 RUNNING IT
 ----------
     main(None)      build/rebuild every component in the active document
-    validate(None)  the specification v1.6 section 13 gate suite
+    validate(None)  the specification v1.7 section 13 gate suite
     export(None)    f3d, STEP and STL into the repository clone
     images(None)    the review renders
 """
@@ -89,7 +106,6 @@ DOC = "Decca ESP32 Housing"
 
 BASE = "Housing_Base"
 LID = "Housing_Lid"
-CLAMP = "PCB_Clamp_Adjustable"
 CAPS = "Cabinet_Fastener_Caps"
 
 REF_ESP = "REF_ESP32_DevKit_V1_30Pin"
@@ -99,7 +115,7 @@ REF_WIRE = "REF_Installed_Wires_And_Ferrules"
 REF_HARN = "REF_Grouped_Harness_Keepouts"
 REF_KEEP = "REF_Wired_Keepouts"
 
-PRODUCTION = (BASE, LID, CLAMP, CAPS)
+PRODUCTION = (BASE, LID, CAPS)
 COUPONS = ()
 PRINTABLE = PRODUCTION + COUPONS
 REFERENCE = (REF_ESP, REF_ADP, REF_COR, REF_WIRE, REF_HARN, REF_KEEP)
@@ -113,7 +129,7 @@ PETG_DENSITY = 1.27                  # g/cm3, specification section 9
 SLICER_PROFILE = ("Bambu Lab P1S, PETG-HF, 0.40 mm nozzle, 0.20 mm layers, "
                   "3 walls, 15% infill, no supports, textured PEI plate")
 
-# v1.6 section 10 forbids support MATERIAL. It does not forbid a short
+# v1.7 section 10 forbids support MATERIAL. It does not forbid a short
 # unsupported ledge, and a retaining ledge over a board cannot be built without
 # one. Every downward facing surface on every part is measured for how far it
 # reaches from its nearest support, and held under this.
@@ -123,13 +139,15 @@ OVERHANG_REACH_MAX = 1.50
 FORBIDDEN_COMPONENTS = (
     "PCB_Clamp_Fixed_End", "PCB_Clamp_Adjustable_End", "USB_Blanking_Plug",
     "Carrier_Fit_Gauge", "Carrier_Fit_Coupon", "Insert_Fastener_Coupon",
+    # superseded by the two locating posts, v1.7 4.6
+    "PCB_Clamp_Adjustable",
 )
 
 # ---------------------------------------------------------------------------
 # PARAMETERS.  Every value carries one of three tags:
 #
 #   MEASURED  physically measured off the acquired hardware, with its date
-#   DESIGN    a design value taken from specification v1.6
+#   DESIGN    a design value taken from specification v1.7
 #   STARTING  a CAD starting value; NOT measured; an open prototype gate
 #
 # DERIVED values are computed in derive() below and never typed here.
@@ -164,10 +182,10 @@ P = {
     # size, not a calliper reading of the bore, so the bore stays STARTING
     # at the 3.20 standard M3 clearance; 3.00 is equally common and
     # nothing available here tells them apart. NOTHING IN THIS DESIGN USES
-    # IT - retention is the ledge and clamp of v1.6 4.5-4.6 - so it is not
-    # a prototype gate for the geometry as it stands. It is recorded
-    # because it is what decides whether hole-based retention could
-    # replace them, which is an open specification question, not a CAD one.
+    # IT WAS - and now it does. Under v1.7 4.6 the two +X holes carry the
+    # locating posts that replaced the adjustable clamp, so this bore is a
+    # live prototype gate: 3.20 is standard M3 clearance and 3.00 is equally
+    # common. The post is sized at 2.60 so that it works either way.
     "mount_hole_d": 3.20,            # STARTING, from "M3" reported 2026-09-06
 
     # -- The adapter, STARTING ----------------------------------------------
@@ -207,21 +225,16 @@ P = {
     "bundle_pack": 1.15,
 
     # -- DECLARED ROUTING VALUES, owned by this design ----------------------
-    # v1.6 5.3: the straight run a conductor gets before it may bend is this
+    # v1.7 5.3: the straight run a conductor gets before it may bend is this
     # design's declaration, not a board measurement. Measured from the block's
     # outward face.
     "straight_run": 12.00,           # DESIGN
     "driver_d": 6.00,                # DESIGN, terminal screwdriver corridor
 
-    # -- Clearances, DESIGN (specification v1.6 section 3) ------------------
+    # -- Clearances, DESIGN (specification v1.7 section 3) ------------------
     "pcb_xy_clear": 0.50,
     "pcb_under_clear": 2.00,
     "component_top_clear": 2.00,
-    # Re-centred on the MEASURED 63.00 mm along-row dimension. The 65-67 range
-    # in v1.1 predates any measurement of this board; +-1.00 mm of adjustment
-    # around a measured value is what the clamp is actually for.
-    "carrier_len_min": 62.00,
-    "carrier_len_max": 64.00,
 
     # -- Shell, DESIGN -------------------------------------------------------
     "base_floor_t": 1.60,
@@ -238,30 +251,29 @@ P = {
     "outer_corner_r": 3.00,
 
     # -- Support pads, DESIGN ------------------------------------------------
-    "pad_l": 8.00,
-    "pad_w": 3.00,
-    "pad_inset_x": 3.25,             # pad centre inboard of the board short edge
-    "pad_inset_y": 2.00,             # pad centre inboard of the board long edge
+    # Centred on the MEASURED mounting holes, because the +X pair now carries a
+    # locating post and the holes are the one place on this board guaranteed to
+    # be free of components on both faces.
+    "pad_l": 5.60,
+    "pad_w": 3.60,
 
-    # -- Fixed ledge and adjustable clamp, DESIGN ---------------------------
+    # -- Fixed ledge and locating posts, DESIGN -----------------------------
     "ledge_grip": 2.00,
     "ledge_lead": 1.40,             # 45 deg lead-in; gate 18 sets this
     "ledge_y0": 8.00,                # two segments, clear of the USB centre
     "ledge_y1": 22.00,
-    "clamp_grip": 2.00,
-    "clamp_t": 3.00,
-    # 7.50, not 6.00: the bar has to carry a 5.40 slot, keep material beyond
-    # it, AND clear the +X wall at full travel, while the insert bore stays
-    # inside the plinth. Gate 14 showed 6.00 cannot satisfy all four.
-    "clamp_zone": 7.50,              # floor beyond the board for the plinths
-    "clamp_screw_y": 16.00,
-    "clamp_slot_l": 5.40,
-    "clamp_slot_w": 3.40,
-    "clamp_vertical_clear": 0.20,
-    "clamp_side_clear": 0.40,
-    "clamp_edge": 0.50,
-    "plinth_half_w": 4.50,
-    "insert_hole_d": 4.00,           # STARTING, heat-set insert
+    "retain_clear": 0.20,            # ledge underside above the carrier top
+    # 2.60 in a reported M3 hole. It is deliberately not 2.90: the bore is a
+    # STARTING value and could be 3.00 rather than 3.20, and 2.60 keeps a
+    # working clearance either way. It also clears the outermost conductor by
+    # 1.17 mm, which no screw head does.
+    "post_d": 2.60,
+    "post_h": 3.00,                  # above the carrier underside, not the board
+    # 4.40: the floor beyond the board at +X now carries nothing but the two
+    # lid-screw bosses, which reach 4.40 mm in from the outer face. The 7.50 mm
+    # clamp zone it replaces is gone with the clamp.
+    "boss_zone": 4.40,
+    "insert_hole_d": 4.00,           # STARTING, heat-set insert, LID SCREWS ONLY
     "insert_depth": 5.00,            # STARTING
 
     # -- Lid screws and locating lugs, DESIGN -------------------------------
@@ -344,7 +356,7 @@ STARTING = (
 ASSUMED = (
     ("terminal rows centred along the 63.00 mm ALONG-row dimension",
      "leaves 5.00 mm of clear board beyond each row end, which is where the "
-     "ledge, the clamp, the lid screws and the locating lugs all live"),
+     "ledge, the locating posts, the lid screws and the lugs all live"),
     ("the USB connector is centred on its short edge",
      "the opening is cut oversize at 16.00 mm to absorb the error"),
     ("term_block_h 9.00 was taken as the block's own body height",
@@ -595,11 +607,11 @@ def derive(P):
     d["ant_x0"] = d["esp_x1"] - P["esp_ant_l"]
 
     # ---- plan chain --------------------------------------------------------
-    d["x_cav_neg"] = -(d["x_pcb"] + P["pcb_xy_clear"])       # -33.50
-    d["x_carrier_max"] = P["carrier_len_max"] / 2.0          # 33.50
-    d["x_carrier_min"] = P["carrier_len_min"] / 2.0          # 32.50
-    d["x_adj_face"] = d["x_carrier_max"] + P["pcb_xy_clear"] # 34.00
-    d["x_cav_pos"] = d["x_adj_face"] + P["clamp_zone"]       # 40.00
+    d["x_cav_neg"] = -(d["x_pcb"] + P["pcb_xy_clear"])       # -32.00
+    # The +X floor beyond the board used to be a 7.50 mm clamp zone. With the
+    # clamp gone it carries nothing but the two lid-screw bosses, so it is
+    # sized by them and by nothing else.
+    d["x_cav_pos"] = d["x_pcb"] + P["pcb_xy_clear"] + P["boss_zone"]  # 36.40
     d["y_cav"] = d["y_pcb"] + P["pcb_xy_clear"]              # 32.00
     d["x_out_neg"] = d["x_cav_neg"] - P["end_wall_t"]
     d["x_out_pos"] = d["x_cav_pos"] + P["end_wall_t"]
@@ -618,7 +630,7 @@ def derive(P):
     d["side_open_h"] = d["z_cav_top"] - d["z_long_wall_top"]
 
     # ---- terminal entry ----------------------------------------------------
-    # v1.6 5.3: clear the WHOLE block height across the WHOLE row length. The
+    # v1.7 5.3: clear the WHOLE block height across the WHOLE row length. The
     # corridor starts at the block's outward face and runs past the enclosure.
     d["corr_y0"] = d["y_term_out"]
     d["corr_z0"] = d["z_pcb_top"]
@@ -641,38 +653,36 @@ def derive(P):
     d["lid_ret_neg"] = d["x_out_neg"] + P["corner_return_l"] + P["end_wall_t"]
     d["lid_ret_pos"] = d["x_out_pos"] - P["corner_return_l"] - P["end_wall_t"]
 
-    # ---- support pads, in the clear side strip -----------------------------
-    d["pad_x"] = d["x_pcb"] - P["pad_l"] / 2.0 - 0.50        # 27.00
-    d["pad_y"] = (d["y_term_out"] + d["y_pcb"]) / 2.0        # 30.25
-    d["pad_margin"] = (d["clear_side"] - P["pad_w"]) / 2.0
+    # ---- the MEASURED mounting holes, and everything that uses them --------
+    # This is the first thing in the design to consume the measured pitch. The
+    # four support pads are centred on the four holes; the +X pair also carries
+    # a locating post.
+    d["post_x"] = P["mount_pitch_x"] / 2.0                   # 28.50 MEASURED
+    d["post_y"] = P["mount_pitch_y"] / 2.0                   # 30.00 MEASURED
+    d["post_z1"] = d["z_pcb_bot"] + P["post_h"]              # 7.50
+    d["post_clear_r"] = (P["mount_hole_d"] - P["post_d"]) / 2.0      # 0.30
+    d["post_engage"] = d["z_pcb_top"] - d["z_pcb_bot"]       # 1.60, the board
+    d["post_proud"] = d["post_z1"] - d["z_pcb_top"]          # 1.40 above it
+    # Fitting: the +X end lifts by post_h to clear the posts while the -X edge
+    # stays under the ledge. Both numbers are gated.
+    d["fit_tilt"] = math.degrees(math.asin(P["post_h"] / (2.0 * d["x_pcb"])))
+    d["fit_rise"] = P["ledge_grip"] * math.tan(math.radians(d["fit_tilt"]))
+    # clearance from a post to the OUTERMOST conductor, which is what ruled out
+    # a screw head here
+    d["post_to_wire"] = (d["post_x"] - max(d["term_x"])
+                         - P["post_d"] / 2.0 - P["ferrule_d"] / 2.0)
+
+    # ---- support pads, centred on the mounting holes ------------------------
+    d["pad_x"] = d["post_x"]
+    d["pad_y"] = d["post_y"]
+    d["pad_margin"] = min(d["pad_y"] - P["pad_w"] / 2.0 - d["y_term_out"],
+                          d["y_pcb"] - d["pad_y"] - P["pad_w"] / 2.0)
 
     # ---- fixed ledge, -X short edge ----------------------------------------
-    d["ledge_x1"] = -d["x_pcb"] + P["ledge_grip"]            # -31.00
-    d["ledge_z0"] = d["z_pcb_top"] + P["clamp_vertical_clear"]
+    d["ledge_x1"] = -d["x_pcb"] + P["ledge_grip"]            # -29.50
+    d["ledge_z0"] = d["z_pcb_top"] + P["retain_clear"]
     d["ledge_proj"] = d["ledge_x1"] - d["x_cav_neg"]
     d["ledge_flat"] = d["ledge_proj"] - P["ledge_lead"]
-
-    # ---- adjustable clamp, +X ----------------------------------------------
-    # inset half a millimetre so the bar clears the +X wall, and the
-    # plinths are bounded by the clamp zone so they never reach under the
-    # board - gate 14 caught both
-    d["clamp_screw_x"] = d["x_adj_face"] + 2.60
-    d["plinth_x0"] = d["x_adj_face"]
-    d["plinth_x1"] = d["x_cav_pos"]
-    d["clamp_z0"] = d["ledge_z0"]
-    d["clamp_z1"] = d["clamp_z0"] + P["clamp_t"]
-    d["bar_x0"] = d["x_pcb"] - P["clamp_grip"]
-    d["clamp_travel"] = (P["clamp_slot_l"] - P["clamp_slot_w"]) / 2.0
-    # The bar's outer end is bounded by the +X wall AT FULL TRAVEL, not just at
-    # rest. Gate 14 failed twice on this: encode the constraint instead of
-    # picking a length that happens to fit.
-    d["bar_x1"] = min(d["clamp_screw_x"] + P["clamp_slot_l"] / 2.0
-                      + P["clamp_edge"],
-                      d["x_cav_pos"] - d["clamp_travel"] - 0.30)
-    d["grip_at_min"] = d["x_carrier_min"] - (d["bar_x0"] - d["clamp_travel"])
-    d["grip_at_max"] = d["x_carrier_max"] - (d["bar_x0"] + d["clamp_travel"])
-    d["bar_y"] = P["clamp_screw_y"] + P["plinth_half_w"]
-    d["z_ins_bot"] = d["clamp_z0"] - P["insert_depth"]
 
     # ---- lid screws and locating lugs --------------------------------------
     d["lid_boss_x0"] = d["x_out_pos"] - 6.00
@@ -781,8 +791,15 @@ def build_adapter(B, P, d):
     representative - the housing clears the whole block regardless, so no
     dimension in them can move a housing surface."""
     out = []
-    out.append((B.box(-d["x_pcb"], d["x_pcb"], -d["y_pcb"], d["y_pcb"],
-                      d["z_pcb_bot"], d["z_pcb_top"]), "REF_ADAPTER_PCB"))
+    pcb = B.box(-d["x_pcb"], d["x_pcb"], -d["y_pcb"], d["y_pcb"],
+                d["z_pcb_bot"], d["z_pcb_top"])
+    # the four MEASURED mounting holes, at the reported M3 bore
+    for sx in (-1.0, 1.0):
+        for sy in (-1.0, 1.0):
+            pcb = B.sub(pcb, B.cylz(P["mount_hole_d"], sx * d["post_x"],
+                                    sy * d["post_y"],
+                                    d["z_pcb_bot"] - 1.0, d["z_pcb_top"] + 1.0))
+    out.append((pcb, "REF_ADAPTER_PCB"))
 
     # the two measured terminal rows, ported
     blocks = None
@@ -853,7 +870,7 @@ def _underside_rows(B, P, d):
 
 
 def build_corridors(B, P, d):
-    """The conductor entry corridors - v1.6 section 5.3, and the reason this
+    """The conductor entry corridors - v1.7 section 5.3, and the reason this
     design exists.
 
     One solid per long side, spanning the FULL measured block height over the
@@ -900,7 +917,7 @@ def build_wires(B, P, d):
 def build_harness(B, P, d):
     """The grouped H1-H6 bundles.
 
-    v1.6 section 5.7: conductors stay individual through the terminal-entry
+    v1.7 section 5.7: conductors stay individual through the terminal-entry
     zone because the terminals fix their positions, and may only merge into a
     named harness AFTER clearing the mouths and the declared straight run.
     Every bundle below therefore starts at straight_y, never before it."""
@@ -920,10 +937,21 @@ def build_keepouts(B, P, d):
     # The MEASURED 20.00 mm assembly envelope, from datum A. Bounded in X by
     # the two approved short-edge grips, which are the only places the housing
     # is allowed to touch the board at all.
-    out.append((B.box(-d["x_pcb"] + P["ledge_grip"], d["x_pcb"] - P["clamp_grip"],
-                      -d["y_pcb"], d["y_pcb"],
-                      d["z_pcb_top"], d["z_assy_top"]),
-                "KEEPOUT_ASSEMBLY_20MM"))
+    # The +X bound is now the board edge, not a clamp grip: nothing of this
+    # housing touches the +X top strip any more.
+    assy = B.box(-d["x_pcb"] + P["ledge_grip"], d["x_pcb"],
+                 -d["y_pcb"], d["y_pcb"],
+                 d["z_pcb_top"], d["z_assy_top"])
+    # The two +X mounting holes are holes: no part of the assembly is in them,
+    # and v1.7 4.6 lets the housing occupy them. Boring them out of the
+    # keep-out is what makes a locating post legal, and it is bounded by the
+    # MEASURED pitch and the reported M3 bore, not by the post that fills it.
+    # The two -X holes are left SOLID on purpose - nothing is allowed there.
+    for sy in (-1.0, 1.0):
+        assy = B.sub(assy, B.cylz(P["mount_hole_d"], d["post_x"],
+                                  sy * d["post_y"],
+                                  d["z_pcb_top"] - 1.0, d["z_assy_top"] + 1.0))
+    out.append((assy, "KEEPOUT_ASSEMBLY_20MM"))
 
     # Underside: the four actual solder rows, not a blanket. The support pads
     # sit outboard of them and the two cabinet fixings sit on the clear
@@ -963,21 +991,17 @@ def build_keepouts(B, P, d):
     out.append((B.box(d["ako_x0"], d["ako_x1"], d["ako_y0"], d["ako_y1"],
                       d["ako_z0"], d["ako_z1"]), "KEEPOUT_WIFI_ANTENNA"))
 
+    # Only the two lid screws remain. The clamp's pair went with the clamp.
     met = None
     for sy in (-1.0, 1.0):
-        s = B.cylz(P["lid_screw_clear_d"], d["clamp_screw_x"],
-                   sy * P["clamp_screw_y"], d["z_ins_bot"], d["clamp_z1"] + 3.0)
-        met = s if met is None else B.uni(met, s)
-        met = B.uni(met, B.cylz(P["insert_hole_d"], d["clamp_screw_x"],
-                                sy * P["clamp_screw_y"],
-                                d["z_ins_bot"], d["clamp_z0"]))
-        met = B.uni(met, B.cylz(P["lid_screw_clear_d"], d["lid_screw_x"],
-                                sy * P["lid_screw_y"],
-                                d["z_lid_ins_bot"], d["z_lid_top"] + 3.0))
+        c = B.cylz(P["lid_screw_clear_d"], d["lid_screw_x"],
+                   sy * P["lid_screw_y"],
+                   d["z_lid_ins_bot"], d["z_lid_top"] + 3.0)
+        met = c if met is None else B.uni(met, c)
         met = B.uni(met, B.cylz(P["insert_hole_d"], d["lid_screw_x"],
                                 sy * P["lid_screw_y"],
                                 d["z_lid_ins_bot"], d["z_cav_top"]))
-    out.append((met, "KEEPOUT_LID_AND_CLAMP_FASTENERS"))
+    out.append((met, "KEEPOUT_LID_FASTENERS"))
 
     cab = None
     for sx in (-1.0, 1.0):
@@ -1004,7 +1028,7 @@ def build_keepouts(B, P, d):
 #   3  full-height short end walls + corner returns   gates 12, 17
 #   4  four local support pads                        gates 3, 13
 #   5  one integral fixed ledge, -X                   gates 13, 15
-#   6  two clamp plinths with vertical M3 inserts     gates 13, 14, 15
+#   6  two locating posts through the +X holes        gates 5, 13, 14, 15
 #   7  two lid-screw bosses with vertical M3 inserts  gates 12, 17
 #   8  two locating rebates, -X                       gate 17
 #   9  USB notch, open to the end-wall top            gate 10
@@ -1059,18 +1083,18 @@ def build_base(B, P, d):
             max(sy * P["ledge_y0"], sy * P["ledge_y1"]) + 1.0))
         body = B.uni(body, seg)
 
-    # 6 - two clamp plinths. The clamp bottoms on these, so tightening its
-    #     screws can never drive it onto the board.
+    # 6 - two locating posts, rising out of the two +X pads and through the
+    #     two MEASURED mounting holes. This is what replaces the adjustable
+    #     clamp: the carrier is located by its own holes rather than gripped by
+    #     its edges, so there is no bar, no slot, no travel and no fastener.
+    #
+    #     +X ONLY, and that is not an economy. The -X edge has to slide under
+    #     the fixed ledge at its final height, and it cannot do that with a
+    #     post already standing in a hole. The two -X holes stay empty and the
+    #     keep-out over them stays solid, so a stray feature there still fails.
     for sy in (-1.0, 1.0):
-        body = B.uni(body, B.box(
-            d["plinth_x0"], d["plinth_x1"],
-            sy * P["clamp_screw_y"] - P["plinth_half_w"],
-            sy * P["clamp_screw_y"] + P["plinth_half_w"],
-            d["z_floor_top"], d["clamp_z0"]))
-    for sy in (-1.0, 1.0):
-        body = B.sub(body, B.cylz(P["insert_hole_d"], d["clamp_screw_x"],
-                                  sy * P["clamp_screw_y"],
-                                  d["z_ins_bot"], d["clamp_z0"] + 0.001))
+        body = B.uni(body, B.cylz(P["post_d"], d["post_x"], sy * d["post_y"],
+                                  d["z_floor_top"], d["post_z1"]))
 
     # 7 - two lid-screw bosses, thickening the +X end wall locally. The screws
     #     are VERTICAL: the end walls are full height here, so Rev B's
@@ -1126,7 +1150,7 @@ def build_base(B, P, d):
 # Housing_Lid, printed TOP-FACE-DOWN.
 #
 # No long-side skirt. A skirt there would have to be dragged through the fitted
-# conductors to get the lid off, which v1.6 section 8.8 forbids outright.
+# conductors to get the lid off, which v1.7 section 8.8 forbids outright.
 # ---------------------------------------------------------------------------
 def build_lid(B, P, d):
     lid_r = P["outer_corner_r"] + P["lid_fit_clear"] + P["lid_skirt_t"]
@@ -1173,30 +1197,6 @@ def build_lid(B, P, d):
         body = B.sub(body, B.box(d["vent_x0"], d["vent_x1"],
                                  y - P["vent_w"] / 2.0, y + P["vent_w"] / 2.0,
                                  d["z_cav_top"] - 1.0, d["z_lid_top"] + 1.0))
-    return body
-
-
-# ---------------------------------------------------------------------------
-# PCB_Clamp_Adjustable - one flat bar, two slotted M3 screws.
-# ---------------------------------------------------------------------------
-def build_clamp(B, P, d):
-    body = B.box(d["bar_x0"], d["bar_x1"], -d["bar_y"], d["bar_y"],
-                 d["clamp_z0"], d["clamp_z1"])
-    for sy in (-1.0, 1.0):
-        y = sy * P["clamp_screw_y"]
-        slot = B.box(d["clamp_screw_x"] - P["clamp_slot_l"] / 2.0
-                     + P["clamp_slot_w"] / 2.0,
-                     d["clamp_screw_x"] + P["clamp_slot_l"] / 2.0
-                     - P["clamp_slot_w"] / 2.0,
-                     y - P["clamp_slot_w"] / 2.0, y + P["clamp_slot_w"] / 2.0,
-                     d["clamp_z0"] - 1.0, d["clamp_z1"] + 1.0)
-        for sx in (-1.0, 1.0):
-            slot = B.uni(slot, B.cylz(
-                P["clamp_slot_w"],
-                d["clamp_screw_x"] + sx * (P["clamp_slot_l"] / 2.0
-                                           - P["clamp_slot_w"] / 2.0), y,
-                d["clamp_z0"] - 1.0, d["clamp_z1"] + 1.0))
-        body = B.sub(body, slot)
     return body
 
 
@@ -1341,8 +1341,6 @@ def main(_context=None):
                                 "ESP32_Controller_Housing_Base")])
     add_component(root, LID, [(build_lid(B, P, d),
                                "ESP32_Controller_Housing_Lid")])
-    add_component(root, CLAMP, [(build_clamp(B, P, d),
-                                 "ESP32_Controller_PCB_Clamp_Adjustable")])
     add_component(root, CAPS, [(build_cap(B, P, d),
                                 "ESP32_Controller_Cabinet_Fastener_Cap")])
 
@@ -1366,7 +1364,7 @@ def main(_context=None):
           % (d["body_l"], d["body_w"], d["z_cav_top"] - d["z_floor_bot"]))
     print("  complete outside %7.2f x %7.2f x %7.2f mm"
           % (d["overall_l"], d["overall_w"], d["overall_h"]))
-    print("  v1.6 limit       %7.2f x %7.2f x %7.2f mm" % (85.0, 75.0, 36.0))
+    print("  v1.7 limit       %7.2f x %7.2f x %7.2f mm" % (85.0, 75.0, 36.0))
     print("  Rev A was       %7.2f x %7.2f x %7.2f mm" % (105.0, 77.0, 38.3))
     print("  Rev B was        %7.2f x %7.2f x %7.2f mm" % (81.6, 70.1, 35.3))
 
@@ -1404,9 +1402,9 @@ def main(_context=None):
               % (name, qty, each, sub, mass))
     print("  %-26s %25.2f cm3 %7.1f g" % ("PRODUCTION TOTAL", tot_v, tot_m))
     print("  %-26s %25.2f cm3 %7.1f g   (limit)"
-          % ("v1.6 section 9 limit", 35.0, 45.0))
+          % ("v1.7 section 9 limit", 35.0, 45.0))
     print("  %-26s %25.2f cm3 %7.1f g   (preferred)"
-          % ("v1.6 preferred target", 30.0, 38.0))
+          % ("v1.7 preferred target", 30.0, 38.0))
 
     print("")
     for name in PRINTABLE:
@@ -1437,20 +1435,21 @@ def run(_context=None):
 STEP_FILES = (
     (BASE, "ESP32_Controller_Housing_Base.step"),
     (LID, "ESP32_Controller_Housing_Lid.step"),
-    (CLAMP, "ESP32_Controller_PCB_Clamp_Adjustable.step"),
     (CAPS, "ESP32_Controller_Cabinet_Fastener_Cap.step"),
 )
 
 STL_FILES = (
     (BASE, "ESP32_Controller_Housing_Base.stl"),
     (LID, "ESP32_Controller_Housing_Lid.stl"),
-    (CLAMP, "ESP32_Controller_PCB_Clamp_Adjustable.stl"),
     (CAPS, "ESP32_Controller_Cabinet_Fastener_Cap.stl"),
 )
 
 # Rev A and Rev B artefacts that would be mistaken for the replacement.
-# v1.6 section 12: quarantine or remove them.
+# v1.7 section 12: quarantine or remove them.
 OBSOLETE = (
+    # superseded by the two locating posts, v1.7 4.6
+    ("STL", "ESP32_Controller_PCB_Clamp_Adjustable.stl"),
+    ("CAD", "ESP32_Controller_PCB_Clamp_Adjustable.step"),
     ("STL", "ESP32_Controller_PCB_Clamp_Fixed.stl"),
     ("STL", "ESP32_Controller_USB_Plug.stl"),
     ("STL", "ESP32_Controller_Carrier_Fit_Gauge.stl"),
@@ -1668,14 +1667,13 @@ def _overhangs(body, z_bed, up, tol=0.02, grid=1.0, march=40.0, step=0.25):
 PRINT_ORIENT = {
     BASE: ("floor-down", +1, "z_floor_bot"),
     LID: ("TOP-FACE-DOWN", -1, "z_lid_top"),
-    CLAMP: ("flat, loaded section across the layers", +1, "clamp_z0"),
     CAPS: ("flat", +1, None),
 }
 
 
 
 # ---------------------------------------------------------------------------
-# validate - the specification v1.6 section 13 gate suite, run in Fusion on
+# validate - the specification v1.7 section 13 gate suite, run in Fusion on
 # the BRep solids. The offline mesh verifier re-derives all of it from the
 # exported triangles, independently, against hand-typed values.
 # ---------------------------------------------------------------------------
@@ -1697,7 +1695,6 @@ def validate(_context=None):
 
     base = _one(design, BASE)
     lid = _one(design, LID)
-    clamp = _one(design, CLAMP)
     cap = _one(design, CAPS)
     K = _bodies(design, REF_KEEP)
     ADP = _bodies(design, REF_ADP)
@@ -1715,7 +1712,7 @@ def validate(_context=None):
             harn = b if harn is None else B.uni(B.copy(harn), B.copy(b))
 
     print("=" * 78)
-    print("Decca ESP32 Controller Housing Rev C - specification v1.6 "
+    print("Decca ESP32 Controller Housing Rev C - specification v1.7 "
           "section 13 gates")
     print("=" * 78)
 
@@ -1769,22 +1766,21 @@ def validate(_context=None):
     for nm in names:
         for _n, b in prod:
             worst = max(worst, _hit(B, b, K[nm]))
-        worst = max(worst, _hit(B, clamp, K[nm]))
     gate(worst <= 0.001, "5  no part or fastener enters an electronics keep-out",
          "%d keep-outs x %d solids, worst intrusion %.3f mm3"
          % (len(names), len(prod), worst))
 
     # -- 6 -------------------------------------------------------------------
     drv = K["KEEPOUT_TERMINAL_DRIVER_CORRIDORS"]
-    hb, hc, hl = (_hit(B, base, drv), _hit(B, clamp, drv), _hit(B, lid, drv))
+    hb, hl = _hit(B, base, drv), _hit(B, lid, drv)
     hw = _hit(B, wires, drv) if wires else 0.0
-    gate(hb <= 0.001 and hc <= 0.001,
+    gate(hb <= 0.001,
          "6  every terminal screw reachable from above, wires fitted",
-         "%d corridors dia %.2f from z %.2f; base %.3f clamp %.3f mm3; the "
-         "cover is removed for service (lid %.3f mm3 seated); fitted wires "
-         "take %.3f mm3 of the corridors"
+         "%d corridors dia %.2f from z %.2f; base %.3f mm3; the cover is "
+         "removed for service (lid %.3f mm3 seated); fitted wires take %.3f "
+         "mm3 of the corridors"
          % (2 * P["term_per_side"], P["driver_d"], d["z_block_top"],
-            hb, hc, hl, hw))
+            hb, hl, hw))
 
     # -- 7 -------------------------------------------------------------------
     # every terminal has a horizontal corridor from its mouth to the exterior
@@ -1802,19 +1798,18 @@ def validate(_context=None):
          % (2 * P["term_per_side"], 2 * P["term_per_side"] * 75, blocked))
 
     # -- 8 -------------------------------------------------------------------
-    hbc, hlc, hcc = (_hit(B, base, corr), _hit(B, lid, corr),
-                     _hit(B, clamp, corr))
-    gate(hbc <= 0.001 and hlc <= 0.001 and hcc <= 0.001,
-         "8  corridors clear of wall, skirt, fastener and clamp",
+    hbc, hlc = _hit(B, base, corr), _hit(B, lid, corr)
+    gate(hbc <= 0.001 and hlc <= 0.001,
+         "8  corridors clear of wall, skirt, fastener and post",
          "corridor = the WHOLE %.2f mm block height over the WHOLE %.2f mm row, "
-         "z %.2f-%.2f; base %.3f lid %.3f clamp %.3f mm3; declared straight "
-         "run %.2f mm reaches y %.2f against an enclosure face at %.2f"
+         "z %.2f-%.2f; base %.3f lid %.3f mm3 (the base figure includes the "
+         "two locating posts); declared straight run %.2f mm reaches y %.2f "
+         "against an enclosure face at %.2f"
          % (P["term_block_h"], P["term_row_l"], d["corr_z0"], d["corr_z1"],
-            hbc, hlc, hcc, P["straight_run"], d["straight_y"], d["lid_y"]))
+            hbc, hlc, P["straight_run"], d["straight_y"], d["lid_y"]))
 
     # -- 9 -------------------------------------------------------------------
-    hbw, hlw, hcw = (_hit(B, base, wires), _hit(B, lid, wires),
-                     _hit(B, clamp, wires))
+    hbw, hlw = _hit(B, base, wires), _hit(B, lid, wires)
     # withdrawal: slide every conductor straight out along its own axis
     out = _moved(B, wires, 0.0, 0.0, 0.0)
     pulled = 0.0
@@ -1822,12 +1817,13 @@ def validate(_context=None):
         for sgn in (-1.0, 1.0):
             m = _moved(B, wires, 0.0, sgn * step, 0.0)
             pulled = max(pulled, 0.0)
-    gate(hbw <= 0.001 and hlw <= 0.001 and hcw <= 0.001,
+    gate(hbw <= 0.001 and hlw <= 0.001,
          "9  fitted wire and ferrule envelopes clear on insertion",
          "%d conductors, %.2f mm insulated over a %.2f mm ferrule %.2f long, "
-         "entering at z %.2f; base %.3f lid %.3f clamp %.3f mm3"
+         "entering at z %.2f; base %.3f lid %.3f mm3; the nearest printed "
+         "feature to the OUTERMOST conductor is a locating post, %.2f mm clear"
          % (2 * P["term_per_side"], P["wire_d"], P["ferrule_d"],
-            P["ferrule_l"], d["z_port"], hbw, hlw, hcw))
+            P["ferrule_l"], d["z_port"], hbw, hlw, d["post_to_wire"]))
 
     # -- 10 ------------------------------------------------------------------
     usb = K["KEEPOUT_USB_SERVICE_ENVELOPE"]
@@ -1844,15 +1840,16 @@ def validate(_context=None):
 
     # -- 11 ------------------------------------------------------------------
     ako = K["KEEPOUT_WIFI_ANTENNA"]
-    hm = _hit(B, K["KEEPOUT_LID_AND_CLAMP_FASTENERS"], ako)
-    hb, hc = _hit(B, base, ako), _hit(B, clamp, ako)
+    hm = _hit(B, K["KEEPOUT_LID_FASTENERS"], ako)
+    hb = _hit(B, base, ako)
     hl = _hit(B, lid, ako)
     flat = (d["ako_x1"] - d["ako_x0"]) * (d["ako_y1"] - d["ako_y0"]) \
         * P["lid_top_t"]
-    gate(hm <= 0.001 and hb <= 0.001 and hc <= 0.001 and hl <= flat + 1.0,
+    gate(hm <= 0.001 and hb <= 0.001 and hl <= flat + 1.0,
          "11 antenna keep-out free of metal, inserts and thick structure",
-         "metal %.3f, base %.3f, clamp %.3f mm3; lid material %.0f mm3 against "
-         "%.0f for a flat %.2f mm skin" % (hm, hb, hc, hl, flat, P["lid_top_t"]))
+         "metal %.3f, base %.3f mm3; lid material %.0f mm3 against %.0f for a "
+         "flat %.2f mm skin - and there are two lid inserts now, not four"
+         % (hm, hb, hl, flat, P["lid_top_t"]))
 
     # -- 12 ------------------------------------------------------------------
     hi = _hit(B, base, lid)
@@ -1867,43 +1864,50 @@ def validate(_context=None):
 
     # -- 13 ------------------------------------------------------------------
     ncc = K["KEEPOUT_NO_CONTACT_COMPONENTS"]
-    hb, hc = _hit(B, base, ncc), _hit(B, clamp, ncc)
-    gate(hb <= 0.001 and hc <= 0.001,
-         "13 ledge, clamp and pads touch approved bare regions only",
-         "ledge grip %.2f and clamp grip %.2f into the %.2f mm of clear board "
-         "beyond each row end; the four pads sit in the %.2f mm clear strip "
-         "outboard of the blocks with %.2f mm to spare; intrusion base %.3f "
-         "clamp %.3f mm3"
-         % (P["ledge_grip"], P["clamp_grip"], d["clear_end"], d["clear_side"],
-            d["pad_margin"], hb, hc))
+    hb = _hit(B, base, ncc)
+    gate(hb <= 0.001 and d["pad_margin"] > 0.0,
+         "13 ledge, posts and pads touch approved bare regions only",
+         "ledge grip %.2f into the %.2f mm of clear board beyond the -X row "
+         "end; the four pads are CENTRED ON THE MEASURED MOUNTING HOLES, which "
+         "is the one place on this board guaranteed clear on both faces, and "
+         "sit in the %.2f mm strip outboard of the blocks with %.2f mm to "
+         "spare; intrusion %.3f mm3"
+         % (P["ledge_grip"], d["clear_end"], d["clear_side"],
+            d["pad_margin"], hb))
 
     # -- 14 ------------------------------------------------------------------
-    lines = []
-    worstc = 0.0
-    for L in (P["carrier_len_min"], (P["carrier_len_min"]
-                                     + P["carrier_len_max"]) / 2.0,
-              P["carrier_len_max"]):
-        half = L / 2.0
-        shift = d["x_pcb"] - half
-        moved = _moved(B, clamp, -shift, 0.0, 0.0)
-        clash = _hit(B, moved, base)
-        worstc = max(worstc, clash)
-        lines.append("%.2f->grip %.2f clash %.3f"
-                     % (L, half - (d["bar_x0"] - shift), clash))
-    gate(d["grip_at_min"] >= 1.0 and d["grip_at_max"] >= 1.0
-         and worstc <= 0.001,
-         "14 clamp accommodates carrier widths %.2f-%.2f mm"
-         % (P["carrier_len_min"], P["carrier_len_max"]),
-         "travel +-%.2f in a %.2f slot; %s"
-         % (d["clamp_travel"], P["clamp_slot_l"], "; ".join(lines)))
+    # What replaced the clamp, and every way it could be wrong. The post has
+    # to fit the reported bore with clearance whichever of 3.00 and 3.20 it
+    # turns out to be; engage the full board thickness and stand proud of it;
+    # clear the OUTERMOST conductor, which is the constraint that ruled a screw
+    # head out here; and leave the board fittable, which means the tilt needed
+    # to clear the posts must not bind the -X edge under the fixed ledge.
+    hpost = _hit(B, base, K["KEEPOUT_ASSEMBLY_20MM"])
+    gate(d["post_clear_r"] >= 0.20
+         and d["post_engage"] >= P["adapter_pcb_t"] - 1e-9
+         and d["post_proud"] >= 1.00 and d["post_to_wire"] >= 0.50
+         and d["fit_rise"] < P["retain_clear"] and hpost <= 0.001,
+         "14 the carrier is located by its MEASURED mounting holes",
+         "2 posts dia %.2f in a bore taken at %.2f = %.2f mm radial clearance "
+         "(0.20 even if the bore is 3.00); %.2f mm of engagement through the "
+         "board and %.2f proud of it; %.2f mm clear of the OUTERMOST "
+         "conductor, which no M3 head is - r 2.75 fouls it by 0.28; fitting "
+         "tilt %.2f deg lifts the ledge end %.3f mm inside a %.2f mm gap; "
+         "assembly keep-out intrusion %.3f mm3"
+         % (P["post_d"], P["mount_hole_d"], d["post_clear_r"],
+            d["post_engage"], d["post_proud"], d["post_to_wire"],
+            d["fit_tilt"], d["fit_rise"], P["retain_clear"], hpost))
 
     # -- 15 ------------------------------------------------------------------
-    gate(d["clamp_z0"] > d["z_pcb_top"] and d["ledge_z0"] > d["z_pcb_top"],
+    gate(d["ledge_z0"] > d["z_pcb_top"] and d["post_clear_r"] > 0.0,
          "15 retention loads nothing on the carrier",
-         "clamp and ledge undersides at z %.2f, %.2f mm above a carrier top at "
-         "%.2f; the clamp bottoms on plinths at the same height, so tightening "
-         "cannot close that gap"
-         % (d["clamp_z0"], d["clamp_z0"] - d["z_pcb_top"], d["z_pcb_top"]))
+         "the ledge underside is at z %.2f, %.2f mm above a carrier top at "
+         "%.2f; the two posts touch nothing but the bores of two holes, with "
+         "%.2f mm of radial clearance. No fastener bears on this board at all "
+         "any more, so there is nothing left that could be over-tightened onto "
+         "it - which is a stronger guarantee than the clamp's plinths gave."
+         % (d["ledge_z0"], d["ledge_z0"] - d["z_pcb_top"], d["z_pcb_top"],
+            d["post_clear_r"]))
 
     # -- 16 ------------------------------------------------------------------
     inside_fp = abs(P["cab_x"]) + P["cab_pad_d"] / 2.0 < d["x_out_pos"]
@@ -2002,7 +2006,7 @@ def validate(_context=None):
          "0 of %d deleted components; %.3f mm3 of base above the board plane "
          "anywhere across the terminal rows - no lacing rails, ears, sawtooth "
          "roofs, USB plug, tie towers, elevated cable windows, per-terminal "
-         "guides, second clamp or corner screws"
+         "guides, corner screws, or the superseded adjustable clamp"
          % (len(FORBIDDEN_COMPONENTS), tower_hit))
 
     # -- 23 ------------------------------------------------------------------
@@ -2057,11 +2061,12 @@ def validate(_context=None):
     # -- 27 ------------------------------------------------------------------
     gate(len(COUPONS) == 0,
          "27 prototype coupons: only those justified by open geometry",
-         "none defined. v1.6 2.1 requires coupons to reproduce REPLACEMENT "
+         "none defined. v1.7 2.1 requires coupons to reproduce REPLACEMENT "
          "production geometry, and the Rev B coupons are superseded. The "
-         "interfaces a coupon would settle - carrier fit, the vertical insert, "
-         "the countersink and the cap - are unchanged from Rev B in kind but "
-         "not in position, so a coupon is defined only when the owner elects "
+         "interfaces a coupon would settle - the locating post in a real "
+         "mounting hole, the vertical insert, the countersink and the cap - "
+         "are open, and the post is the one worth a coupon first, because its "
+         "bore is a STARTING value. A coupon is defined when the owner elects "
          "to print one. No anchor or pull-test coupon is required (5.10).")
 
     # -- 28 ------------------------------------------------------------------
@@ -2084,7 +2089,7 @@ def validate(_context=None):
 
     # -- 29 ------------------------------------------------------------------
     gate(True, "29 housing-mounted strain relief: none, and none justified",
-         "v1.6 5.9 requires this to be shown unnecessary before it is omitted. "
+         "v1.7 5.9 requires this to be shown unnecessary before it is omitted. "
          "The grouped cabinet wiring is secured immediately outside the "
          "housing; nothing printed sits between a terminal mouth and the "
          "exterior; and no tie feature, slot or tower exists anywhere on "
@@ -2109,6 +2114,10 @@ def validate(_context=None):
           "STARTING; 55.00 outer-to-outer does not give it")
     proto("nothing on the carrier underside outside the modelled joint rows",
           "this is what lets the two cabinet fixings sit under the board")
+    proto("the mounting-hole bore, taken at %.2f from the reported M3"
+          % P["mount_hole_d"],
+          "the post is sized 2.60 so it works at 3.00 too, but the fit is not "
+          "proven until a post goes into a real hole")
     proto("heat-set insert %.2f dia x %.2f deep"
           % (P["insert_hole_d"], P["insert_depth"]),
           "the exact part is still not recorded anywhere in the repository")
@@ -2121,7 +2130,7 @@ def validate(_context=None):
     proto("real conductor and ferrule sizes",
           "%.2f mm wire over a %.2f x %.2f ferrule are STARTING"
           % (P["wire_d"], P["ferrule_d"], P["ferrule_l"]))
-    proto("EN and BOOT positions - v1.6 6.4 forbids holes until measured")
+    proto("EN and BOOT positions - v1.7 6.4 forbids holes until measured")
     proto("lid fit %.2f mm per face on this printer and filament"
           % P["lid_fit_clear"])
     proto("cap nib interference %.2f mm per side on this printer"
@@ -2131,7 +2140,7 @@ def validate(_context=None):
         proto("ASSUMED: %s" % what)
 
     print("")
-    print("%d checks covering all 30 v1.6 section 13 gates, %d failed, "
+    print("%d checks covering all 30 v1.7 section 13 gates, %d failed, "
           "%d prototype gates open" % (CHECKS, len(FAILS), len(BLOCKED)))
     if FAILS:
         for f in FAILS:
@@ -2306,11 +2315,11 @@ def images(_context=None):
     shot("01_closed", {BASE: True, LID: True}, "iso")
 
     shot("02_lid_removed",
-         {BASE: True, CLAMP: True, CAPS: True, REF_ADP: True, REF_ESP: True},
+         {BASE: True, CAPS: True, REF_ADP: True, REF_ESP: True},
          "iso")
 
     parts = []
-    for nm, dz in ((BASE, 0.0), (CAPS, 24.0), (CLAMP, 38.0), (LID, 92.0)):
+    for nm, dz in ((BASE, 0.0), (CAPS, 24.0), (LID, 92.0)):
         occ = find_component(design, nm)
         for b in occ.bRepBodies:
             parts.append((b, 0.0, 0.0, dz, None, b.name))
@@ -2357,10 +2366,10 @@ def images(_context=None):
 
     # --- top-operated screw access, with representative wires fitted ------
     shot("08_screw_access_top",
-         {BASE: True, CLAMP: True, REF_ADP: True,
+         {BASE: True, REF_ADP: True,
           REF_KEEP: DRIVER | ENTRY}, "top")
     shot("08b_screw_access_iso",
-         {BASE: True, CLAMP: True, REF_ADP: True,
+         {BASE: True, REF_ADP: True,
           REF_KEEP: DRIVER | ENTRY}, "iso")
 
     # --- cover removal with the wiring connected --------------------------
@@ -2428,15 +2437,18 @@ def images(_context=None):
           REF_KEEP: {"KEEPOUT_WIFI_ANTENNA"}}, "iso")
 
     shot("14_retention",
-         {BASE: True, CLAMP: True, REF_ADP: True,
+         {BASE: True, REF_ADP: True,
           REF_KEEP: {"KEEPOUT_NO_CONTACT_COMPONENTS"}}, "iso")
+    # the two locating posts standing in the two MEASURED +X mounting holes,
+    # which is the whole of what replaced the adjustable clamp
+    shot("14b_locating_posts", {BASE: True, REF_ADP: True}, "iso")
 
     # longitudinal section on y = 0
     half = B.box(d["lid_x_neg"] - 20.0, d["lid_x_pos"] + 20.0,
                  -d["lid_y"] - 20.0, 0.0,
                  d["z_floor_bot"] - 20.0, d["z_lid_top"] + 20.0)
     parts = []
-    for nm in (BASE, LID, CLAMP, CAPS, REF_ADP, REF_ESP):
+    for nm in (BASE, LID, CAPS, REF_ADP, REF_ESP):
         for bb in find_component(design, nm).bRepBodies:
             parts.append((bb, 0.0, 0.0, 0.0, half, bb.name))
     _temp_component(design, "SECTION_VIEW", parts)
@@ -2444,7 +2456,7 @@ def images(_context=None):
     shot("15_section", {"SECTION_VIEW": True}, "back")
     clear_component(design, "SECTION_VIEW")
 
-    _show(design, {BASE: True, LID: True, CLAMP: True, CAPS: True,
+    _show(design, {BASE: True, LID: True, CAPS: True,
                    REF_ADP: True, REF_ESP: True})
 
     removed = []

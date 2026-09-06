@@ -16,50 +16,41 @@ Print-ready meshes exported from the CAD sources.
 - STLs are derived artefacts — the editable source lives in `../CAD/`.
 - Name files to match their CAD source and revision.
 
-## ESP32 controller housing — current revision: **B — PROTOTYPE, nothing printed yet**
+## ESP32 controller housing — revision **C**: PROTOTYPE, nothing printed yet
 
-PETG or PETG-HF. 0.40 mm nozzle, 0.20 mm layers. **Three perimeters** on the
-lid skirt (1.20 mm = 3 × 0.40); four only locally at the four bosses and the
-two hook features. 15-20% infill. **No part needs support material** — the
-offline verifier gates on it, measuring how far every downward-facing surface
-*reaches* from something holding it up, in each part's stated orientation.
-Worst case on any part is **1.00 mm**, against a stated 1.50 mm limit. Cable
-windows and the USB slot are held to a stricter rule and carry no
-downward-facing facet at all. Deburr the windows and the USB slot before
-assembly.
+PETG or PETG-HF. 0.40 mm nozzle, 0.20 mm layers, 3 perimeters, 15–20% infill.
+**No part needs support material** — both verifiers gate on it, measuring how
+far every downward-facing surface *reaches* from something holding it up in
+each part's stated orientation. Worst case on any part is **1.25 mm** (CAD) or
+**0.75 mm** (mesh) against a self-declared 1.50 mm limit, and the slicer emitted
+**zero support features on all three parts**.
 
 | File | Print notes |
 |---|---|
-| `ESP32_Controller_Carrier_Fit_Coupon.stl` | **PRINT THIS FIRST, with coupon B, and nothing else.** Plate flat on the bed, no supports. 2.66 cm³, **3.24 g, 21 m 32 s**. A 1:1 slice of the real housing: the -X end wall, the real fixed ledge with its 0.80 mm lead-in, the 4.50 mm support height on four production-pattern pads, the clamp plinth with its **vertical** insert, and three read-off steps at 65.00 / 66.00 / 67.00 mm standing *below* the carrier plane so they never obstruct it. Slide the acquired breakout under the ledge and read which step its free edge lands on. That settles `adapter_pcb_l`, `adapter_pcb_t`, `pad_h` and the 0.20 mm retention gap against the real board. |
-| `ESP32_Controller_Insert_Fastener_Coupon.stl` | **PRINT THIS SECOND.** Plate flat, no supports. 2.03 cm³, **2.31 g, 23 m 41 s**. Carries one **horizontal** lid-screw boss at production geometry, one vertical clamp insert, the cabinet countersink and the cap recess with its pry notch. The horizontal insert is the point of it: a heat-set insert driven into a bore in a wall printed on its side is the one fastener in this design nobody has demonstrated. Print two caps alongside and check the press and release. |
-| `ESP32_Controller_Housing_Base.stl` | **DO NOT PRINT YET — see the release gate below.** Floor flat on the bed, no supports. 78.70 × 69.20 × 24.60 mm, 16.85 cm³, **19.91 g, 1 h 4 m 8 s**. Worst unsupported reach 1.00 mm, at the fixed ledge. The four buttressed cable-tie piers rise straight off the bed and need nothing under them. Needs **four** M3 heat-set inserts: two **vertical** in the clamp plinths, two **horizontal** in the +X lid-screw bosses. **The exact insert is not recorded anywhere in this repository**; 4.00 mm dia × 5.00 mm deep is a starting value. Record the real part before printing. |
-| `ESP32_Controller_Housing_Lid.stl` | **DO NOT PRINT YET — see the release gate below.** Top face flat on the bed, skirt pointing up, no supports. 81.60 × 70.10 × 28.70 mm, 16.07 cm³, **19.24 g, 1 h 13 m 35 s**. Printing it this way is the whole design: the four cable windows and the USB slot are open at the skirt's lower free edge, so inverted they only ever grow — no roof, no bridge, no sawtooth, no support. It also keeps the recessed `USB / DISCONNECT 5V` legend crisp. |
-| `ESP32_Controller_PCB_Clamp_Adjustable.stl` | Flat, as modelled, so the loaded cantilever is stressed along the layers. 1.12 cm³, **1.16 g, 7 m 13 s**. Slotted for ±1.00 mm of travel, which is what lets a 65.00-67.00 mm board fit without redesign. Its underside bottoms on the base plinths, so tightening cannot drive it onto the board. |
-| `ESP32_Controller_Cabinet_Fastener_Cap.stl` | **PRINT 2 OFF.** Flat. 0.08 cm³, **0.19 g, 2 m 21 s** each. Presses into each cabinet-fixing recess over the countersunk M3 head. A 10.10 body in a 10.40 recess with **three r0.90 nibs to a 10.64 crest** — +0.13 mm of measured interference per side, so it has to be pushed in and pulled out; a 2.80 × 1.60 mm pry notch in the base rim takes a fine blade for removal. Mandatory, not optional: a recessed metal head under the board cannot be insulated by integral geometry, because it is installed after the base is printed. |
+| `ESP32_Controller_Housing_Base.stl` | **DO NOT PRINT YET — see the release gate below.** Floor flat on the bed, no supports. 71.60 × 70.20 × 25.60 mm, 17.41 cm³, **20.19 g, 1 h 7 m 4 s**. Carries the fixed ledge, the two Ø2.60 locating posts, four support pads, both lid-screw bosses and the two recessed cabinet fixings. |
+| `ESP32_Controller_Housing_Lid.stl` | **DO NOT PRINT YET.** **Top face flat on the bed**, skirt pointing up, no supports — that orientation is what makes the USB notch and the vents print with no bridge. 74.50 × 73.10 × 5.60 mm, 9.14 cm³, **11.16 g, 22 m 49 s**. No long-side skirt: one would foul the fitted conductors. |
+| `ESP32_Controller_Cabinet_Fastener_Cap.stl` | **PRINT 2 OFF.** Flat. 0.08 cm³, **0.19 g, 2 m 22 s** each. Presses into each cabinet-fixing recess over the countersunk head, retained by three compliant nibs at +0.12 mm interference per side — not a clearance fit. |
+
+**Production set: 31.73 g, 1 h 34 m 37 s.** Every slice returned
+`return_code 0, "Success."` with no warnings.
+
+> **Removed as obsolete:** `ESP32_Controller_PCB_Clamp_Adjustable.stl`, deleted
+> under specification v1.7 §4.6 when hole-located retention replaced the clamp;
+> and the Rev A and Rev B meshes `ESP32_Controller_PCB_Clamp_Fixed.stl`,
+> `ESP32_Controller_USB_Plug.stl`, `ESP32_Controller_Carrier_Fit_Gauge.stl`,
+> `ESP32_Controller_Carrier_Fit_Coupon.stl` and
+> `ESP32_Controller_Insert_Fastener_Coupon.stl`. The generator deletes them on
+> every run and both verifiers fail if one reappears.
 
 > ### RELEASE GATE — the base and the lid may NOT be printed yet
 >
-> The 24.00 mm assembled electronics height is **assumed**. It gives a closed
-> height of 35.30 mm against a mandatory 36.00 mm — 0.70 mm of margin — and
-> **neither coupon tests it.** Measure the real assembled stack before
-> committing filament to the base or the lid. The approved next physical action
-> is the two coupons, 5.55 g and 45 minutes for the pair.
->
-> No mesh here has been printed. Every dimension derives from CAD starting
-> values, not from measurements of the acquired hardware. See
-> `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revB.md` section 9
-> for the full list of open prototype gates.
->
-> Filament and time figures are the Bambu Studio CLI's own, for a P1S in
-> Generic PETG-HF at 0.20 mm, 3 walls, 15% infill, no supports — **40.69 g and
-> 2 h 29 m 38 s for the whole production set, zero support features.**
->
-> **Removed as obsolete:** `ESP32_Controller_PCB_Clamp_Fixed.stl` and
-> `ESP32_Controller_USB_Plug.stl` (Rev A, deleted by v1.1), and
-> `ESP32_Controller_Carrier_Fit_Gauge.stl` (superseded Rev B: one
-> near-full-width gauge replaced by two coupons that test more for less
-> filament). The verifier fails if any of them reappears.
-
+> Rev C is built on the owner's measured DORHEA geometry, but most dimensions
+> are still starting values. Fifteen prototype gates are open, including the
+> PCB thickness and below-board protrusion that set the 4.50 mm pad height, the
+> terminal-block depth, the mounting-hole **bore** the locating posts go into,
+> the heat-set insert for the two lid screws, the acquired cabinet screw's real
+> head, the USB position, and real conductor and ferrule sizes. They are listed
+> in `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md` §7.
 
 ## Display bezel — current revision: **Q — COMPLETE, signed off 2026-08-31**
 

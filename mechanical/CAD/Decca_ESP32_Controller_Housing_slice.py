@@ -99,8 +99,6 @@ OVERRIDES = {
 PARTS = [
     ("Housing_Base", "ESP32_Controller_Housing_Base.stl", 1, "as-modelled"),
     ("Housing_Lid", "ESP32_Controller_Housing_Lid.stl", 1, "flip-x"),
-    ("PCB_Clamp_Adjustable", "ESP32_Controller_PCB_Clamp_Adjustable.stl", 1,
-     "as-modelled"),
     ("Cabinet_Fastener_Cap", "ESP32_Controller_Cabinet_Fastener_Cap.stl", 2,
      "as-modelled"),
 ]
