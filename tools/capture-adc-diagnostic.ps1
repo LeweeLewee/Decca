@@ -13,18 +13,33 @@ $summaryPath = Join-Path $OutputDirectory "adc-noise-$stamp-summary.md"
 $client = [System.Net.Sockets.TcpClient]::new()
 $client.Connect($HostName, $Port)
 $reader = [System.IO.StreamReader]::new($client.GetStream())
+$writer = [System.IO.StreamWriter]::new(
+    $rawPath,
+    $false,
+    [System.Text.UTF8Encoding]::new($false)
+)
+$writer.AutoFlush = $true
 
 $summary = [System.Collections.Generic.List[string]]::new()
+$phaseCounts = @{}
 try {
     while (($line = $reader.ReadLine()) -ne $null) {
-        Write-Host $line
         if ($line.StartsWith("#")) {
+            Write-Host $line
             $summary.Add($line.Substring(1).Trim())
         } else {
-            Add-Content -LiteralPath $rawPath -Value $line -Encoding utf8
+            $writer.WriteLine($line)
+            if (-not $line.StartsWith("time_ms,")) {
+                $phase = ($line -split ',', 3)[1]
+                $phaseCounts[$phase] = 1 + $phaseCounts[$phase]
+                if (($phaseCounts[$phase] % 500) -eq 0) {
+                    Write-Host "[$phase] $($phaseCounts[$phase]) samples captured"
+                }
+            }
         }
     }
 } finally {
+    $writer.Dispose()
     $reader.Dispose()
     $client.Dispose()
 }
