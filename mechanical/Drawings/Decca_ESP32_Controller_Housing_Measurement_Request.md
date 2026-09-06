@@ -10,8 +10,11 @@ Module Terminal Adapter", **with the selected 30-pin ESP32 DevKit fitted**
 > physical terminal-entry measurements in sections 3, 5 and 14 are recorded. A
 > supplier photograph establishes topology, not manufacturing dimensions."*
 >
-> **That gate is not satisfied.** This document is what has to be measured to
-> open it. No replacement production geometry has been created.
+> **GATE CLOSED 2026-09-06.** The owner supplied the macro dimensions and
+> ruled the fine terminal-port detail out of scope, on the grounds that the
+> hole size and internal depth do not drive housing geometry. That is
+> correct, and §11 records how the remaining dependency was designed out
+> rather than measured. Replacement CAD is released to proceed.
 
 ---
 
@@ -82,9 +85,9 @@ them.
 
 | ID | Measure | From | Tool | Feeds |
 |---|---|---|---|---|
-| **M1** | Terminal-mouth **centre height** | Datum A | callipers / depth gauge | v1.5 §5.2–5.3, gates 7–9 |
-| **M2** | Terminal-mouth **opening**, width × height of the hole itself | — | callipers or pin gauges | wire + ferrule envelope, gate 9 |
-| **M3** | **Usable insertion depth** — outward mouth face to the internal stop, with the screw backed off | mouth face | depth gauge or a marked wire | declared straight insertion length, gate 8 |
+| ~~**M1**~~ | ~~Terminal-mouth **centre height**~~ | Datum A | ✅ **CLOSED qualitatively: the hole sits just above the base of the terminal block**, owner 2026-09-06. Designed out — see §11. |
+| ~~**M2**~~ | ~~Terminal-mouth **opening**~~ | — | ✅ **OUT OF SCOPE, owner 2026-09-06.** The hole is small; each terminal is approximately 3 mm wide. The housing never enters the hole, so its size does not drive housing geometry. |
+| ~~**M3**~~ | ~~**Usable insertion depth**~~ | mouth face | ✅ **OUT OF SCOPE, owner 2026-09-06.** Depth *inside* the block is the manufacturer's business. What the housing must provide is a straight run *outside* the mouth, which is a declared routing value, not a board measurement. |
 | ~~**M4**~~ | ~~Terminal-block **outward face position**~~ | Datum C | ✅ **CLOSED: outer faces 55.00 mm apart on a 63.00 mm board → each block face sits 4.00 mm inboard of its long PCB edge.** Owner, 2026-09-06. |
 | M5 | Terminal **pitch**, and centre of terminal 1 | Datum B | callipers over a known span (measure 1→15 and divide) | ⚠ **PART-CLOSED: row length 53.00 mm**, owner 2026-09-06. 15 ways in 53.00 is consistent with a 3.50 mm pitch (15 × 3.50 = 52.50 plus end walls) but the pitch itself is **inferred, not measured**. Still wanted: terminal-1 centre from Datum B. |
 | M6 | Terminal-block **height** and **depth** inboard | Datum A / Datum C | callipers | ⚠ **PART-CLOSED: total height 9.00 mm**, owner 2026-09-06 — recorded as the block's own body height; confirm whether it was taken from the PCB top face or from Datum A. Per-block **depth in Y** is still open: 55.00 mm outer-to-outer does not give it without the gap between the two rows. |
@@ -186,6 +189,9 @@ and Drawings READMEs and the Rev B build report already state at the top.
 | 2026-09-06 | **M4** | Terminal blocks **55.00 mm outer face to outer face** | On a 63.00 mm board this puts each block's outward face **4.00 mm inboard of its long PCB edge**. |
 | 2026-09-06 | **M5** (part) | Terminal-block row **length 53.00 mm** | 15 ways in 53.00 mm is consistent with 3.50 mm pitch. Pitch inferred, not measured. Leaves 6.50 mm of clear board beyond each end of the rows. |
 | 2026-09-06 | **M6** (part) | Terminal-block **total height 9.00 mm** | Recorded as the block's own body height. Datum to confirm. Per-block depth in Y still open. |
+| 2026-09-06 | **M1** | Wire hole sits **just above the base of the terminal block** | Qualitative. Designed out rather than dimensioned — see §11. |
+| 2026-09-06 | **M2** | Terminal width **approximately 3 mm** each; hole itself small | Consistent with 53.00 mm ÷ 15 = 3.53 mm pitch. Owner ruled the hole size out of scope. |
+| 2026-09-06 | **M3** | — | Owner ruled internal insertion depth out of scope. |
 
 ### What follows arithmetically from the batch above
 
@@ -203,8 +209,39 @@ These are recorded here as they arrive. They will be rolled into specification
 §3 in one revision when the blocking set is complete, so the specification is
 not versioned once per reading.
 
-**Still blocking: M1, M2, M3** — mouth centre height, mouth opening, usable
-insertion depth. All three are on one terminal block.
+**Nothing is blocking. The gate is closed.**
+
+## 11. How the last dependency was designed out instead of measured
+
+The owner's position — that the hole size and internal depth do not impact the
+design, and the macro dimensions are sufficient — is correct, and it is better
+than a measurement because it removes the dependency instead of pinning it.
+
+**The reasoning.** The only thing M1 was ever needed for was *how high can the
+long-side wall rise before it stands in front of a terminal mouth*. The answer
+"just above the base of the block" makes that question moot: the entry is low in
+a block that itself starts at the PCB top face, so **no useful wall height
+exists above the board on the long sides at all.**
+
+**The design response.** Rather than model the mouth at a measured height and
+tuck a wall beneath it, the replacement clears **the entire 9.00 mm block
+height** across the full 53.00 mm row length on both long sides. The base's long
+walls therefore stop at the PCB top face and the lid carries no long-side skirt.
+
+That is conservative by construction: wherever the hole actually sits within the
+block, nothing the housing owns is ever in front of it. **A later measurement of
+M1, M2 or M3 cannot invalidate the geometry**, because the housing already
+clears more than the worst case. The cost is nil — a wall in that band was never
+available.
+
+**What replaces M3.** The straight run a conductor needs before it may bend is
+now a **declared routing value** owned by this design, not a board dimension. It
+is parameterised, stated in the build report and gated, and it is measured from
+the block's outward face to the enclosure exterior and beyond.
+
+**M2 likewise.** The conductor envelope is driven by the wire and ferrule the
+installer actually uses (M18, M19 — the installer's own hardware), not by the
+terminal bore. The housing never enters the bore.
 
 ## 10. A question the mounting holes now raise
 

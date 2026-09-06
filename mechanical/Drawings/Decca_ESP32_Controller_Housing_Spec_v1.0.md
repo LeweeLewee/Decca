@@ -1,6 +1,6 @@
-# Decca ESP32 Controller Housing Specification v1.5
+# Decca ESP32 Controller Housing Specification v1.6
 
-**Status:** **REDESIGN REQUIRED.** Rev A was rejected for bulk. Rev B is now rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing.
+**Status:** **REDESIGN IN PROGRESS — measurement gate CLOSED 2026-09-06.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
 
 **Scope:** Enclosure for the selected 30-pin ESP32 DevKit fitted to the acquired DORHEA 30-pin screw-terminal adapter only. The MOSFET board is excluded and remains separately mounted.
 
@@ -14,6 +14,7 @@
 | v1.3 | The v1.2 cable-tie anchors were slender uprights of bare wall thickness, loaded near their tops. Adds section 5c: a cable-tie anchor is a compact continuation of the base wall with a declared minimum section in the cable-pull direction, declared minimum material around its aperture, a blended foot or root gusset, and generous root radii. Adds gates 28–30. Requires that the anchor be shown not to obstruct the terminals, the harness, the tie route or the lid's removal path, and that no verification claim be read as evidence of pull strength. Envelope, volume and mass limits are unchanged. |
 | v1.4 | Identifies the acquired adapter as the DORHEA 30-pin terminal adapter shown at 66 × 63 mm. Rejects Rev B after confirming that its harness and tie geometry is based on the wrong connection path. External conductors enter the green screw-terminal blocks horizontally through their outward-facing long-side ports; the black vertical sockets are only for the ESP32 module. Replaces the elevated cable-window and tie-tower requirements with direct terminal-entry corridors, installed-wire and ferrule keep-outs, a cover removable with the wiring connected, and optional low-profile strain relief only after the conductors have cleared the terminal mouths. Existing envelope and material limits remain design targets, but all Rev B production and coupon geometry is superseded. |
 | v1.5 | Records the owner's physical measurement of **20 mm overall height** for the complete DORHEA adapter plus fitted ESP32. This supersedes Rev B's unverified 24 mm “above PCB” assumption and closes the gross assembled-height measurement gate. The 20 mm value is an overall envelope, not an above-PCB dimension; replacement CAD shall reference it from the assembly's actual lowest underside feature to its highest point. Terminal-port and underside measurements remain open. |
+| v1.6 | Records the owner's macro measurements of 2026-09-06 — PCB outline 66 × 63 mm, mounting-hole centre pitch 58 × 56 mm, terminal blocks 55 mm outer face to outer face, row length 53 mm, block height 9 mm, and the wire entry sitting just above the base of the block. **Closes the §15 measurement gate and releases replacement CAD.** Supersedes the v1.5 §5.3 requirement for dimensioned port geometry: the terminal-port bore size and internal insertion depth do not drive housing geometry and are out of scope. In their place §5.3 now requires the housing to clear the **entire terminal-block height** across the full row length on both long sides, which is conservative whatever the port position, and to declare its own straight external run as a routing value. Envelope, volume and mass limits are unchanged. |
 
 ## 1. Design intent
 
@@ -57,13 +58,19 @@ Use repository source dimensions and existing measured references as the design 
 | Item | Requirement |
 |---|---:|
 | Selected terminal adapter | DORHEA 30-pin GPIO breakout / 1-into-2 terminal adapter |
-| Supplier-stated plan envelope | 66 × 63 mm |
+| PCB plan outline | **66 × 63 mm — owner-measured 2026-09-06** (confirms the supplier figure) |
 | Terminal arrangement | 15 green screw terminals on each long side; screws operated from above; conductors enter horizontally through the outward-facing side ports |
 | ESP32 connection | Two black vertical 15-pin sockets accept the ESP32 DevKit; these sockets are not external wiring points |
 | Supplier image's additional dimension | 25 mm, reference only; datums are ambiguous and the value shall not drive CAD |
+| Terminal blocks, outer face to outer face | **55 mm — owner-measured 2026-09-06**, so each block face sits **4.0 mm inboard** of its long PCB edge |
+| Terminal-block row length | **53 mm — owner-measured 2026-09-06**, leaving 6.5 mm of clear board beyond each row end |
+| Terminal-block height | **9 mm — owner-measured 2026-09-06** |
+| Terminal width | approximately 3 mm each; consistent with 53 ÷ 15 = 3.53 mm pitch |
+| Conductor entry position | **just above the base of the terminal block — owner, 2026-09-06.** Qualitative and sufficient: see §5.3 |
+| Mounting-hole centre pitch | **58 × 56 mm — owner-measured 2026-09-06**; hole diameter not measured, axis assignment to confirm before any hole-based retention is used |
 | Adapter PCB thickness | 1.6 mm starting value; physically measure |
-| Terminal-port centre height, opening and usable insertion depth | **UNMEASURED — mandatory input to replacement CAD** |
-| Corner mounting-hole diameter and pitch | Visible on the selected board but **UNMEASURED**; do not use for retention until measured |
+| Terminal-port bore size and internal insertion depth | **OUT OF SCOPE, owner 2026-09-06.** They do not drive housing geometry; §5.3 clears the whole block height instead |
+| Corner mounting-hole diameter | **UNMEASURED**; do not use for retention until measured and until §4.5–4.6 are amended |
 | Complete adapter plus fitted ESP32 height | **20 mm overall — physically measured by the owner, 2026-09-05** |
 | Required space below PCB | 2.5 mm starting value |
 | General XY fit clearance | 0.5 mm per constrained side |
@@ -94,7 +101,7 @@ Supplier dimensions and repository dimensions remain assumptions until checked a
 
 1. Treat the selected adapter's green screw-terminal blocks as the external electrical connection. Conductors enter their ports **horizontally from the two long sides**. The black vertical sockets are used only to mount the ESP32 module.
 2. Model a parameterised wire-and-ferrule envelope for every terminal used by the Decca wiring. Each envelope shall include the stripped/ferruled end inside the block, the insulated conductor outside it and a straight installation corridor from the terminal mouth to the enclosure exterior.
-3. The terminal-port centre height, port size, ferrule size and minimum practical straight insertion length are mandatory physical inputs. Do not release replacement CAD while they remain assumed.
+3. **The housing shall clear the entire measured terminal-block height across the full row length on both long sides.** This supersedes the v1.5 requirement for a dimensioned port centre height, bore size and internal insertion depth, which the owner has ruled out of scope because they do not drive housing geometry. Clearing the whole block is conservative wherever the port actually sits, so no later port measurement can invalidate the geometry. The minimum straight external run before a conductor may bend is a **declared routing value owned by this design**, parameterised, stated in the build report and verified — it is not a board measurement. The conductor envelope follows the wire and ferrule actually installed, not the terminal bore.
 4. No housing surface, lid skirt, tie feature or fastener shall intersect a terminal-entry corridor. A conductor shall not be required to bend immediately on leaving its terminal mouth merely to clear the enclosure.
 5. Preserve direct top access to every terminal screw with the cover removed. A fitted conductor and ferrule shall be insertable, clamped, released and withdrawn using ordinary tools without removing the adapter from the base.
 6. Side openings may be continuous along each terminal row or divided into a small number of grouped openings. Choose the simplest support-free geometry that protects the board ends while keeping the terminal mouths and conductor corridors clear. Do not reproduce Rev B's elevated windows above the terminal blocks.
@@ -301,7 +308,7 @@ Record the results in the build report before release.
 
 - Continue the work only in the dedicated housing branch and PR until prototype acceptance is complete.
 - Treat every Rev B housing body, STL, STEP, render, slice result and verification result as superseded. Do not print or release them.
-- Do not begin replacement production CAD until the physical terminal-entry measurements in sections 3, 5 and 14 are recorded. A supplier photograph establishes topology, not manufacturing dimensions.
+- The measurement gate is **CLOSED** as of 2026-09-06 and replacement production CAD is released. The macro geometry in §3 is owner-measured; the terminal-port bore and internal depth are out of scope under §5.3. A supplier photograph still establishes topology, not manufacturing dimensions, and no remaining assumption may be presented as a measurement.
 - Do not merge the housing PR during the amendment sprint.
 - Avoid unrelated wiring, firmware, or printing-work changes.
 - This v1.5 specification and hardware-identification correction may precede replacement CAD. Once replacement modelling begins, update the generated CAD, verification scripts, exported artefacts, renders, build report and PR description together.
