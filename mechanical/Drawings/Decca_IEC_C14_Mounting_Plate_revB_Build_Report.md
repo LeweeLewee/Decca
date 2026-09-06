@@ -1,6 +1,6 @@
 # Decca IEC C14 Mounting Plate Rev B — CAD Build Report
 
-**Status:** CAD PASS / physical prototype fit pending  
+**Status:** CAD PASS / profile geometry owner-confirmed / printed fit pending  
 **Supersedes:** Rev A, rejected for incorrect rectangular inlet opening  
 **Build date:** 2026-09-06
 
@@ -76,7 +76,15 @@ STL volume: **4326.486776 mm³**
 - STEP: `88490a052b2ffc9eee2647a45866b8bced727ce17cc5107601133e631fd2de1e`
 - STL: `f8f2b5cd85442c2af8480e3f829a39a151d1d11ab3b5c1a89496b39c6e7720e2`
 
-## 6. Physical release gate
+## 6. Owner profile-geometry confirmation — 2026-09-06
+
+The owner reviewed the Rev B profile drawing and **confirmed that the six-sided outline, calculated angled sections and corner treatment match the intended IEC C14 socket geometry**.
+
+This closes the **profile-definition/design-intent gate** that caused Rev A to fail.
+
+It does **not** constitute full physical release because the Rev B part has not yet been printed and fitted. The remaining release gate is the actual printed-part test below.
+
+## 7. Physical release gate
 
 Rev B is **not released** until a printed part confirms:
 
