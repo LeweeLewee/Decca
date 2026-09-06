@@ -1142,8 +1142,10 @@ def main():
           % MOUNT_HOLE_D,
           "the post is 2.60 so it works at 3.00 too, but no post has been in a "
           "real hole yet")
-    proto("heat-set insert 4.00 dia x 5.00 deep",
-          "the exact part is still not recorded anywhere in the repository")
+    proto("heat-set insert bore 4.00 dia x 5.00 deep",
+          "the PART is identified - Hanglife M3 threaded, owner 2026-09-06 - "
+          "but its length and OD are not, and those are what this bore has "
+          "to match")
     proto("the acquired cabinet screw's real head diameter",
           "%.2f mm max envelope declared, ISO 10642 assumed, not measured"
           % CAB_HEAD_D_MAX)

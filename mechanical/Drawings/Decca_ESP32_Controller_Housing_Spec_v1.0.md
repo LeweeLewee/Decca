@@ -77,6 +77,7 @@ Use repository source dimensions and existing measured references as the design 
 | Minimum top clearance | 2.0 mm |
 | Minimum clearance below lowest component/solder feature | 2.0 mm |
 | Minimum USB opening | 14 × 9 mm |
+| Lid-screw heat-set insert | **Hanglife M3 threaded — owner, 2026-09-06.** Two off, vertical, in the +X lid-screw bosses. The **bore** is a starting value at Ø4.00 × 5.00 deep and shall be re-derived from the acquired insert's measured length and outer diameter before release. |
 | Carrier location | **By the measured mounting holes — §4.6.** No adjustable range is required or permitted: the board's plan dimensions and its hole pitch are both measured, so there is nothing left for an adjustment to absorb. |
 
 Supplier dimensions and repository dimensions remain assumptions until checked against the acquired board. Do not infer the terminal-port centre height, mounting-hole pitch, precise EN/BOOT positions or underside keep-outs from the listing photograph.

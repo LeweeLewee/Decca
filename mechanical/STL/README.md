@@ -48,7 +48,8 @@ each part's stated orientation. Worst case on any part is **1.25 mm** (CAD) or
 > are still starting values. Fifteen prototype gates are open, including the
 > PCB thickness and below-board protrusion that set the 4.50 mm pad height, the
 > terminal-block depth, the mounting-hole **bore** the locating posts go into,
-> the heat-set insert for the two lid screws, the acquired cabinet screw's real
+> the heat-set insert **bore** for the two lid screws — the part is identified
+> as Hanglife M3 threaded but not yet measured — the acquired cabinet screw's real
 > head, the USB position, and real conductor and ferrule sizes. They are listed
 > in `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md` §7.
 

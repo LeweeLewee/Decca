@@ -407,8 +407,11 @@ measured hole pitch leave nothing for an adjustment to absorb.
 
 **Hardware still unmeasured:** PCB thickness (1.60) and the below-board
 protrusion (2.50), which together set the 4.50 mm pad height; terminal-block
-depth in Y (6.50); the heat-set insert (4.00 × 5.00, still unrecorded anywhere
-in this repository); the acquired cabinet screw's head against the declared
+depth in Y (6.50); the heat-set insert **bore** (4.00 × 5.00 — the part is now
+identified as **Hanglife M3 threaded**, owner 2026-09-06, the first time this
+fastener has had a name anywhere in this repository, but its length and outer
+diameter are still unmeasured and those are what the bore has to match); the
+acquired cabinet screw's head against the declared
 6.20 mm maximum envelope; the USB connector position; real conductor and ferrule
 sizes; EN and BOOT positions, so no holes are cut; and the mounting holes'
 exact bore, recorded at 3.20 from the reported M3 and used by nothing.

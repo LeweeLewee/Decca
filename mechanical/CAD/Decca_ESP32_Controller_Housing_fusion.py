@@ -273,7 +273,14 @@ P = {
     # lid-screw bosses, which reach 4.40 mm in from the outer face. The 7.50 mm
     # clamp zone it replaces is gone with the clamp.
     "boss_zone": 4.40,
-    "insert_hole_d": 4.00,           # STARTING, heat-set insert, LID SCREWS ONLY
+    # The part is IDENTIFIED - Hanglife M3 threaded heat-set inserts, owner
+    # 2026-09-06 - which is the first time this fastener has had a name
+    # anywhere in this repository. The two numbers below are still not
+    # settled by that: they have to match the insert's LENGTH and OUTER
+    # DIAMETER, and a brand and a thread give neither. 4.00 x 5.00 is the
+    # common recommendation for a 4.6 mm OD, 5.0 mm long M3 brass insert,
+    # and remains STARTING until the acquired one is measured.
+    "insert_hole_d": 4.00,           # STARTING, LID SCREWS ONLY
     "insert_depth": 5.00,            # STARTING
 
     # -- Lid screws and locating lugs, DESIGN -------------------------------
@@ -2118,9 +2125,9 @@ def validate(_context=None):
           % P["mount_hole_d"],
           "the post is sized 2.60 so it works at 3.00 too, but the fit is not "
           "proven until a post goes into a real hole")
-    proto("heat-set insert %.2f dia x %.2f deep"
+    proto("heat-set insert bore %.2f dia x %.2f deep"
           % (P["insert_hole_d"], P["insert_depth"]),
-          "the exact part is still not recorded anywhere in the repository")
+          "the PART is identified - Hanglife M3 threaded, owner 2026-09-06 - but its length and OD are not, and those are what this bore has to match")
     proto("the acquired cabinet screw's real head diameter",
           "%.2f mm max envelope declared, ISO 10642 assumed, not measured"
           % P["cab_head_d_max"])
