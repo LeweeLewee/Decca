@@ -1,6 +1,6 @@
 # Decca IEC C14 Mounting Plate — Rev B Specification
 
-**Status:** corrected design inputs locked; CAD built / physical fit pending  
+**Status:** corrected design inputs locked; **CAD PASS / physical fit pending**  
 **Scope:** mechanical mounting plate only  
 **Branch:** `feat/iec-c14-mounting-plate`
 
@@ -66,7 +66,7 @@ Both exceed the **3.0 mm** minimum requirement.
 
 ## 6. CAD validation gates
 
-Before Rev B is print-ready, verify from the exported STEP/STL:
+The clean exported STEP/STL passed all of the following:
 
 1. plate envelope = **40.00 × 50.00 × 3.00 mm**;
 2. one connected manifold solid;
@@ -81,11 +81,14 @@ Before Rev B is print-ready, verify from the exported STEP/STL:
 11. minimum fixing-hole edge to C14 profile ligament ≥ **3.0 mm**;
 12. STL is watertight, winding-consistent and one body;
 13. no countersinks, pockets, ribs, bosses, inserts or hidden fastening features;
-14. broad-face print requires no support geometry.
+14. broad-face print requires no support geometry;
+15. the committed source cleanly regenerates and independently verifies the STEP/STL.
+
+**Result: 15/15 PASS.**
 
 ## 7. Physical release gate
 
-Rev B remains **prototype pending** until the owner confirms:
+Rev B remains **physical fit pending** until the owner confirms:
 
 1. the complete C14 profile enters the opening without forcing and the plate visibly encloses the socket profile as intended;
 2. both M3 fixings align without slotting;
