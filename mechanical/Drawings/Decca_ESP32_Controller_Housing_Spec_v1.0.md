@@ -15,7 +15,7 @@
 | v1.4 | Identifies the acquired adapter as the DORHEA 30-pin terminal adapter shown at 66 × 63 mm. Rejects Rev B after confirming that its harness and tie geometry is based on the wrong connection path. External conductors enter the green screw-terminal blocks horizontally through their outward-facing long-side ports; the black vertical sockets are only for the ESP32 module. Replaces the elevated cable-window and tie-tower requirements with direct terminal-entry corridors, installed-wire and ferrule keep-outs, a cover removable with the wiring connected, and optional low-profile strain relief only after the conductors have cleared the terminal mouths. Existing envelope and material limits remain design targets, but all Rev B production and coupon geometry is superseded. |
 | v1.5 | Records the owner's physical measurement of **20 mm overall height** for the complete DORHEA adapter plus fitted ESP32. This supersedes Rev B's unverified 24 mm “above PCB” assumption and closes the gross assembled-height measurement gate. The 20 mm value is an overall envelope, not an above-PCB dimension; replacement CAD shall reference it from the assembly's actual lowest underside feature to its highest point. Terminal-port and underside measurements remain open. |
 | v1.6 | Records the owner's macro measurements of 2026-09-06 — PCB outline 66 × 63 mm, mounting-hole centre pitch 58 × 56 mm *(re-measured the same day as **60 mm across × 57 mm along** — see §3; the 58 × 56 pair left 1.00 mm unaccounted for)*, terminal blocks 55 mm outer face to outer face, row length 53 mm, block height 9 mm, and the wire entry sitting just above the base of the block. **Closes the §15 measurement gate and releases replacement CAD.** Supersedes the v1.5 §5.3 requirement for dimensioned port geometry: the terminal-port bore size and internal insertion depth do not drive housing geometry and are out of scope. In their place §5.3 now requires the housing to clear the **entire terminal-block height** across the full row length on both long sides, which is conservative whatever the port position, and to declare its own straight external run as a routing value. Envelope, volume and mass limits are unchanged. |
-| v1.7 | **Replaces the adjustable clamp with hole-located retention**, and adds §4.12, the lid-screw boss wall rule. The owner's 2026-09-06 measurements close the last gap: a 60 × 57 mm mounting-hole pitch with M3 holes, every hole 3.00 mm from its nearest board edge. §4.6 now requires the carrier to be located by features engaging its own mounting holes rather than gripped by its opposite short edge, and §4.5's fixed ledge is retained unchanged. Screws through those holes are **prohibited** and the reason is recorded in §4.6: the binding clearance is not the terminal block but the outermost conductor, 3.767 mm from the hole centre, which an M3 head of radius 2.75 fouls by 0.28 mm against a 2.60 mm ferrule. The adjustable-carrier-range requirement, the clamp's volume allowance, its print orientation, its STEP and STL deliverables and gate 14 all go with it; gate 14 becomes the hole-location gate. Envelope, volume and mass limits are unchanged, and the design moves further inside them. |
+| v1.7 | **Replaces the adjustable clamp with hole-located retention**, adds §4.12, the lid-screw boss wall rule, and adds §14.0, which makes a prototype print of a small, cheap part a legitimate way to close a measurement gate rather than something that has to wait for one. The owner's 2026-09-06 measurements close the last gap: a 60 × 57 mm mounting-hole pitch with M3 holes, every hole 3.00 mm from its nearest board edge. §4.6 now requires the carrier to be located by features engaging its own mounting holes rather than gripped by its opposite short edge, and §4.5's fixed ledge is retained unchanged. Screws through those holes are **prohibited** and the reason is recorded in §4.6: the binding clearance is not the terminal block but the outermost conductor, 3.767 mm from the hole centre, which an M3 head of radius 2.75 fouls by 0.28 mm against a 2.60 mm ferrule. The adjustable-carrier-range requirement, the clamp's volume allowance, its print orientation, its STEP and STL deliverables and gate 14 all go with it; gate 14 becomes the hole-location gate. Envelope, volume and mass limits are unchanged, and the design moves further inside them. |
 
 ## 1. Design intent
 
@@ -275,6 +275,31 @@ The verifier shall fail the build unless all applicable checks pass:
 
 ## 14. Prototype acceptance gates
 
+### 14.0 A prototype print is a legitimate way to close a measurement gate
+
+Where a part is **small, cheap and quick to print** — this housing is 20 g and
+about an hour — a test print may be made and fitted *before* the §3 starting
+values behind it have been measured, and the result used as the evidence that
+closes them. On a part like this the print is the faster and better instrument:
+callipers on a populated board give the nominal, while a fitted print gives the
+answer to the question actually being asked, which is whether it seats.
+
+This does not weaken anything. What it changes is the **order**:
+
+1. A print made under this clause is a **prototype**, not a release. It is
+   recorded as one, and §14 acceptance still has to be met before any part is
+   production-approved.
+2. **The result is recorded either way.** A print that fits closes the gates it
+   demonstrably exercises and no others; a print that does not fit is a
+   measurement in its own right and is recorded as one.
+3. The specification states, per gate, **which starting values it rests on**, so
+   that a fit obtained against an unmeasured value is never mistaken for a fit
+   obtained against a measured one.
+4. It does not extend to anything expensive, slow, or consumed by the attempt —
+   a heat-set insert driven into a boss cannot be undone, so a boss geometry
+   change still warrants a fresh part rather than a second attempt in the same
+   hole.
+
 The CAD revision is not production-approved until physical checks confirm:
 
 - the acquired DORHEA board's overall length, width and PCB thickness;
@@ -312,6 +337,7 @@ Record the results in the build report before release.
 
 - Continue the work only in the dedicated housing branch and PR until prototype acceptance is complete.
 - Treat every Rev B housing body, STL, STEP, render, slice result and verification result as superseded. Do not print or release them.
+- Prototype printing is governed by §14.0, not by the measurement gate. A test print of a small, cheap part is a legitimate instrument and does not require the §3 starting values behind it to be measured first; its result is recorded under §14.
 - The measurement gate is **CLOSED** as of 2026-09-06 and replacement production CAD is released. The macro geometry in §3 is owner-measured; the terminal-port bore and internal depth are out of scope under §5.3. A supplier photograph still establishes topology, not manufacturing dimensions, and no remaining assumption may be presented as a measurement.
 - Do not merge the housing PR during the amendment sprint.
 - Avoid unrelated wiring, firmware, or printing-work changes.
