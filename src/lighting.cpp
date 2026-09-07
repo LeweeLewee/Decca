@@ -97,6 +97,17 @@ void setBrightness(Zone zone, uint8_t brightness) {
     g_lastStepMs = nowMs();
 }
 
+void setBrightnessImmediate(Zone zone, uint8_t brightness) {
+    if (!isDial(zone)) {
+        return;
+    }
+
+    g_targetBrightness = brightness;
+    g_brightness = brightness;
+    g_lastStepMs = nowMs();
+    writeDuty(g_brightness);
+}
+
 uint8_t brightness(Zone zone) {
     return isDial(zone) ? g_brightness : 0;
 }

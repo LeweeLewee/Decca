@@ -14,8 +14,9 @@ supports an internal pull-up.
 Connect the isolated Stereo/Mono contact between TX2/GPIO17 and GND. Configure
 GPIO17 as `INPUT_PULLUP` and debounce it with the other retained controls.
 The installed contact is open/HIGH in Stereo and closed/LOW in Mono. Stereo
-requests dial lights on; Mono requests them off. Expose the stable request from the buttons module without directly calling
-the lighting module.
+requests dial lights on; Mono requests them off. After debounce, production
+applies either request immediately rather than fading. Expose the stable request
+from the buttons module without directly calling the lighting module.
 
 ## Consequences
 - ADR-0005 is superseded.
@@ -24,5 +25,7 @@ the lighting module.
 - This decision assigns and implements the input only. The lighting output was
   subsequently accepted on GPIO25 and was reassigned to GPIO18, which passed its
   controlled transition and physical verification on 2026-09-06.
+- A legacy gradual Stereo/Mono response was rejected during physical testing;
+  v0.28.1 makes both directions immediate while power transitions retain fades.
 - Wiring polarity and both stable states require physical acceptance before the
   input is marked bench-verified.

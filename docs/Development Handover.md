@@ -38,7 +38,7 @@ Implemented modules:
 | `buttons` | On/off, sole VHF contact and TX2 Stereo/Mono lighting request, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
 | `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
-| `lighting` | Safe-off non-blocking PWM fades |
+| `lighting` | Safe-off PWM with immediate Stereo/Mono updates and non-blocking power fades |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
 | WiiM interface | Phase 2, not implemented |
@@ -209,9 +209,13 @@ the user's Wi-Fi or OTA passwords.
     network; after confirmed power-off the switch signal moved to D26 and the
     DFR0457 control signal to D18, and the owner confirmed correct operation. The
     recommended external pull-down remains deferred.
-11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
+11. **Implementation complete, deployment pending (v0.28.1):** physical testing
+    rejected the gradual Stereo/Mono response. After the 25 ms debounce, Stereo
+    now applies duty 217 immediately and Mono applies duty 0 immediately. Logical
+    power transitions retain the non-blocking fade.
+12. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
-12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+13. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -276,8 +280,9 @@ L50..0..R50 with centred bars and monochrome icons.
 
 TX2/GPIO17, GPIO26 on/off and GPIO18 lighting PWM are physically accepted. The
 previous GPIO19/GPIO25 results remain historical evidence.
-Final MOSFET/three-lamp acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
-fades to 85%; Mono and standby fade off. Preserve the accepted
+Final MOSFET/three-lamp acceptance is open under HW-LGT-01. v0.28.1 changes the
+required behaviour: Stereo switches immediately to 85%, Mono switches
+immediately off, and logical standby retains its fade. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
 GPIO16 remains unused; GPIO18 is reserved for dial-light PWM. The owner deferred

@@ -151,15 +151,22 @@ signal wires disconnected; the ESP32 returned at `decca.local` / 192.168.1.79.
 After powered-off rewiring, the owner confirmed GPIO26 on/off and GPIO18 DFR0457
 lighting operation work correctly. No external D18 pull-down is fitted.
 
+Immediate Stereo/Mono correction (v0.28.1): `lighting` now exposes an immediate
+write that cancels an active fade. Two new cases verify immediate off during a
+fade and immediate duty 217 without an `update()` call, expanding the lighting
+suite from seven to nine cases. Release, debug and credential-enabled OTA builds
+pass, and all eight suites compile; no tests were executed and OTA/physical
+acceptance is pending.
+
 v0.27.1 physical result (2026-09-05): authenticated OTA and reboot succeeded;
 the owner approved the 2.2-second firmware-version hold and both approximately
 4.34-second 0–85% lighting fades, with no flicker reported. HW-LGT-01 remains
 open for WAGO distribution installation plus pot-stability, temperature and
 installed-current checks.
 
-GPIO reassignment candidate (2026-09-06): v0.28.0 changes only the on/off input
+GPIO reassignment candidate (2026-09-06, subsequently accepted): v0.28.0 changes only the on/off input
 mapping from GPIO19/D19 to GPIO26/D26 and dial-light PWM from GPIO25/D25 to
 GPIO18/D18. `test_hardware` asserts the new mapping; the lighting suite continues
 to assert safe-off duty 0, LEDC channel 0, 1 kHz, 8-bit duty and unchanged 20 ms
-fade timing. GPIO19/GPIO25 results above remain historical facts. GPIO26/GPIO18
-must not be marked physically verified until the controlled transition passes.
+fade timing. GPIO19/GPIO25 results above remain historical facts. The controlled
+transition later passed and GPIO26/GPIO18 are physically verified.

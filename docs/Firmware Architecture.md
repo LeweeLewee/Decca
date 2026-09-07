@@ -27,7 +27,7 @@ AI-assisted editing.
 | `buttons`  | Debounced on/off, sole VHF source selector and Stereo/Mono lighting request | `hardware`  |
 | `pots`     | Filtered ADC1 reads of the four position pots (Balance, Treble, Bass, Volume) | `hardware` |
 | `display`  | OLED rendering and idle pixel protection          | `hardware`, `settings`|
-| `lighting` | Warm dial illumination (PWM via MOSFET, fades)   | `hardware`, `settings`|
+| `lighting` | Warm dial illumination (PWM via MOSFET, immediate and faded updates) | `hardware`, `settings`|
 | `power`    | Pure logical on/standby state handling           | —                     |
 | WiiM iface | WiiM Pro local-API control *(Phase 2)*           | `settings`, Wi-Fi     |
 | `ota`      | Authenticated Wi-Fi firmware update service      | Wi-Fi                 |
@@ -48,13 +48,14 @@ AI-assisted editing.
   fixed at 100 Hz; an integer low-pass filter precedes normalisation and output
   deadband so `update()` remains deterministic and non-blocking.
 - **`lighting`** drives the warm dial illumination only (dial, not cabinet) via a
-  logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
-  brightness, and a safe boot state. It starts at duty 0, reads its initial
+  logic-level N-channel MOSFET under PWM, with immediate and faded updates,
+  configurable idle brightness, and a safe boot state. It starts at duty 0, reads its initial
   target from `settings`, and advances one PWM count every 20 ms without
   blocking. At the owner-approved duty 217 (85%), a complete fade takes about
-  4.34 seconds. `main` selects that normal target
-   only when logically on and Stereo is requested; Mono and standby select zero.
-   `lighting` does not read buttons or power state directly.
+  4.34 seconds. `main` selects that normal target only when logically on and
+  Stereo is requested. A debounced Stereo/Mono change uses the immediate API;
+  logical power changes retain the fade path. `lighting` does not read buttons
+  or power state directly.
 - **Boot safe-off** is established as early as firmware can act: before serial,
   settings, display or network initialisation, `hardware::init()` first drives
   GPIO18/D18 LOW and then attaches LEDC at duty 0. The owner has deferred the

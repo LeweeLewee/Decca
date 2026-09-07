@@ -3,8 +3,8 @@
  * @brief   Dial illumination (PWM-driven).
  *
  * lighting replaces the original dial lamps with PWM-controlled LEDs. It
- * handles brightness, standby dimming, and fade effects that keep the lighting
- * feeling period-appropriate rather than abruptly digital.
+ * handles brightness, immediate Stereo/Mono switching, and fade effects used
+ * for power-state and commissioning transitions.
  *
  * Responsibility:  drive illumination outputs; own brightness and effects.
  * Depends on:      hardware (pin map), settings (brightness/standby prefs).
@@ -45,6 +45,13 @@ void update();
  * @param brightness  0 (off) – 255 (full).
  */
 void setBrightness(Zone zone, uint8_t brightness);
+
+/**
+ * @brief Apply a brightness immediately, cancelling any active fade.
+ * @param zone        Which illumination zone.
+ * @param brightness  0 (off) – 255 (full).
+ */
+void setBrightnessImmediate(Zone zone, uint8_t brightness);
 
 /**
  * @brief Read the brightness currently applied to a zone.

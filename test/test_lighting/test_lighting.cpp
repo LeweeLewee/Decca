@@ -143,6 +143,33 @@ void test_lighting_fades_down() {
     TEST_ASSERT_EQUAL_UINT32(7, g_lastDuty);
 }
 
+void test_lighting_applies_immediate_brightness_and_cancels_fade() {
+    startInjected();
+    decca::lighting::setBrightness(Zone::Dial, 20);
+    advance(5 * decca::lighting::kFadeStepIntervalMs);
+
+    decca::lighting::setBrightnessImmediate(Zone::Dial, 0);
+
+    TEST_ASSERT_EQUAL_UINT8(0, decca::lighting::brightness(Zone::Dial));
+    TEST_ASSERT_EQUAL_UINT8(0,
+                            decca::lighting::targetBrightness(Zone::Dial));
+    TEST_ASSERT_EQUAL_UINT32(0, g_lastDuty);
+    const uint16_t writesAtTarget = g_writeCount;
+    advance(1000);
+    TEST_ASSERT_EQUAL_UINT16(writesAtTarget, g_writeCount);
+}
+
+void test_lighting_immediate_on_reaches_target_without_update() {
+    startInjected();
+
+    decca::lighting::setBrightnessImmediate(Zone::Dial, 217);
+
+    TEST_ASSERT_EQUAL_UINT8(217, decca::lighting::brightness(Zone::Dial));
+    TEST_ASSERT_EQUAL_UINT8(217,
+                            decca::lighting::targetBrightness(Zone::Dial));
+    TEST_ASSERT_EQUAL_UINT32(217, g_lastDuty);
+}
+
 void test_lighting_ignores_invalid_zone() {
     startInjected();
     const Zone invalid = static_cast<Zone>(99);
@@ -160,5 +187,7 @@ void runAll() {
     RUN_TEST(test_lighting_fades_up_by_elapsed_steps);
     RUN_TEST(test_lighting_stops_exactly_at_target);
     RUN_TEST(test_lighting_fades_down);
+    RUN_TEST(test_lighting_applies_immediate_brightness_and_cancels_fade);
+    RUN_TEST(test_lighting_immediate_on_reaches_target_without_update);
     RUN_TEST(test_lighting_ignores_invalid_zone);
 }

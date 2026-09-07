@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.0 assigns on/off to physically accepted GPIO26 and dial-light PWM to physically accepted GPIO18. The controlled OTA and powered-off rewiring completed on 2026-09-06; the previous GPIO19/GPIO25 assignments retain their historical evidence. DFR0457 behaviour remains locked at 1 kHz, duty 217 and approximately 4.34-second fades. |
-| Version  | 0.28.0                                            |
+| Status   | Draft. Firmware v0.28.1 makes debounced Stereo/Mono lighting changes immediate while retaining non-blocking fades for logical power transitions. On/off GPIO26 and dial-light PWM GPIO18 are physically accepted. DFR0457 behaviour remains locked at 1 kHz and duty 217. |
+| Version  | 0.28.1                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -120,9 +120,9 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 |-----------|------------------------------------------------------------------------------|-------|
 | FR-LGT-01 | The system shall drive the warm dial illumination via PWM through a logic-level N-channel MOSFET. | 1 |
 | FR-LGT-02 | Lighting shall support configurable idle brightness and standby dimming.     | 1     |
-| FR-LGT-03 | Lighting transitions shall fade (up/down) rather than switch abruptly; the normal 0–85% transition shall take approximately 4.3 s. | 1 |
+| FR-LGT-03 | Logical power and commissioning lighting transitions shall use the non-blocking fade; the normal 0–85% transition shall take approximately 4.3 s. Stereo/Mono changes are exempt under FR-LGT-05. | 1 |
 | FR-LGT-04 | Lighting shall adopt a defined safe state at boot.                           | 1     |
-| FR-LGT-05 | While logically on, Stereo shall fade the dial lighting to the stored normal level and Mono shall fade it off. Logical standby shall force lighting off. | 1 |
+| FR-LGT-05 | While logically on, a debounced Stereo change shall apply the stored normal dial-light duty immediately and Mono shall apply duty 0 immediately. Logical power/standby transitions shall retain the fade behaviour in FR-LGT-03. | 1 |
 
 > Confirmed Phase 1 lighting is the **dial illumination** only. Cabinet lighting
 > is not part of the confirmed Phase 1 build.

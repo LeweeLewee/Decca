@@ -284,7 +284,7 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
    ```
 
 4. Confirm the OLED reveals the `DECCA` wordmark from left to right over roughly
-   1 s, then holds `MUSIC CENTRE v0.28.0` for roughly 2.2 s in the lower
+   1 s, then holds `MUSIC CENTRE v0.28.1` for roughly 2.2 s in the lower
    calibrated area before showing `VINYL` prominently without a legacy button
    label and a local dashboard with Volume 75% and the other three controls at
    50%.
@@ -370,10 +370,12 @@ mains.
    pio test -e esp32dev -f test_lighting
    ```
 
-4. Observe the dial lighting. It should fade gently from off to a low test duty
-   and back to off, without flashing at full brightness.
+4. Observe the dial lighting. The standalone lighting test should fade gently
+   from off to a low test duty and back to off, without flashing at full
+   brightness. In production, Stereo/Mono changes must switch immediately;
+   logical power transitions retain this fade.
 5. Confirm the output contains `LIGHTING_SNAPSHOT duty=217`, the lamps hold at
-   the approved 85% duty for five seconds, and all seven tests pass.
+   the approved 85% duty for five seconds, and all nine tests pass.
 
 Pass criteria:
 
@@ -381,7 +383,7 @@ Pass criteria:
 - brightness changes smoothly in both directions;
 - no full-brightness flash occurs at reset or test start;
 - the MOSFET and wiring remain cool;
-- all seven behavioural tests pass.
+- all nine behavioural tests pass.
 
 Recorded historical result (2026-08-31): GPIO25, the DAOKAI MOSFET stage and the three-lamp
 electrical load passed. Brightness comparisons at 70%, 80% and 100% resulted in

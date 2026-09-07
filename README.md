@@ -8,14 +8,15 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Firmware version: **v0.28.0**, defined once in `src/version.h`, shown during
+- Firmware version: **v0.28.1**, defined once in `src/version.h`, shown during
   cold-start/OTA-reboot and reported over serial for deployment identification.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
   VHF latched = Digital Streamer; every other selector position = Vinyl.
 - TX2/GPIO17 is assigned to the Stereo/Mono contact as a lighting request:
-  Stereo open = lights on; Mono closed = lights off. Both positions are physically verified.
+  Stereo open = lights on immediately; Mono closed = lights off immediately.
+  Both positions are physically verified.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - Production coordinates power, all four pots, the VHF-derived source state and
@@ -29,6 +30,8 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   distribution installation plus pot-stability, temperature and current checks
   remain open as HW-LGT-01. Normal Stereo
   lighting is 85%; Mono and logical standby are off.
+- v0.28.1 changes the debounced Stereo/Mono response to immediate PWM updates;
+  logical power transitions retain the non-blocking fade.
 - Firmware v0.28.0 is installed by authenticated OTA. On/off is now connected to
   GPIO26/D26 and dial-light PWM to GPIO18/D18; the owner confirmed both work
   correctly after the powered-off wiring transition.

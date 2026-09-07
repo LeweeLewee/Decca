@@ -241,10 +241,12 @@ DAOKAI pack is retained as superseded test stock.
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. The owner-approved normal value is 85% / duty 217. Firmware
 stores it in non-volatile settings and applies it only while logically on and in
-Stereo; Mono and standby fade to zero. The unused aerial control may be used as a
-temporary commissioning input if convenient, but it is not reserved as a
-permanent lighting control. Behaviours: fade up/down, configurable stored
-brightness, safe boot state.
+Stereo. Debounced Stereo/Mono changes apply duty 217 or zero immediately;
+logical power transitions retain the non-blocking fade. The unused aerial
+control may be used as a temporary commissioning input if convenient, but it is
+not reserved as a permanent lighting control. Behaviours: immediate mode
+selection, faded power transitions, configurable stored brightness, safe boot
+state.
 
 ### ZA3 trigger output
 The ESP32 controls a dedicated interface to the ZA3 **12 V trigger input**. The

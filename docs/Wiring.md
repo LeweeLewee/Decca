@@ -252,8 +252,9 @@ Yellow = SDA.
   aerial control may be used temporarily for commissioning if convenient, but is
   not reserved permanently for lighting.
 
-Expected behaviours: fade up, fade down, stored/configurable brightness, safe
-boot state. Firmware support is implemented. As a historical result, GPIO25,
+Expected behaviours: immediate Stereo/Mono response, faded logical power
+transitions, stored/configurable brightness, and safe boot state. Firmware
+support is implemented. As a historical result, GPIO25,
 the MOSFET stage and the three-lamp electrical load passed the dial-lighting
 bench procedure on 2026-08-31. GPIO18/D18 passed its controlled transition and
 physical verification on 2026-09-06. Subsequent 70%, 80% and 100% comparisons established
@@ -271,9 +272,10 @@ DFR0457 switched output ------------- three lamp negatives in parallel
 ```
 
 Firmware configures D18 as output LOW before any other peripheral
-initialisation, then attaches LEDC at duty 0. Normal operation remains 1 kHz,
-duty 217/255, with 20 ms one-count fade steps. Mono and logical standby fade to
-duty 0 and hold the output LOW. Because no external pull-down is currently
+initialisation, then attaches LEDC at duty 0. Normal operation remains 1 kHz and
+duty 217/255. Debounced Stereo/Mono changes switch immediately between duty 217
+and duty 0; logical power transitions retain 20 ms one-count fade steps. Because
+no external pull-down is currently
 fitted, the ESP32 cannot guarantee D18 LOW during reset and before `setup()`;
 observe specifically for any lamp flash during physical verification.
 

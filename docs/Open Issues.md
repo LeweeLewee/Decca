@@ -35,11 +35,11 @@ disturbance stopped, but lamp flicker remained.
   approved the 2.2-second firmware-version hold and both approximately
   4.34-second lighting fades, with no flicker reported.
 
-**Locked behaviour:** firmware v0.28.0 reassigns the lighting PWM output from the
-previously accepted GPIO25/D25 to the now physically accepted GPIO18/D18. Stereo
-open/high requests lights on at the owner-approved
-85% / duty 217; Mono closed/low and logical standby request off. Preserve 1 kHz
-and the 20 ms/count fades. Firmware drives D18 LOW at the earliest opportunity,
+**Locked behaviour:** firmware v0.28.1 uses the physically accepted lighting PWM
+output on GPIO18/D18. Stereo
+open/high applies the owner-approved 85% / duty 217 immediately; Mono closed/low
+applies duty 0 immediately. Logical power transitions retain the 20 ms/count
+fade. Preserve 1 kHz. Firmware drives D18 LOW at the earliest opportunity,
 but the owner has deferred the recommended external pull-down; reset-time
 safe-off before `setup()` is therefore not guaranteed and needs observation.
 
@@ -47,6 +47,12 @@ safe-off before `setup()` is therefore not guaranteed and needs observation.
 `283d40a`, using 1 kHz PWM and an 85% / duty 217 target with approximately
 4.34-second fades. Its authenticated OTA upload succeeded and the device
 returned at `decca.local` / 192.168.1.79.
+
+**Pending firmware acceptance:** v0.28.1 implements immediate debounced
+Stereo/Mono response while retaining logical power fades. Release, debug and
+credential-enabled OTA builds pass, and all eight Unity suites compile without
+upload or execution; OTA deployment and physical response verification remain
+pending.
 
 **GPIO transition state:** complete 2026-09-06. Authenticated OTA installed
 v0.28.0 with the signal wires disconnected; after confirmed power-off the owner
@@ -57,17 +63,20 @@ operation. D19/D25 remain historical assignments.
 
 1. **Passed:** cold startup showed no unwanted lamp flash before the controlled
    fade.
-2. **Passed:** Stereo softly fades to 85% and Mono softly fades fully off in
-   approximately 4.34 seconds.
+2. **Historical pass (v0.27.1):** Stereo softly faded to 85% and Mono softly
+   faded fully off in approximately 4.34 seconds. v0.28.1 intentionally
+   supersedes this response with the immediate behaviour in item 4.
 3. **Passed:** no lamp flicker was reported at steady state or through fades.
-4. **Open:** install the ordered WAGO 221-415 +5 V and common-GND star points.
-5. **Open:** exercise and then release all four pots; confirm the OLED does not
+4. **Open:** deploy v0.28.1 by authenticated OTA and verify Stereo and Mono each
+   take effect immediately after debounce, without waiting for a fade.
+5. **Open:** install the ordered WAGO 221-415 +5 V and common-GND star points.
+6. **Open:** exercise and then release all four pots; confirm the OLED does not
    chatter between control overlays while the lamps are on.
-6. **Open:** confirm no abnormal module or wiring temperature and measure the
+7. **Open:** confirm no abnormal module or wiring temperature and measure the
    installed three-lamp current.
-7. **Complete:** physical results are recorded and release v0.28.0 is installed
+8. **Complete:** physical results are recorded and release v0.28.0 is installed
    by authenticated OTA on the accepted D26/D18 assignments. Close only after
-   items 4–6 pass.
+   items 4–7 pass.
 
 **Procurement records:** `hardware/BOM/phase1.csv` and `docs/Parts List.md`.
 **Wiring:** `docs/Wiring.md`, H5 and Power Distribution.

@@ -16,6 +16,8 @@ namespace {
 decca::display::ViewState g_viewState;
 decca::buttons::SourceMode g_sourceMode =
     decca::buttons::SourceMode::DigitalStreamer;
+decca::buttons::LightingRequest g_lightingRequest =
+    decca::buttons::LightingRequest::On;
 uint16_t g_potValues[4]{};
 constexpr uint16_t kControlPresentationDeadband = 5;
 
@@ -106,20 +108,28 @@ void applyPowerState() {
     Serial.println(powerOn ? "ON" : "STANDBY");
 }
 
-void applyLightingState() {
+void applyLightingState(bool immediate = false) {
+    const decca::buttons::LightingRequest request =
+        decca::buttons::lightingRequest();
     const bool lightsRequested =
-        decca::buttons::lightingRequest() ==
-        decca::buttons::LightingRequest::On;
+        request == decca::buttons::LightingRequest::On;
     const uint8_t target = decca::power::isOn() && lightsRequested
                                ? decca::settings::get().dial
                                : 0;
-    if (decca::lighting::targetBrightness(decca::lighting::Zone::Dial) ==
-        target) {
+    g_lightingRequest = request;
+    if (decca::lighting::targetBrightness(decca::lighting::Zone::Dial) == target &&
+        (!immediate ||
+         decca::lighting::brightness(decca::lighting::Zone::Dial) == target)) {
         return;
     }
 
-    decca::lighting::setBrightness(decca::lighting::Zone::Dial, target);
-    Serial.print("[LIGHTING] target=");
+    if (immediate) {
+        decca::lighting::setBrightnessImmediate(decca::lighting::Zone::Dial,
+                                                target);
+    } else {
+        decca::lighting::setBrightness(decca::lighting::Zone::Dial, target);
+    }
+    Serial.print(immediate ? "[LIGHTING] immediate=" : "[LIGHTING] target=");
     Serial.println(target);
 }
 
@@ -134,6 +144,7 @@ void setup() {
     Serial.println(decca::version::kFirmwareVersion);
     decca::settings::init();
     decca::buttons::init();
+    g_lightingRequest = decca::buttons::lightingRequest();
     decca::pots::init();
     decca::lighting::init();
     decca::power::init(
@@ -160,7 +171,9 @@ void loop() {
     if (sourceMode != g_sourceMode) {
         applySourceState(true);
     }
-    applyLightingState();
+    const bool lightingRequestChanged =
+        decca::buttons::lightingRequest() != g_lightingRequest;
+    applyLightingState(lightingRequestChanged);
     decca::lighting::update();
     decca::display::update();
     decca::ota::update();

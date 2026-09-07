@@ -65,11 +65,15 @@ no flicker reported. WAGO distribution installation plus pot-stability,
 temperature and current checks remain open under HW-LGT-01. Mono and logical
 standby are off.
 
+Firmware v0.28.1 changes Stereo/Mono lighting requests to immediate duty
+updates after debounce because the gradual response was rejected in physical
+testing. Logical power transitions continue to use the non-blocking fade.
+
 Stereo/Mono is assigned to TX2/GPIO17 with the internal pull-up. The contact is
 closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
 requests lights off. Both input positions are physically accepted. The previous
 GPIO25 assignment and lamp bank passed safe-off and smooth-fade testing through
-full duty; GPIO18 is the new unverified output. The current production target
+full duty; GPIO18 is now physically verified. The current production target
 remains 85% / duty 217.
 
 Source selection follows ADR-0013: closed/latched VHF = Digital Streamer;
@@ -91,6 +95,7 @@ GitHub `main` remains unchanged; the current feature source is
 firmware v0.28.0 from commit `283d40a`: authenticated OTA succeeded, the device
 returned at `decca.local`, and the owner confirmed the D26/D18 wiring works
 correctly. Its version hold is 2.2 seconds and the
-0–85% lighting transition is approximately 4.34 seconds in either direction.
+0–85% power/commissioning lighting transition is approximately 4.34 seconds in
+either direction. v0.28.1 is not yet installed.
 Complete the remaining HW-LGT-01 WAGO installation, pot-stability, temperature
 and current checks.
