@@ -4,8 +4,8 @@
 > **PROTOTYPE PRINTED, FITTED AND INSTALLED — 2026-09-07.** See §10.
 > Rev C is the first housing revision with measured hardware in it and the
 > first ever to be printed. It fitted first time. It is **not production
-> approved**: v1.7 §14 acceptance is outstanding, eleven prototype gates and
-> three installation gates remain open, and several §3 values it was built
+> approved**: v1.7 §14 acceptance is outstanding, seven prototype gates and
+> two installation gates remain open, and several §3 values it was built
 > on are still starting values rather than measurements.
 
 **Controlling document:** `Decca_ESP32_Controller_Housing_Spec_v1.0.md` — whose
@@ -196,16 +196,16 @@ envelope follows the wire and ferrule actually installed, not the terminal bore.
 | Outside length | 105.00 | 81.60 | 78.10 | **75.50 mm** | ≤85 | — |
 | Outside width | 77.00 | 70.10 | 73.10 | **73.10 mm** | ≤75 | — |
 | Closed height | 38.30 | 35.30 | 27.20 | **27.20 mm** | ≤36 | — |
-| Housing_Base | 49.66 | 16.85 | 18.65 | **17.98 cm³** | — | ≤15 |
+| Housing_Base | 49.66 | 16.85 | 18.65 | **17.94 cm³** | — | ≤15 |
 | Housing_Lid | 14.84 | 16.07 | 9.56 | **9.25 cm³** | — | ≤18 |
 | PCB_Clamp_Adjustable | 1.58 | 1.12 | 0.99 | **deleted** | — | — |
 | Cabinet_Fastener_Cap × 2 | — | 0.16 | 0.16 | **0.16 cm³** | — | — |
-| **Production total** | **67.93** | **34.20** | 29.36 | **27.39 cm³** | **≤35** | **≤30** |
-| **Full-solid PETG mass** | **86.3** | **43.4** | 37.3 | **34.8 g** | **≤45** | **≤38** |
+| **Production total** | **67.93** | **34.20** | 29.36 | **27.36 cm³** | **≤35** | **≤30** |
+| **Full-solid PETG mass** | **86.3** | **43.4** | 37.3 | **34.7 g** | **≤45** | **≤38** |
 
 **Three production parts, not four**, and comfortably inside the preferred
-targets rather than scraping them: 27.39 cm³ against a 30 cm³ preference and
-34.8 g against 38 g. Rev A's 68 cm³ is down by 60%.
+targets rather than scraping them: 27.36 cm³ against a 30 cm³ preference and
+34.7 g against 38 g. Rev A's 68 cm³ is down by 60%.
 
 The length came from deleting the clamp. The +X floor beyond the board was a
 7.50 mm clamp zone sized by a slot, the material beyond it, wall clearance at
@@ -262,10 +262,10 @@ orientation.
 
 | Part | Qty | Filament each | g total | Print time each |
 |---|---:|---:|---:|---:|
-| Housing_Base | 1 | 20.58 g | 20.58 | 1 h 7 m 30 s |
+| Housing_Base | 1 | 20.65 g | 20.65 | 1 h 7 m 44 s |
 | Housing_Lid | 1 | 11.30 g | 11.30 | 22 m 57 s |
 | Cabinet_Fastener_Cap | 2 | 0.19 g | 0.38 | 2 m 22 s |
-| **Production total** | | | **32.26 g** | **1 h 35 m 11 s** |
+| **Production total** | | | **32.33 g** | **1 h 35 m 25 s** |
 
 **Support usage: none.** `enable_support = 0` and the slicer emitted **zero
 support features on all three parts**, which is the operational confirmation of
@@ -285,7 +285,7 @@ and a numbered gate. There is nothing else on the part.
 | 4 | Four support pads at (±28.50, ±30.00) | carry the board, **centred on the measured mounting holes** | 3, 13 |
 | 5 | One integral fixed ledge, −X, 2.00 mm grip | retains the −X short edge | 13, 15 |
 | 6 | **Two Ø2.60 locating posts, +X** | locate the carrier by its own mounting holes | 5, 13, 14, 15 |
-| 7 | Two lid-screw bosses, **vertical** M3 inserts, screw **centred**, 1.50 mm wall | lid retention at +X | 12, 17 |
+| 7 | Two lid-screw bosses, **vertical** M3 inserts, screw **centred**, 1.50 mm wall, **2.00 mm bolt relief beneath** | lid retention at +X | 12, 17 |
 | 8 | Two locating rebates, −X | lid location and capture | 17 |
 | 9 | USB notch, open to the end-wall top | ≥14 × 9 service access with no bridge | 10 |
 | 10 | Two recessed, capped cabinet fixings | cabinet mounting inside the footprint | 2, 16, 25, 26 |
@@ -363,8 +363,8 @@ suite reads **only** the exported STLs and re-derives every claim from triangles
 against values typed in by hand. Neither imports the other's numbers.
 
 ```
-30 CAD checks,  0 failed, 11 prototype gates open, 8 closed by the fitted prototype
-29 mesh checks, 0 failed, 10 prototype, 3 installation, 8 closed by the fitted prototype
+30 CAD checks,  0 failed, 7 prototype open, 12 closed by the fitted prototype
+29 mesh checks, 0 failed, 6 prototype, 2 installation, 12 closed by the fitted prototype
 ```
 
 The two open counts differ by one because the suites classify the antenna
@@ -416,7 +416,7 @@ a threshold.
   have marched inward; a screw-hole probe sitting on the tessellation seam; and
   an `overhang_report` unpacked with the wrong arity.
 
-## 7. Prototype gates — eleven still open, eight closed by the fitted print
+## 7. Prototype gates — seven still open, twelve closed by the fitted print
 
 **The axis correction.** Rev C was first built with the 66 mm along the rows
 and the 63 mm across. The owner corrected it the same day. The parametric model
@@ -430,7 +430,7 @@ was re-centred at that point from the legacy 65–67 mm to 62–64 mm; v1.7 has
 since deleted the clamp and the range with it, because a measured board and a
 measured hole pitch leave nothing for an adjustment to absorb.
 
-**Eight of these were closed on 2026-09-07 by the fitted prototype — see §10.**
+**Twelve of these were closed on 2026-09-07 by the fitted prototype — see §10.**
 What follows is what is left.
 
 **Hardware still unmeasured:** PCB thickness (1.60) and the below-board
@@ -460,7 +460,7 @@ the grouped cabinet wiring is secured outside the housing; antenna performance.
 
 | Part | Orientation | Filament | Time |
 |---|---|---:|---:|
-| Housing_Base | **floor down** | 20.58 g | 1 h 7 m 30 s |
+| Housing_Base | **floor down** | 20.65 g | 1 h 7 m 44 s |
 | Housing_Lid | **top face down** — makes the USB notch and vents print with no bridge | 11.30 g | 22 m 57 s |
 | Cabinet_Fastener_Cap | flat, **2 off** | 0.19 g ea | 2 m 22 s ea |
 
@@ -526,9 +526,40 @@ That distinction is the whole of v1.7 §14.0 point 3, and both suites state it o
 each entry rather than letting a fit against an unmeasured value pass for a fit
 against a measured one.
 
-**Eleven prototype gates and three installation gates remain open**, and several
+**Seven prototype gates and two installation gates remain open**, and several
 things this print will have exercised are simply **not yet reported**: whether
 the heat-set inserts drove into their bosses and the lid screws pulled the lid
 down; whether the terminals are wired, which would close the entry corridors,
 the screwdriver access and cover-removal-while-wired in one go; whether the two
 cabinet fixings and their caps were used; and surface quality and cleanup.
+
+### 10.3 Second report, same day — four more closed, and one change demanded
+
+The inserts drove and the lid screws pulled the lid down. **The terminals are
+wired.** Both cabinet fixings and both insulating caps are fitted. The finish
+was *"nice simple finish, no issues"* — no sag, no cleanup, nothing deburred.
+
+That closes four more, taking the total to **twelve**:
+
+| Also closed | What it settles |
+|---|---|
+| **The heat-set inserts drive and the lid screws pull the lid down** | Hanglife M3 inserts into the Ø4.00 bores, on the 1.50 mm walls §4.3 had just widened from 0.50 |
+| **The terminals are WIRED** | The entry corridors, top screwdriver access, the ferrule envelope and cover-removal-with-wiring-connected — **the gates this whole revision exists for**, since Rev B could not be wired at all |
+| **Cabinet fixings and caps** | Both screws recessed inside the declared 6.20 mm head envelope; both caps held on their 0.12 mm nib interference. This also closes the installation gate for the fixing centres |
+| **Surface finish** | Reported clean, which is the operational confirmation of the zero-support claim |
+
+### 10.4 The one change the fit demanded
+
+Tightening the real bolts showed what no geometric gate had: past the insert,
+**the bolt has nowhere to go**. It tightens against solid plastic before it
+pulls the cover down.
+
+**v1.7 §4.13 now requires 2.00 mm of relief beneath each insert**, narrower than
+the insert bore so the insert stays supported along its whole length. It is
+built, and it is gated on both sides — CAD gate 12 checks the derivation, and
+mesh gate 17 measures the relief floor off the exported triangles at
+**z 17.00 / 17.00** against 17.00.
+
+**This is the first change on this design to come from a fitted prototype rather
+than from a gate**, which is the case for §14.0 made in a single edit: thirty
+geometric gates could not have found it, and one hour of printing did.

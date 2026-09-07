@@ -1,6 +1,6 @@
 # Decca ESP32 Controller Housing Specification v1.7
 
-**Status:** **REV C BUILT to this specification 2026-09-06, and PRINTED, FITTED AND INSTALLED as a prototype 2026-09-07 — it fitted first time. NOT production approved: §14 acceptance is outstanding and eleven prototype gates remain open. See §14.1.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
+**Status:** **REV C BUILT to this specification 2026-09-06, and PRINTED, FITTED AND INSTALLED as a prototype 2026-09-07 — it fitted first time. NOT production approved: §14 acceptance is outstanding, but only seven prototype and two installation gates remain open — twelve have been closed by the fitted prototype. See §14.1.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
 
 **Scope:** Enclosure for the selected 30-pin ESP32 DevKit fitted to the acquired DORHEA 30-pin screw-terminal adapter only. The MOSFET board is excluded and remains separately mounted.
 
@@ -100,6 +100,7 @@ Supplier dimensions and repository dimensions remain assumptions until checked a
 10b. The countersink shall be dimensioned from a **declared maximum screw-head envelope** plus a declared radial clearance, not from a nominal head diameter. The specification shall record the nominal head diameter, the maximum head envelope, the head angle and the clearance separately. The usable recess shall accommodate the maximum envelope plus its clearance with the head sitting fully below the cap, and shall retain at least 1.00 mm of floor beneath the countersink. Compatibility with any acquired screw shall not be claimed until that screw has been measured.
 11. It is acceptable to remove the electronics before installing the cabinet fasteners.
 12. Each lid-screw boss shall **centre its insert bore** and retain at least **1.20 mm of wall around that bore in every direction**. A heat-set insert expands the surrounding plastic as it is driven in; a boss that is thin on one face splits there. The wall shall be re-checked against the acquired insert's measured outer diameter, not only against the modelled bore.
+13. Each lid-screw boss shall provide at least **2.00 mm of bolt relief beneath the insert**, narrower than the insert bore so the insert stays supported along its whole length. A bolt that bottoms on solid plastic cannot pull its cover down, and this is not visible in any geometric gate that only checks the insert. **Owner requirement, 2026-09-07, from tightening real bolts into real inserts.**
 
 ## 5. Cable routing and strain relief
 
@@ -253,7 +254,7 @@ The verifier shall fail the build unless all applicable checks pass:
 9. Representative installed wire-and-ferrule envelopes enter the correct screw terminals and can be inserted and withdrawn without collision.
 10. The USB service envelope is clear through the opening.
 11. The ESP32 antenna keep-out is clear of metal, inserts, and thick structure.
-12. Lid overlap, fit allowance and the lid-screw boss walls meet specification.
+12. Lid overlap, fit allowance, the lid-screw boss walls and the bolt relief beneath each insert meet specification.
 13. The fixed ledge, the locating posts and the support pads contact only approved PCB-edge regions and mounting-hole bores.
 14. The carrier is located by its measured mounting holes: post diameter against the reported bore, engagement and proud height against the carrier, clearance to the outermost conductor, the holes that must be left empty, and the fitting tilt against the ledge gap.
 15. The retention system does not load the ESP32, sockets, terminals, solder joints, or components, and carries no fastener that could be tightened onto the carrier.
@@ -321,7 +322,7 @@ The CAD revision is not production-approved until physical checks confirm:
   handling and does not load the terminal connections;
 - antenna performance is acceptable;
 - PETG print quality is acceptable without supports;
-- a **horizontal** heat-set insert can actually be driven into the coupon boss;
+- a **vertical** heat-set insert can be driven into a lid-screw boss and the bolt tightened into it with relief beneath — ✅ **confirmed 2026-09-07**, and it is what produced §4.13;
 - the cabinet screw's real head diameter is inside the declared maximum
   envelope;
 - the insulating cap presses in, stays in and comes out again on the real
@@ -351,9 +352,31 @@ proves the 4.50 mm pad height works, it does not measure the PCB thickness or
 the below-board protrusion behind it; and a Ø2.60 post fitting the real hole
 does not measure the bore, which sets how much play the board has.
 
-**Still unreported from this build:** whether the heat-set inserts drove and the
-lid screws pulled the lid down; whether the terminals are wired; whether the two
-cabinet fixings and their caps were used; surface quality and cleanup.
+**Second report, same day.** The inserts drove and the lid screws pulled the
+lid down; **the terminals are wired**; both cabinet fixings and both insulating
+caps are fitted; and the finish was reported as *"nice simple finish, no
+issues"*. That closes four more: the insert bore against a real Hanglife M3; the
+whole wired condition, which is the entry corridors, top screwdriver access, the
+ferrule envelope and cover-removal-with-wiring-connected — the gates this
+revision exists for, since Rev B could not be wired at all; the cabinet screw
+head inside its declared 6.20 mm envelope together with the caps' 0.12 mm nib
+interference; and surface finish. It also closes the installation gate for the
+cabinet fixing centres.
+
+**Twelve gates are now closed by the fitted prototype**, against seven prototype
+and two installation gates still open.
+
+**The one change it demanded.** Tightening the real bolts showed the bolt has
+nowhere to go once it passes the insert. §4.13 now requires 2.00 mm of relief
+beneath each insert, and it is built and gated — measured off the exported
+triangles as well as in CAD. **It is the first change on this design to come
+from a fitted prototype rather than from a gate**, which is the argument for
+§14.0 made in one edit.
+
+**Still unreported:** the conductor and ferrule sizes actually installed — what
+is established is that the design accommodates them, not what they are; whether
+the grouped wiring is secured outside the housing; and antenna performance with
+the lid fitted.
 
 ## 15. Change control
 

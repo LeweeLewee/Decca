@@ -194,6 +194,9 @@ POST_Z1 = 7.50                 # Z_PCB_BOT + 3.00
 POST_PROUD = 1.40              # above Z_PCB_TOP
 INSERT_HOLE_D = 4.00
 INSERT_DEPTH = 5.00
+INSERT_RELIEF_D = 3.40         # bolt relief under the insert - owner,
+INSERT_RELIEF_DEPTH = 2.00     # 2026-09-07, after tightening real bolts
+Z_INS_RELIEF_BOT = 17.00       # = Z_CAV_TOP - INSERT_DEPTH - the relief
 
 # -- lid screws and locating lugs --------------------------------------------
 LID_SCREW_X = 35.50
@@ -1022,13 +1025,24 @@ def main():
                     clear = False
         if clear:
             holes += 1
-    gate(reb == 2 and lug == 2 and holes == 2,
+    # The bolt relief under each insert, measured off the triangles: the
+    # highest base material on the screw axis is the FLOOR of the relief, so
+    # the bolt has somewhere to go instead of bottoming on solid plastic.
+    floors = [top_of(base, LID_SCREW_X, s * LID_SCREW_Y, Z_CAV_TOP - 0.10)
+              for s in (-1, 1)]
+    relief_ok = all(f is not None and abs(f - Z_INS_RELIEF_BOT) <= 0.10
+                    for f in floors)
+    gate(reb == 2 and lug == 2 and holes == 2 and relief_ok,
          "17 cover removes and refits with the wiring connected",
          "%d/2 base rebates, %d/2 lid lugs engaging %.2f mm, %d/2 vertical M3 "
          "holes at (%.2f, +-%.2f); the lid lifts straight off the corner "
          "returns because it has NO long-side skirt to drag through the "
-         "conductors" % (reb, lug, HOOK_ENGAGE, holes, LID_SCREW_X,
-                         LID_SCREW_Y))
+         "conductors. Bolt relief floors measured at z %s against %.2f - "
+         "%.2f mm of insert bore then %.2f mm of relief, so a tightened bolt "
+         "is not bottoming on solid plastic"
+         % (reb, lug, HOOK_ENGAGE, holes, LID_SCREW_X, LID_SCREW_Y,
+            "/".join("%.2f" % (f or 0.0) for f in floors), Z_INS_RELIEF_BOT,
+            INSERT_DEPTH, INSERT_RELIEF_DEPTH))
 
     # -- 18 ------------------------------------------------------------------
     orient = (("base", Z_FLOOR_BOT, +1, "floor-down"),
@@ -1168,22 +1182,10 @@ def main():
           % MOUNT_HOLE_D,
           "a 2.60 post now demonstrably fits the real hole; the bore itself is "
           "still unmeasured and it sets how much play the board has")
-    proto("heat-set insert bore 4.00 dia x 5.00 deep",
-          "the PART is identified - Hanglife M3 threaded, owner 2026-09-06 - "
-          "but its length and OD are not, and those are what this bore has "
-          "to match")
-    proto("the acquired cabinet screw's real head diameter",
-          "%.2f mm max envelope declared, ISO 10642 assumed, not measured"
-          % CAB_HEAD_D_MAX)
     proto("USB connector position on the acquired ESP32",
           "STARTING; the notch is cut %.2f mm wide to absorb the error"
           % USB_SLOT_W)
-    proto("real conductor and ferrule sizes",
-          "%.2f mm wire over a %.2f x %.2f ferrule are STARTING"
-          % (WIRE_D, FERRULE_D, FERRULE_L))
     proto("EN and BOOT positions", "v1.7 6.4 forbids holes until measured")
-    proto("cap nib interference %.2f mm per side on this printer"
-          % CAB_NIB_INT)
     print("")
     print("ASSUMPTIONS - recorded so they cannot pass as measurements")
     proto("the USB connector is centred on its short edge")
@@ -1214,6 +1216,31 @@ def main():
     confirmed("the 9.00 mm block height is the block's own body height",
               "%s. Was an ASSUMPTION; the lid closed over the assembly, which "
               "is the consequence that was at risk" % FIT)
+    confirmed("the heat-set inserts drive and the lid screws pull the lid down",
+              "%s. Hanglife M3 threaded inserts into the %.2f mm bores, and "
+              "the bolts pulled the lid home. The owner asked for %.2f mm of "
+              "relief UNDER each insert so the bolt is not tightening against "
+              "solid plastic; that is now built and gated in 12. It is the "
+              "first change on this design to come from a fitted prototype "
+              "rather than from a gate"
+              % (FIT, INSERT_HOLE_D, INSERT_RELIEF_DEPTH))
+    confirmed("the terminals are WIRED, and everything downstream of that",
+              "%s. Real conductors are in real terminals, which exercises the "
+              "entry corridors, top screwdriver access, the ferrule envelope "
+              "and cover removal with the wiring connected - the gates this "
+              "whole revision exists for, since Rev B could not be wired at "
+              "all. The conductor and ferrule SIZES are still not recorded, "
+              "so what is closed is that the design accommodates what was "
+              "actually installed" % FIT)
+    confirmed("the cabinet fixings and their insulating caps are fitted",
+              "%s. Both countersunk screws recessed inside the declared "
+              "%.2f mm maximum head envelope, and both caps pressed in and "
+              "stayed. The nib interference was %.2f mm per side by design; "
+              "it holds on this printer and filament"
+              % (FIT, CAB_HEAD_D_MAX, CAB_NIB_INT))
+    confirmed("surface finish and cleanup",
+              "%s - \"nice simple finish, no issues\". No sag at the ledge, "
+              "no cleanup reported, nothing deburred" % FIT)
     confirmed("PETG prints this geometry with no support material",
               "%s, on the owner's printer and filament; the slicer harness "
               "independently emitted ZERO support features on all three "
@@ -1221,7 +1248,6 @@ def main():
 
     print("")
     print("INSTALLATION GATES")
-    install("cabinet fixing centres and the surface behind them")
     install("the grouped cabinet wiring is secured outside the housing")
     install("antenna performance with the lid fitted")
 

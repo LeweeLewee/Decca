@@ -293,6 +293,14 @@ P = {
     # and remains STARTING until the acquired one is measured.
     "insert_hole_d": 4.00,           # STARTING, LID SCREWS ONLY
     "insert_depth": 5.00,            # STARTING
+    # Relief BELOW the insert, so the bolt has somewhere to go as it is
+    # tightened instead of bottoming on solid plastic. Asked for by the owner
+    # on 2026-09-07 after driving the real inserts and running the real bolts
+    # into them - the first change on this design to come from a fitted
+    # prototype rather than from a gate. Narrower than the insert bore on
+    # purpose: the insert stays fully supported along its whole length.
+    "insert_relief_d": 3.40,         # = the lid screw's own clearance
+    "insert_relief_depth": 2.00,     # owner, 2026-09-07
 
     # -- Lid screws and locating lugs, DESIGN -------------------------------
     # 26.00, not 22.00: at 22.00 the base's lid-screw bosses reached into
@@ -705,7 +713,9 @@ def derive(P):
     d["boss_wall"] = min(d["lid_screw_x"] - d["lid_boss_x0"],
                          d["x_out_pos"] - d["lid_screw_x"],
                          P["lid_boss_half_w"]) - P["insert_hole_d"] / 2.0
-    d["z_lid_ins_bot"] = d["z_cav_top"] - P["insert_depth"]
+    d["z_lid_ins_bot"] = d["z_cav_top"] - P["insert_depth"]           # 19.00
+    d["z_ins_relief_bot"] = d["z_lid_ins_bot"] - P["insert_relief_depth"]  # 17.00
+    d["boss_under_relief"] = d["z_ins_relief_bot"] - d["z_floor_top"]
     d["hook_z1"] = d["z_cav_top"] - P["lid_overlap"] + P["hook_drop"]
     d["hook_z0"] = d["hook_z1"] - P["hook_drop"]
     d["lug_proj"] = P["lid_fit_clear"] + P["hook_depth"] - 0.20
@@ -1014,7 +1024,7 @@ def build_keepouts(B, P, d):
     for sy in (-1.0, 1.0):
         c = B.cylz(P["lid_screw_clear_d"], d["lid_screw_x"],
                    sy * P["lid_screw_y"],
-                   d["z_lid_ins_bot"], d["z_lid_top"] + 3.0)
+                   d["z_ins_relief_bot"], d["z_lid_top"] + 3.0)
         met = c if met is None else B.uni(met, c)
         met = B.uni(met, B.cylz(P["insert_hole_d"], d["lid_screw_x"],
                                 sy * P["lid_screw_y"],
@@ -1128,6 +1138,13 @@ def build_base(B, P, d):
         body = B.sub(body, B.cylz(P["insert_hole_d"], d["lid_screw_x"],
                                   sy * P["lid_screw_y"],
                                   d["z_lid_ins_bot"], d["z_cav_top"] + 0.001))
+        # bolt relief under the insert. It starts 0.20 mm INSIDE the insert
+        # bore rather than exactly at its floor, because a coincident face
+        # between two subtracted solids is where slivers come from.
+        body = B.sub(body, B.cylz(P["insert_relief_d"], d["lid_screw_x"],
+                                  sy * P["lid_screw_y"],
+                                  d["z_ins_relief_bot"],
+                                  d["z_lid_ins_bot"] + 0.20))
 
     # 8 - two locating rebates in the -X outer face
     for sy in (-1.0, 1.0):
@@ -1885,8 +1902,9 @@ def validate(_context=None):
     hi = _hit(B, base, lid)
     gate(hi <= 0.001
          and abs(d["z_cav_top"] - d["z_skirt_bot"] - P["lid_overlap"]) < 1e-9
-         and d["boss_wall"] >= P["boss_wall_min"],
-         "12 lid overlap, fit allowance and screw-boss walls as specified",
+         and d["boss_wall"] >= P["boss_wall_min"]
+         and d["boss_under_relief"] >= 2.00,
+         "12 lid overlap, fit, boss walls and bolt relief as specified",
          "overlap %.2f (spec %.2f) at the SHORT ENDS AND CORNERS ONLY, gap "
          "%.2f per face, skirt %.2f; no long-side skirt at all, because one "
          "would foul the fitted conductors; lid/base interference %.3f mm3; "
@@ -1896,7 +1914,12 @@ def validate(_context=None):
          "splits a boss"
          % (P["lid_overlap"], P["lid_overlap"], P["lid_fit_clear"],
             P["lid_skirt_t"], hi, P["lid_boss_l"], d["boss_wall"],
-            P["insert_hole_d"], P["boss_wall_min"]))
+            P["insert_hole_d"], P["boss_wall_min"])
+         + "; %.2f mm of bolt relief under the insert, dia %.2f, on %.2f mm of "
+           "remaining boss - the owner asked for this after tightening the "
+           "real bolts into the real inserts"
+           % (P["insert_relief_depth"], P["insert_relief_d"],
+              d["boss_under_relief"]))
 
     # -- 13 ------------------------------------------------------------------
     ncc = K["KEEPOUT_NO_CONTACT_COMPONENTS"]
@@ -2174,6 +2197,31 @@ def validate(_context=None):
     confirmed("the 9.00 mm block height is the block's own body height",
               "%s. Was an ASSUMPTION; the lid closed over the assembly, which "
               "is the consequence that was at risk" % FIT)
+    confirmed("the heat-set inserts drive and the lid screws pull the lid down",
+              "%s. Hanglife M3 threaded inserts into the %.2f mm bores, and "
+              "the bolts pulled the lid home. The owner asked for %.2f mm of "
+              "relief UNDER each insert so the bolt is not tightening against "
+              "solid plastic; that is now built and gated in 12. It is the "
+              "first change on this design to come from a fitted prototype "
+              "rather than from a gate"
+              % (FIT, P["insert_hole_d"], P["insert_relief_depth"]))
+    confirmed("the terminals are WIRED, and everything downstream of that",
+              "%s. Real conductors are in real terminals, which exercises the "
+              "entry corridors, top screwdriver access, the ferrule envelope "
+              "and cover removal with the wiring connected - the gates this "
+              "whole revision exists for, since Rev B could not be wired at "
+              "all. The conductor and ferrule SIZES are still not recorded, "
+              "so what is closed is that the design accommodates what was "
+              "actually installed" % FIT)
+    confirmed("the cabinet fixings and their insulating caps are fitted",
+              "%s. Both countersunk screws recessed inside the declared "
+              "%.2f mm maximum head envelope, and both caps pressed in and "
+              "stayed. The nib interference was %.2f mm per side by design; "
+              "it holds on this printer and filament"
+              % (FIT, P["cab_head_d_max"], P["cab_nib_int"]))
+    confirmed("surface finish and cleanup",
+              "%s - \"nice simple finish, no issues\". No sag at the ledge, "
+              "no cleanup reported, nothing deburred" % FIT)
     confirmed("PETG prints this geometry with no support material",
               "%s, on the owner's printer and filament. The slicer harness "
               "independently emitted ZERO support features on all three "
@@ -2194,21 +2242,10 @@ def validate(_context=None):
           % P["mount_hole_d"],
           "a 2.60 post now demonstrably fits the real hole; the bore itself "
           "is still not measured, and it sets how much play the board has")
-    proto("heat-set insert bore %.2f dia x %.2f deep"
-          % (P["insert_hole_d"], P["insert_depth"]),
-          "the PART is identified - Hanglife M3 threaded, owner 2026-09-06 - but its length and OD are not, and those are what this bore has to match")
-    proto("the acquired cabinet screw's real head diameter",
-          "%.2f mm max envelope declared, ISO 10642 assumed, not measured"
-          % P["cab_head_d_max"])
     proto("USB connector position on the acquired ESP32",
           "STARTING; the notch is cut %.2f mm wide to absorb the error"
           % P["usb_slot_w"])
-    proto("real conductor and ferrule sizes",
-          "%.2f mm wire over a %.2f x %.2f ferrule are STARTING"
-          % (P["wire_d"], P["ferrule_d"], P["ferrule_l"]))
     proto("EN and BOOT positions - v1.7 6.4 forbids holes until measured")
-    proto("cap nib interference %.2f mm per side on this printer"
-          % P["cab_nib_int"])
     proto("antenna performance with the lid fitted")
     for what, _why in ASSUMED:
         proto("ASSUMED: %s" % what)
