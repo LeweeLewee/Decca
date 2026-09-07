@@ -4,9 +4,9 @@
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
 > sole VHF input GPIO23 and OLED I²C GPIO21/22 are bench-verified.
 > Stereo/Mono input GPIO17/TX2 is physically verified.
-> On/off GPIO26 and lighting PWM GPIO18 are new assignments awaiting physical
-> verification. GPIO19 and GPIO25 are the previously accepted assignments;
-> other pins are unassigned. See
+> On/off GPIO26 and lighting PWM GPIO18 were physically accepted after the
+> controlled v0.28.0 transition on 2026-09-06. GPIO19 and GPIO25 retain their
+> earlier historical evidence; other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
 > amplifier and power-control decisions.
@@ -180,8 +180,9 @@ simple open/close contact read as a **low-voltage digital input** with the ESP32
 **internal pull-up** enabled on GPIO26, board label **D26**. **Not a mains
 switch.** Closed = logical ON; open = logical STANDBY. The same switch and
 polarity were physically accepted on the previous GPIO19/D19 assignment on
-2026-08-30; GPIO26 awaits physical verification. Its logical state drives the
-locked system-power sequence documented above.
+2026-08-30. The rewired GPIO26/D26 assignment was physically accepted on
+2026-09-06. Its logical state drives the locked system-power sequence documented
+above.
 
 ### Source button bank (H3)
 The original selector PCB and interlocked mechanism are retained as the
@@ -227,8 +228,9 @@ specified switching range of 0–1 kHz. GPIO18/D18 is the new PWM assignment.
 GPIO18 is not a boot-strapping pin; firmware drives it LOW at the start of board
 initialisation before attaching LEDC at duty 0. The owner has deferred the
 recommended external control-input pull-down, so pre-firmware reset-time
-safe-off is not guaranteed by the ESP32. The previous
-GPIO25/D25 assignment is the one covered by existing physical evidence.
+safe-off is not guaranteed by the ESP32. The previous GPIO25/D25 assignment
+retains its historical evidence; GPIO18/D18 was physically accepted after the
+controlled v0.28.0 transition on 2026-09-06.
 Firmware PWM remains set to 1 kHz. The initial
 steady-light test resolved the visible flicker. Cold startup and both
 approximately 4.34-second fade directions were subsequently owner-approved on

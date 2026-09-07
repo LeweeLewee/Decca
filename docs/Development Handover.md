@@ -75,9 +75,9 @@ button panel is deferred.
 | VHF source contact | GPIO23/D23 | Physically accepted |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO26/D26 | New assignment, verification pending; GPIO19/D19 previously verified |
+| On/off | GPIO26/D26 | Physically accepted 2026-09-06; GPIO19/D19 retained as historical evidence |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted, open Stereo = on / closed Mono = off |
-| Dial-light PWM | GPIO18/D18 | New assignment, verification pending; GPIO25/D25 previously accepted |
+| Dial-light PWM | GPIO18/D18 | Physically accepted 2026-09-06; GPIO25/D25 retained as historical evidence |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
 
@@ -105,6 +105,9 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - Historical evidence: GPIO19/D19 was physically verified with the retained H2 Red/Green switch.
   Closed selects logical ON and open selects STANDBY; both transitions were
   accepted on the production firmware.
+- Current evidence (2026-09-06): authenticated OTA installed v0.28.0, the device
+  returned at `decca.local`, and the owner confirmed the rewired GPIO26 on/off
+  input and GPIO18 DFR0457 lighting output work correctly.
 - Revised button logic passed strict host compilation and its nine-case harness.
 - Lighting logic passed strict host compilation and its seven-case harness.
 - OTA logic passed strict host compilation and its five-case harness.
@@ -182,9 +185,9 @@ the user's Wi-Fi or OTA passwords.
    eight on-target suites; latest accepted run passed 55/55 tests.
 3. **Complete (2026-08-30):** fitted-Perspex display calibration, visual design
    cycle and physical acceptance.
-4. **Complete (2026-08-30):** implement the logical `power` module, bench-test
-   the previous GPIO19 assignment and integrate on/standby display coordination
-   in production. GPIO26 awaits physical verification.
+4. **Complete (2026-09-06):** implement the logical `power` module, retain the
+   previous GPIO19 evidence, and physically accept GPIO26 with on/standby display
+   coordination in production.
 5. **Complete:** production coordinates pots, persistent VHF-derived source,
    logical power, fitted display and OTA in one non-blocking loop.
 6. **Complete historical evidence (2026-08-31):** GPIO25/MOSFET/three-lamp electrical test passed:
@@ -201,11 +204,11 @@ the user's Wi-Fi or OTA passwords.
    2.2-second version hold and both approximately 4.34-second 0–85% fades.
    Install the ordered WAGO star points, recheck pot/display stability with
    lamps on, then temperature and installed lamp current before closing.
-10. **Open (2026-09-06):** deploy feature firmware v0.28.0 by authenticated OTA
-    while old D19/D25 wiring remains, then—only after confirmed power-off—move
-    the switch signal to D26 and DFR0457 control signal to D18. The owner has
-    deferred the recommended external pull-down, so specifically observe boot
-    for any lamp flash and physically verify the new assignments.
+10. **Complete (2026-09-06):** authenticated OTA deployed feature firmware
+    v0.28.0 with the signal wires disconnected. The device returned on the local
+    network; after confirmed power-off the switch signal moved to D26 and the
+    DFR0457 control signal to D18, and the owner confirmed correct operation. The
+    recommended external pull-down remains deferred.
 11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -251,18 +254,17 @@ Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
 Immediate priority: resolve docs/Open Issues.md HW-LGT-01. DFR0457 is installed,
-its v0.27.1 startup and fade behaviour are owner-approved with no flicker, and
-commit `d0b1d3c` is running after authenticated OTA and network-return
-verification. Complete the remaining WAGO installation, pot-stability,
+its v0.28.0 GPIO18 operation is owner-approved after authenticated OTA and
+powered-off rewiring. Complete the remaining WAGO installation, pot-stability,
 temperature and current checks at 1 kHz and 85% / duty 217. When delivered, use
 WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
 The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 
-GitHub main is the firmware source of truth and contains the installed 85% duty
-217 setting. The ESP32's last-known installed image is firmware v0.27.1 at
-commit `d0b1d3c`; its authenticated OTA upload succeeded and the device returned
-at `decca.local`. Firmware releases use the single version value in
-`src/version.h`; v0.27.1 holds that identifier for 2.2 seconds on the
+The feature branch is the source of the installed v0.28.0 image until it is
+merged. Its authenticated OTA upload succeeded and the device returned at
+`decca.local`; the owner then confirmed the D26/D18 wiring works correctly.
+Firmware releases use the single version value in `src/version.h`; v0.28.0 holds
+that identifier for 2.2 seconds on the
 cold-start/OTA-reboot screen and uses approximately 4.34-second lighting fades.
 Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
@@ -272,8 +274,8 @@ continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
 L50..0..R50 with centred bars and monochrome icons.
 
-TX2/GPIO17 and the previous GPIO25 assignment are physically accepted. Firmware
-v0.28.0 assigns lighting PWM to GPIO18, which awaits physical verification.
+TX2/GPIO17, GPIO26 on/off and GPIO18 lighting PWM are physically accepted. The
+previous GPIO19/GPIO25 results remain historical evidence.
 Final MOSFET/three-lamp acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
 fades to 85%; Mono and standby fade off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital

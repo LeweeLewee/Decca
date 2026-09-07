@@ -10,8 +10,8 @@ namespace decca::hardware {
 
 // GPIO32–35, VHF GPIO23 and display GPIO21/22 are bench-verified.
 // Stereo/Mono GPIO17 (TX2) is physically verified.
-// On/off GPIO26 and lighting PWM GPIO18 await physical verification. Their
-// previous GPIO19/GPIO25 assignments were physically verified.
+// On/off GPIO26 and lighting PWM GPIO18 are physically verified. Their previous
+// GPIO19/GPIO25 assignments remain documented as historical evidence.
 constexpr uint8_t kPotVolume = 32;
 constexpr uint8_t kPotBass = 33;
 constexpr uint8_t kPotTreble = 34;

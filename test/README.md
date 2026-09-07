@@ -144,6 +144,13 @@ The non-blocking fade interval is now 20 ms per count, giving approximately
 OTA and integration acceptance are tracked as HW-LGT-01 in
 `docs/Open Issues.md`.
 
+GPIO reassignment acceptance (2026-09-06): all eight suites compiled for the
+v0.28.0 feature branch without upload or execution, and release, debug and
+credential-enabled OTA builds passed. Authenticated OTA succeeded with the old
+signal wires disconnected; the ESP32 returned at `decca.local` / 192.168.1.79.
+After powered-off rewiring, the owner confirmed GPIO26 on/off and GPIO18 DFR0457
+lighting operation work correctly. No external D18 pull-down is fitted.
+
 v0.27.1 physical result (2026-09-05): authenticated OTA and reboot succeeded;
 the owner approved the 2.2-second firmware-version hold and both approximately
 4.34-second 0–85% lighting fades, with no flicker reported. HW-LGT-01 remains

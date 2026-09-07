@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.0 assigns on/off to GPIO26 and dial-light PWM to GPIO18. The previous GPIO19/GPIO25 assignments retain their historical physical evidence; D26/D18 await controlled OTA, rewiring and physical verification. DFR0457 behaviour remains locked at 1 kHz, duty 217 and approximately 4.34-second fades. |
+| Status   | Draft. Firmware v0.28.0 assigns on/off to physically accepted GPIO26 and dial-light PWM to physically accepted GPIO18. The controlled OTA and powered-off rewiring completed on 2026-09-06; the previous GPIO19/GPIO25 assignments retain their historical evidence. DFR0457 behaviour remains locked at 1 kHz, duty 217 and approximately 4.34-second fades. |
 | Version  | 0.28.0                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |

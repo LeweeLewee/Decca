@@ -29,9 +29,9 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   distribution installation plus pot-stability, temperature and current checks
   remain open as HW-LGT-01. Normal Stereo
   lighting is 85%; Mono and logical standby are off.
-- Firmware now assigns on/off to GPIO26/D26 and dial-light PWM to GPIO18/D18.
-  Both new assignments await the controlled OTA/wiring transition and physical
-  verification; the ESP32 remains powered off with the old D19/D25 wiring.
+- Firmware v0.28.0 is installed by authenticated OTA. On/off is now connected to
+  GPIO26/D26 and dial-light PWM to GPIO18/D18; the owner confirmed both work
+  correctly after the powered-off wiring transition.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work, then check [Open Issues](docs/Open%20Issues.md).
@@ -47,9 +47,9 @@ firmware work, then check [Open Issues](docs/Open%20Issues.md).
 | VHF source contact | GPIO23/D23 | Physically accepted |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO26/D26 | New assignment; physical verification pending (GPIO19/D19 previously verified) |
+| On/off | GPIO26/D26 | Physically verified; GPIO19/D19 was the previous verified assignment |
 | Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted |
-| Dial lighting PWM | GPIO18/D18 | New assignment; physical verification pending (GPIO25/D25 previously accepted) |
+| Dial lighting PWM | GPIO18/D18 | Physically verified with DFR0457; GPIO25/D25 was the previous accepted assignment |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 

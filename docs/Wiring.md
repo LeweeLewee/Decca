@@ -8,9 +8,9 @@ Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
 (see Specification `HW-06`). `hardware.h` matches the status recorded below:
 the four pot inputs, sole VHF source input and OLED I²C GPIO21/22 are verified.
-On/off GPIO26 and lighting PWM GPIO18 are new assignments awaiting the
-controlled transition and physical verification; GPIO19 and GPIO25 are the
-previously verified assignments.
+On/off GPIO26 and lighting PWM GPIO18 completed the controlled transition and
+are physically verified; GPIO19 and GPIO25 are the previously verified
+assignments.
 
 ## Wiring Colour Standard
 
@@ -68,13 +68,13 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Bass pot wiper        | GPIO33 (bench-verified) | **D33** | ADC1        | H1      | ADC1 required                            |
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
-| On/off switch (Red)   | GPIO26 (verification pending) | D26 | Digital in | H2 | Internal pull-up; closed = ON; GPIO19/D19 previously verified |
+| On/off switch (Red)   | GPIO26 (physically verified) | D26 | Digital in | H2 | Internal pull-up; closed = ON; GPIO19/D19 previously verified |
 | Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
 | SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
 | Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
-| Dial lighting PWM     | GPIO18 (verification pending) | D18 | PWM (LEDC), 1 kHz | H5 | DFR0457 control input; no external pull-down currently fitted; GPIO25/D25 previously accepted |
+| Dial lighting PWM     | GPIO18 (physically verified) | D18 | PWM (LEDC), 1 kHz | H5 | DFR0457 control input; no external pull-down currently fitted; GPIO25/D25 previously accepted |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO23 and GPIO26 support the required internal pull-ups. GPIO18 and GPIO26
@@ -140,7 +140,7 @@ The original Decca on/off switch is retained, including its **original solder
 joints and original cable**. It is a simple open/close switch.
 
 - Active conductors (confirmed): **Red** and **Green**.
-- New interface (physical verification pending): **Red → ESP32 GPIO26 /
+- Current physically verified interface: **Red → ESP32 GPIO26 /
   board label D26** input with **internal pull-up enabled**; **Green → GND**.
 - Historical fact: the same switch and polarity were bench-verified on
   **GPIO19 / D19** on 2026-08-30.
@@ -255,8 +255,8 @@ Yellow = SDA.
 Expected behaviours: fade up, fade down, stored/configurable brightness, safe
 boot state. Firmware support is implemented. As a historical result, GPIO25,
 the MOSFET stage and the three-lamp electrical load passed the dial-lighting
-bench procedure on 2026-08-31. GPIO18/D18 awaits physical verification after
-the controlled transition. Subsequent 70%, 80% and 100% comparisons established
+bench procedure on 2026-08-31. GPIO18/D18 passed its controlled transition and
+physical verification on 2026-09-06. Subsequent 70%, 80% and 100% comparisons established
 the approved normal level is now 85%; Mono and standby are off. Final DFR0457
 integration and installed-holder checks remain open.
 
@@ -279,9 +279,8 @@ observe specifically for any lamp flash during physical verification.
 
 ### Controlled D19/D25 to D26/D18 transition
 
-The known starting state is the ESP32 powered off with the switch signal still
-on D19 and the DFR0457 control signal still on D25. Do not move either conductor
-while powered.
+This procedure completed successfully on 2026-09-06. It is retained for future
+controller replacement. Do not move either conductor while powered.
 
 1. Leave both old signal wires on D19/D25. The owner has explicitly deferred the
    recommended external D18 control-input pull-down.
@@ -300,6 +299,12 @@ while powered.
 
 Stop if any prerequisite or conductor identity is uncertain. Do not adjust any
 potentiometer as part of this transition.
+
+Recorded result (2026-09-06): authenticated OTA of v0.28.0 succeeded while both
+signal conductors were disconnected. The ESP32 returned at `decca.local` /
+`192.168.1.79`. After confirmed power-off, the switch signal was connected to
+D26 and the DFR0457 control/PWM signal to D18. The owner confirmed the completed
+wiring works correctly. No external pull-down is fitted.
 
 ## H6 — Fosi ZA3 12 V Trigger
 

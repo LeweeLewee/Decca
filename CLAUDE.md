@@ -53,9 +53,9 @@ firmware. They record the current physical evidence and open work.
 Phase 1 module implementation is in progress. `hardware`, `settings`, `pots`,
 `buttons`, `lighting`, `display`, `power` and authenticated `ota` exist. Pot
 GPIO32–35, sole VHF source input GPIO23 and OLED GPIO21/22 are physically
-verified. On/off GPIO19 and lighting PWM GPIO25 have prior physical acceptance;
-firmware v0.28.0 reassigns them to GPIO26 and GPIO18 respectively, pending the
-controlled OTA/wiring transition and physical verification. DFRobot DFR0457 is
+verified. On/off GPIO19 and lighting PWM GPIO25 retain prior physical evidence;
+firmware v0.28.0 reassigns them to physically verified GPIO26 and GPIO18
+respectively. DFRobot DFR0457 is
 installed as the final MOSFET stage;
 its initial steady-light test resolved the flicker. Firmware uses 1 kHz PWM and
 85% / duty 217. That image was uploaded successfully by authenticated OTA and
@@ -86,9 +86,11 @@ remains Phase 3.
 The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow
 SDA GPIO21. Rev Q bezel PR #7 is merged, complete and owner-approved.
 
-GitHub `main` is the firmware source of truth. The ESP32's last-known installed
-image is firmware v0.27.1 at commit `d0b1d3c`: authenticated OTA succeeded and
-the device returned at `decca.local`. Its version hold is 2.2 seconds and the
+GitHub `main` remains unchanged; the current feature source is
+`feature/reassign-control-gpios`. The ESP32's last-known installed image is
+firmware v0.28.0 from commit `283d40a`: authenticated OTA succeeded, the device
+returned at `decca.local`, and the owner confirmed the D26/D18 wiring works
+correctly. Its version hold is 2.2 seconds and the
 0–85% lighting transition is approximately 4.34 seconds in either direction.
 Complete the remaining HW-LGT-01 WAGO installation, pot-stability, temperature
 and current checks.

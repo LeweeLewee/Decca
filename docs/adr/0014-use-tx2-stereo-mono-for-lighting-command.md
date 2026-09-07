@@ -22,7 +22,7 @@ the lighting module.
 - No 3.3 V or 5 V wire is used at the switch.
 - GPIO17 is no longer available for other functions.
 - This decision assigns and implements the input only. The lighting output was
-  subsequently accepted on GPIO25 and is now reassigned to GPIO18 pending its
-  controlled transition and separate physical verification.
+  subsequently accepted on GPIO25 and was reassigned to GPIO18, which passed its
+  controlled transition and physical verification on 2026-09-06.
 - Wiring polarity and both stable states require physical acceptance before the
   input is marked bench-verified.

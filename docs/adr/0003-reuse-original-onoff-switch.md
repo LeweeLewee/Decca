@@ -13,13 +13,14 @@ Reuse the original switch and cable as a **low-voltage logic input** to the ESP3
 Current interface: Red → ESP32 GPIO26 input with **internal pull-up enabled**;
 Green → GND. Physical acceptance on 2026-08-30 established closed/active-low
 as logical ON and open as logical STANDBY on the previous GPIO19 assignment.
-GPIO26 awaits the controlled wiring transition and physical verification.
+GPIO26 was physically accepted after the controlled wiring transition on
+2026-09-06.
 
 ## Consequences
 - The switch **must not** switch 230 V mains; it is logic-level only.
 - The original Red/Green conductors are documented as an **exception** to the
   general wiring colour standard and are not recoloured (see docs/Wiring.md).
-- GPIO19/D19 is the previously bench-verified assignment; GPIO26/D26 is the new
-  unverified assignment. The firmware's `power`
+- GPIO19/D19 is the previously bench-verified assignment; GPIO26/D26 is the
+  current physically verified assignment. The firmware's `power`
   module owns the logical state without owning the GPIO; `main` coordinates the
   debounced input with display and later power-sequence outputs.

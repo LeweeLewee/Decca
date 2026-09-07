@@ -231,9 +231,9 @@ button panel.
 ### 7.3 Original on/off switch verification
 
 Historical result: this procedure passed on 2026-08-30 on GPIO19/D19, confirming
-the retained H2 Red/Green cable and active-low polarity. Firmware v0.28.0 moves
-the input to GPIO26/D26; that new assignment awaits the controlled transition
-and physical verification. Keep the Decca disconnected from mains.
+the retained H2 Red/Green cable and active-low polarity. The controlled v0.28.0
+transition moved the input to GPIO26/D26 on 2026-09-06, and the owner confirmed
+the rewired control works correctly. Keep the Decca disconnected from mains.
 
 1. After the controlled transition in section 7.7, connect H2 Red to GPIO26 /
    board label D26 and H2 Green to GND. GPIO26 uses
@@ -255,9 +255,9 @@ Pass criteria:
 - returning to closed wakes the display immediately;
 - all button and power tests pass without using the switch for mains voltage.
 
-Recorded historical result: both switch directions were physically accepted on
-GPIO19/D19 and no logical inversion is required. Record GPIO26/D26 separately
-only after the new physical test passes.
+Recorded results: both switch directions were physically accepted on GPIO19/D19,
+and GPIO26/D26 was physically accepted after the controlled v0.28.0 transition
+on 2026-09-06. No logical inversion is required.
 
 ### 7.4 OLED bench verification
 
@@ -349,9 +349,10 @@ Keep the lighting PWM signal and lamp load disconnected for this input-only test
 
 ### 7.6 Dial-lighting bench verification
 
-Historical result: GPIO25/D25 passed this procedure on 2026-08-31. Firmware
-v0.28.0 moves the output to GPIO18/D18; that new assignment awaits the controlled
-transition and physical verification. Keep the Decca disconnected from mains.
+Historical result: GPIO25/D25 passed this procedure on 2026-08-31. The controlled
+v0.28.0 transition moved the output to GPIO18/D18 on 2026-09-06, and the owner
+confirmed the rewired lighting works correctly. Keep the Decca disconnected from
+mains.
 
 1. Check the MOSFET stage before applying power:
    - GPIO18 / board label D18 connects only to the DFR0457 control/PWM input;
@@ -388,10 +389,17 @@ owner approval of 90% / duty 230. The lamps fade smoothly, hold evenly and fade
 fully off with no flash, flicker, abnormal heat or smell.
 
 The installed DFR0457 was subsequently approved at 1 kHz, duty 217/255 with
-approximately 4.34-second fades on GPIO25. Do not carry that physical result
-forward to GPIO18 until the controlled transition is complete.
+approximately 4.34-second fades on GPIO25. GPIO18/D18 was then physically
+accepted after the controlled v0.28.0 transition on 2026-09-06; the configured
+frequency, duty and fade timing were unchanged.
 
 ### 7.7 Controlled GPIO reassignment and authenticated OTA
+
+Completed 2026-09-06. Authenticated OTA installed v0.28.0 while the D19/D25
+signals were disconnected. The ESP32 returned at `decca.local` / 192.168.1.79;
+after confirmed power-off, H2 was moved to D26 and DFR0457 PWM to D18. The owner
+then confirmed the completed wiring works correctly. No external D18 pull-down
+is fitted, so the pre-`setup()` reset-time caveat remains.
 
 Do not start this procedure until the ESP32 is powered off, the old D19/D25
 wiring is confirmed still present, all builds/tests pass, `decca.local`, the
