@@ -16,16 +16,18 @@ Source (editable, parametric) mechanical design files.
 - Parametric source is preferred so parts can be re-derived if dimensions change.
 - Record revisions in `docs/Revision History.md`.
 
-## ESP32 controller housing — revision **C**: PROTOTYPE CAD, not yet printed
+## ESP32 controller housing — revision **C**: PROTOTYPE, printed and fitted
 
 Controlling document: [`../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md`](../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md),
 content revision **v1.7**. Full write-up:
 [`../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md`](../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md).
 
-> **Nothing here has been printed and nothing is approved for printing.** Rev C
-> is the first housing revision with measured hardware in it, but most
-> dimensions are still CAD starting values and every one is an open prototype
-> gate. See build report §7.
+> **PROTOTYPE PRINTED, FITTED AND INSTALLED — 2026-09-07.** The owner printed
+> this geometry, fitted the adapter, closed the lid and installed it in the
+> Decca; it fitted first time. That is a prototype under specification v1.7
+> §14.0, **not a release** — v1.7 §14 acceptance is outstanding and eleven
+> prototype gates remain open. Build report §10 records gate by gate what the
+> fitted print established and what it did not.
 
 **Rev C exists because Rev B could not be wired.** Rev B passed thirty gates
 and routed grouped harnesses over the tops of the terminal blocks. The DORHEA

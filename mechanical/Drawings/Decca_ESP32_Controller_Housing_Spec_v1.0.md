@@ -1,6 +1,6 @@
 # Decca ESP32 Controller Housing Specification v1.7
 
-**Status:** **REV C BUILT to this specification, 2026-09-06. Prototype gates remain open; nothing is approved for printing.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
+**Status:** **REV C BUILT to this specification 2026-09-06, and PRINTED, FITTED AND INSTALLED as a prototype 2026-09-07 — it fitted first time. NOT production approved: §14 acceptance is outstanding and eleven prototype gates remain open. See §14.1.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
 
 **Scope:** Enclosure for the selected 30-pin ESP32 DevKit fitted to the acquired DORHEA 30-pin screw-terminal adapter only. The MOSFET board is excluded and remains separately mounted.
 
@@ -15,7 +15,7 @@
 | v1.4 | Identifies the acquired adapter as the DORHEA 30-pin terminal adapter shown at 66 × 63 mm. Rejects Rev B after confirming that its harness and tie geometry is based on the wrong connection path. External conductors enter the green screw-terminal blocks horizontally through their outward-facing long-side ports; the black vertical sockets are only for the ESP32 module. Replaces the elevated cable-window and tie-tower requirements with direct terminal-entry corridors, installed-wire and ferrule keep-outs, a cover removable with the wiring connected, and optional low-profile strain relief only after the conductors have cleared the terminal mouths. Existing envelope and material limits remain design targets, but all Rev B production and coupon geometry is superseded. |
 | v1.5 | Records the owner's physical measurement of **20 mm overall height** for the complete DORHEA adapter plus fitted ESP32. This supersedes Rev B's unverified 24 mm “above PCB” assumption and closes the gross assembled-height measurement gate. The 20 mm value is an overall envelope, not an above-PCB dimension; replacement CAD shall reference it from the assembly's actual lowest underside feature to its highest point. Terminal-port and underside measurements remain open. |
 | v1.6 | Records the owner's macro measurements of 2026-09-06 — PCB outline 66 × 63 mm, mounting-hole centre pitch 58 × 56 mm *(re-measured the same day as **60 mm across × 57 mm along** — see §3; the 58 × 56 pair left 1.00 mm unaccounted for)*, terminal blocks 55 mm outer face to outer face, row length 53 mm, block height 9 mm, and the wire entry sitting just above the base of the block. **Closes the §15 measurement gate and releases replacement CAD.** Supersedes the v1.5 §5.3 requirement for dimensioned port geometry: the terminal-port bore size and internal insertion depth do not drive housing geometry and are out of scope. In their place §5.3 now requires the housing to clear the **entire terminal-block height** across the full row length on both long sides, which is conservative whatever the port position, and to declare its own straight external run as a routing value. Envelope, volume and mass limits are unchanged. |
-| v1.7 | **Replaces the adjustable clamp with hole-located retention**, adds §4.12, the lid-screw boss wall rule, and adds §14.0, which makes a prototype print of a small, cheap part a legitimate way to close a measurement gate rather than something that has to wait for one. The owner's 2026-09-06 measurements close the last gap: a 60 × 57 mm mounting-hole pitch with M3 holes, every hole 3.00 mm from its nearest board edge. §4.6 now requires the carrier to be located by features engaging its own mounting holes rather than gripped by its opposite short edge, and §4.5's fixed ledge is retained unchanged. Screws through those holes are **prohibited** and the reason is recorded in §4.6: the binding clearance is not the terminal block but the outermost conductor, 3.767 mm from the hole centre, which an M3 head of radius 2.75 fouls by 0.28 mm against a 2.60 mm ferrule. The adjustable-carrier-range requirement, the clamp's volume allowance, its print orientation, its STEP and STL deliverables and gate 14 all go with it; gate 14 becomes the hole-location gate. Envelope, volume and mass limits are unchanged, and the design moves further inside them. |
+| v1.7 | **Replaces the adjustable clamp with hole-located retention**, adds §4.12, the lid-screw boss wall rule, records the first prototype's fit in §14.1, and adds §14.0, which makes a prototype print of a small, cheap part a legitimate way to close a measurement gate rather than something that has to wait for one. The owner's 2026-09-06 measurements close the last gap: a 60 × 57 mm mounting-hole pitch with M3 holes, every hole 3.00 mm from its nearest board edge. §4.6 now requires the carrier to be located by features engaging its own mounting holes rather than gripped by its opposite short edge, and §4.5's fixed ledge is retained unchanged. Screws through those holes are **prohibited** and the reason is recorded in §4.6: the binding clearance is not the terminal block but the outermost conductor, 3.767 mm from the hole centre, which an M3 head of radius 2.75 fouls by 0.28 mm against a 2.60 mm ferrule. The adjustable-carrier-range requirement, the clamp's volume allowance, its print orientation, its STEP and STL deliverables and gate 14 all go with it; gate 14 becomes the hole-location gate. Envelope, volume and mass limits are unchanged, and the design moves further inside them. |
 
 ## 1. Design intent
 
@@ -332,6 +332,28 @@ The CAD revision is not production-approved until physical checks confirm:
 - no pull test, load test or dedicated strain-relief coupon is required.
 
 Record the results in the build report before release.
+
+### 14.1 Results so far — first prototype, 2026-09-07
+
+Printed under §14.0, fitted and installed in the Decca. It fitted first time.
+**Closed by that fit**, each recorded in both verification suites with the
+observer and date: the two locating posts entering the real mounting holes,
+which also confirms the 60 × 57 pitch over the 58 × 56 first reported; the
+carrier fitting by the designed ledge-and-tilt sequence; the lid closing on the
+assembly, which closes the whole height chain from the measured 20.00 mm
+assembly; the enclosure installing in the Decca; nothing under the board outside
+the modelled joint rows; the terminal rows being centred on the 63.00 mm
+dimension; the 9.00 mm block height being the block's own body height; and PETG
+printing this geometry with no support material.
+
+**Not closed by it**, and the distinction is §14.0 point 3: a board that seats
+proves the 4.50 mm pad height works, it does not measure the PCB thickness or
+the below-board protrusion behind it; and a Ø2.60 post fitting the real hole
+does not measure the bore, which sets how much play the board has.
+
+**Still unreported from this build:** whether the heat-set inserts drove and the
+lid screws pulled the lid down; whether the terminals are wired; whether the two
+cabinet fixings and their caps were used; surface quality and cleanup.
 
 ## 15. Change control
 

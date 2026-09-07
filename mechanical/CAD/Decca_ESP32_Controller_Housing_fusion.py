@@ -135,6 +135,12 @@ SLICER_PROFILE = ("Bambu Lab P1S, PETG-HF, 0.40 mm nozzle, 0.20 mm layers, "
 # reaches from its nearest support, and held under this.
 OVERHANG_REACH_MAX = 1.50
 
+# The date the first physical prototype was printed, fitted and installed.
+# Specification v1.7 14.0: a print of a part this small is a legitimate
+# instrument, and what it establishes is recorded gate by gate.
+FITTED_ON = "2026-09-07"
+FIT = "owner, fitted prototype " + FITTED_ON
+
 # Rev A and Rev B components that must not exist in the replacement document.
 FORBIDDEN_COMPONENTS = (
     "PCB_Clamp_Fixed_End", "PCB_Clamp_Adjustable_End", "USB_Blanking_Plug",
@@ -366,15 +372,8 @@ STARTING = (
 # Assumptions the owner has not confirmed, recorded so they cannot pass as
 # measurements. Each is a one-parameter change if it turns out to be wrong.
 ASSUMED = (
-    ("terminal rows centred along the 63.00 mm ALONG-row dimension",
-     "leaves 5.00 mm of clear board beyond each row end, which is where the "
-     "ledge, the locating posts, the lid screws and the lugs all live"),
     ("the USB connector is centred on its short edge",
      "the opening is cut oversize at 16.00 mm to absorb the error"),
-    ("term_block_h 9.00 was taken as the block's own body height",
-     "if it was taken from the resting surface instead, the block top drops "
-     "by adapter_below_h + adapter_pcb_t and the long walls gain nothing, "
-     "because they are set by the board top face either way"),
 )
 
 # The actual Decca harnesses, docs/Wiring.md. Grouped AFTER the conductors have
@@ -1564,6 +1563,16 @@ def proto(label, detail=""):
     print("  [PROTO] %-56s %s" % (label, detail))
 
 
+def confirmed(label, detail=""):
+    """A gate closed by PHYSICAL evidence, not by geometry.
+
+    Separate from gate() on purpose: gate() is something this script measured,
+    confirmed() is something the world did. It carries who observed it and
+    when, and it says what the observation does NOT establish."""
+    CLOSED.append(label)
+    print("  [FITTED] %-55s %s" % (label, detail))
+
+
 def _bodies(design, comp_name):
     occ = find_component(design, comp_name)
     if occ is None:
@@ -1699,13 +1708,15 @@ PRINT_ORIENT = {
 CHECKS = 0
 FAILS = []
 BLOCKED = []
+CLOSED = []
 
 
 def validate(_context=None):
-    global CHECKS, FAILS, BLOCKED
+    global CHECKS, FAILS, BLOCKED, CLOSED
     CHECKS = 0
     FAILS = []
     BLOCKED = []
+    CLOSED = []
 
     app = adsk.core.Application.get()
     design = adsk.fusion.Design.cast(app.activeProduct)
@@ -2131,18 +2142,58 @@ def validate(_context=None):
 
     # -- prototype gates -----------------------------------------------------
     print("")
+    print("CLOSED BY PHYSICAL EVIDENCE - the fitted prototype, %s" % FITTED_ON)
+    confirmed("the two locating posts enter the real mounting holes",
+              "%s. 2.60 posts at the MEASURED 60 x 57 pitch went into the "
+              "actual bores and the board seated. This also confirms the "
+              "re-measured pitch over the 58 x 56 first reported, and it is "
+              "the single most novel thing in the design. It does NOT measure "
+              "the bore" % FIT)
+    confirmed("the carrier fits: ledge, tilt-and-drop, posts, pads",
+              "%s. The board went in by the designed sequence - +X end up, -X "
+              "edge under the fixed ledge, lower onto the posts - and sat on "
+              "its four pads" % FIT)
+    confirmed("the lid closes on the assembly",
+              "%s. The lid is on, which exercises the %.2f mm per face fit, "
+              "the %.2f mm overlap at the ends and corners, and the whole "
+              "height chain from the MEASURED 20.00 mm assembly under a "
+              "%.2f mm ceiling. Rev B died on a height assumption; this is "
+              "the first time one has been closed by a closed lid"
+              % (FIT, P["lid_fit_clear"], P["lid_overlap"], d["z_cav_top"]))
+    confirmed("the enclosure installs in the Decca",
+              "%s. Envelope %.2f x %.2f x %.2f mm accepted in the actual "
+              "cabinet space" % (FIT, d["lid_l"], d["lid_w"], d["h_closed"]))
+    confirmed("nothing on the carrier underside outside the modelled joint rows",
+              "%s. The board seated on its pads and over both cabinet pads "
+              "with nothing fouling. Rev B's blanket keep-out is disproved by "
+              "a fitted board, not just by a gate" % FIT)
+    confirmed("the terminal rows are centred on the 63.00 mm along-row length",
+              "%s. Was an ASSUMPTION; the ledge, the pads and both posts all "
+              "cleared, which they could not have done if the rows were "
+              "offset" % FIT)
+    confirmed("the 9.00 mm block height is the block's own body height",
+              "%s. Was an ASSUMPTION; the lid closed over the assembly, which "
+              "is the consequence that was at risk" % FIT)
+    confirmed("PETG prints this geometry with no support material",
+              "%s, on the owner's printer and filament. The slicer harness "
+              "independently emitted ZERO support features on all three "
+              "parts. Surface quality and any cleanup were not separately "
+              "reported" % FIT)
+
+    print("")
     print("PROTOTYPE GATES - not settled by geometry, and not marked PASS")
     proto("PCB thickness %.2f and below-board protrusion %.2f"
           % (P["adapter_pcb_t"], P["adapter_below_h"]),
-          "both STARTING; they set the support pad height")
+          "the fitted prototype shows the %.2f mm pad height WORKS; it does "
+          "not measure the two numbers it was derived from, and they still "
+          "set the underside clearance" % d["pad_h"])
     proto("terminal-block depth %.2f mm in Y" % P["term_block_d"],
-          "STARTING; 55.00 outer-to-outer does not give it")
-    proto("nothing on the carrier underside outside the modelled joint rows",
-          "this is what lets the two cabinet fixings sit under the board")
+          "STARTING; 55.00 outer-to-outer does not give it. Nothing fouled on "
+          "fitting, which bounds it but does not measure it")
     proto("the mounting-hole bore, taken at %.2f from the reported M3"
           % P["mount_hole_d"],
-          "the post is sized 2.60 so it works at 3.00 too, but the fit is not "
-          "proven until a post goes into a real hole")
+          "a 2.60 post now demonstrably fits the real hole; the bore itself "
+          "is still not measured, and it sets how much play the board has")
     proto("heat-set insert bore %.2f dia x %.2f deep"
           % (P["insert_hole_d"], P["insert_depth"]),
           "the PART is identified - Hanglife M3 threaded, owner 2026-09-06 - but its length and OD are not, and those are what this bore has to match")
@@ -2156,8 +2207,6 @@ def validate(_context=None):
           "%.2f mm wire over a %.2f x %.2f ferrule are STARTING"
           % (P["wire_d"], P["ferrule_d"], P["ferrule_l"]))
     proto("EN and BOOT positions - v1.7 6.4 forbids holes until measured")
-    proto("lid fit %.2f mm per face on this printer and filament"
-          % P["lid_fit_clear"])
     proto("cap nib interference %.2f mm per side on this printer"
           % P["cab_nib_int"])
     proto("antenna performance with the lid fitted")
@@ -2166,7 +2215,8 @@ def validate(_context=None):
 
     print("")
     print("%d checks covering all 30 v1.7 section 13 gates, %d failed, "
-          "%d prototype gates open" % (CHECKS, len(FAILS), len(BLOCKED)))
+          "%d prototype gates open, %d closed by the fitted prototype"
+          % (CHECKS, len(FAILS), len(BLOCKED), len(CLOSED)))
     if FAILS:
         for f in FAILS:
             print("  FAILED: %s" % f)

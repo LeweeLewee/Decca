@@ -41,9 +41,13 @@ RESULT VOCABULARY - used exactly, never loosely
            measured yet, so no amount of geometry can settle it.
   [INST]   INSTALLATION-REQUIRED. Cannot be settled until the housing is in
            the cabinet.
+  [FITTED] CLOSED BY PHYSICAL EVIDENCE. Not measured here at all - observed on
+           the fitted prototype, and carried with the observer and the date.
 
-Nothing here may be read as physical validation. No part of this design has
-been printed.
+The [PASS] gates in this file are geometric and stay that way: nothing measured
+off a triangle is physical validation. The [FITTED] entries are the physical
+part, they are listed separately for exactly that reason, and each one states
+what it does NOT establish as well as what it does.
 """
 
 from __future__ import print_function
@@ -92,11 +96,15 @@ TERM_PER_SIDE = 15
 MOUNT_PITCH = (57.00, 60.00)   # owner, 2026-09-06; along, across. Re-measured
                                # same day, superseding 58 x 56: 60/57 puts every
                                # hole 3.00 mm from its nearest edge on both axes.
-                               # Recorded only - no gate depends on it.
+                               # CONFIRMED 2026-09-07 by a fitted board - posts
+                               # cut at this pitch entered the real holes, which
+                               # 58 x 56 could not have done.
 MOUNT_HOLE_D = 3.20            # the holes take M3 - owner, 2026-09-06. The
-                               # screw size, not a measured bore, so this is
-                               # a STARTING figure. Recorded only; nothing in
-                               # the current design uses the holes.
+                               # screw size, NOT a measured bore, so this stays
+                               # a STARTING figure. The two +X holes carry the
+                               # locating posts, and a 2.60 post is confirmed to
+                               # fit a real one - which still does not measure
+                               # the bore.
 
 X_PCB = 31.50
 Y_PCB = 33.00
@@ -251,6 +259,12 @@ CHECKS = 0
 FAILS = []
 PROTOS = []
 INSTALLS = []
+CLOSED = []
+
+# The first physical prototype: printed, fitted and installed in the Decca on
+# this date, to the geometry these meshes carry. Specification v1.7 14.0.
+FITTED_ON = "2026-09-07"
+FIT = "owner, fitted prototype " + FITTED_ON
 
 
 def gate(ok, label, detail=""):
@@ -274,6 +288,16 @@ def proto(label, detail=""):
 def install(label, detail=""):
     INSTALLS.append(label)
     print("  [INST] %-57s %s" % (label, detail))
+
+
+def confirmed(label, detail=""):
+    """Closed by PHYSICAL evidence rather than by geometry.
+
+    Deliberately not gate(): gate() is something this file measured off the
+    triangles, confirmed() is something the world did. Each one records what
+    the observation establishes and what it does not."""
+    CLOSED.append(label)
+    print("  [FITTED] %-55s %s" % (label, detail))
 
 
 def term_x():
@@ -1135,15 +1159,15 @@ def main():
     print("")
     print("PROTOTYPE GATES - no amount of geometry settles these")
     proto("PCB thickness 1.60 and below-board protrusion 2.50",
-          "both STARTING; together they set the 4.50 mm support pad height")
+          "the fitted prototype shows the 4.50 mm pad height WORKS; it does "
+          "not measure the two numbers behind it")
     proto("terminal-block depth 6.50 mm in Y",
-          "STARTING; 55.00 outer-to-outer does not give it")
-    proto("nothing under the board outside the four modelled joint rows",
-          "this is what lets the two cabinet fixings sit on the centreline")
+          "STARTING; 55.00 outer-to-outer does not give it. Nothing fouled on "
+          "fitting, which bounds it but does not measure it")
     proto("the mounting-hole bore, taken at %.2f from the reported M3"
           % MOUNT_HOLE_D,
-          "the post is 2.60 so it works at 3.00 too, but no post has been in a "
-          "real hole yet")
+          "a 2.60 post now demonstrably fits the real hole; the bore itself is "
+          "still unmeasured and it sets how much play the board has")
     proto("heat-set insert bore 4.00 dia x 5.00 deep",
           "the PART is identified - Hanglife M3 threaded, owner 2026-09-06 - "
           "but its length and OD are not, and those are what this bore has "
@@ -1158,17 +1182,42 @@ def main():
           "%.2f mm wire over a %.2f x %.2f ferrule are STARTING"
           % (WIRE_D, FERRULE_D, FERRULE_L))
     proto("EN and BOOT positions", "v1.7 6.4 forbids holes until measured")
-    proto("lid fit %.2f mm per face on this printer and filament"
-          % LID_FIT_CLEAR)
     proto("cap nib interference %.2f mm per side on this printer"
           % CAB_NIB_INT)
-    proto("PETG print quality with no support on any part")
     print("")
     print("ASSUMPTIONS - recorded so they cannot pass as measurements")
-    proto("terminal rows centred along the 63.00 mm along-row length",
-          "leaves the 5.00 mm of clear board the retention features use")
     proto("the USB connector is centred on its short edge")
-    proto("the 9.00 mm block height is the block's own body height")
+
+    print("")
+    print("CLOSED BY PHYSICAL EVIDENCE - the fitted prototype, %s" % FITTED_ON)
+    confirmed("the two locating posts enter the real mounting holes",
+              "%s. %.2f posts at the MEASURED %.0f x %.0f pitch went into the "
+              "actual bores and the board seated - which also confirms that "
+              "pitch over the 58 x 56 first reported. It does NOT measure the "
+              "bore" % (FIT, POST_D, MOUNT_PITCH[1], MOUNT_PITCH[0]))
+    confirmed("the carrier fits: ledge, tilt-and-drop, posts, pads",
+              "%s. The board went in by the designed sequence and sat on its "
+              "four pads" % FIT)
+    confirmed("the lid closes on the assembly",
+              "%s. Exercises the %.2f mm per face fit, the %.2f mm overlap at "
+              "the ends and corners, and the height chain from the MEASURED "
+              "20.00 mm assembly under a %.2f mm ceiling"
+              % (FIT, LID_FIT_CLEAR, LID_OVERLAP, Z_CAV_TOP))
+    confirmed("the enclosure installs in the Decca",
+              "%s. The %.2f x %.2f mm envelope was accepted in the actual "
+              "cabinet space" % (FIT, LID_L, LID_W))
+    confirmed("nothing under the board outside the four modelled joint rows",
+              "%s. The board seated on its pads and over both cabinet pads "
+              "with nothing fouling" % FIT)
+    confirmed("the terminal rows are centred on the 63.00 mm along-row length",
+              "%s. Was an ASSUMPTION; ledge, pads and both posts all cleared" % FIT)
+    confirmed("the 9.00 mm block height is the block's own body height",
+              "%s. Was an ASSUMPTION; the lid closed over the assembly, which "
+              "is the consequence that was at risk" % FIT)
+    confirmed("PETG prints this geometry with no support material",
+              "%s, on the owner's printer and filament; the slicer harness "
+              "independently emitted ZERO support features on all three "
+              "parts. Surface quality was not separately reported" % FIT)
 
     print("")
     print("INSTALLATION GATES")
@@ -1178,15 +1227,19 @@ def main():
 
     print("")
     print("%d checks covering all 30 v1.7 section 13 gates, %d failed, "
-          "%d prototype, %d installation"
-          % (CHECKS, len(FAILS), len(PROTOS), len(INSTALLS)))
+          "%d prototype, %d installation, %d closed by the fitted prototype"
+          % (CHECKS, len(FAILS), len(PROTOS), len(INSTALLS), len(CLOSED)))
     if FAILS:
         for f in FAILS:
             print("  FAILED: %s" % f)
         return 1
     print("")
     print("All specification v1.7 section 13 gates pass on the exported "
-          "meshes. This is NOT physical validation.")
+          "meshes. Those gates are geometric and stay that way.")
+    print("%d further gates are closed by the fitted prototype of %s and are "
+          "listed above, each with what it does" % (len(CLOSED), FITTED_ON))
+    print("and does not establish. Neither set makes this design "
+          "production-approved: v1.7 section 14 acceptance does.")
     return 0
 
 

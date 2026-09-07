@@ -5,8 +5,9 @@ Print-ready meshes exported from the CAD sources.
 > **ESP32 housing:** the meshes here are **Rev C**, built to the DORHEA
 > adapter's measured geometry with horizontal side-entry terminals. All Rev A
 > and Rev B housing meshes and coupons are superseded and have been removed.
-> **Rev C is not approved for printing either** — see the open prototype gates
-> in `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md` §7.
+> **Rev C has been printed, fitted and installed** — 2026-09-07, first time.
+> It is a prototype, not a release: see `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md` §10
+> for what that closed, and §7 for the twelve gates still open.
 
 **Intended contents**
 - `.stl` (or `.3mf`) files ready to slice and print.
@@ -16,7 +17,7 @@ Print-ready meshes exported from the CAD sources.
 - STLs are derived artefacts — the editable source lives in `../CAD/`.
 - Name files to match their CAD source and revision.
 
-## ESP32 controller housing — revision **C**: PROTOTYPE, nothing printed yet
+## ESP32 controller housing — revision **C**: PROTOTYPE, printed and fitted
 
 PETG or PETG-HF. 0.40 mm nozzle, 0.20 mm layers, 3 perimeters, 15–20% infill.
 **No part needs support material** — both verifiers gate on it, measuring how
@@ -27,8 +28,8 @@ each part's stated orientation. Worst case on any part is **1.25 mm** (CAD) or
 
 | File | Print notes |
 |---|---|
-| `ESP32_Controller_Housing_Base.stl` | **DO NOT PRINT YET — see the release gate below.** Floor flat on the bed, no supports. 72.60 × 70.20 × 25.60 mm, 17.97 cm³, **20.58 g, 1 h 7 m 30 s**. Carries the fixed ledge, the two Ø2.60 locating posts, four support pads, both lid-screw bosses and the two recessed cabinet fixings. |
-| `ESP32_Controller_Housing_Lid.stl` | **DO NOT PRINT YET.** **Top face flat on the bed**, skirt pointing up, no supports — that orientation is what makes the USB notch and the vents print with no bridge. 75.50 × 73.10 × 5.60 mm, 9.25 cm³, **11.30 g, 22 m 57 s**. No long-side skirt: one would foul the fitted conductors. |
+| `ESP32_Controller_Housing_Base.stl` | **Printed and fitted 2026-09-07.** Floor flat on the bed, no supports. 72.60 × 70.20 × 25.60 mm, 17.97 cm³, **20.58 g, 1 h 7 m 30 s**. Carries the fixed ledge, the two Ø2.60 locating posts, four support pads, both lid-screw bosses and the two recessed cabinet fixings. |
+| `ESP32_Controller_Housing_Lid.stl` | **Printed and fitted 2026-09-07.** **Top face flat on the bed**, skirt pointing up, no supports — that orientation is what makes the USB notch and the vents print with no bridge. 75.50 × 73.10 × 5.60 mm, 9.25 cm³, **11.30 g, 22 m 57 s**. No long-side skirt: one would foul the fitted conductors. |
 | `ESP32_Controller_Cabinet_Fastener_Cap.stl` | **PRINT 2 OFF.** Flat. 0.08 cm³, **0.19 g, 2 m 22 s** each. Presses into each cabinet-fixing recess over the countersunk head, retained by three compliant nibs at +0.12 mm interference per side — not a clearance fit. |
 
 **Production set: 32.26 g, 1 h 35 m 11 s.** Every slice returned
@@ -42,10 +43,11 @@ each part's stated orientation. Worst case on any part is **1.25 mm** (CAD) or
 > `ESP32_Controller_Insert_Fastener_Coupon.stl`. The generator deletes them on
 > every run and both verifiers fail if one reappears.
 
-> ### RELEASE GATE — the base and the lid may NOT be printed yet
+> ### RELEASE GATE — printed as a prototype, not yet released
 >
-> Rev C is built on the owner's measured DORHEA geometry, but most dimensions
-> are still starting values. Fifteen prototype gates are open, including the
+> Printing this set is explicitly allowed under specification v1.7 §14.0: on a
+> part this small the print is the measuring instrument. What is NOT yet done is
+> §14 acceptance. Eleven prototype gates are open, including the
 > PCB thickness and below-board protrusion that set the 4.50 mm pad height, the
 > terminal-block depth, the mounting-hole **bore** the locating posts go into,
 > the heat-set insert **bore** for the two lid screws — the part is identified

@@ -8,7 +8,8 @@ Dimensioned engineering drawings for fabrication, measurement, and reference.
 
 ## ESP32 controller housing — **Rev C**, prototype CAD
 
-> **PROTOTYPE. Nothing has been printed and nothing is approved for printing.**
+> **PROTOTYPE — printed, fitted and installed in the Decca on 2026-09-07, and
+> still not production approved.** See the build report §10.
 
 | File | Contents |
 |---|---|

@@ -1,9 +1,12 @@
 # Decca ESP32 Controller Housing — Rev C build report
 
-> **Status: PROTOTYPE CAD. NOT PHYSICALLY VALIDATED.**
-> Nothing here has been printed. Rev C is the first housing revision with any
-> measured hardware in it, but most dimensions are still CAD starting values
-> and every one is an open prototype gate. §7 lists them.
+> **Status: PROTOTYPE — PRINTED AND FITTED, NOT PRODUCTION APPROVED.**
+> **PROTOTYPE PRINTED, FITTED AND INSTALLED — 2026-09-07.** See §10.
+> Rev C is the first housing revision with measured hardware in it and the
+> first ever to be printed. It fitted first time. It is **not production
+> approved**: v1.7 §14 acceptance is outstanding, eleven prototype gates and
+> three installation gates remain open, and several §3 values it was built
+> on are still starting values rather than measurements.
 
 **Controlling document:** `Decca_ESP32_Controller_Housing_Spec_v1.0.md` — whose
 content is specification revision **v1.7**. The filename is retained for link
@@ -360,9 +363,15 @@ suite reads **only** the exported STLs and re-derives every claim from triangles
 against values typed in by hand. Neither imports the other's numbers.
 
 ```
-30 CAD checks,  0 failed, 15 prototype gates open
-29 mesh checks, 0 failed, 15 prototype, 3 installation
+30 CAD checks,  0 failed, 11 prototype gates open, 8 closed by the fitted prototype
+29 mesh checks, 0 failed, 10 prototype, 3 installation, 8 closed by the fitted prototype
 ```
+
+The two open counts differ by one because the suites classify the antenna
+differently — the in-CAD suite calls it a prototype gate, the offline one an
+installation gate. That is a deliberate difference, not drift: the suites are
+independent, and 75 of the offline verifier's hand-typed constants were
+cross-checked against the generator's derived chain with no disagreement.
 
 Together they cover all thirty v1.7 §13 gates.
 
@@ -407,7 +416,7 @@ a threshold.
   have marched inward; a screw-hole probe sitting on the tessellation seam; and
   an `overhang_report` unpacked with the wrong arity.
 
-## 7. Prototype gates — every one of these is still open
+## 7. Prototype gates — eleven still open, eight closed by the fitted print
 
 **The axis correction.** Rev C was first built with the 66 mm along the rows
 and the 63 mm across. The owner corrected it the same day. The parametric model
@@ -421,8 +430,12 @@ was re-centred at that point from the legacy 65–67 mm to 62–64 mm; v1.7 has
 since deleted the clamp and the range with it, because a measured board and a
 measured hole pitch leave nothing for an adjustment to absorb.
 
+**Eight of these were closed on 2026-09-07 by the fitted prototype — see §10.**
+What follows is what is left.
+
 **Hardware still unmeasured:** PCB thickness (1.60) and the below-board
-protrusion (2.50), which together set the 4.50 mm pad height; terminal-block
+protrusion (2.50) — the fitted print shows the 4.50 mm pad height *works*, but
+not what the two numbers behind it are; terminal-block
 depth in Y (6.50); the heat-set insert **bore** (4.00 × 5.00 — the part is now
 identified as **Hanglife M3 threaded**, owner 2026-09-06, the first time this
 fastener has had a name anywhere in this repository, but its length and outer
@@ -437,7 +450,8 @@ outside the four modelled joint rows; the 0.25 mm lid fit on this printer and
 filament; the 0.12 mm cap nib interference; PETG print quality with no support;
 antenna performance with the lid fitted.
 
-**Plus the three assumptions in §2.1.**
+**Plus the one assumption left in §2.1** — the USB connector centred on its
+short edge. The other two were closed by the fitted print (§10.1).
 
 **Installation gates:** cabinet fixing centres and the surface behind them; that
 the grouped cabinet wiring is secured outside the housing; antenna performance.
@@ -453,9 +467,10 @@ the grouped cabinet wiring is secured outside the housing; antenna performance.
 No supports on any part. Worst unsupported reach 1.25 mm (CAD) / 0.75 mm (mesh)
 against a self-declared 1.50 mm limit.
 
-**Nothing is approved for printing yet.** The open gates in §7 come first, and
-the most valuable next physical action is confirming the four §2.1 assumptions
-and the below-board protrusion against the real board.
+**It has been printed** — see §10 — and it is still **not production approved**.
+v1.7 §14.0 makes a prototype print of a part this small a legitimate
+instrument rather than something that has to wait for callipers, and §10
+records gate by gate what the fitted print established and what it did not.
 
 ## 9. Files
 
@@ -469,3 +484,51 @@ standing in the two +X mounting holes with the two −X holes left empty.
 twenty-three `..._revB_*.png` renders. The generator deletes
 them on every run, and both verifiers fail if a forbidden mesh reappears. The
 Rev A and Rev B build reports are retained as history with superseded banners.
+
+## 10. First physical validation — 2026-09-07
+
+The owner printed this geometry, fitted the adapter, closed the lid and
+installed the housing in the Decca. **It fitted first time.** No revision of
+this housing had ever been printed before; Rev A and Rev B never got near a
+printer.
+
+The print was made ahead of the §3 starting values behind it being measured.
+That is now explicitly allowed — v1.7 §14.0, added the same day — because on a
+20 g part that prints in about an hour, the print is the faster and better
+instrument: callipers on a populated board give the nominal, a fitted print
+answers whether it seats.
+
+### 10.1 What the fit closes
+
+Eight gates, listed in both suites under **CLOSED BY PHYSICAL EVIDENCE** with
+the observer and date on each:
+
+| Closed | What the fit demonstrates |
+|---|---|
+| **The two locating posts enter the real mounting holes** | Ø2.60 posts at the measured 60 × 57 pitch went into the actual bores and the board seated. The single most novel thing in the design, and nobody had tried it. It also **confirms the re-measured pitch over the 58 × 56 first reported** — 58 × 56 would not have accepted these posts. |
+| **The carrier fits** | Ledge, tilt-and-drop, posts and pads all worked as a sequence. |
+| **The lid closes on the assembly** | Exercises the 0.25 mm per face fit, the 4.00 mm overlap at the ends and corners, and the whole height chain from the measured 20.00 mm assembly under a 24.00 mm ceiling. **Rev B died on a height assumption**; this is the first time one has been closed by a closed lid. |
+| **The enclosure installs in the Decca** | The 75.50 × 73.10 mm envelope was accepted in the actual cabinet space. |
+| **Nothing under the board outside the modelled joint rows** | The board seated on its four pads and over both cabinet pads with nothing fouling. Rev B's blanket keep-out is now disproved by a fitted board, not just by a gate. |
+| **The terminal rows are centred on the 63.00 mm dimension** | Was an assumption. Ledge, pads and both posts all cleared, which they could not have done otherwise. |
+| **The 9.00 mm block height is the block's own body height** | Was an assumption. The lid closed over the assembly, which is the consequence that was at risk. |
+| **PETG prints this geometry with no support material** | On the owner's printer and filament. The slicer harness had independently emitted zero support features on all three parts. |
+
+### 10.2 What it does not close, and the distinction matters
+
+A board that seats proves the **4.50 mm pad height works**. It does not measure
+the **PCB thickness** or the **below-board protrusion** it was derived from, and
+those two still set the underside clearance. The same holds for the mounting-hole
+**bore**: a Ø2.60 post demonstrably fits the real hole, but the bore is still
+unmeasured and it is what decides how much play the board has.
+
+That distinction is the whole of v1.7 §14.0 point 3, and both suites state it on
+each entry rather than letting a fit against an unmeasured value pass for a fit
+against a measured one.
+
+**Eleven prototype gates and three installation gates remain open**, and several
+things this print will have exercised are simply **not yet reported**: whether
+the heat-set inserts drove into their bosses and the lid screws pulled the lid
+down; whether the terminals are wired, which would close the entry corridors,
+the screwdriver access and cover-removal-while-wired in one go; whether the two
+cabinet fixings and their caps were used; and surface quality and cleanup.
