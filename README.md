@@ -8,28 +8,27 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Firmware version: **v0.27.1**, defined once in `src/version.h`, shown during
+- Firmware version: **v0.27.3**, defined once in `src/version.h`, shown during
   cold-start/OTA-reboot and reported over serial for deployment identification.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
   VHF latched = Digital Streamer; every other selector position = Vinyl.
-- GPIO14/D14 is proposed for the Stereo/Mono contact as a lighting request:
-  Stereo open = lights on; Mono closed = lights off. This behaviour was
-  physically verified on the previous GPIO17/TX2 route; the new routing is
-  pending physical verification.
+- GPIO25/D25 is assigned to the Stereo/Mono contact as a lighting request:
+  Stereo open = lights on; Mono closed = lights off. Firmware logic is correct,
+  but the retained physical switch is faulty and remains open as HW-SW-01.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
-- USB-to-OTA, GPIO19 power, controls, source selection and the fitted display
+- USB-to-OTA, GPIO14 power, GPIO26 VHF source selection and the fitted display
   are complete. The DFR0457 replacement stage is installed and its initial
-  steady-light test resolved the flicker. The v0.27.1 startup/version display
-  and approximately 4.34-second fades were physically approved; WAGO
-  distribution installation plus pot-stability, temperature and current checks
-  remain open as HW-LGT-01. Normal Stereo
-  lighting is 85%; Mono and logical standby are off.
+  steady-light test resolved the flicker. The v0.27.3 startup screen and D18
+  lighting-on path were physically checked; the earlier v0.27.1 fade behaviour
+  remains approved. Mono/off re-verification after HW-SW-01, WAGO distribution,
+  pot stability, temperature and current remain open as HW-LGT-01. Normal
+  Stereo lighting is 85%; Mono and logical standby request off.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work, then check [Open Issues](docs/Open%20Issues.md).
@@ -42,12 +41,12 @@ firmware work, then check [Open Issues](docs/Open%20Issues.md).
 | Bass | GPIO33/D33 | Bench-verified |
 | Treble | GPIO34/D34 | Bench-verified |
 | Balance | GPIO35/D35 | Bench-verified |
-| VHF source contact | GPIO26/D26 | Proposed; pending physical verification |
+| VHF source contact | GPIO26/D26 | Physically verified |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
-| On/off | GPIO19/D19 | Bench-verified |
-| Stereo/Mono lighting request | GPIO14/D14 | Proposed; pending physical verification |
-| Dial lighting PWM | GPIO25/D25 | DFR0457 installed; flicker/fades passed, final checks open under HW-LGT-01 |
+| On/off | GPIO14/D14 | Physically verified |
+| Stereo/Mono lighting request | GPIO25/D25 | Firmware logic verified; physical switch fault open under HW-SW-01 |
+| Dial lighting PWM | GPIO18/D18 | DFR0457 installed and operating; final checks open under HW-LGT-01 |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 

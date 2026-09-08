@@ -1,7 +1,7 @@
 # ADR-0015: Reassign dry-contact inputs for terminal-adapter routing
 
 ## Status
-Accepted
+Superseded by ADR-0016
 
 ## Date
 2026-09-08
@@ -29,15 +29,13 @@ and do not conflict with the ADC1 pots, OLED, on/off input or dial-lighting PWM.
   continues to request lights off.
 - Leave the ZA3 trigger GPIO open/TBD.
 
-The firmware pin map uses the new assignments. Their physical status remains
-**proposed pending physical verification**.
+The firmware pin map used these assignments as an interim routing proposal.
 
 ## Consequences
 
-- GPIO17 and GPIO23 are released.
-- GPIO26 and GPIO14 are unavailable for other functions while this decision is
-  active.
-- Historical physical results for the switches remain evidence of their
-  behaviour, not verification of the new GPIO routing.
-- Bench acceptance must confirm both open/closed states, internal pull-ups and
-  boot/startup behaviour before either new route is marked physically accepted.
+- GPIO17 and GPIO23 were released by this proposal.
+- GPIO26 and GPIO14 were unavailable for other functions while this decision
+  was active.
+- Historical physical results for the switches remained evidence of their
+  behaviour, not verification of the proposed GPIO routing.
+- ADR-0016 supersedes this interim route with the physically reconciled map.

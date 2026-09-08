@@ -125,13 +125,15 @@ The final release build passed and the complete physical run passed 55/55:
 buttons 11/11, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
 power 5/5 and settings 3/3.
 
-The 2026-09-08 reassignment moves this input to GPIO14/D14 and the VHF input
-from GPIO23/D23 to GPIO26/D26. Automated pin-map coverage follows the new
+The final 2026-09-08 reassignment uses GPIO14/D14 for on/off, GPIO26/D26 for
+VHF, GPIO25/D25 for Stereo/Mono and GPIO18/D18 for lighting PWM. Automated pin-map coverage follows the new
 constants and now includes compile-time guards against duplicate GPIO allocation
 and use of the project's excluded strapping pins. The production build passed
 and all eight on-target suites compiled in PlatformIO; they were not executed
-because no ESP32 was attached. The new physical routes remain pending bench
-verification under HW-GPIO-01.
+because no ESP32 was attached. Firmware v0.27.3 was then uploaded by
+authenticated OTA and returned at `decca.local` / `192.168.1.79`. Owner testing
+accepted the routing and firmware logic. The retained Stereo/Mono switch fault
+is tracked separately as HW-SW-01.
 
 GPIO25 load acceptance (2026-08-31): the physical lighting snapshot fades to
 the owner-approved duty 230 (90%), holds for five seconds and fades fully off.
@@ -146,7 +148,7 @@ flash 839,253 bytes / 64.0%) and the complete on-target run passed 55/55.
 
 DFR0457 release candidate (2026-09-05): the normal target changes to duty 217
 (85%), settings schema v4 ensures the earlier persisted 90% value cannot
-override it, and GPIO25 PWM changes from 5 kHz to the controller's 1 kHz limit.
+override it, and the historical GPIO25 PWM changes from 5 kHz to the controller's 1 kHz limit.
 The non-blocking fade interval is now 20 ms per count, giving approximately
 4.34-second transitions between off and duty 217 in both directions. Physical
 OTA and integration acceptance are tracked as HW-LGT-01 in
@@ -157,3 +159,11 @@ the owner approved the 2.2-second firmware-version hold and both approximately
 4.34-second 0–85% lighting fades, with no flicker reported. HW-LGT-01 remains
 open for WAGO distribution installation plus pot-stability, temperature and
 installed-current checks.
+
+v0.27.3 deployment result (2026-09-08): the `esp32dev-ota` build passed with
+RAM 49,936 bytes / 15.2% and flash 839,409 bytes / 64.0%. Authenticated OTA of
+commit `0a4d3bd` completed with exit code 0 in 60.527 seconds, and the ESP32
+returned at `decca.local` / `192.168.1.79`. The v0.27.3 screen, GPIO14 on/off,
+GPIO26 VHF, GPIO25 Stereo/Mono firmware logic and GPIO18 lighting path were
+checked. The lamps reached fully on; Mono/off remained blocked by the faulty
+retained switch under HW-SW-01.

@@ -17,7 +17,7 @@ validation remains.
 | ABW1 10K linear potentiometers | 4 | **INSTALLED / VERIFIED** | AB Elektronik / TT Electronics ABW1 10K, CPC order code RE04644. Position sensors for Balance, Treble, Bass and Volume; not in the audio path. | CPC |
 | OLED display | 1 | **INSTALLED / VERIFIED** | Pi Hut SKU 105630; 1.3-inch white 128×64 SH1106, four-pin I²C, 3.3 V. | The Pi Hut |
 | DAOKAI MOSFET driver modules | Pack of 10; 1 previously tested | **RETAINED TEST STOCK — SUPERSEDED** | ASIN B09YYH2BTF. One module passed the earlier GPIO25 bench test on 2026-08-31. Retain the pack as test stock; DFR0457 is selected for the final installation. | Amazon / DAOKAI |
-| DFRobot Gravity MOSFET Power Controller | 1 | **INSTALLED — FLICKER/FADE PASS / FINAL CHECKS OPEN** | DFR0457; installed for final dial-lamp switching. v0.27.1 at 1 kHz and 85% / duty 217 passed cold-start, fade-up, fade-down and no-flicker observation. Pot-stability, temperature and current checks remain before closure. | The Pi Hut |
+| DFRobot Gravity MOSFET Power Controller | 1 | **INSTALLED — FLICKER/FADE PASS / FINAL CHECKS OPEN** | DFR0457; control input is on GPIO18/D18. Earlier v0.27.1 testing at 1 kHz and 85% / duty 217 passed cold-start, fade-up, fade-down and no-flicker observation; v0.27.3 confirmed the D18 path reaches fully on. Mono/off re-verification after HW-SW-01, pot stability, temperature and current remain before closure. | The Pi Hut |
 | ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **THREE-LAMP ELECTRICAL LOAD VERIFIED / FIT CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Three parallel lamps passed even 5 V PWM illumination on 2026-08-31. Physical holder fit, final brightness and total bank current remain open. | Amazon / ShuoHui |
 | 5 V regulated control supply | 1 | **CONNECTED — SHARED RAIL / USB REMOVED** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Now feeds the ESP32 at VIN/5V and the lighting rail; USB was removed before external power was connected. Previously powered the accepted three-lamp PWM test on 2026-08-31. | Existing stock |
 | TopHomer panel-mount DC input sockets | Pack of 5; 1 required | **PURCHASED — DELIVERY / FIT / POLARITY CHECK** | ASIN B08HGXYS4J; female two-terminal threaded-nut sockets, 5.5 mm OD × 2.1 mm ID, rated 3 A. Use one only after confirming the actual Phihong plug fit and centre-positive polarity before drilling or wiring. | Amazon / TopHomer |
@@ -33,8 +33,8 @@ validation remains.
 |-------------------------|-------------------------------------------------------------|
 | Original on/off switch  | Retained with original solder joints and cable. Low-voltage logic input only (Red/Green). Not switching mains. |
 | Original selector PCB   | **Retained** as mechanical carrier for the interlocked selector (ADR-0001). Not disposable. |
-| Original source buttons | Original mechanism retained. Only VHF has a reliable electrical state: closed = Digital Streamer, open = Vinyl. SW/MW/LW/Gram mechanically release VHF and have no individual GPIO; replacement panel deferred (ADR-0015). |
-| Original Stereo/Mono control | Retained. Open Stereo requests lights on; closed Mono requests lights off. Behaviour was physically verified on the previous GPIO17/TX2 route; proposed GPIO14/D14 routing is pending physical verification (ADR-0015). |
+| Original source buttons | Original mechanism retained. Only VHF has a reliable electrical state: closed = Digital Streamer, open = Vinyl. SW/MW/LW/Gram mechanically release VHF and have no individual GPIO; replacement panel deferred (ADR-0016). |
+| Original Stereo/Mono control | Retained on GPIO25/D25. Open Stereo requests lights on; closed Mono requests lights off. Firmware logic is correct, but the physical switch contact is faulty and open under HW-SW-01 (ADR-0016). |
 | Original Decca knobs    | Retained via mechanical adaptor strategy (see `mechanical/Knob Adaptors/`). |
 
 ## Audio Path / Phase 2

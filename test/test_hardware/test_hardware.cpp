@@ -56,7 +56,7 @@ static_assert(!isExcludedStrappingPin(decca::hardware::kSwitchStereoMono),
 
 }  // namespace
 
-// Named constants must match the intended routing pending physical verification.
+// Named constants must match the accepted final controller routing.
 void test_hardware_pin_map_contract() {
     TEST_ASSERT_EQUAL_UINT8(32, decca::hardware::kPotVolume);
     TEST_ASSERT_EQUAL_UINT8(33, decca::hardware::kPotBass);

@@ -22,4 +22,5 @@ Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
 | 0012 | Use authenticated local-network ArduinoOTA                   | Accepted |
 | 0013 | Use VHF as the authoritative two-state source selector       | Superseded |
 | 0014 | Use TX2 Stereo/Mono as the dial-lighting command              | Superseded |
-| 0015 | Reassign dry-contact inputs for terminal-adapter routing      | Accepted |
+| 0015 | Reassign dry-contact inputs for terminal-adapter routing      | Superseded |
+| 0016 | Finalise controller GPIO routing                              | Accepted |

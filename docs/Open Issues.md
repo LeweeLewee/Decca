@@ -5,24 +5,37 @@ This is the canonical short list of unresolved integration issues. Read it with
 the revision history remain valid records of what was tested at the time, but do
 not close a later issue listed here.
 
-## HW-GPIO-01 — Verify rerouted dry-contact inputs
+## HW-GPIO-01 — Verify final controller-side GPIO routing
 
-**Status:** OPEN — GPIO26/D26 and GPIO14/D14 are proposed pending physical
-verification.
+**Status:** COMPLETE — owner testing on 2026-09-08 confirmed the final routing
+and firmware logic: on/off GPIO14/D14, VHF GPIO26/D26, Stereo/Mono GPIO25/D25
+and DFR0457 lighting PWM GPIO18/D18.
 
-The VHF/source-selector input was reassigned from GPIO23/D23 to GPIO26/D26 and
-the Stereo/Mono input from GPIO17/TX2 to GPIO14/D14 to improve wiring routing on
-the ESP32 terminal adapter. Application logic, internal pull-ups and 25 ms
-debounce behaviour are unchanged.
+Firmware v0.27.3 at commit `0a4d3bd` was built for `esp32dev-ota`, uploaded by
+authenticated OTA and returned at `decca.local` / `192.168.1.79`. The owner
+confirmed the v0.27.3 startup screen, correct ON/STANDBY operation on GPIO14,
+the VHF route on GPIO26, GPIO25 Stereo/Mono input logic, and D18 lighting output.
+The retained Stereo/Mono switch itself is faulty and is tracked separately as
+HW-SW-01; that mechanical/contact fault does not reopen the firmware pin map.
+
+## HW-SW-01 — Repair retained Stereo/Mono switch
+
+**Status:** OPEN — GPIO25/D25 input logic is correct, but the retained physical
+switch does not currently produce the required closed/LOW Mono state.
+
+**Observed (2026-09-08):** with v0.27.3 running and the unit logically ON, the
+lamps reached fully on after the Stereo/open command. After moving the physical
+control to Mono and waiting ten seconds, the lamps remained fully on. The owner
+identified the retained switch as the fault and confirmed the firmware logic is
+correct.
 
 **Acceptance required:**
 
-1. Confirm VHF contact open/closed is correctly detected on GPIO26/D26.
-2. Confirm Stereo/Mono contact open/closed is correctly detected on GPIO14/D14.
-3. Confirm internal pull-up behaviour on both open contacts.
-4. Confirm there is no boot or startup regression.
-
-Do not mark either new route physically accepted until all four checks pass.
+1. Repair or replace the isolated Stereo/Mono contact without connecting 3.3 V
+   or 5 V to GPIO25.
+2. Confirm Stereo is open/HIGH and requests lights on.
+3. Confirm Mono is closed/LOW and requests lights off.
+4. Confirm both transitions while logical power is ON, then record the result.
 
 ## HW-LGT-01 — Final dial-lighting integration acceptance
 
@@ -54,29 +67,28 @@ disturbance stopped, but lamp flicker remained.
   approved the 2.2-second firmware-version hold and both approximately
   4.34-second lighting fades, with no flicker reported.
 
-**Locked behaviour:** GPIO25/D25 remains the lighting PWM output. Stereo
+**Locked behaviour:** GPIO18/D18 is the lighting PWM output. Stereo
 open/high requests lights on at the owner-approved 85% / duty 217; Mono
 closed/low and logical standby request off. Preserve fades and safe-off boot.
 
-**Device state:** the last-known installed image is firmware v0.27.1 at commit
-`d0b1d3c`, using 1 kHz PWM and an 85% / duty 217 target with approximately
-4.34-second fades. Its authenticated OTA upload succeeded and the device
-returned at `decca.local`. GitHub `main` remains the source of truth.
+**Device state:** the installed image is firmware v0.27.3 at commit `0a4d3bd`,
+using GPIO18 PWM at 1 kHz and an 85% / duty 217 target. Its authenticated OTA
+upload succeeded and the device returned at `decca.local` / `192.168.1.79`.
 
 **Acceptance required to close:**
 
 1. **Passed:** cold startup showed no unwanted lamp flash before the controlled
    fade.
-2. **Passed:** Stereo softly fades to 85% and Mono softly fades fully off in
-   approximately 4.34 seconds.
+2. **Partial:** the D18 path reached fully on during the 2026-09-08 check. The
+   Mono/off transition is blocked by the retained switch fault in HW-SW-01.
 3. **Passed:** no lamp flicker was reported at steady state or through fades.
 4. **Open:** install the ordered WAGO 221-415 +5 V and common-GND star points.
 5. **Open:** exercise and then release all four pots; confirm the OLED does not
    chatter between control overlays while the lamps are on.
 6. **Open:** confirm no abnormal module or wiring temperature and measure the
    installed three-lamp current.
-7. **Complete:** physical results are recorded and release v0.27.1 is installed
-   by authenticated OTA. Close only after items 4–6 pass.
+7. **Complete:** physical results are recorded and release v0.27.3 is installed
+   by authenticated OTA. Close only after items 2 and 4–6 pass.
 
 **Procurement records:** `hardware/BOM/phase1.csv` and `docs/Parts List.md`.
 **Wiring:** `docs/Wiring.md`, H5 and Power Distribution.

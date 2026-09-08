@@ -199,9 +199,9 @@ disconnected from mains and power only the ESP32 by USB.
 
 1. Connect one Black conductor of the VHF-derived pair to GPIO26 / board label
    D26 and the other Black conductor to GND; the dry-contact pair may be
-   swapped. This new routing is proposed pending physical verification.
+   swapped. This routing was physically verified on 2026-09-08.
 2. Leave SW, MW, LW and Gram conductors disconnected and individually insulated.
-   Do not connect them to GPIO16, GPIO17, GPIO18 or GPIO23.
+   Do not connect them to GPIO13, GPIO16, GPIO17, GPIO19 or GPIO23.
 3. Run:
 
    ```powershell
@@ -230,11 +230,11 @@ button panel.
 
 ### 7.3 Original on/off switch verification
 
-This procedure passed on 2026-08-30, confirming GPIO19/D19 and the retained H2
-Red/Green cable. Keep the Decca disconnected from mains and power only the
+This procedure passed on GPIO19/D19 on 2026-08-30 and on the final GPIO14/D14
+route on 2026-09-08, confirming the retained H2 Red/Green cable. Keep the Decca disconnected from mains and power only the
 low-voltage ESP32 controller by USB.
 
-1. Connect H2 Red to GPIO19 / board label D19 and H2 Green to GND. GPIO19 uses
+1. Connect H2 Red to GPIO14 / board label D14 and H2 Green to GND. GPIO14 uses
    the ESP32 internal pull-up; do not connect either conductor to 3.3 V or 5 V.
 2. Run:
 
@@ -253,8 +253,8 @@ Pass criteria:
 - returning to closed wakes the display immediately;
 - all button and power tests pass without using the switch for mains voltage.
 
-Recorded result: both switch directions were physically accepted. GPIO19 is no
-longer proposed and no logical inversion is required.
+Recorded result: both switch directions were physically accepted on D14 with
+v0.27.3. No logical inversion is required.
 
 ### 7.4 OLED bench verification
 
@@ -281,7 +281,7 @@ Keep the Decca disconnected from mains and power only the ESP32 by USB.
    ```
 
 4. Confirm the OLED reveals the `DECCA` wordmark from left to right over roughly
-   1 s, then holds `MUSIC CENTRE v0.27.1` for roughly 2.2 s in the lower
+   1 s, then holds `MUSIC CENTRE v0.27.3` for roughly 2.2 s in the lower
    calibrated area before showing `VINYL` prominently without a legacy button
    label and a local dashboard with Volume 75% and the other three controls at
    50%.
@@ -327,11 +327,10 @@ SDA/SCL labels.
 
 ### 7.5 Stereo/Mono input verification
 
-Keep GPIO25 and the lamp load disconnected for this input-only test.
+Keep GPIO18 and the lamp load disconnected for this input-only test.
 
-1. Connect the Stereo/Mono contact between GPIO14 / board label D14 and GND. Do
-   not connect 3.3 V or 5 V to the switch. This new routing is proposed pending
-   physical verification.
+1. Connect the Stereo/Mono contact between GPIO25 / board label D25 and GND. Do
+   not connect 3.3 V or 5 V to the switch.
 2. Connect the ESP32 by USB and run:
 
    ```powershell
@@ -345,19 +344,23 @@ Keep GPIO25 and the lamp load disconnected for this input-only test.
    reversed, stop and correct the documented contact/polarity before enabling
    any lighting output.
 
+Recorded result (2026-09-08): GPIO25 firmware logic is correct, but the retained
+switch did not produce the Mono closed/LOW state. Repair the switch under
+HW-SW-01, then repeat steps 3–4 before accepting end-to-end operation.
+
 ### 7.6 Dial-lighting bench verification
 
-GPIO25 remains proposed until this procedure passes. Keep the Decca disconnected
+GPIO18 is the installed DFR0457 PWM route. Keep the Decca disconnected
 from mains. Use only the isolated low-voltage 5 V lighting supply and USB power
 for the ESP32.
 
 1. Check the MOSFET stage before applying power:
-   - GPIO25 / board label D25 connects only to the logic-level N-channel MOSFET gate;
+   - GPIO18 / board label D18 connects only to the DFR0457 control input;
    - the MOSFET source connects to GND;
    - the dial-light negative lead connects to the MOSFET drain;
    - the dial-light positive lead connects to 5 V;
    - the ESP32 and 5 V lighting supply share GND.
-2. Confirm there is no direct connection from the dial-light load to GPIO25 and
+2. Confirm there is no direct connection from the dial-light load to GPIO18 and
    no connection to the Decca mains wiring.
 3. Connect the ESP32 by USB and run:
 
@@ -382,6 +385,11 @@ Recorded result (2026-08-31): GPIO25, the DAOKAI MOSFET stage and the three-lamp
 electrical load passed. Brightness comparisons at 70%, 80% and 100% resulted in
 owner approval of 90% / duty 230. The lamps fade smoothly, hold evenly and fade
 fully off with no flash, flicker, abnormal heat or smell.
+
+Current route (2026-09-08): the installed DFR0457 control input is on GPIO18.
+Firmware v0.27.3 established safe-off before other setup, authenticated OTA
+succeeded, the device returned at `decca.local`, and the owner confirmed the D18
+path reached the fully-on target. Mono/off re-verification awaits HW-SW-01.
 
 ### 7.7 Remaining commissioning
 

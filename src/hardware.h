@@ -8,8 +8,9 @@
 
 namespace decca::hardware {
 
-// GPIO32–35, display GPIO21/22 and lighting PWM GPIO18 are verified.
-// On/off GPIO14, VHF GPIO26 and Stereo/Mono GPIO25 are pending verification.
+// GPIO32–35, display GPIO21/22, on/off GPIO14, VHF GPIO26 and lighting PWM
+// GPIO18 are verified. Stereo/Mono GPIO25 logic is verified; the retained
+// physical switch fault is tracked as HW-SW-01.
 constexpr uint8_t kPotVolume = 32;
 constexpr uint8_t kPotBass = 33;
 constexpr uint8_t kPotTreble = 34;
