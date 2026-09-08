@@ -126,10 +126,11 @@ void applyLightingState() {
 }  // namespace
 
 void setup() {
+    // Establish lighting safe-off before serial, display or network setup.
+    decca::hardware::init();
     Serial.begin(115200);
     Serial.print("[SYSTEM] firmware=");
     Serial.println(decca::version::kFirmwareVersion);
-    decca::hardware::init();
     decca::settings::init();
     decca::buttons::init();
     decca::pots::init();

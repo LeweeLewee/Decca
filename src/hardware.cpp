@@ -10,6 +10,11 @@
 namespace decca::hardware {
 
 void init() {
+    // GPIO18 can float while the ESP32 resets. Take active control at the first
+    // opportunity and keep it low until LEDC is attached at duty 0.
+    pinMode(kDialLightingPwm, OUTPUT);
+    digitalWrite(kDialLightingPwm, LOW);
+
     pinMode(kPotVolume, INPUT);
     pinMode(kPotBass, INPUT);
     pinMode(kPotTreble, INPUT);
