@@ -14,8 +14,10 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
   VHF latched = Digital Streamer; every other selector position = Vinyl.
-- TX2/GPIO17 is assigned to the Stereo/Mono contact as a lighting request:
-  Stereo open = lights on; Mono closed = lights off. Both positions are physically verified.
+- GPIO14/D14 is proposed for the Stereo/Mono contact as a lighting request:
+  Stereo open = lights on; Mono closed = lights off. This behaviour was
+  physically verified on the previous GPIO17/TX2 route; the new routing is
+  pending physical verification.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - Production coordinates power, all four pots, the VHF-derived source state and
@@ -40,11 +42,11 @@ firmware work, then check [Open Issues](docs/Open%20Issues.md).
 | Bass | GPIO33/D33 | Bench-verified |
 | Treble | GPIO34/D34 | Bench-verified |
 | Balance | GPIO35/D35 | Bench-verified |
-| VHF source contact | GPIO23/D23 | Physically accepted |
+| VHF source contact | GPIO26/D26 | Proposed; pending physical verification |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified |
-| Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted |
+| Stereo/Mono lighting request | GPIO14/D14 | Proposed; pending physical verification |
 | Dial lighting PWM | GPIO25/D25 | DFR0457 installed; flicker/fades passed, final checks open under HW-LGT-01 |
 
 Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.

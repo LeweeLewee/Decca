@@ -2,8 +2,9 @@
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
-> sole VHF input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
-> Stereo/Mono input GPIO17/TX2 is physically verified.
+> OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified. The sole VHF input
+> GPIO26/D26 and Stereo/Mono input GPIO14/D14 are proposed pending physical
+> verification after their wiring-routing reassignment.
 > Lighting GPIO25 and the MOSFET/lamp electrical load are physically accepted;
 > other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
@@ -186,16 +187,17 @@ The original selector PCB and interlocked mechanism are retained as the
 mechanical carrier (ADR-0001), but unreliable soldering/contact behaviour makes
 multi-button electrical reuse unsuitable.
 
-Only the reliable VHF-derived dry-contact state is connected to GPIO23 / D23
+Only the reliable VHF-derived dry-contact state is connected to GPIO26 / D26
 with the internal pull-up and software debounce. Closed/latched VHF selects
 Digital Streamer; every other interlocked position releases VHF and selects
-Vinyl. GPIO16 and GPIO18 are released; GPIO17 is released from the source bank
-and assigned separately to the Stereo/Mono contact. A new button panel remains
-a deferred fallback (ADR-0013).
+Vinyl. GPIO16, GPIO17, GPIO18 and GPIO23 are released. A new button panel remains
+a deferred fallback (ADR-0015).
 
-The Stereo/Mono contact uses TX2/GPIO17 with the internal pull-up. Open/HIGH in
+The Stereo/Mono contact uses GPIO14/D14 with the internal pull-up. Open/HIGH in
 Stereo requests dial lights on and closed/LOW in Mono requests them off. It is a command input
-only; GPIO25 and the lighting load remain separately gated (ADR-0014).
+only; GPIO25 and the lighting load remain separately gated. The switch behaviour
+was physically accepted on the previous GPIO17/TX2 route, while the new GPIO14
+route is pending physical verification (ADR-0014 and ADR-0015).
 
 ## Outputs
 

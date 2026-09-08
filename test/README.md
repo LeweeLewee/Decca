@@ -113,7 +113,7 @@ appearance were accepted. The release build passed and all eight suites passed
 53/53: buttons 9/9, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
 power 5/5 and settings 3/3. Production was restored over COM3.
 
-Stereo/Mono assignment (2026-08-30): TX2/GPIO17 is now included in the buttons
+Stereo/Mono assignment (2026-08-30): TX2/GPIO17 was included in the buttons
 suite as a pulled-up lighting request. Stereo open/high maps to on; Mono
 closed/low maps to off. The credential-enabled production firmware builds
 successfully (RAM 49,880 bytes / 15.2%; flash 837,497 bytes / 63.9%) and all
@@ -124,6 +124,14 @@ expanded buttons suite passed 11/11 on target in both physical positions:
 The final release build passed and the complete physical run passed 55/55:
 buttons 11/11, display 15/15, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6,
 power 5/5 and settings 3/3.
+
+The 2026-09-08 reassignment moves this input to GPIO14/D14 and the VHF input
+from GPIO23/D23 to GPIO26/D26. Automated pin-map coverage follows the new
+constants and now includes compile-time guards against duplicate GPIO allocation
+and use of the project's excluded strapping pins. The production build passed
+and all eight on-target suites compiled in PlatformIO; they were not executed
+because no ESP32 was attached. The new physical routes remain pending bench
+verification under HW-GPIO-01.
 
 GPIO25 load acceptance (2026-08-31): the physical lighting snapshot fades to
 the owner-approved duty 230 (90%), holds for five seconds and fades fully off.

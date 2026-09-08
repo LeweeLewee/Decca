@@ -35,7 +35,7 @@ Implemented modules:
 |---|---|
 | `hardware` | Pin map and safe initialisation implemented |
 | `settings` | NVS persistence implemented, schema version 3 |
-| `buttons` | On/off, sole VHF contact and TX2 Stereo/Mono lighting request, 25 ms non-blocking debounce |
+| `buttons` | On/off, sole VHF contact and Stereo/Mono lighting request, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
 | `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
 | `lighting` | Safe-off non-blocking PWM fades |
@@ -56,12 +56,12 @@ state is reliable electrically:
 | Closed / latched | Digital Streamer | Restore phone-controlled digital playback |
 | Open / released | Vinyl | Select Line-In |
 
-GPIO23/D23 is the only source input. The accepted VHF-derived pair is Green to
-GPIO23 and Yellow to GND, although the two dry-contact wires may be swapped.
-GPIO16 and GPIO18 are released. GPIO17 is released from the source bank and
-assigned to the separate Stereo/Mono contact. SW, MW, LW and Gram have no individual
+GPIO26/D26 is proposed as the only source input. The VHF-derived pair uses two
+Black conductors, with either conductor connected to GPIO26 and the other to
+GND. GPIO16, GPIO17, GPIO18 and GPIO23 are released. GPIO14/D14 is proposed for
+the separate Stereo/Mono contact. SW, MW, LW and Gram have no individual
 firmware function; their interlocked release of VHF selects Vinyl. A replacement
-button panel is deferred.
+button panel is deferred. Both new routes remain pending physical verification.
 
 ## Confirmed controller wiring
 
@@ -71,11 +71,11 @@ button panel is deferred.
 | Bass | GPIO33/D33 | Bench-verified, 0 / about 2047 / 4095 |
 | Treble | GPIO34/D34 | Bench-verified, 0 / about 2047 / 4095 |
 | Balance | GPIO35/D35 | Bench-verified, 0 / about 2047 / 4095 |
-| VHF source contact | GPIO23/D23 | Physically accepted |
+| VHF source contact | GPIO26/D26 | Proposed; pending physical verification |
 | OLED SDA | GPIO21/D21 | Bench-verified |
 | OLED SCL | GPIO22/D22 | Bench-verified |
 | On/off | GPIO19/D19 | Bench-verified, closed = on / open = standby |
-| Stereo/Mono lighting request | GPIO17/TX2 | Physically accepted, open Stereo = on / closed Mono = off |
+| Stereo/Mono lighting request | GPIO14/D14 | Proposed; pending physical verification, open Stereo = on / closed Mono = off |
 | Dial-light PWM | GPIO25/D25 | Electrically accepted with MOSFET/three-lamp load |
 
 Final H4 OLED loom, physically confirmed 2026-08-30:
@@ -99,8 +99,9 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
   focused identity, control, source, metadata, play/pause and standby layouts
   were accepted from physical photographs. The calibration pattern remains a
   service diagnostic.
-- VHF on GPIO23 was physically accepted as the only reliable active selector;
-  every other interlocked position releases it and selects Vinyl.
+- VHF was physically accepted on the previous GPIO23 route as the only reliable
+  active selector; every other interlocked position releases it and selects
+  Vinyl. The new GPIO26 route remains pending physical verification.
 - GPIO19/D19 was physically verified with the retained H2 Red/Green switch.
   Closed selects logical ON and open selects STANDBY; both transitions were
   accepted on the production firmware.
@@ -115,7 +116,8 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
   hardware 3, lighting 7, OTA 5, pots 6, power 5 and settings 3). Production
   firmware was restored by USB; serial reported `[POWER] state=ON` and
   `[OTA] ready at 192.168.1.79 (decca.local)`.
-- After TX2 Stereo/Mono integration, the release build passed and all eight
+- After the previous TX2/GPIO17 Stereo/Mono integration, the release build
+  passed and all eight
   on-target suites passed 55/55 (buttons 11, display 15, hardware 3, lighting 7,
   OTA 5, pots 6, power 5 and settings 3).
 - After production lighting coordination and settings schema v3, the
@@ -189,9 +191,11 @@ the user's Wi-Fi or OTA passwords.
    safe off, smooth fades through full duty, even illumination and fade fully off.
 7. **Complete (2026-08-31):** normal Stereo lighting approved at 90% / duty
    230 and integrated in production; Mono and logical standby fade to off.
-8. **Complete (2026-08-30):** original Stereo/Mono switch wired to TX2/GPIO17
-   and GND. Physical snapshots confirmed Stereo open requests dial lights on and
-   Mono closed requests them off. GPIO25 load remained disabled during testing.
+8. **Historical pass (2026-08-30):** original Stereo/Mono switch wired to
+   TX2/GPIO17 and GND. Physical snapshots confirmed Stereo open requests dial
+   lights on and Mono closed requests them off. GPIO25 load remained disabled
+   during testing. The replacement GPIO14/D14 route is not yet physically
+   verified.
 9. **Open — HW-LGT-01:** DFR0457 is installed and the initial steady-light test
    reports no flicker. Firmware v0.27.1 at commit `d0b1d3c` is installed by
    authenticated OTA. The owner physically approved cold startup, the
@@ -264,12 +268,13 @@ continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 accepted control overlays use Volume 0–100%, Bass/Treble −50..0..+50 and Balance
 L50..0..R50 with centred bars and monochrome icons.
 
-TX2/GPIO17 and GPIO25 are physically accepted. Final MOSFET/three-lamp
+GPIO25 is physically accepted. VHF GPIO26/D26 and Stereo/Mono GPIO14/D14 are
+proposed pending physical verification under HW-GPIO-01. Final MOSFET/three-lamp
 acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
 fades to 85%; Mono and standby fade off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
-GPIO16 and GPIO18 remain unused. Preserve the final OLED loom: Brown GND,
+GPIO16, GPIO17, GPIO18 and GPIO23 remain unused. Preserve the final OLED loom: Brown GND,
 Red 3V3 VCC, Orange SCL GPIO22, Yellow SDA GPIO21.
 
 Keep the ESP32 control/UI-only, preserve module independence, update all affected

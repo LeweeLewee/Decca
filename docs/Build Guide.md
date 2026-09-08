@@ -194,14 +194,14 @@ no inversion.
 
 ### 7.2 VHF two-state source verification
 
-Only the reliable VHF-derived Green/Yellow pair is used. Keep the Decca
+Only the reliable VHF-derived two-Black-conductor pair is used. Keep the Decca
 disconnected from mains and power only the ESP32 by USB.
 
-1. Connect one conductor of the VHF-derived pair to GPIO23 / board label
-   D23 and the other to GND. Current termination is Green → GPIO23 and
-   Yellow → GND; the dry-contact pair may be swapped.
+1. Connect one Black conductor of the VHF-derived pair to GPIO26 / board label
+   D26 and the other Black conductor to GND; the dry-contact pair may be
+   swapped. This new routing is proposed pending physical verification.
 2. Leave SW, MW, LW and Gram conductors disconnected and individually insulated.
-   Do not connect them to GPIO16, GPIO17 or GPIO18.
+   Do not connect them to GPIO16, GPIO17, GPIO18 or GPIO23.
 3. Run:
 
    ```powershell
@@ -329,8 +329,9 @@ SDA/SCL labels.
 
 Keep GPIO25 and the lamp load disconnected for this input-only test.
 
-1. Connect the Stereo contact between TX2/GPIO17 and GND. Do not connect 3.3 V
-   or 5 V to the switch.
+1. Connect the Stereo/Mono contact between GPIO14 / board label D14 and GND. Do
+   not connect 3.3 V or 5 V to the switch. This new routing is proposed pending
+   physical verification.
 2. Connect the ESP32 by USB and run:
 
    ```powershell

@@ -37,11 +37,13 @@ AI-assisted editing.
 
 ### Module notes (confirmed Phase 1 build)
 
-- **`buttons`** reads the retained on/off switch and sole active-low VHF contact
-  with 25 ms software debounce. It exposes the stable VHF-derived source mode:
+- **`buttons`** reads the retained on/off switch, the sole active-low VHF contact
+  on proposed GPIO26/D26 and the active-low Stereo/Mono contact on proposed
+  GPIO14/D14 with 25 ms software debounce. Both reassigned routes remain pending
+  physical verification. It exposes the stable VHF-derived source mode:
   closed = Digital Streamer; open = Vinyl. Press events do not repeat while held.
   The other interlocked positions release VHF and therefore select Vinyl
-  (ADR-0013).
+  (ADR-0015).
 - **`pots`** treats the four pots as **position sensors only** (not in the audio
   path). It applies calibration, smoothing, deadband, and optional inversion, and
   emits values suitable for stable display updates (FR-POT-01..05). Sampling is

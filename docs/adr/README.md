@@ -20,5 +20,6 @@ Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
 | 0009 | Omit legacy button labels from user-facing display views    | Accepted |
 | 0011 | Use Gram as the sole two-state source selector               | Superseded |
 | 0012 | Use authenticated local-network ArduinoOTA                   | Accepted |
-| 0013 | Use VHF as the authoritative two-state source selector       | Accepted |
-| 0014 | Use TX2 Stereo/Mono as the dial-lighting command              | Accepted |
+| 0013 | Use VHF as the authoritative two-state source selector       | Superseded |
+| 0014 | Use TX2 Stereo/Mono as the dial-lighting command              | Superseded |
+| 0015 | Reassign dry-contact inputs for terminal-adapter routing      | Accepted |

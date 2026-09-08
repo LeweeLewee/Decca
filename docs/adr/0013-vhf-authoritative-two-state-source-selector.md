@@ -1,7 +1,7 @@
 # ADR-0013: Use VHF as the authoritative two-state source selector
 
 ## Status
-Accepted
+Superseded by ADR-0015
 
 ## Date
 2026-08-30

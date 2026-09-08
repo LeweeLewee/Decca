@@ -5,6 +5,25 @@ This is the canonical short list of unresolved integration issues. Read it with
 the revision history remain valid records of what was tested at the time, but do
 not close a later issue listed here.
 
+## HW-GPIO-01 — Verify rerouted dry-contact inputs
+
+**Status:** OPEN — GPIO26/D26 and GPIO14/D14 are proposed pending physical
+verification.
+
+The VHF/source-selector input was reassigned from GPIO23/D23 to GPIO26/D26 and
+the Stereo/Mono input from GPIO17/TX2 to GPIO14/D14 to improve wiring routing on
+the ESP32 terminal adapter. Application logic, internal pull-ups and 25 ms
+debounce behaviour are unchanged.
+
+**Acceptance required:**
+
+1. Confirm VHF contact open/closed is correctly detected on GPIO26/D26.
+2. Confirm Stereo/Mono contact open/closed is correctly detected on GPIO14/D14.
+3. Confirm internal pull-up behaviour on both open contacts.
+4. Confirm there is no boot or startup regression.
+
+Do not mark either new route physically accepted until all four checks pass.
+
 ## HW-LGT-01 — Final dial-lighting integration acceptance
 
 **Status:** OPEN — DFR0457 installed; flicker, v0.27.1 startup and 85% fade

@@ -1,7 +1,7 @@
 # ADR-0014: Use TX2 Stereo/Mono as the dial-lighting command
 
 ## Status
-Accepted
+Superseded by ADR-0015
 
 ## Context
 The original Stereo/Mono control is visible, mechanically useful and no longer

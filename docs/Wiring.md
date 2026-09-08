@@ -6,9 +6,10 @@
 
 Records every physical connection so the build is reproducible. The firmware pin
 map (`src/hardware.h`) must be reconciled against this document before any build
-(see Specification `HW-06`). `hardware.h` matches the status recorded below: the four pot inputs, sole VHF
-source input, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified; all other
-assigned pins remain proposed.
+(see Specification `HW-06`). `hardware.h` matches the status recorded below: the
+four pot inputs, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified. The
+rerouted VHF GPIO26 and Stereo/Mono GPIO14 inputs are proposed pending physical
+verification; other assigned pins retain the status shown below.
 
 ## Wiring Colour Standard
 
@@ -29,7 +30,7 @@ See the on/off section.
 **Exception — H3 VHF dry-contact pair.** The installed VHF source-selector pair
 uses **two Black conductors**. They form an isolated dry contact, so colour does
 not distinguish signal from return and either Black conductor may be connected
-to GPIO23 with the other connected to GND. See the H3 section.
+to GPIO26 with the other connected to GND. See the H3 section.
 
 **Exception — H4 OLED harness.** The installed and bench-verified screen loom
 uses **Orange for SCL** and **Yellow for SDA**. These are signal conductors in H4
@@ -67,18 +68,19 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | Treble pot wiper      | GPIO34 (bench-verified) | **D34** | ADC1, in-only | H1    | ADC1; input-only pin, no pull-up needed  |
 | Balance pot wiper     | GPIO35 (bench-verified) | **D35** | ADC1, in-only | H1    | ADC1; input-only pin                     |
 | On/off switch (Red)   | GPIO19 (bench-verified) | D19 | Digital in | H2 | Internal pull-up; closed = ON |
-| Source selector: VHF | GPIO23 (physically accepted) | D23 | Digital in | H3 | Closed = Digital Streamer; open = Vinyl |
+| Source selector: VHF | GPIO26 (**proposed; pending physical verification**) | D26 | Digital in, pull-up | H3 | Closed = Digital Streamer; open = Vinyl |
 | SW / MW / LW / Gram  | — | — | No individual GPIO | H3 | Mechanical positions release VHF and select Vinyl |
-| Stereo/Mono          | GPIO17 (assigned) | TX2 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
+| Stereo/Mono          | GPIO14 (**proposed; pending physical verification**) | D14 | Digital in, pull-up | H3 | Open Stereo = lights requested on; closed Mono = off |
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO25 (physically accepted) | D25 | PWM (LEDC), 1 kHz | H5 | Installed DFRobot DFR0457 control input; three-lamp bank |
 | ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
-> GPIO23 supports the required internal pull-up, avoids ESP32 strapping pins and
-> is bench-verified. GPIO16 and GPIO18 are released for future use. GPIO17 is
-> reserved for the separate Stereo/Mono contact and must not be connected to
-> the unreliable source-selector contacts.
+> GPIO26 and GPIO14 support the required internal pull-ups and avoid the
+> project's excluded ESP32 strapping pins GPIO0, GPIO2, GPIO5, GPIO12 and
+> GPIO15. Both new routes are proposed pending physical verification. GPIO16,
+> GPIO17, GPIO18 and GPIO23 are released; do not connect the unreliable
+> source-selector contacts to them.
 
 ## H1 — Potentiometers
 
@@ -149,18 +151,19 @@ joints and original cable**. It is a simple open/close switch.
 
 The original PCB and interlocked selector mechanism are retained mechanically
 (ADR-0001). Repeated soldering and contact tests showed that multi-button
-electrical reuse is not reliable. ADR-0013 supersedes ADR-0011 and ADR-0004.
+electrical reuse is not reliable. ADR-0015 retains the VHF behaviour established
+by ADR-0013 while superseding its GPIO routing.
 
 Only the physically accepted **VHF-derived two-Black-wire dry-contact pair** is
 connected:
 
 | VHF-derived pair | ESP32 termination | Status |
 |-----------|-------------------|--------|
-| Black conductor | GPIO23 / board label D23 | Bench-verified input |
-| Black conductor | GND | Bench-verified return |
+| Black conductor | GPIO26 / board label D26 | **Proposed; pending physical verification** |
+| Black conductor | GND | Existing dry-contact return; rerouted pair pending verification |
 
 The two Black conductors may be swapped because this is an isolated dry contact.
-GPIO23 uses the ESP32 internal pull-up and 25 ms software debounce. Do not connect
+GPIO26 uses the ESP32 internal pull-up and 25 ms software debounce. Do not connect
 either conductor to 3.3 V or 5 V.
 
 Authoritative source logic:
@@ -173,8 +176,8 @@ Authoritative source logic:
 Pressing SW, MW, LW or Gram releases VHF through the retained interlock. Those
 positions have no individual ESP32 input; the open VHF state authoritatively
 selects Vinyl. Their former conductors are disconnected and individually
-insulated at the controller end. GPIO16 and GPIO18 are not assigned; GPIO17 is
-reserved for the separate Stereo/Mono contact.
+insulated at the controller end. GPIO16, GPIO17, GPIO18 and GPIO23 are not
+assigned.
 
 A purpose-built replacement button panel is a deferred fallback if the two-state
 scheme later proves insufficient. No LW solder repair is required for the
@@ -182,19 +185,20 @@ current design.
 
 ## Stereo/Mono Control
 
-TX2 / **GPIO17** is assigned as an active-low digital input with the ESP32
+**GPIO14 / D14** is proposed as an active-low digital input with the ESP32
 internal pull-up. Wire the isolated contact only:
 
 | Stereo/Mono contact | ESP32 termination |
 |---------------------|-------------------|
-| Contact that closes in Mono | GPIO17 / board label TX2 |
+| Contact that closes in Mono | GPIO14 / board label D14 |
 | Common / return | GND |
 
 Do not connect either contact to 3.3 V or 5 V. Open/HIGH means **Stereo** and
-requests dial lights on; closed/LOW means **Mono** and requests them off. This
-assignment and both physical input states were accepted on 2026-08-30.
-GPIO25 and the lamp load are commissioned separately. See ADR-0014, which
-supersedes ADR-0005.
+requests dial lights on; closed/LOW means **Mono** and requests them off. The
+switch behaviour was accepted on the previous GPIO17/TX2 route on 2026-08-30;
+the new GPIO14/D14 routing remains pending physical verification. GPIO25 and the
+lamp load are commissioned separately. See ADR-0015, which supersedes the pin
+routing in ADR-0014 without changing its lighting behaviour.
 
 ## H4 — OLED Display
 
