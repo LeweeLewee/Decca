@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.27.4 removes the lighting fade engine so debounced Stereo/Mono and logical power changes apply their PWM duty immediately. The release build passes and all eight on-target suites compile; the installed image remains v0.27.3 pending OTA and physical verification. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. WiiM integration remains outstanding. |
+| Status   | Draft. Firmware v0.27.4 removes the lighting fade engine so debounced Stereo/Mono and logical power changes apply their PWM duty immediately. The release and credential-enabled OTA builds pass, all eight on-target suites compile, authenticated OTA succeeded and the device returned at `decca.local` / `192.168.1.79`. Physical transition verification remains open. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. WiiM integration remains outstanding. |
 | Version  | 0.27.4                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |

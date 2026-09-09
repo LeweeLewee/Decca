@@ -171,4 +171,6 @@ Immediate lighting correction (v0.27.4): the fade state machine and timer are
 removed. `setBrightness()` now writes every changed duty immediately for
 Stereo/Mono and logical power transitions. The lighting suite now contains six
 cases. The release build passes and all eight on-target suites compile without
-upload or execution. OTA and physical acceptance remain pending.
+upload or execution. The credential-enabled OTA build passed, authenticated OTA
+succeeded in 57.956 seconds and `decca.local` returned at `192.168.1.79`.
+Physical acceptance remains pending.

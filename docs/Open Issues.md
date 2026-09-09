@@ -73,14 +73,16 @@ Stereo open/high applies the owner-approved 85% / duty 217 immediately and Mono
 closed/low applies duty 0 immediately. Logical power transitions are also
 immediate. Preserve safe-off boot.
 
-**Pending firmware acceptance:** v0.27.4 removes the fade engine and makes every
-lighting transition immediate. The release build passes and all eight on-target
-suites compile without upload or execution. Deployment and physical verification
-remain pending.
+**Pending physical acceptance:** v0.27.4 removes the fade engine and makes every
+lighting transition immediate. The release and credential-enabled OTA builds
+pass, all eight on-target suites compile without upload or execution,
+authenticated OTA succeeded and the device returned on the network. Physical
+transition verification remains pending.
 
-**Device state:** the installed image is firmware v0.27.3 at commit `0a4d3bd`,
-using GPIO18 PWM at 1 kHz and an 85% / duty 217 target. Its authenticated OTA
-upload succeeded and the device returned at `decca.local` / `192.168.1.79`.
+**Device state:** the installed image is firmware v0.27.4 built from commit
+`19c16b6`, using GPIO18 PWM at 1 kHz and an 85% / duty 217 target. Its
+authenticated OTA upload succeeded in 57.956 seconds and the device returned at
+`decca.local` / `192.168.1.79`.
 
 **Acceptance required to close:**
 
@@ -94,8 +96,8 @@ upload succeeded and the device returned at `decca.local` / `192.168.1.79`.
    chatter between control overlays while the lamps are on.
 6. **Open:** confirm no abnormal module or wiring temperature and measure the
    installed three-lamp current.
-7. **Complete:** physical results are recorded and release v0.27.3 is installed
-   by authenticated OTA. Close only after items 2 and 4–6 pass.
+7. **Complete:** release v0.27.4 is installed by authenticated OTA and network
+   return is confirmed. Close only after items 2 and 4–6 pass.
 
 **Procurement records:** `hardware/BOM/phase1.csv` and `docs/Parts List.md`.
 **Wiring:** `docs/Wiring.md`, H5 and Power Distribution.

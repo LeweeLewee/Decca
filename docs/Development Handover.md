@@ -205,9 +205,10 @@ the user's Wi-Fi or OTA passwords.
    blocked by HW-SW-01.
    Install the ordered WAGO star points, recheck pot/display stability with
    lamps on, then temperature and installed lamp current before closing.
-10. **Implementation complete, deployment pending (v0.27.4):** the fade engine
-    is removed. After the 25 ms debounce, Stereo applies duty 217 immediately
-    and Mono applies duty 0 immediately; power transitions are also immediate.
+10. **Deployed, physical verification pending (v0.27.4):** the fade engine is
+    removed. After the 25 ms debounce, Stereo applies duty 217 immediately and
+    Mono applies duty 0 immediately; power transitions are also immediate.
+    Authenticated OTA succeeded and `decca.local` returned at `192.168.1.79`.
 11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
 12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
@@ -252,21 +253,20 @@ full, then CLAUDE.md, docs/Specification.md, docs/Firmware Architecture.md, docs
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priorities: deploy and verify the immediate v0.27.4 lighting behavior,
+Immediate priorities: physically verify the immediate v0.27.4 lighting behavior,
 repair the retained Stereo/Mono switch under HW-SW-01 and resolve HW-LGT-01.
-DFR0457 is installed on GPIO18, and firmware v0.27.3 at
-commit `0a4d3bd` is running after authenticated OTA and network-return
-verification. Complete the remaining WAGO installation, pot-stability,
+DFR0457 is installed on GPIO18, and firmware v0.27.4 built from commit `19c16b6`
+is running after authenticated OTA and network-return verification. Complete the remaining WAGO installation, pot-stability,
 temperature and current checks at 1 kHz and 85% / duty 217. When delivered, use
 WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
 The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 
-The PR branch contains the installed 85% duty 217 setting. The ESP32's
-last-known installed image is firmware v0.27.3 at commit `0a4d3bd`; its
+The main branch contains the installed 85% duty 217 setting. The ESP32's
+installed image is firmware v0.27.4 built from commit `19c16b6`; its
 authenticated OTA upload succeeded and the device returned
 at `decca.local`. Firmware releases use the single version value in
-`src/version.h`; v0.27.3 holds that identifier for 2.2 seconds on the
-cold-start/OTA-reboot screen. Candidate v0.27.4 removes all lighting fades.
+`src/version.h`; v0.27.4 holds that identifier for 2.2 seconds on the
+cold-start/OTA-reboot screen and removes all lighting fades.
 Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
 VHF-derived source, logical power and display while

@@ -25,9 +25,9 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   continuously servicing authenticated OTA.
 - USB-to-OTA, GPIO14 power, GPIO26 VHF source selection and the fitted display
   are complete. The DFR0457 replacement stage is installed and its initial
-  steady-light test resolved the flicker. The v0.27.3 startup screen and D18
-  lighting-on path were physically checked; the earlier v0.27.1 fade behaviour
-  remains approved. Mono/off re-verification after HW-SW-01, WAGO distribution,
+  steady-light test resolved the flicker. Firmware v0.27.4 was deployed by
+  authenticated OTA and returned at `decca.local`; it removes every lighting
+  fade. Physical transition verification after HW-SW-01, WAGO distribution,
   pot stability, temperature and current remain open as HW-LGT-01. Normal
   Stereo lighting is 85%; Mono and logical standby request off.
 - v0.27.4 removes the fade engine: Stereo/Mono and logical power changes now

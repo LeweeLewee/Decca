@@ -392,6 +392,10 @@ Firmware v0.27.3 established safe-off before other setup, authenticated OTA
 succeeded, the device returned at `decca.local`, and the owner confirmed the D18
 path reached the fully-on target. Mono/off re-verification awaits HW-SW-01.
 
+Current firmware (2026-09-09): v0.27.4 removes all fades and was deployed by
+authenticated OTA from commit `19c16b6`; `decca.local` returned at
+`192.168.1.79`. Physical immediate-transition verification remains open.
+
 ### 7.7 Remaining commissioning
 
 - Confirming final holder fit and measuring the installed three-lamp current

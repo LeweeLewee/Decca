@@ -89,10 +89,9 @@ remains Phase 3.
 The final H4 OLED loom is Brown GND, Red 3V3/VCC, Orange SCL GPIO22 and Yellow
 SDA GPIO21. Rev Q bezel PR #7 is merged, complete and owner-approved.
 
-The ESP32's last-known installed image is firmware v0.27.3 at commit `0a4d3bd`:
-authenticated OTA succeeded and the device returned at `decca.local`. The PR
-branch is the source of truth until merge. Its version hold is 2.2 seconds and the
-0–85% lighting transition is approximately 4.34 seconds in either direction.
-Firmware v0.27.4 is not yet installed; all of its lighting transitions are immediate.
+The ESP32's installed image is firmware v0.27.4 built from commit `19c16b6`:
+authenticated OTA succeeded on 2026-09-09 and the device returned at
+`decca.local` / `192.168.1.79`. Its version hold remains 2.2 seconds and all
+lighting transitions are immediate. Physical response verification remains open.
 Complete the remaining HW-LGT-01 WAGO installation, pot-stability, temperature
 and current checks.
