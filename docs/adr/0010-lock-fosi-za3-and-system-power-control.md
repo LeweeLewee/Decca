@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+The lighting-transition details are superseded by ADR-0017. The audio,
+amplifier and system power-control decisions remain accepted.
+
 ## Context
 ADR-0008 locked the audio architecture as WiiM Pro feeding a separate stereo
 power amplifier, but intentionally left the amplifier model open. Subsequent

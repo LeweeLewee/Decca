@@ -125,7 +125,7 @@ switch.
 **ON sequence**
 1. Original switch closes and the ESP32 detects the active state.
 2. ESP32 asserts the ZA3 12 V trigger through the trigger-driver stage.
-3. ESP32 fades the three dial lamps up to their stored commissioning brightness.
+3. ESP32 switches the three dial lamps to their stored commissioning brightness.
 4. ESP32 enables the OLED and runs the normal startup/dashboard sequence.
 5. WiiM remains physically powered and wakes from automatic standby when playback
    or supported network/control activity requires it.
@@ -134,7 +134,7 @@ switch.
 1. ESP32 detects the original switch opening.
 2. ESP32 stops playback / sends an appropriate WiiM control action where useful;
    WiiM then uses its own automatic standby behaviour.
-3. ESP32 fades the dial lamps to zero.
+3. ESP32 switches the dial lamps immediately to zero.
 4. ESP32 blanks the OLED.
 5. ESP32 removes the 12 V trigger so the ZA3 enters its trigger-controlled off/
    standby state.
@@ -233,10 +233,11 @@ DAOKAI pack is retained as superseded test stock.
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. The owner-approved normal value is 85% / duty 217. Firmware
 stores it in non-volatile settings and applies it only while logically on and in
-Stereo; Mono and standby fade to zero. The unused aerial control may be used as a
+Stereo. Debounced Stereo/Mono and logical power changes apply duty 217 or zero
+immediately. The unused aerial control may be used as a
 temporary commissioning input if convenient, but it is not reserved as a
-permanent lighting control. Behaviours: fade up/down, configurable stored
-brightness, safe boot state.
+permanent lighting control. Behaviours: immediate switching, configurable stored
+brightness and safe boot state.
 
 ### ZA3 trigger output
 The ESP32 controls a dedicated interface to the ZA3 **12 V trigger input**. The

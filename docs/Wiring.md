@@ -247,8 +247,9 @@ Yellow = SDA.
   aerial control may be used temporarily for commissioning if convenient, but is
   not reserved permanently for lighting.
 
-Expected behaviours: fade up, fade down, stored/configurable brightness, safe
-boot state. Firmware support is implemented. GPIO18, the MOSFET stage and the
+Expected behaviours: immediate Stereo/Mono and logical power response,
+stored/configurable brightness and safe boot state. Firmware
+support is implemented. GPIO18, the MOSFET stage and the
 three-lamp electrical load passed the dial-lighting bench procedure on
 2026-08-31. Subsequent 70%, 80% and 100% comparisons established the approved
 normal level is now 85%; Mono and standby are off. Final DFR0457 integration and

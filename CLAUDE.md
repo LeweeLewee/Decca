@@ -65,6 +65,10 @@ no flicker reported. WAGO distribution installation plus pot-stability,
 temperature and current checks remain open under HW-LGT-01. Mono and logical
 standby are off.
 
+Firmware v0.27.4 removes the fade engine. Stereo/Mono lighting requests update
+PWM duty immediately after the 25 ms debounce, and logical power transitions
+also switch the LEDs immediately.
+
 Stereo/Mono is assigned to GPIO25/D25 with the internal pull-up. The contact is
 closed/LOW in Mono and open/HIGH in Stereo; Stereo requests lights on and Mono
 requests lights off. Both states were physically accepted on the previous
@@ -89,5 +93,6 @@ The ESP32's last-known installed image is firmware v0.27.3 at commit `0a4d3bd`:
 authenticated OTA succeeded and the device returned at `decca.local`. The PR
 branch is the source of truth until merge. Its version hold is 2.2 seconds and the
 0–85% lighting transition is approximately 4.34 seconds in either direction.
+Firmware v0.27.4 is not yet installed; all of its lighting transitions are immediate.
 Complete the remaining HW-LGT-01 WAGO installation, pot-stability, temperature
 and current checks.

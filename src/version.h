@@ -8,6 +8,6 @@
 namespace decca::version {
 
 /** Semantic firmware version shown at boot and reported over serial. */
-constexpr char kFirmwareVersion[] = "0.27.3";
+constexpr char kFirmwareVersion[] = "0.27.4";
 
 }  // namespace decca::version

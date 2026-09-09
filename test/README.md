@@ -14,7 +14,7 @@ test/
 ├── test_buttons/           active-low debounce, state + event queue
 ├── test_pots/              ADC mapping, smoothing, calibration + deadband
 ├── test_display/           SH1106 frames, timing, refresh + physical bring-up
-├── test_lighting/          PWM safe-off, target and fade behaviour
+├── test_lighting/          PWM safe-off and immediate switching behaviour
 ├── test_power/             pure logical on/standby transitions
 └── test_ota/               non-blocking authenticated OTA lifecycle
 ```
@@ -46,9 +46,9 @@ exercise mapping, normalisation, smoothing, calibration, inversion and deadband.
 The buttons suite injects digital levels to exercise active-low debounce, bounce
 rejection, stable latching state, re-arming and fixed-queue ordering. The pots
 and buttons suites also report physical snapshots through Unity for bench
-verification. The lighting suite exercises a real low-duty fade for physical
-bring-up and injects its clock and PWM writer for deterministic safe-off,
-fade-up, fade-down, target-clamping and invalid-zone coverage. The display suite
+verification. The lighting suite exercises real immediate on/off writes for
+physical bring-up and injects its PWM writer for deterministic safe-off,
+unchanged-duty and invalid-zone coverage. The display suite
 injects its clock, panel initialiser and semantic frame writer to exercise the
 five-frame startup animation, standby/source dashboards, persistent mapped
 function identity,
@@ -149,10 +149,9 @@ flash 839,253 bytes / 64.0%) and the complete on-target run passed 55/55.
 DFR0457 release candidate (2026-09-05): the normal target changes to duty 217
 (85%), settings schema v4 ensures the earlier persisted 90% value cannot
 override it, and the historical GPIO25 PWM changes from 5 kHz to the controller's 1 kHz limit.
-The non-blocking fade interval is now 20 ms per count, giving approximately
-4.34-second transitions between off and duty 217 in both directions. Physical
-OTA and integration acceptance are tracked as HW-LGT-01 in
-`docs/Open Issues.md`.
+That v0.27.1 release used a 20 ms/count fade and approximately 4.34-second
+transitions. v0.27.4 supersedes it with immediate writes. Physical OTA and
+integration acceptance are tracked as HW-LGT-01 in `docs/Open Issues.md`.
 
 v0.27.1 physical result (2026-09-05): authenticated OTA and reboot succeeded;
 the owner approved the 2.2-second firmware-version hold and both approximately
@@ -167,3 +166,9 @@ returned at `decca.local` / `192.168.1.79`. The v0.27.3 screen, GPIO14 on/off,
 GPIO26 VHF, GPIO25 Stereo/Mono firmware logic and GPIO18 lighting path were
 checked. The lamps reached fully on; Mono/off remained blocked by the faulty
 retained switch under HW-SW-01.
+
+Immediate lighting correction (v0.27.4): the fade state machine and timer are
+removed. `setBrightness()` now writes every changed duty immediately for
+Stereo/Mono and logical power transitions. The lighting suite now contains six
+cases. The release build passes and all eight on-target suites compile without
+upload or execution. OTA and physical acceptance remain pending.

@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted display, GPIO14 logical power, GPIO26 VHF, four-pot UI and GPIO18 DFR0457 lighting are implemented and physically checked on v0.27.3. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. Eight on-target suites last physically passed 55/55 on the previous input routing. WiiM integration remains outstanding. |
-| Version  | 0.27.3                                            |
+| Status   | Draft. Firmware v0.27.4 removes the lighting fade engine so debounced Stereo/Mono and logical power changes apply their PWM duty immediately. The release build passes and all eight on-target suites compile; the installed image remains v0.27.3 pending OTA and physical verification. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. WiiM integration remains outstanding. |
+| Version  | 0.27.4                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -122,9 +122,9 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 |-----------|------------------------------------------------------------------------------|-------|
 | FR-LGT-01 | The system shall drive the warm dial illumination via PWM through a logic-level N-channel MOSFET. | 1 |
 | FR-LGT-02 | Lighting shall support configurable idle brightness and standby dimming.     | 1     |
-| FR-LGT-03 | Lighting transitions shall fade (up/down) rather than switch abruptly; the normal 0–85% transition shall take approximately 4.3 s. | 1 |
+| FR-LGT-03 | Every lighting transition shall apply its requested PWM duty immediately, without a fade or delayed final step. | 1 |
 | FR-LGT-04 | Lighting shall adopt a defined safe state at boot.                           | 1     |
-| FR-LGT-05 | While logically on, Stereo shall fade the dial lighting to the stored normal level and Mono shall fade it off. Logical standby shall force lighting off. | 1 |
+| FR-LGT-05 | While logically on, a debounced Stereo change shall apply the stored normal dial-light duty immediately and Mono shall apply duty 0 immediately. Logical power-on and standby shall likewise apply their lighting duty immediately. | 1 |
 
 > Confirmed Phase 1 lighting is the **dial illumination** only. Cabinet lighting
 > is not part of the confirmed Phase 1 build.

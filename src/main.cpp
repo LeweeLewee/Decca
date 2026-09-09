@@ -113,13 +113,12 @@ void applyLightingState() {
     const uint8_t target = decca::power::isOn() && lightsRequested
                                ? decca::settings::get().dial
                                : 0;
-    if (decca::lighting::targetBrightness(decca::lighting::Zone::Dial) ==
-        target) {
+    if (decca::lighting::brightness(decca::lighting::Zone::Dial) == target) {
         return;
     }
 
     decca::lighting::setBrightness(decca::lighting::Zone::Dial, target);
-    Serial.print("[LIGHTING] target=");
+    Serial.print("[LIGHTING] duty=");
     Serial.println(target);
 }
 
@@ -137,6 +136,7 @@ void setup() {
     decca::lighting::init();
     decca::power::init(
         decca::buttons::isPressed(decca::buttons::Button::OnOff));
+    applyLightingState();
     g_viewState.power = decca::power::isOn()
                             ? decca::display::PowerState::On
                             : decca::display::PowerState::Standby;
@@ -144,7 +144,6 @@ void setup() {
     decca::display::init();
     applySourceState(false);
     applyPowerState();
-    applyLightingState();
     decca::ota::init();
 }
 
@@ -160,7 +159,6 @@ void loop() {
         applySourceState(true);
     }
     applyLightingState();
-    decca::lighting::update();
     decca::display::update();
     decca::ota::update();
 }

@@ -18,9 +18,11 @@ Format: lightweight (Nygard). Status is one of `Proposed`, `Accepted`,
 | 0007 | Present logical function and now-playing context            | Accepted |
 | 0008 | Lock WiiM Pro with separate power amplification             | Accepted |
 | 0009 | Omit legacy button labels from user-facing display views    | Accepted |
+| 0010 | Lock Fosi ZA3 and system power-control architecture         | Accepted; lighting transitions superseded by 0017 |
 | 0011 | Use Gram as the sole two-state source selector               | Superseded |
 | 0012 | Use authenticated local-network ArduinoOTA                   | Accepted |
 | 0013 | Use VHF as the authoritative two-state source selector       | Superseded |
 | 0014 | Use TX2 Stereo/Mono as the dial-lighting command              | Superseded |
 | 0015 | Reassign dry-contact inputs for terminal-adapter routing      | Superseded |
 | 0016 | Finalise controller GPIO routing                              | Accepted |
+| 0017 | Remove dial-lighting fades                                    | Accepted |

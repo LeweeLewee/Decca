@@ -38,7 +38,7 @@ Implemented modules:
 | `buttons` | On/off, sole VHF contact and Stereo/Mono lighting request, 25 ms non-blocking debounce |
 | `pots` | Four filtered/calibrated ADC1 inputs |
 | `display` | Fitted-Perspex SH1106 UI physically accepted; calibrated views plus idle dim/display-off protection |
-| `lighting` | Safe-off non-blocking PWM fades |
+| `lighting` | Safe-off PWM with immediate updates for every transition |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
 | WiiM interface | Phase 2, not implemented |
@@ -189,8 +189,9 @@ the user's Wi-Fi or OTA passwords.
 6. **Complete:** GPIO18/DFR0457/three-lamp operation is physically verified;
    the historical GPIO25/MOSFET test also passed:
    safe off, smooth fades through full duty, even illumination and fade fully off.
-7. **Complete (2026-08-31):** normal Stereo lighting approved at 90% / duty
-   230 and integrated in production; Mono and logical standby fade to off.
+7. **Historical (2026-08-31):** normal Stereo lighting was approved at 90% /
+   duty 230 with faded transitions. v0.27.4 supersedes the transition behaviour
+   and applies both brightness states immediately.
 8. **Historical pass (2026-08-30):** original Stereo/Mono switch wired to
    TX2/GPIO17 and GND. Physical snapshots confirmed Stereo open requests dial
    lights on and Mono closed requests them off. GPIO25 load remained disabled
@@ -204,9 +205,12 @@ the user's Wi-Fi or OTA passwords.
    blocked by HW-SW-01.
    Install the ordered WAGO star points, recheck pot/display stability with
    lamps on, then temperature and installed lamp current before closing.
-10. Add WiiM Pro integration only in Phase 2, after the hardware is available and
+10. **Implementation complete, deployment pending (v0.27.4):** the fade engine
+    is removed. After the 25 ms debounce, Stereo applies duty 217 immediately
+    and Mono applies duty 0 immediately; power transitions are also immediate.
+11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
    the live local API is verified.
-11. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -214,7 +218,7 @@ the user's Wi-Fi or OTA passwords.
 `docs/Open Issues.md` is the authoritative short list. Consult
 `docs/Parts List.md` and the CSV BOMs for procurement detail. Immediate open
 items are the ordered WAGO 221-415 distribution-connector pack and final DFR0457
-fade, pot-stability, temperature, current and holder checks.
+immediate-transition, pot-stability, temperature, current and holder checks.
 Phase 2 items remain the ZA3 12 V trigger interface, WiiM Pro, Fosi ZA3,
 speakers and final audio interconnects.
 
@@ -248,9 +252,9 @@ full, then CLAUDE.md, docs/Specification.md, docs/Firmware Architecture.md, docs
 Architecture.md, docs/Wiring.md, docs/Build Guide.md and the relevant ADRs.
 Treat the live main branch and those documents as authoritative over chat memory.
 
-Immediate priorities: repair the retained Stereo/Mono switch under HW-SW-01 and
-resolve HW-LGT-01. DFR0457 is installed on GPIO18, its earlier v0.27.1 startup
-and fade behaviour are owner-approved with no flicker, and firmware v0.27.3 at
+Immediate priorities: deploy and verify the immediate v0.27.4 lighting behavior,
+repair the retained Stereo/Mono switch under HW-SW-01 and resolve HW-LGT-01.
+DFR0457 is installed on GPIO18, and firmware v0.27.3 at
 commit `0a4d3bd` is running after authenticated OTA and network-return
 verification. Complete the remaining WAGO installation, pot-stability,
 temperature and current checks at 1 kHz and 85% / duty 217. When delivered, use
@@ -262,7 +266,7 @@ last-known installed image is firmware v0.27.3 at commit `0a4d3bd`; its
 authenticated OTA upload succeeded and the device returned
 at `decca.local`. Firmware releases use the single version value in
 `src/version.h`; v0.27.3 holds that identifier for 2.2 seconds on the
-cold-start/OTA-reboot screen and uses approximately 4.34-second lighting fades.
+cold-start/OTA-reboot screen. Candidate v0.27.4 removes all lighting fades.
 Then proceed to Phase 2 WiiM integration when its hardware is available.
 Production now coordinates all four pots,
 VHF-derived source, logical power and display while
@@ -273,8 +277,9 @@ L50..0..R50 with centred bars and monochrome icons.
 
 GPIO18 PWM, VHF GPIO26/D26 and on/off GPIO14/D14 are physically verified.
 Stereo/Mono uses GPIO25/D25; its switch fault is open under HW-SW-01. Final MOSFET/three-lamp
-acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo
-fades to 85%; Mono and standby fade off. Preserve the accepted
+acceptance is open under HW-LGT-01. Preserve the required behaviour: Stereo and
+logical power-on switch immediately to 85%; Mono and logical standby switch
+immediately off. Preserve the accepted
 VHF-only source logic: VHF closed = Digital
 Streamer; VHF open = Vinyl/Line-In;
 GPIO13, GPIO16, GPIO17, GPIO19 and GPIO23 remain unused. Preserve the final OLED loom: Brown GND,

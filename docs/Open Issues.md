@@ -39,9 +39,10 @@ correct.
 
 ## HW-LGT-01 — Final dial-lighting integration acceptance
 
-**Status:** OPEN — DFR0457 installed; flicker, v0.27.1 startup and 85% fade
-behaviour physically accepted. WAGO installation, pot-stability, temperature
-and current remain.
+**Status:** OPEN — DFR0457 installed and steady-state flicker resolved. The
+previous fade behavior is superseded because installed testing showed a delayed
+final switch rather than a useful visible ramp. Immediate v0.27.4 behavior,
+WAGO installation, pot-stability, temperature and current remain to be verified.
 
 **Observed:** the previous MOSFET/module path produced visible lamp flicker. With
 that path energised, electrical disturbance also caused the display to jump
@@ -67,9 +68,15 @@ disturbance stopped, but lamp flicker remained.
   approved the 2.2-second firmware-version hold and both approximately
   4.34-second lighting fades, with no flicker reported.
 
-**Locked behaviour:** GPIO18/D18 is the lighting PWM output. Stereo
-open/high requests lights on at the owner-approved 85% / duty 217; Mono
-closed/low and logical standby request off. Preserve fades and safe-off boot.
+**Locked behaviour:** GPIO18/D18 is the lighting PWM output. After debounce,
+Stereo open/high applies the owner-approved 85% / duty 217 immediately and Mono
+closed/low applies duty 0 immediately. Logical power transitions are also
+immediate. Preserve safe-off boot.
+
+**Pending firmware acceptance:** v0.27.4 removes the fade engine and makes every
+lighting transition immediate. The release build passes and all eight on-target
+suites compile without upload or execution. Deployment and physical verification
+remain pending.
 
 **Device state:** the installed image is firmware v0.27.3 at commit `0a4d3bd`,
 using GPIO18 PWM at 1 kHz and an 85% / duty 217 target. Its authenticated OTA
@@ -77,11 +84,11 @@ upload succeeded and the device returned at `decca.local` / `192.168.1.79`.
 
 **Acceptance required to close:**
 
-1. **Passed:** cold startup showed no unwanted lamp flash before the controlled
-   fade.
+1. **Passed:** cold startup showed no unwanted lamp flash before firmware control.
 2. **Partial:** the D18 path reached fully on during the 2026-09-08 check. The
    Mono/off transition is blocked by the retained switch fault in HW-SW-01.
-3. **Passed:** no lamp flicker was reported at steady state or through fades.
+3. **Passed:** no lamp flicker was reported at steady state. The old fade result
+   is superseded by the v0.27.4 immediate-switch requirement.
 4. **Open:** install the ordered WAGO 221-415 +5 V and common-GND star points.
 5. **Open:** exercise and then release all four pots; confirm the OLED does not
    chatter between control overlays while the lamps are on.
