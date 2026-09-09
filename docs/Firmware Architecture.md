@@ -37,18 +37,21 @@ AI-assisted editing.
 
 ### Module notes (confirmed Phase 1 build)
 
-- **`buttons`** reads the retained on/off switch and sole active-low VHF contact
-  with 25 ms software debounce. It exposes the stable VHF-derived source mode:
+- **`buttons`** reads the retained on/off switch on GPIO14/D14, the sole
+  active-low VHF contact on GPIO26/D26 and the active-low Stereo/Mono contact on
+  GPIO25/D25 with 25 ms software debounce. The on/off and VHF routes are
+  physically verified. Stereo/Mono firmware logic is correct, while the faulty
+  retained switch remains open as HW-SW-01. It exposes the stable VHF-derived source mode:
   closed = Digital Streamer; open = Vinyl. Press events do not repeat while held.
   The other interlocked positions release VHF and therefore select Vinyl
-  (ADR-0013).
+  (ADR-0016).
 - **`pots`** treats the four pots as **position sensors only** (not in the audio
   path). It applies calibration, smoothing, deadband, and optional inversion, and
   emits values suitable for stable display updates (FR-POT-01..05). Sampling is
   fixed at 100 Hz; an integer low-pass filter precedes normalisation and output
   deadband so `update()` remains deterministic and non-blocking.
 - **`lighting`** drives the warm dial illumination only (dial, not cabinet) via a
-  logic-level N-channel MOSFET under PWM, with fade up/down, configurable idle
+  logic-level N-channel MOSFET on GPIO18/D18 under PWM, with fade up/down, configurable idle
   brightness, and a safe boot state. It starts at duty 0, reads its initial
   target from `settings`, and advances one PWM count every 20 ms without
   blocking. At the owner-approved duty 217 (85%), a complete fade takes about

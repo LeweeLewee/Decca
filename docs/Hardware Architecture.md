@@ -2,9 +2,10 @@
 
 > **Status:** active. Reflects the confirmed Phase 1 physical build plus the
 > locked Phase 2 audio and power-control architecture. Pot inputs GPIO32–35,
-> sole VHF input GPIO23, OLED I²C GPIO21/22 and on/off GPIO19 are bench-verified.
-> Stereo/Mono input GPIO17/TX2 is physically verified.
-> Lighting GPIO25 and the MOSFET/lamp electrical load are physically accepted;
+> OLED I²C GPIO21/22, on/off GPIO14, VHF GPIO26 and lighting PWM GPIO18 are
+> physically verified. Stereo/Mono uses GPIO25/D25; firmware logic is correct,
+> while the retained switch fault remains open as HW-SW-01.
+> The MOSFET/lamp electrical load is physically installed and operating;
 > other pins are unassigned. See
 > `docs/Wiring.md` for the authoritative
 > controller interconnect detail and ADR-0008 / ADR-0010 for the streamer,
@@ -176,7 +177,7 @@ clockwise on 2026-08-24, so the default 0–4095 calibration remains applicable.
 ### On/off switch (H2)
 Retained original switch and cable, active conductors **Red** and **Green**. A
 simple open/close contact read as a **low-voltage digital input** with the ESP32
-**internal pull-up** enabled on bench-verified GPIO19, board label **D19**.
+**internal pull-up** enabled on physically verified GPIO14, board label **D14**.
 **Not a mains switch.** Closed = logical ON; open = logical STANDBY. Both
 directions were physically accepted on 2026-08-30. Its logical state drives the
 locked system-power sequence documented above.
@@ -186,16 +187,17 @@ The original selector PCB and interlocked mechanism are retained as the
 mechanical carrier (ADR-0001), but unreliable soldering/contact behaviour makes
 multi-button electrical reuse unsuitable.
 
-Only the reliable VHF-derived dry-contact state is connected to GPIO23 / D23
+Only the reliable VHF-derived dry-contact state is connected to GPIO26 / D26
 with the internal pull-up and software debounce. Closed/latched VHF selects
 Digital Streamer; every other interlocked position releases VHF and selects
-Vinyl. GPIO16 and GPIO18 are released; GPIO17 is released from the source bank
-and assigned separately to the Stereo/Mono contact. A new button panel remains
-a deferred fallback (ADR-0013).
+Vinyl. GPIO13, GPIO16, GPIO17, GPIO19 and GPIO23 are released. A new button panel remains
+a deferred fallback (ADR-0016).
 
-The Stereo/Mono contact uses TX2/GPIO17 with the internal pull-up. Open/HIGH in
+The Stereo/Mono contact uses GPIO25/D25 with the internal pull-up. Open/HIGH in
 Stereo requests dial lights on and closed/LOW in Mono requests them off. It is a command input
-only; GPIO25 and the lighting load remain separately gated (ADR-0014).
+only; GPIO18 and the lighting load remain separately gated. The switch behaviour
+was physically accepted on the previous GPIO17/TX2 route. GPIO25 input logic is
+correct, but the retained switch requires repair under HW-SW-01 (ADR-0016).
 
 ## Outputs
 
@@ -220,7 +222,8 @@ three-lamp current remain commissioning checks.
 
 The final switch is one **DFRobot Gravity MOSFET Power Controller, DFR0457**,
 now installed. It accepts the 5 V lamp rail and 3.3 V logic/control, with a
-specified switching range of 0–1 kHz. Firmware PWM is set to 1 kHz. The initial
+specified switching range of 0–1 kHz. GPIO18/D18 drives the controller input and
+firmware PWM is set to 1 kHz. The initial
 steady-light test resolved the visible flicker. Cold startup and both
 approximately 4.34-second fade directions were subsequently owner-approved on
 v0.27.1 with no flicker. WAGO distribution installation plus pot-stability,

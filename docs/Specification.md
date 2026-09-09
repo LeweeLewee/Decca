@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. USB-to-OTA, fitted-display, GPIO19 logical-power, four-pot UI, VHF source and TX2 Stereo/Mono acceptance are complete. DFR0457 is installed; v0.27.1 cold-start, 85% fade-up/down and no-flicker behaviour are physically approved at 1 kHz. HW-LGT-01 remains open for WAGO distribution installation plus pot-stability, temperature and current checks. Eight on-target suites last passed 55/55. WiiM integration remains outstanding. |
-| Version  | 0.27.1                                            |
+| Status   | Draft. USB-to-OTA, fitted display, GPIO14 logical power, GPIO26 VHF, four-pot UI and GPIO18 DFR0457 lighting are implemented and physically checked on v0.27.3. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. Eight on-target suites last physically passed 55/55 on the previous input routing. WiiM integration remains outstanding. |
+| Version  | 0.27.3                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -45,7 +45,9 @@ Confirmed Phase 1 front-panel controls:
 - Four rotary controls as 10 kΩ position sensors: **Balance, Treble, Bass, Volume**.
 - Retained original **on/off switch** (low-voltage logic input).
 - Original **source button bank** retained mechanically. Only **VHF** provides a reliable electrical state: VHF latched = **Digital Streamer**; every other selector position = **Vinyl**.
-- Original **Stereo/Mono** contact on TX2/GPIO17: Stereo open requests lights on; Mono closed requests lights off. Both positions are physically verified.
+- Original **Stereo/Mono** contact assigned to GPIO25/D25: Stereo open requests
+  lights on; Mono closed requests lights off. Firmware logic is correct, but the
+  retained switch requires repair under HW-SW-01.
 - **OLED** display and **warm dial illumination**.
 
 See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
@@ -82,11 +84,11 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-BTN-02 | The system shall expose the stable VHF state continuously and emit one event per confirmed press without hold repeats. | 1 |
 | FR-BTN-03 | Closed/latched VHF shall select Digital Streamer; open/released VHF shall select Vinyl. | 1 |
 | FR-BTN-04 | SW, MW, LW and Gram shall have no individual ESP32 input; their authoritative effect is to release VHF and select Vinyl through the original interlock. A replacement button panel is a deferred fallback only. | 1 |
-| FR-BTN-05 | The system shall debounce the Stereo/Mono contact on GPIO17 and expose its stable lighting request continuously: Stereo open/high = on; Mono closed/low = off. | 1 |
+| FR-BTN-05 | The system shall debounce the Stereo/Mono contact on GPIO25 and expose its stable lighting request continuously: Stereo open/high = on; Mono closed/low = off. | 1 |
 
 > Digital service, station, playlist and track selection remain in the WiiM app.
 > In Phase 2 the ESP32 maps Vinyl to WiiM Line-In and Digital Streamer to the
-> phone-controlled network playback path (ADR-0013).
+> phone-controlled network playback path (ADR-0016).
 
 ### 5.3 Potentiometers
 
@@ -195,9 +197,9 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 
 | ID     | Interface                                                                       |
 |--------|---------------------------------------------------------------------------------|
-| IF-01  | **Front panel:** four 10 kΩ pots on ADC1; retained on/off switch; sole debounced VHF source contact on GPIO23; pulled-up Stereo/Mono lighting-request contact on GPIO17/TX2. VHF closed = Digital Streamer; VHF open = Vinyl. Stereo open/high = lights requested on; Mono closed/low = off. |
+| IF-01  | **Front panel:** four 10 kΩ pots on ADC1; retained on/off switch on GPIO14/D14; sole debounced VHF source contact on GPIO26/D26; pulled-up Stereo/Mono lighting-request contact on GPIO25/D25. VHF closed = Digital Streamer; VHF open = Vinyl. Stereo open/high = lights requested on; Mono closed/low = off. The retained Stereo/Mono switch fault is tracked as HW-SW-01. |
 | IF-02  | **Display:** purchased Pi Hut 1.3-inch white 128×64 **SH1106** OLED over **I²C** at address 0x3C, powered from 3.3 V and mounted behind the dial glass. |
-| IF-03  | **Lighting:** PWM-driven warm dial illumination via logic-level N-channel MOSFET (dial only in Phase 1). |
+| IF-03  | **Lighting:** GPIO18/D18 PWM-driven warm dial illumination via logic-level N-channel MOSFET (dial only in Phase 1). |
 | IF-04  | **WiiM Pro local API (Phase 2):** two-state Line-In/digital-path switching, volume control, and metadata/playback-state feedback. Digital content selection remains in the WiiM app. |
 | IF-05  | **Serial console:** 115200 baud for diagnostics and bring-up.                   |
 
@@ -246,7 +248,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 ## 12. Traceability
 
 - **Requirements → design:** `docs/Firmware Architecture.md` (modules, phase map).
-- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 superseded multi-button plan, 0005 superseded Stereo/Mono deferral, 0006 WiiM Phase 2, 0007 display presentation, 0008 streamer/separate-amplifier architecture, 0009 function-only display hierarchy, 0010 Fosi ZA3 and system power, 0011 superseded Gram-only source selection, 0012 authenticated local OTA, 0013 VHF-authoritative two-state selection, 0014 TX2 Stereo/Mono lighting command).
+- **Key decisions:** `docs/adr/` (ADR-0001 retained PCB, 0002 pots as sensors, 0003 on/off input, 0004 superseded multi-button plan, 0005 superseded Stereo/Mono deferral, 0006 WiiM Phase 2, 0007 display presentation, 0008 streamer/separate-amplifier architecture, 0009 function-only display hierarchy, 0010 Fosi ZA3 and system power, 0011 superseded Gram-only source selection, 0012 authenticated local OTA, 0013 VHF-authoritative two-state selection, 0014 superseded TX2 Stereo/Mono routing, 0015 superseded interim routing, 0016 final controller routing).
 - **Requirements → hardware:** `docs/Hardware Architecture.md`, `docs/Wiring.md`.
 - **Requirements → verification:** test suites under `test/`, one per module.
 - **Change history:** `docs/Revision History.md`.

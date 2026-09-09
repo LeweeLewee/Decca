@@ -177,7 +177,7 @@ void test_display_animates_startup_without_blocking() {
         TEST_ASSERT_EQUAL_UINT8(frame, g_lastStartupFrame);
     }
 
-    TEST_ASSERT_EQUAL_STRING("0.27.1", g_lastFirmwareVersion);
+    TEST_ASSERT_EQUAL_STRING("0.27.3", g_lastFirmwareVersion);
     TEST_ASSERT_EQUAL_UINT32(2200,
                              decca::display::kStartupFinalFrameHoldMs);
     g_nowMs += decca::display::kStartupFinalFrameHoldMs - 1U;
