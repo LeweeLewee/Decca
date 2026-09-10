@@ -1,5 +1,20 @@
 # Revision History
 
+## 2026-09-06 — IEC C14 mounting plate Rev B corrects rejected Rev A
+
+- Owner physical review **rejected Rev A**: the rectangular opening passed the written CAD gates but did not properly enclose the actual IEC C14 shape.
+- Corrected the specification error by making the previously supplied **16.00 mm** and **14.00 mm** measurements governing profile datums alongside the **27.14 × 19.50 mm** overall measurements.
+- Derived each angled section as **5.57 mm run × 5.50 mm rise = 7.828 mm at 44.638°**; nominal corners are **R2.00** at the two long-flat corners and **R0.40** at the other four.
+- Built Rev B with **0.25 mm normal profile clearance**, retaining the exact 31 × 17 mm Decca grid and 39 mm C14 fixing pitch. Exported STEP/STL pass **15/15** checks; minimum fixing-to-opening ligament is **3.98 mm**.
+- Status: **Rev A rejected; Rev B CAD PASS / physical prototype fit pending**.
+
+## 2026-09-06 — IEC C14 mounting plate Rev A CAD complete
+
+- Built the dedicated 40.00 × 50.00 × 3.00 mm IEC C14 mounting plate on `feat/iec-c14-mounting-plate` from the locked measured interface specification.
+- Added reproducible CadQuery source, neutral STEP, manifold STL, dimensioned drawing, independent verifier and build report.
+- Exported geometry passes **12/12** CAD gates: exact 31.00 × 17.00 mm M2 grid, exact 39.00 mm M3 pitch and midpoint, centred 20.00 × 27.60 mm opening, correct through-hole diameters, one connected manifold part and minimum fixing-to-opening ligament **4.00 mm**.
+- Status is deliberately **CAD complete / prototype pending**. Physical fit of the purchased C14, cabinet-hole alignment, flat clamping and rear terminal/wire clearance are still required before release.
+
 Chronological log of meaningful changes across firmware, hardware, and
 mechanical design. Firmware release detail belongs in Git tags/releases; this
 document captures cross-cutting milestones and hardware/mechanical revisions

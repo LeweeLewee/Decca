@@ -1,5 +1,37 @@
 # CAD
 
+## IEC C14 mounting plate — Rev B — ACTIVE PROTOTYPE / PHYSICAL FIT PENDING
+
+**Rev A is rejected.** Rev B replaces the rectangular opening with the measured six-sided C14 profile.
+
+| File | Role |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_revB_cadquery.py` | controlling parametric Rev B source |
+| `Decca_IEC_C14_Mounting_Plate_revB_verify.py` | independent exported STEP/STL verifier |
+| `Decca_IEC_C14_Mounting_Plate_revB_drawing.py` | dimensioned profile drawing generator |
+| `Decca_IEC_C14_Mounting_Plate_revB.step` | neutral Rev B CAD export |
+
+Measured native profile: **27.14 × 19.50 mm**, **16.00 mm short flat**, **14.00 mm straight side**, with each angled section derived as **5.57 mm run × 5.50 mm rise = 44.638°**. Nominal inlet corners are **R2.00** at the two long-flat corners and **R0.40** at the other four. Production opening uses **0.25 mm normal clearance** and is rotated 90° in the plate.
+
+**15/15 Rev B exported-geometry checks PASS.** Physical fit remains mandatory before release.
+
+### Rev A — REJECTED
+
+The Rev A source and exports are retained for traceability only. Its 20.00 × 27.60 mm rectangular opening does **not** properly enclose the physical C14 profile and must not be printed or installed.
+
+## IEC C14 mounting plate — Rev A — CAD COMPLETE / PROTOTYPE PENDING
+
+Rev A is a reproducible CadQuery model built from the measured purchased inlet interface. The controlling specification is `../Drawings/Decca_IEC_C14_Mounting_Plate_Spec_revA.md`.
+
+| File | Role |
+|---|---|
+| `Decca_IEC_C14_Mounting_Plate_revA_cadquery.py` | parametric source and analytic pre-export checks |
+| `Decca_IEC_C14_Mounting_Plate_revA_verify.py` | independent STEP/STL verifier |
+| `Decca_IEC_C14_Mounting_Plate_revA_drawing.py` | dimensioned PNG generator |
+| `Decca_IEC_C14_Mounting_Plate_revA.step` | neutral CAD export |
+
+Geometry: 40.00 × 50.00 × 3.00 mm, R2 corners, centred 20.00 × 27.60 mm C14 opening, 4 × Ø2.40 Decca holes on a 31.00 × 17.00 mm grid and 2 × Ø3.40 C14 holes at 39.00 mm pitch. **12/12 CAD gates PASS.** Physical fit is still required before release.
+
 Source (editable, parametric) mechanical design files.
 
 ## ESP32 controller housing — Rev C installed prototype
