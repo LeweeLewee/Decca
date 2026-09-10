@@ -230,6 +230,16 @@ merged and owner-approved. The released Rev P.5 carrier remains frozen and
 unchanged. Re-check the recorded 0.339 mm carrier clearance if either part is
 reprinted on a different machine or profile.
 
+The ESP32 controller housing **Rev C** package is now on main. The owner printed,
+fitted, wired and installed it on 2026-09-07; it fitted first time. It remains a
+prototype, not a production release: seven prototype and two installation gates
+remain in specification v1.7.
+
+The IEC C14 mounting plate **Rev B** is the active design. Rev A failed physical
+profile review and must not be installed. Rev B uses the corrected measured
+six-sided profile, passes 15/15 CAD checks and has owner confirmation of the
+profile drawing; full physical fit and rear terminal/wire clearance remain open.
+
 ## Engineering guardrails
 
 - Preserve module independence; coordinate only in `main`.

@@ -20,12 +20,15 @@ validation remains.
 | DFRobot Gravity MOSFET Power Controller | 1 | **INSTALLED — FLICKER PASS / IMMEDIATE SWITCH + FINAL CHECKS OPEN** | DFR0457; control input is on GPIO18/D18. Earlier v0.27.1 fade observations are superseded because the installed LEDs held brightness until a delayed final switch. v0.27.4 removes the fade engine. Mono/off re-verification after HW-SW-01, immediate power-transition verification, pot stability, temperature and current remain before closure. | The Pi Hut |
 | ShuoHui E10 warm-white LED lamps | Pack of 10; 3 required | **THREE-LAMP ELECTRICAL LOAD VERIFIED / FIT CHECK** | ASIN B0CFTLZFGT; E10, AC/DC 6 V, 0.2 W, 3000 K. Three parallel lamps passed even 5 V PWM illumination on 2026-08-31. Physical holder fit, final brightness and total bank current remain open. | Amazon / ShuoHui |
 | 5 V regulated control supply | 1 | **CONNECTED — SHARED RAIL / USB REMOVED** | Phihong PSA15R-050P switching adapter; 5.0 V DC at 3.0 A (15 W). Now feeds the ESP32 at VIN/5V and the lighting rail; USB was removed before external power was connected. Previously powered the accepted three-lamp PWM test on 2026-08-31. | Existing stock |
-| TopHomer panel-mount DC input sockets | Pack of 5; 1 required | **PURCHASED — DELIVERY / FIT / POLARITY CHECK** | ASIN B08HGXYS4J; female two-terminal threaded-nut sockets, 5.5 mm OD × 2.1 mm ID, rated 3 A. Use one only after confirming the actual Phihong plug fit and centre-positive polarity before drilling or wiring. | Amazon / TopHomer |
-| Low-voltage inline fuse holder | 1 | **OPEN — BUY** | Installed in the +5 V conductor immediately after the panel socket and before distribution. | _TBD_ |
-| 2 A fuse | 2 | **OPEN — BUY** | One fitted and one spare; type must match the selected holder. Final rating to be rechecked against measured lamp current during bench commissioning. | _TBD_ |
+| TopHomer panel-mount DC input sockets | Pack of 5 | **PURCHASED — OBSOLETE / NOT REQUIRED** | ASIN B08HGXYS4J; previously intended for the Phihong input. The installed PSU output is soldered directly into the low-voltage wiring, so no panel DC socket is used. | Amazon / TopHomer |
+| Low-voltage inline fuse holder | 1 | **REUSED / IMPLEMENTED** | Original Decca holder installed in the +5 V conductor immediately after the soldered PSU output connection and before distribution. | Original Decca hardware |
+| 2 A fuse | 2 | **PURCHASED** | One fitted and one spare. Recheck the final rating against measured lamp current during commissioning. | Purchased |
 | WAGO 221-415 five-way distribution connectors | Pack of 3; 2 required | **ORDERED — DELIVERY / INSTALLATION CHECK** | Pi Hut SKU 104130. Use one connector as the +5 V star point and one as the common-GND star point; retain the third as a spare. Each five-way connector makes every port common and accepts the selected 22–24 AWG wiring. | The Pi Hut |
 | Lyeteung JST-XH 4-pin harness set | 15 pairs | **PURCHASED — CHECK PHYSICAL STOCK** | ASIN B0CBWX98NF; 2.54 mm male/female connectors with 150 mm 22 AWG leads. Use where a four-way removable low-voltage harness is suitable. | Amazon / Lyeteung |
 | 22–24 AWG stranded power wire and ferrules | 1 lot | **CHECK STOCK** | Orange for +5 V and Brown for GND; ferrules sized for the ESP32 terminal adapter and distribution connectors. | Existing stock / _TBD_ |
+| IEC C14 panel-mount mains inlet | 1 | **ACQUIRED / MEASURED — REV B FIT CHECK OPEN** | 250 V AC, 10 A class. The owner supplied the physical profile dimensions and confirmed the Rev B drawing; the corrected six-sided Rev B plate passes 15/15 CAD checks. Verify inlet fit, both fixing patterns, flat clamping and rear terminal/wire clearance before mains energisation. | Amazon |
+| UK mains to IEC C13 lead | 1 | **ORDERED — DELIVERY CHECK** | Appropriately fused BS 1363 UK plug to IEC C13 female lead for the rear C14 inlet. | Amazon |
+| Internal 4-gang mains distribution block | 1 | **ORDERED — INSTALLATION DESIGN OPEN** | Enclosed Masterplug four-socket extension block. Retain its enclosure and verify secure mounting, routing, earthing and the final C14 connection before energisation. | Amazon / Masterplug |
 
 ## Reused Original Components (Phase 1)
 
@@ -57,18 +60,25 @@ decisions.
 
 ## Whole-system mains boundary
 
-The Phihong 5 V adapter is treated as an **external enclosed adapter** by default;
-only its isolated 5 V output enters the cabinet. The current design therefore
-does not add a 230 V socket merely for the controller rail.
+The Phihong adapter's enclosed mains side remains intact. Its isolated 5 V output
+lead is soldered directly into the Decca low-voltage wiring, through the reused
+inline fuse holder; the purchased TopHomer panel DC socket is obsolete.
 
-A future one-mains-lead arrangement for the WiiM, ZA3 and controller would require
-a separate fused mains-inlet/distribution design. That remains an **open system
-design decision**, not an approved component purchase.
+The whole-system one-mains-lead arrangement is now an active implementation:
+an IEC C14 inlet, UK C13 lead and enclosed Masterplug four-gang distribution
+block are ordered. The corrected Rev B C14 mounting plate has passed CAD checks
+but remains physical-fit pending; mains wiring, earthing, secure mounting and
+rear terminal clearance must be verified before energisation.
 
 ## Mechanical / Fasteners
 
 - Knob adaptors (printed — see `mechanical/Knob Adaptors/`)
 - Display mount / bezel
+- ESP32 controller housing Rev C: printed, fitted, wired and installed as a
+  prototype on 2026-09-07; it fitted first time. Seven prototype and two
+  installation gates remain before production release.
+- IEC C14 mounting plate Rev B: 15/15 CAD checks pass and the owner confirmed
+  the corrected profile drawing; physical fit remains open. Rev A is rejected.
 - Standoffs, screws, brackets
 
 ## Consumables / Harness

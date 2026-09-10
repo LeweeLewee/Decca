@@ -32,6 +32,14 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   Stereo lighting is 85%; Mono and logical standby request off.
 - v0.27.4 removes the fade engine: Stereo/Mono and logical power changes now
   apply the required LED duty immediately.
+- ESP32 controller housing Rev C was printed, fitted, wired and installed as a
+  prototype on 2026-09-07. Its CAD/mesh gates pass; seven prototype and two
+  installation gates remain before production release.
+- IEC C14 mounting plate Rev B is the active corrected-profile design. Its
+  15/15 CAD checks pass and the owner confirmed the profile drawing; physical
+  fit remains pending. Rev A is rejected.
+- The completed 2026-09-06 ADC/PWM noise report and its 12,000-row raw capture
+  are retained under `diagnostics/` as historical v0.27.1 evidence.
 
 Read [Development Handover](docs/Development%20Handover.md) before continuing
 firmware work, then check [Open Issues](docs/Open%20Issues.md).
@@ -68,6 +76,7 @@ Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 - `test/`: PlatformIO suites
 - `hardware/`: BOM, wiring and electrical design
 - `mechanical/`: CAD, drawings and print files
+- `diagnostics/`: completed diagnostic evidence; not production firmware
 
 ## Windows build tools
 

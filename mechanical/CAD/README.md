@@ -2,6 +2,31 @@
 
 Source (editable, parametric) mechanical design files.
 
+## ESP32 controller housing — Rev C installed prototype
+
+Rev C is the current housing geometry. The owner printed, fitted, wired and
+installed it on 2026-09-07; it fitted first time. The package remains a
+prototype rather than a production release because seven prototype gates and
+two installation gates remain open in the v1.7 specification.
+
+- `Decca_ESP32_Controller_Housing_fusion.py` is the parametric generator.
+- `Decca_ESP32_Controller_Housing_verify.py` independently verifies the STLs.
+- `Decca_ESP32_Controller_Housing_slice.py` records slicer evidence.
+- `Decca_ESP32_Controller_Housing.f3d` and the STEP files are the editable and
+  neutral CAD deliverables.
+
+Rev A and Rev B are superseded. The controlling documents are
+`../Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md` (content revision
+v1.7) and `../Drawings/Decca_ESP32_Controller_Housing_Build_Report_revC.md`.
+
+## IEC C14 mounting plate — Rev B active prototype
+
+Rev B replaces the rejected rectangular Rev A opening with the measured
+six-sided C14 profile. Its generated STEP/STL passed all 15 CAD checks and the
+owner confirmed the drawn profile. Physical inlet/cabinet fit and rear terminal
+clearance remain mandatory before release. Rev A sources are retained only for
+traceability and must not be used for installation.
+
 **Intended contents**
 - Fusion 360 archives (`.f3d`) and/or OpenSCAD (`.scad`) source.
 - Neutral exchange formats (STEP `.step`) for interop.

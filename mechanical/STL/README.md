@@ -2,6 +2,21 @@
 
 Print-ready meshes exported from the CAD sources.
 
+## ESP32 controller housing — Rev C installed prototype
+
+Use `ESP32_Controller_Housing_Base.stl`,
+`ESP32_Controller_Housing_Lid.stl`, and two copies of
+`ESP32_Controller_Cabinet_Fastener_Cap.stl`. This set was printed, fitted,
+wired and installed on 2026-09-07. It remains a prototype until the open gates
+in the Rev C build report are closed.
+
+## IEC C14 mounting plate — Rev B active prototype
+
+Use `Decca_IEC_C14_Mounting_Plate_revB.stl` only for the next fit check. Rev B
+is CAD-passed but physical-fit pending. `Decca_IEC_C14_Mounting_Plate_revA.stl`
+is retained solely as the rejected physical-review record and must not be
+printed for installation.
+
 **Intended contents**
 - `.stl` (or `.3mf`) files ready to slice and print.
 - Optional print notes (orientation, supports, material) alongside each part.

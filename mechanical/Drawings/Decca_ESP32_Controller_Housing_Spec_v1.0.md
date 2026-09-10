@@ -1,436 +1,390 @@
-# Decca ESP32 Controller Housing Specification v1.0
+# Decca ESP32 Controller Housing Specification v1.7
 
-Status: **CAD-ready design specification — prototype fit and installation validation required**
+**Status:** **REV C BUILT to this specification 2026-09-06, and PRINTED, FITTED AND INSTALLED as a prototype 2026-09-07 — it fitted first time. NOT production approved: §14 acceptance is outstanding, but only seven prototype and two installation gates remain open — twelve have been closed by the fitted prototype. See §14.1.** Rev A was rejected for bulk. Rev B is rejected because it routes grouped harnesses above the terminal blocks instead of modelling conductors entering the real screw terminals horizontally from both long sides. No Rev B housing part or coupon is approved for printing. The owner has supplied the macro board geometry and released replacement CAD to proceed.
 
-Date: 2026-08-31  
-Manufacturing method: **FDM 3D print**  
-CAD platform: **Autodesk Fusion 360**  
-Scope: **ESP32 DevKit and its screw-terminal breakout only**
+**Scope:** Enclosure for the selected 30-pin ESP32 DevKit fitted to the acquired DORHEA 30-pin screw-terminal adapter only. The MOSFET board is excluded and remains separately mounted.
 
-## 1. Purpose
+## Revision record
 
-Create a compact, electrically protective and fully serviceable housing for the
-Decca controller assembly already defined by the repository:
-
-1. one **30-pin ESP32 DevKit V1 / DOIT-style board**; and
-2. its acquired **matching 30-pin screw-terminal breakout/adapter**.
-
-The ESP32 remains plugged into the breakout in normal service. The enclosure is
-mounted inside the Decca cabinet and protects the underside, ESP32, terminals
-and wiring from accidental contact and loose conductive objects.
-
-The following are explicitly outside this housing:
-
-- the MOSFET lighting board, whether test or final;
-- WAGO power-distribution connectors;
-- the inline fuse and panel DC socket;
-- the OLED;
-- the WiiM Pro, Fosi ZA3 and future 12 V trigger interface.
-
-Those items are mounted separately.
-
-## 2. Repository-controlled hardware definition
-
-The live repository is the component authority.
-
-| Item | Controlling definition |
+| Revision | Change |
 |---|---|
-| Controller | 30-pin ESP32 DevKit V1 / DOIT-style, Wi-Fi, at least 4 MB flash |
-| Breakout | Acquired matching 30-pin screw-terminal adapter for the installed controller |
-| Normal power | Shared regulated 5 V rail connected to breakout terminal serving ESP32 5V/VIN |
-| Normal firmware access | Authenticated OTA |
-| Recovery access | ESP32 USB connector must remain physically accessible |
-| Normal USB state | USB disconnected whenever the shared 5 V supply is connected |
-| Connected interfaces | H1 pots, H2 on/off, H3 VHF and Stereo/Mono, H4 OLED, H5 lighting control; H6 future |
-| Wiring | Ferruled 22–24 AWG where applicable; removable controller-end harnesses where practical |
+| v1.0 | Initial housing specification. |
+| v1.1 | Owner review rejects Rev A. Removes external lacing rails, mounting ears, USB plug, second clamp, four-screw lid, and sawtooth cable roofs. Introduces a shallow-base/deep-lid architecture, grouped-harness strain relief, two internal cabinet fixings, an integral fixed ledge plus one adjustable clamp, two lid screws plus locating hooks, and mandatory material-use gates. |
+| v1.2 | Rev B architecture approved. Amends the prototype risks review found in it: strain relief must align with its own window and be checked as a fitted tie rather than an aperture; cabinet caps must be positively retained; the countersink must be sized from a declared maximum head envelope; the prototype tool must test the horizontal insert; the assembled electronics height becomes a release gate that blocks production printing; and real slicer evidence is required where the tooling exists. Envelope, volume and mass limits are unchanged. |
+| v1.3 | The v1.2 cable-tie anchors were slender uprights of bare wall thickness, loaded near their tops. Adds section 5c: a cable-tie anchor is a compact continuation of the base wall with a declared minimum section in the cable-pull direction, declared minimum material around its aperture, a blended foot or root gusset, and generous root radii. Adds gates 28–30. Requires that the anchor be shown not to obstruct the terminals, the harness, the tie route or the lid's removal path, and that no verification claim be read as evidence of pull strength. Envelope, volume and mass limits are unchanged. |
+| v1.4 | Identifies the acquired adapter as the DORHEA 30-pin terminal adapter shown at 66 × 63 mm. Rejects Rev B after confirming that its harness and tie geometry is based on the wrong connection path. External conductors enter the green screw-terminal blocks horizontally through their outward-facing long-side ports; the black vertical sockets are only for the ESP32 module. Replaces the elevated cable-window and tie-tower requirements with direct terminal-entry corridors, installed-wire and ferrule keep-outs, a cover removable with the wiring connected, and optional low-profile strain relief only after the conductors have cleared the terminal mouths. Existing envelope and material limits remain design targets, but all Rev B production and coupon geometry is superseded. |
+| v1.5 | Records the owner's physical measurement of **20 mm overall height** for the complete DORHEA adapter plus fitted ESP32. This supersedes Rev B's unverified 24 mm “above PCB” assumption and closes the gross assembled-height measurement gate. The 20 mm value is an overall envelope, not an above-PCB dimension; replacement CAD shall reference it from the assembly's actual lowest underside feature to its highest point. Terminal-port and underside measurements remain open. |
+| v1.6 | Records the owner's macro measurements of 2026-09-06 — PCB outline 66 × 63 mm, mounting-hole centre pitch 58 × 56 mm *(re-measured the same day as **60 mm across × 57 mm along** — see §3; the 58 × 56 pair left 1.00 mm unaccounted for)*, terminal blocks 55 mm outer face to outer face, row length 53 mm, block height 9 mm, and the wire entry sitting just above the base of the block. **Closes the §15 measurement gate and releases replacement CAD.** Supersedes the v1.5 §5.3 requirement for dimensioned port geometry: the terminal-port bore size and internal insertion depth do not drive housing geometry and are out of scope. In their place §5.3 now requires the housing to clear the **entire terminal-block height** across the full row length on both long sides, which is conservative whatever the port position, and to declare its own straight external run as a routing value. Envelope, volume and mass limits are unchanged. |
+| v1.7 | **Replaces the adjustable clamp with hole-located retention**, adds §4.12, the lid-screw boss wall rule, records the first prototype's fit in §14.1, and adds §14.0, which makes a prototype print of a small, cheap part a legitimate way to close a measurement gate rather than something that has to wait for one. The owner's 2026-09-06 measurements close the last gap: a 60 × 57 mm mounting-hole pitch with M3 holes, every hole 3.00 mm from its nearest board edge. §4.6 now requires the carrier to be located by features engaging its own mounting holes rather than gripped by its opposite short edge, and §4.5's fixed ledge is retained unchanged. Screws through those holes are **prohibited** and the reason is recorded in §4.6: the binding clearance is not the terminal block but the outermost conductor, 3.767 mm from the hole centre, which an M3 head of radius 2.75 fouls by 0.28 mm against a 2.60 mm ferrule. The adjustable-carrier-range requirement, the clamp's volume allowance, its print orientation, its STEP and STL deliverables and gate 14 all go with it; gate 14 becomes the hole-location gate. Envelope, volume and mass limits are unchanged, and the design moves further inside them. |
 
-The repository records the board family and pin count but not a manufacturer,
-purchase link, exact breakout outline, mounting-hole pattern or assembled
-height. CAD must therefore keep the hardware envelope parametric and use
-non-hole-dependent retention. No fictional mounting-hole pattern may be added
-to the breakout reference model.
+## 1. Design intent
 
-## 3. Design architecture
+Produce a compact, serviceable, support-free FDM enclosure around the ESP32 and its selected terminal adapter. The enclosure shall protect the electronics, retain the PCB without loading components, permit terminal and USB access, manage the actual grouped Decca harnesses, and minimise printed material.
 
-The housing comprises four printable parts:
+Neither Rev A nor Rev B is the geometry baseline. A replacement design may reuse independently valid clearances, fastener concepts and material limits, but it shall not inherit either revision's cable-routing geometry.
 
-1. **Base tray**: insulated mounting surface, PCB support pads, cabinet mounting
-   ears, cable-lacing features and lid bosses.
-2. **Removable lid**: overlapping protective cover with ventilation, USB
-   opening and Wi-Fi antenna clearance.
-3. **Two adjustable PCB edge clamps**: retain the breakout at its bare short
-   edges without using unverified PCB holes.
-4. **Fit gauge**: a short low-material coupon proving PCB thickness, edge-clamp
-   clearance and lid/base overlap before the full housing is printed.
+## 2. Replacement architecture
 
-The controller assembly lies horizontally. The ESP32 faces upwards, the
-breakout screw terminals face the two long sides, and the ESP32 USB connector
-faces a short end of the housing.
+### 2.1 Production parts
 
-The lid is fixed by machine screws into heat-set inserts. Snap fits are not the
-primary closure because repeated servicing is expected during commissioning.
+- **Housing_Base:** material-efficient tray with a continuous insulating floor, local PCB supports and retention, and internal cabinet mounting points. Its long-side geometry shall leave every required terminal mouth, ferrule and straight conductor approach unobstructed. It shall not place walls, tie towers or other features between a terminal mouth and the exterior.
+- **Housing_Lid:** removable top cover providing top protection, USB service access and only the side coverage compatible with the horizontal terminal-entry corridors. It shall be removable and refittable while the terminal wiring remains connected.
+- **Cabinet_Fastener_Caps:** only if separate caps are required to insulate the recessed cabinet screw heads.
+- **Prototype coupons:** define only after the replacement production geometry exists. Reuse a coupon only if it reproduces unchanged production geometry. The Rev B coupons are superseded and shall not be printed as evidence for the replacement design.
 
-## 4. Reference geometry and starting envelope
+### 2.2 Explicitly forbidden features
 
-All dimensions below are named parameters, not hidden sketch dimensions.
+Do not include:
 
-The board dimensions are deliberately classified:
+- external cable-lacing rails;
+- sawtooth, crenellated, or bridge-roof cable openings;
+- external cabinet mounting ears or feet;
+- decorative ribs, fins, tabs, or unexplained projections;
+- a USB blanking plug;
+- per-terminal cable slots or guides based on thirty separate wires;
+- any wall, skirt, tie anchor or other feature obstructing the horizontal conductor path into a screw-terminal mouth;
+- any design that assumes the external wiring connects to the black vertical ESP32 sockets;
+- any design that forces a conductor to turn upwards, downwards or sideways immediately after leaving a terminal mouth;
+- elevated tie towers positioned between the terminal blocks and the enclosure exterior;
+- a second full-width removable PCB clamp;
+- a four-corner lid screw pattern.
 
-- **locked**: 30-pin DOIT-style ESP32 and matching 30-pin breakout;
-- **CAD starting values**: initial breakout and assembly envelope used to
-  generate the first prototype;
-- **fit parameters**: values Claude must expose so the model can be corrected
-  without redesign after offering up the acquired board.
+Every external structure must have a stated functional requirement and a verification check. If neither exists, remove it.
 
-| Parameter | Initial value | Status |
-|---|---:|---|
-| Breakout nominal length | 66.00 mm | CAD starting value |
-| Breakout nominal width | 63.00 mm | CAD starting value |
-| Breakout PCB thickness | 1.60 mm | CAD starting value |
-| Maximum component height below PCB | 2.50 mm | conservative starting value |
-| Maximum assembled height above PCB | 24.00 mm | conservative starting value |
-| PCB perimeter clearance | 0.50 mm per side | design value |
-| Clearance above highest component | 3.00 mm minimum | design value |
-| Clearance beneath PCB solder joints | 3.00 mm minimum | design value |
-| USB service envelope | 14.00 mm W × 9.00 mm H | design starting value |
-| Terminal/wire access height | 10.00 mm minimum | design value |
+## 3. Reference geometry and clearances
 
-The housing must tolerate at least ±1.0 mm adjustment in breakout length using
-the edge clamps. The lid and base must not rely on the ESP32 PCB outline for
-location.
+Use repository source dimensions and existing measured references as the design basis:
 
-If the acquired breakout does not fit the initial nominal envelope, change only
-the named hardware-reference parameters and re-derive the housing. Do not
-modify or force the PCB.
-
-## 5. Base tray
-
-### 5.1 Electrical isolation
-
-- Solid floor beneath the complete breakout.
-- Nominal floor thickness: **2.40 mm**.
-- No screw, insert or cabinet fastener may project into the electrical clearance
-  volume beneath the PCB.
-- Maintain **at least 3.00 mm** air/printed clearance beneath solder joints.
-- PCB supports may touch only bare PCB perimeter regions, never solder joints,
-  tracks, components or terminal pins.
-
-### 5.2 PCB support and retention
-
-Do not use assumed breakout mounting holes.
-
-- Support the breakout on four or more low perimeter pads.
-- One short edge locates against a fixed end datum.
-- The opposite short edge uses an adjustable printed clamp secured by two M3
-  screws in slotted holes.
-- A second removable clamp at the fixed end prevents lift while preserving the
-  datum.
-- Clamp contact is limited to bare PCB edge.
-- Provide **0.20 mm nominal vertical clamp clearance** above the PCB before
-  screw tightening; the clamp should retain, not bend, the board.
-- Both clamps must be removable with the lid off and wiring still connected.
-- The ESP32 must remain removable vertically from its breakout sockets after
-  the lid and appropriate clamp are removed.
-
-### 5.3 Cabinet mounting
-
-Provide four external mounting ears integral with the base:
-
-- four **4.0 × 8.0 mm slots** for small cabinet/wood screws;
-- long axes aligned across the housing to allow installation adjustment;
-- screw heads remain outside the PCB electrical envelope;
-- mounting holes remain accessible with the lid fitted;
-- nominal ear thickness: **3.0 mm**;
-- fillet each ear into the base, minimum **R2.0 mm**;
-- base must mount on either a horizontal or vertical internal wooden surface
-  without relying on adhesive.
-
-No drilling dimensions for the Decca cabinet are locked by this specification.
-The external ears deliberately let the installed housing establish its own hole
-positions.
-
-## 6. Terminal and cable access
-
-The two long sides must keep every breakout screw terminal usable.
-
-- With the lid removed, a normal small terminal screwdriver must approach every
-  terminal vertically without obstruction.
-- Provide a continuous cable-exit zone along both terminal sides rather than
-  one hole per GPIO.
-- Minimum clear exit height: **10.0 mm**.
-- Round every wire-contact edge, minimum **R1.0 mm**.
-- No wire may be pinched between lid and base.
-- Add an external lacing rail on each long side with at least four
-  **2.5 × 6.0 mm** cable-tie slots.
-- Cable ties provide strain relief after the terminal connection; they must not
-  pull directly on the screw terminals.
-- Preserve the documented harness separation where practical. Do not mould pin
-  labels into the housing until the physical orientation of the breakout has
-  been confirmed.
-
-## 7. USB and controls
-
-- Provide an unobstructed opening at the ESP32 USB end.
-- The opening must accept the connector body and normal moulded cable shroud,
-  not only the metal plug.
-- USB must be insertable and removable without taking the housing off the
-  cabinet.
-- Add a removable printed USB blanking plug as an optional fifth part if it does
-  not complicate the main lid. The plug is dust/contact protection only.
-- Provide two recessed tool-access holes in the lid for **EN/RESET** and
-  **BOOT**, derived from named ESP32 reference coordinates.
-- Tool holes: nominal **3.0 mm diameter**, with underside lead-in.
-- The lid must identify the USB end and the two button functions with small
-  recessed text or symbols.
-
-The normal electrical rule remains unchanged: do not connect USB while the
-shared external 5 V rail is connected.
-
-## 8. Wi-Fi and ventilation
-
-The ESP32 uses Wi-Fi continuously for OTA and future WiiM control.
-
-- Identify the PCB antenna end in the reference component.
-- No heat-set insert, cabinet mounting screw, cable bundle or thick structural
-  rib may sit directly above or within **10 mm laterally** of the antenna.
-- Use a thin non-metallic lid region above the antenna, nominal **1.6 mm**.
-- Provide ventilation slots above the ESP32/regulator region and on the upper
-  sidewalls.
-- Slot width: **2.0–2.5 mm**; bridge width: at least **2.0 mm**.
-- Ventilation must not create a straight path for a loose screw to fall onto
-  powered circuitry. Offset or louvre the top openings where practical.
-- No fan is required.
-
-## 9. Lid and closure
-
-- Removable overlapping lid; no live circuit is exposed from above when fitted.
-- Nominal structural wall: **2.0 mm**.
-- Nominal top thickness: **1.8 mm**, reduced to **1.6 mm** over the antenna
-  keep-out.
-- Lid/base overlap: **5.0 mm** nominal.
-- Sliding clearance on each mating face: **0.25 mm**.
-- Four M3 machine screws into heat-set inserts in base corner bosses.
-- Use M3 × 8 mm as the starting screw length; CAD must prove no screw can enter
-  the PCB electrical envelope at full insertion.
-- Insert bosses must be outside the breakout outline and terminal screwdriver
-  corridors.
-- A shallow underside tongue-and-groove or stepped overlap should prevent the
-  lid shifting and prevent wire entry into the joint.
-- External corners: nominal **R3.0 mm**.
-- Internal stressed corners: minimum **R1.0 mm**.
-
-The lid is protective, not load-bearing. Do not add decorative bulk or a large
-logo. Small recessed text, **DECCA CONTROLLER**, is acceptable on the lid.
-
-## 10. Initial overall envelope
-
-Starting values for the first CAD build:
-
-| Feature | Initial target |
+| Item | Requirement |
 |---|---:|
-| Internal PCB plan envelope | 68.0 × 65.0 mm |
-| Base wall thickness | 2.0 mm |
-| Internal height above PCB support plane | 27.0 mm |
-| Nominal body outside plan, excluding ears | approx. 72.0 × 69.0 mm |
-| Nominal closed height | approx. 35.0 mm |
-| Maximum target footprint including ears | 90.0 × 78.0 mm |
+| Selected terminal adapter | DORHEA 30-pin GPIO breakout / 1-into-2 terminal adapter |
+| PCB plan outline | **63 mm ALONG the rows × 66 mm ACROSS them — owner-measured 2026-09-06**, axis assignment corrected by the owner the same day. The 66 mm is measured from one connector side to the other. |
+| Terminal arrangement | 15 green screw terminals on each long side; screws operated from above; conductors enter horizontally through the outward-facing side ports |
+| ESP32 connection | Two black vertical 15-pin sockets accept the ESP32 DevKit; these sockets are not external wiring points |
+| Supplier image's additional dimension | 25 mm, reference only; datums are ambiguous and the value shall not drive CAD |
+| Terminal blocks, outer face to outer face | **55 mm — owner-measured 2026-09-06**, so each block face sits **5.5 mm inboard** of its long PCB edge |
+| Terminal-block row length | **53 mm — owner-measured 2026-09-06**, leaving 5.0 mm of clear board beyond each row end |
+| Terminal-block height | **9 mm — owner-measured 2026-09-06** |
+| Terminal width | approximately 3 mm each; consistent with 53 ÷ 15 = 3.53 mm pitch |
+| Conductor entry position | **just above the base of the terminal block — owner, 2026-09-06.** Qualitative and sufficient: see §5.3 |
+| Mounting-hole centre pitch | **60 mm across × 57 mm along — owner-measured 2026-09-06**, re-measured the same day and superseding an earlier 58 × 56 reading that left 1.00 mm unaccounted for. On the recorded 66 × 63 board this puts every hole **3.00 mm from its nearest edge on both axes**, and 2.50 mm outboard of the nearest block face. **Hole diameter still not measured**, and it alone decides whether hole-based retention could replace §4.5–4.6. |
+| Adapter PCB thickness | 1.6 mm starting value; physically measure |
+| Terminal-port bore size and internal insertion depth | **OUT OF SCOPE, owner 2026-09-06.** They do not drive housing geometry; §5.3 clears the whole block height instead |
+| Corner mounting-hole size | **M3 — owner, 2026-09-06.** The screw size, not a calliper reading of the bore; Ø3.20 standard clearance is recorded as the working starting value. Hole-based retention is now geometrically possible — a plain M3 head clears the nearest block corner by 0.45 mm — but **§4.5–4.6 still forbid it** until they are amended. See the measurement request §10. |
+| Complete adapter plus fitted ESP32 height | **20 mm overall — physically measured by the owner, 2026-09-05** |
+| Required space below PCB | 2.5 mm starting value |
+| General XY fit clearance | 0.5 mm per constrained side |
+| Minimum top clearance | 2.0 mm |
+| Minimum clearance below lowest component/solder feature | 2.0 mm |
+| Minimum USB opening | 14 × 9 mm |
+| Lid-screw heat-set insert | **Hanglife M3 threaded — owner, 2026-09-06.** Two off, vertical, in the +X lid-screw bosses. The **bore** is a starting value at Ø4.00 × 5.00 deep and shall be re-derived from the acquired insert's measured length and outer diameter before release. |
+| Carrier location | **By the measured mounting holes — §4.6.** No adjustable range is required or permitted: the board's plan dimensions and its hole pitch are both measured, so there is nothing left for an adjustment to absorb. |
 
-These are design targets, not permission to violate required electrical,
-terminal, antenna or cable clearances. Claude should report the final derived
-envelope rather than forcing these approximate totals.
+Supplier dimensions and repository dimensions remain assumptions until checked against the acquired board. Do not infer the terminal-port centre height, mounting-hole pitch, precise EN/BOOT positions or underside keep-outs from the listing photograph.
 
-## 11. Fusion 360 parameters
+## 4. Base requirements
 
-Expose at least:
+1. Nominal floor thickness: **1.6 mm**.
+2. Use local ribs and pads only where required; do not thicken the complete floor.
+3. Maintain at least 2.0 mm clearance from the lowest PCB, solder, or pin feature to the enclosure floor or insulated fastener cover.
+4. Support the board at four local edge/corner regions.
+5. Retain one short PCB edge beneath an integral fixed ledge.
+6. Locate the carrier at the opposite short end by **integral posts engaging its own mounting holes**. The posts shall be sized to fit the reported M3 bore with at least 0.20 mm of radial clearance whether that bore is 3.00 or 3.20 mm, shall engage the full carrier thickness and stand at least 1.00 mm proud of it, and shall carry no fastener of any kind.
+6a. **No screw shall pass through a carrier mounting hole.** The constraint is not the terminal block, which a head clears: a corner hole is outboard of the block on both axes, so a head meets the block's corner at 3.202 mm and an M3 cap head of radius 2.75 clears it by 0.45 mm. The constraint is the **outermost conductor**, whose axis lies 3.767 mm from the hole centre; against the declared 2.60 mm ferrule the same head fouls it by 0.28 mm. A 2.60 mm post clears it by 1.17 mm. Any future proposal to fasten through these holes shall re-derive this clearance against the conductor and ferrule actually installed.
+6b. Posts shall be placed only where the carrier can be fitted and removed. Where a fixed ledge requires the carrier to translate at its final height, that end shall carry no post, and the tilt needed to clear the posts at the opposite end shall be shown not to bind the carrier beneath the ledge.
+7. The ledge and posts shall bear only on clear PCB-edge regions and the bores of the mounting holes. They shall not load the ESP32 module, sockets, terminal blocks, solder joints, or components.
+8. Provide two recessed cabinet fixing points within the enclosure footprint, positioned near the short ends and outside electronics keep-outs.
+9. Do not use external mounting ears.
+10. Cabinet fastener heads shall remain below the PCB support plane and shall be electrically isolated by integral geometry or printed insulating caps.
+10a. Each insulating cap shall be **positively retained**. A diametral clearance fit is not acceptable. Retention shall be by controlled light interference, by three or more compliant retention nibs, or by another clearly justified captive arrangement; it shall not depend on adhesive, and it shall not rely on a delicate snap feature that a 0.4 mm nozzle cannot print reliably. The cap shall remain centred over the fastener head, shall not fall out of an enclosure mounted vertically before the PCB is installed, shall remain removable for service without destroying the base, shall remain captive beneath the PCB after assembly, and shall preserve the section 3 underside clearance.
+10b. The countersink shall be dimensioned from a **declared maximum screw-head envelope** plus a declared radial clearance, not from a nominal head diameter. The specification shall record the nominal head diameter, the maximum head envelope, the head angle and the clearance separately. The usable recess shall accommodate the maximum envelope plus its clearance with the head sitting fully below the cap, and shall retain at least 1.00 mm of floor beneath the countersink. Compatibility with any acquired screw shall not be claimed until that screw has been measured.
+11. It is acceptable to remove the electronics before installing the cabinet fasteners.
+12. Each lid-screw boss shall **centre its insert bore** and retain at least **1.20 mm of wall around that bore in every direction**. A heat-set insert expands the surrounding plastic as it is driven in; a boss that is thin on one face splits there. The wall shall be re-checked against the acquired insert's measured outer diameter, not only against the modelled bore.
+13. Each lid-screw boss shall provide at least **2.00 mm of bolt relief beneath the insert**, narrower than the insert bore so the insert stays supported along its whole length. A bolt that bottoms on solid plastic cannot pull its cover down, and this is not visible in any geometric gate that only checks the insert. **Owner requirement, 2026-09-07, from tightening real bolts into real inserts.**
 
-```text
-// Repository-controlled hardware
-esp_pin_count             = 30
-adapter_pcb_l             = 66.00 mm
-adapter_pcb_w             = 63.00 mm
-adapter_pcb_t             = 1.60 mm
-adapter_below_h           = 2.50 mm
-assembly_above_pcb_h      = 24.00 mm
+## 5. Cable routing and strain relief
 
-// Clearances
-pcb_xy_clear              = 0.50 mm
-pcb_under_clear           = 3.00 mm
-component_top_clear       = 3.00 mm
-clamp_vertical_clear      = 0.20 mm
-antenna_keepout           = 10.00 mm
-lid_fit_clear             = 0.25 mm
+1. Treat the selected adapter's green screw-terminal blocks as the external electrical connection. Conductors enter their ports **horizontally from the two long sides**. The black vertical sockets are used only to mount the ESP32 module.
+2. Model a parameterised wire-and-ferrule envelope for every terminal used by the Decca wiring. Each envelope shall include the stripped/ferruled end inside the block, the insulated conductor outside it and a straight installation corridor from the terminal mouth to the enclosure exterior.
+3. **The housing shall clear the entire measured terminal-block height across the full row length on both long sides.** This supersedes the v1.5 requirement for a dimensioned port centre height, bore size and internal insertion depth, which the owner has ruled out of scope because they do not drive housing geometry. Clearing the whole block is conservative wherever the port actually sits, so no later port measurement can invalidate the geometry. The minimum straight external run before a conductor may bend is a **declared routing value owned by this design**, parameterised, stated in the build report and verified — it is not a board measurement. The conductor envelope follows the wire and ferrule actually installed, not the terminal bore.
+4. No housing surface, lid skirt, tie feature or fastener shall intersect a terminal-entry corridor. A conductor shall not be required to bend immediately on leaving its terminal mouth merely to clear the enclosure.
+5. Preserve direct top access to every terminal screw with the cover removed. A fitted conductor and ferrule shall be insertable, clamped, released and withdrawn using ordinary tools without removing the adapter from the base.
+6. Side openings may be continuous along each terminal row or divided into a small number of grouped openings. Choose the simplest support-free geometry that protects the board ends while keeping the terminal mouths and conductor corridors clear. Do not reproduce Rev B's elevated windows above the terminal blocks.
+7. Model the conductors individually through the terminal-entry zone because their physical positions are fixed by the terminals. They may merge into the named grouped H1–H6 harness envelopes only after clearing the terminal mouths and the required straight approach distance.
+8. The cover shall lift off and refit with all production terminal conductors connected. Its seated position and complete removal path shall clear the terminal screws, conductor insulation, ferrules and grouped harnesses.
+9. Integrated strain relief is optional. First determine whether the existing cabinet wiring can be secured immediately outside the housing without adding printed structure. If housing-mounted restraint is justified, locate a small low-profile tie slot or anchor **downstream of the straight terminal-entry zone**. It shall not sit between the terminal mouths and the exterior, force an immediate cable bend, or require a tall tower.
+10. Any modelled restraint shall suit only lightweight low-voltage wiring and ordinary assembly handling. No pull test, load test or dedicated strain-relief coupon is required.
+11. Do not provide external rails, per-terminal printed guides, decorative projections or cable features without a stated installation need.
 
-// Structure
-base_floor_t              = 2.40 mm
-wall_t                    = 2.00 mm
-lid_top_t                 = 1.80 mm
-lid_antenna_t             = 1.60 mm
-lid_overlap               = 5.00 mm
-outer_corner_r            = 3.00 mm
-inner_fillet_r            = 1.00 mm
+## 6. USB and controls
 
-// Access
-wire_exit_h               = 10.00 mm
-usb_open_w                = 14.00 mm
-usb_open_h                = 9.00 mm
-button_tool_d             = 3.00 mm
-tie_slot_w                = 2.50 mm
-tie_slot_l                = 6.00 mm
+1. Provide an unobstructed USB service opening of at least 14 × 9 mm, aligned to the repository reference model.
+2. Do not provide a separate USB blanking plug.
+3. An optional small recessed label may read **USB / DISCONNECT 5V**.
+4. Do not add EN or BOOT access holes to the lid until their positions are physically measured. The removable lid provides prototype access.
 
-// Fasteners
-lid_screw_nominal         = 3.00 mm
-lid_screw_length          = 8.00 mm
-cabinet_slot_w            = 4.00 mm
-cabinet_slot_l            = 8.00 mm
-ear_t                     = 3.00 mm
-```
+## 7. Ventilation and antenna
 
-Recommended component structure:
+1. Use a modest set of simple top ventilation slots only.
+2. Do not duplicate large ventilation arrays on the sides.
+3. Keep fasteners, inserts, thick ribs, and cabinet metal outside the ESP32 antenna keep-out.
+4. Nominal lid thickness over the antenna: 1.6 mm.
+5. Ventilation shall remain adequate for the Decca controller's expected load without turning the lid into an unnecessarily large grille.
 
-```text
-Decca_ESP32_Controller_Housing
-├── REF_ESP32_DevKit_V1_30Pin
-├── REF_30Pin_Terminal_Adapter
-├── REF_Wired_Keepouts
-├── Housing_Base
-├── Housing_Lid
-├── PCB_Clamp_Fixed_End
-├── PCB_Clamp_Adjustable_End
-├── USB_Blanking_Plug
-└── Carrier_Fit_Gauge
-```
+## 8. Lid retention
 
-All hardware reference components must be visibly marked non-manufacturing.
+1. Nominal lid top thickness: **1.6 mm**.
+2. Nominal lid skirt thickness where a skirt is permitted: **1.2 mm**, suitable for three 0.4 mm perimeters.
+3. Use overlap only at the short ends, corners or other regions that do not obstruct terminal-entry corridors. Rev B's continuous deep long-side skirt is not a requirement.
+4. Nominal fit allowance: **0.25 mm per mating side**, subject to the printer coupon.
+5. Prefer two M3 screws at one short end and two non-stressed locating hooks at the opposite end if the arrangement remains clear of the USB connector, wiring and removal path. An equally simple two-fastener arrangement is acceptable if the replacement geometry requires it.
+6. The hooks guide and locate the lid; they are not fatigue-loaded snap latches.
+7. Do not use four corner screws, large corner piers, decorative bulk, or a large raised logo.
+8. The cover shall be removable without disconnecting any screw-terminal conductor.
 
-## 12. FDM design rules
+## 9. Envelope and material-use gates
 
-- Preferred material: **PETG or PETG-HF**.
-- Design for a 0.4 mm nozzle.
-- Nominal layer height: **0.20 mm**.
-- At least four perimeters around fastener bosses and mounting ears.
-- At least three perimeters elsewhere.
-- 20–30% infill is sufficient if walls and bosses meet the perimeter rules.
-- Heat-set insert holes must be parameterised for the exact inserts used; do not
-  assume a catalogue diameter without recording it.
-- Avoid supports in electrical cavities and mating surfaces.
+The Rev A envelope of approximately 105 × 77 × 38.3 mm and approximately 68 cm³ of printed material is rejected.
+
+### 9.1 Mandatory limits
+
+| Metric | Mandatory limit | Preferred target |
+|---|---:|---:|
+| Complete outside envelope | ≤85 × 75 × 36 mm | smaller where clearances permit |
+| Production-part solid volume | ≤35 cm³ | ≤30 cm³ |
+| Estimated PETG mass at 1.27 g/cm³ | ≤45 g | ≤38 g |
+| Base solid volume | — | ≤15 cm³ |
+| Lid solid volume | — | ≤18 cm³ |
+
+The production-part total includes the base, lid, and mandatory fastener caps. It excludes the prototype coupons and non-printing reference bodies.
+
+No external feature may project beyond the main body envelope.
+
+The generator and verifier shall report per-part and total solid volume plus estimated PETG mass. A production volume above 35 cm³ or estimated mass above 45 g is a failed gate, not a warning.
+
+### 9.2 Slicer evidence
+
+The solid-volume figure is a conservative design gate and shall be retained as
+one. It is **not** predicted spool consumption and shall not be described as
+such. Where a Bambu Studio or OrcaSlicer CLI is available, the complete
+production set shall additionally be sliced with a declared profile — Bambu
+P1S, PETG or PETG-HF, 0.4 mm nozzle, 0.2 mm layers, three perimeters, 15%
+infill, no supports, each part in its stated orientation — and the build report
+shall record filament grams and print time per part and in total, support usage
+and any slicer warnings. If no suitable slicer is available that shall be
+stated plainly.
+
+### 9.3 Measured assembly height
+
+The complete DORHEA adapter plus fitted ESP32 is **20.00 mm high overall**, from
+the owner's physical measurement on 2026-09-05. This supersedes Rev B's
+unverified `assembly_above_pcb_h = 24.00 mm` assumption and closes the prior
+gross-height release gate.
+
+The two values are not interchangeable: 20.00 mm is the complete assembly
+envelope, while the old 24.00 mm parameter purported to start at the adapter
+PCB top face. Replacement CAD shall establish the real lowest underside datum
+and model a 20.00 mm overall reference assembly from that datum, plus the
+specified floor and top clearances. Do not subtract an assumed PCB thickness or
+underside allowance to manufacture a new “above PCB” value.
+
+## 10. FDM design rules
+
+- Material: PETG or PETG-HF.
+- Nozzle: 0.4 mm.
+- Layer height: 0.2 mm.
+- Use three perimeters for the lid skirt; use four only at local bosses and hooks when structurally necessary.
+- Use 15–20% infill only where slicer infill is unavoidable.
+- Prefer thin shells, local ribs, and isolated pads over thick solids.
+- No internal support material shall be required.
 - Print the base floor-down.
-- Print the lid top-face-down only if cosmetic finish and recessed markings
-  remain correct; otherwise print open-side-down and bridge/angle vents so no
-  internal support is required.
-- Print clamps and fit gauge in their working orientation.
-- Deburr all cable and USB openings before assembly.
+- Choose the cover orientation from the replacement geometry and verify it needs no support. Do not retain Rev B's top-face-down orientation merely to preserve its obsolete elevated cable windows.
 
-## 13. CAD deliverables for Claude
+## 11. CAD component structure
 
-Create:
+Decca_ESP32_Controller_Housing
 
-### Editable and exchange files
+- REF_ESP32_DevKit_V1_30Pin
+- REF_30Pin_Terminal_Adapter
+- REF_Terminal_Entry_Corridors
+- REF_Installed_Wires_And_Ferrules
+- REF_Grouped_Harness_Keepouts
+- Housing_Base
+- Housing_Lid
+- PCB_Clamp_Adjustable
+- Cabinet_Fastener_Caps
 
-- `mechanical/CAD/Decca_ESP32_Controller_Housing.f3d`
-- `mechanical/CAD/Decca_ESP32_Controller_Housing_assembly.step`
-- `mechanical/CAD/ESP32_Controller_Housing_Base.step`
-- `mechanical/CAD/ESP32_Controller_Housing_Lid.step`
-- `mechanical/CAD/ESP32_Controller_PCB_Clamps.step`
-- `mechanical/CAD/ESP32_Controller_Carrier_Fit_Gauge.step`
+Rev C defines no prototype coupons: §2.1 requires a coupon to reproduce
+*replacement* production geometry, and the Rev B coupons are superseded. One is
+defined only when the owner elects to print it.
 
-### Parametric build and verification
+Keep reference bodies visibly distinct from printable bodies. Do not export reference bodies as production meshes.
 
-- `mechanical/CAD/Decca_ESP32_Controller_Housing_fusion.py`
-- `mechanical/CAD/Decca_ESP32_Controller_Housing_verify.py`
+## 12. Deliverables
 
-### Print files
+Keep established filenames where replacement avoids needless repository clutter, but identify the replacement as a post-Rev-B redesign and state clearly that earlier Rev B exports are superseded.
 
-- `mechanical/STL/ESP32_Controller_Housing_Base.stl`
-- `mechanical/STL/ESP32_Controller_Housing_Lid.stl`
-- `mechanical/STL/ESP32_Controller_PCB_Clamp_Fixed.stl`
-- `mechanical/STL/ESP32_Controller_PCB_Clamp_Adjustable.stl`
-- `mechanical/STL/ESP32_Controller_Carrier_Fit_Gauge.stl`
-- optional `mechanical/STL/ESP32_Controller_USB_Plug.stl`
+Required:
 
-### Review evidence
+- editable Fusion source;
+- assembled housing STEP;
+- separate base and lid STEP files;
+- parametric generator and verification scripts;
+- print-ready base, lid, cap and any justified prototype-coupon STL files;
+- a cabinet-fastener-cap STL, which is mandatory because a recessed metal head installed after printing cannot be insulated by integral geometry;
+- the slicer harness and its recorded output where a slicer CLI is available;
+- updated build/verification report;
+- updated review renders showing closed, open and exploded views; direct long-side terminal entry with representative fitted wires and ferrules; terminal screwdriver access; cover removal with wiring connected; USB access; cabinet fixings; and any justified downstream strain relief;
+- a material table showing every production part's volume and estimated PETG mass.
 
-- dimensioned overall and section views;
-- lid removed view showing terminal screwdriver corridors;
-- underside view showing the isolated PCB and cabinet fastener envelopes;
-- USB insertion envelope;
-- Wi-Fi antenna keep-out;
-- exploded assembly;
-- machine-readable verification report;
-- build report under `mechanical/Drawings/`.
+Remove or clearly quarantine obsolete Rev A and Rev B production artefacts that could be mistaken for current deliverables. Do not deliver a fixed-clamp STL, an adjustable-clamp STL, a USB-plug STL or Rev B tie-anchor geometry.
 
-## 14. CAD verification gates
+## 13. Automated verification gates
 
-Claude’s independent verifier must establish at minimum:
+The verifier shall fail the build unless all applicable checks pass:
 
-1. every printable part is a closed manifold solid;
-2. base floor is continuous below the complete PCB outline;
-3. minimum underside electrical clearance is at least 3.00 mm;
-4. no cabinet fastener or lid screw envelope intersects the PCB or wiring
-   keep-out;
-5. minimum component-to-lid clearance is at least 3.00 mm;
-6. all breakout screw terminals have unobstructed top screwdriver corridors;
-7. both long sides provide the required wire-exit height;
-8. no lid material crosses the wire paths;
-9. USB service envelope is unobstructed;
-10. button tool holes align to the parameterised ESP32 reference;
-11. antenna keep-out contains no screw, insert, thick rib or cable-lacing feature;
-12. lid overlap and fit clearance are correct around the complete perimeter;
-13. clamps contact only the permitted bare PCB edge zones;
-14. the adjustable clamp provides at least ±1.0 mm longitudinal adjustment;
-15. no retaining feature loads the ESP32 board or its socket headers;
-16. all four cabinet slots are outside the electrical envelope;
-17. base, lid and clamps can be assembled and removed in a valid sequence;
-18. each part is printable in the stated orientation without internal supports.
+1. Every production mesh is manifold and watertight.
+2. The base has a continuous insulating floor.
+3. Electronics underside clearance is at least 2.0 mm.
+4. Lid top clearance is at least 2.0 mm.
+5. No fastener, insert, hook, rib, cap, or enclosure surface intersects an electronics keep-out.
+6. Every terminal screw remains accessible from above with the cover removed, including when its representative conductor and ferrule are fitted.
+7. Every used terminal has a horizontal conductor-entry corridor from its outward-facing mouth to the enclosure exterior.
+8. Every terminal-entry corridor preserves the declared straight insertion length and is clear of housing walls, cover skirts, fasteners and cable-management features.
+9. Representative installed wire-and-ferrule envelopes enter the correct screw terminals and can be inserted and withdrawn without collision.
+10. The USB service envelope is clear through the opening.
+11. The ESP32 antenna keep-out is clear of metal, inserts, and thick structure.
+12. Lid overlap, fit allowance, the lid-screw boss walls and the bolt relief beneath each insert meet specification.
+13. The fixed ledge, the locating posts and the support pads contact only approved PCB-edge regions and mounting-hole bores.
+14. The carrier is located by its measured mounting holes: post diameter against the reported bore, engagement and proud height against the carrier, clearance to the outermost conductor, the holes that must be left empty, and the fitting tilt against the ledge gap.
+15. The retention system does not load the ESP32, sockets, terminals, solder joints, or components, and carries no fastener that could be tightened onto the carrier.
+16. Both cabinet fastener heads are recessed, insulated, and outside electronics keep-outs.
+17. The complete cover installation and removal sequence clears all fitted conductors, ferrules and harnesses without disconnecting them.
+18. No production part requires slicer support.
+19. The complete outside envelope is no greater than 85 × 75 × 36 mm.
+20. Production-part solid volume is no greater than 35 cm³.
+21. Estimated PETG mass is no greater than 45 g.
+22. No forbidden rail, ear, sawtooth roof, USB plug, decorative projection, elevated tie tower, unexplained external feature, or superseded generated artefact exists.
+23. Conductors remain individual through the fixed terminal-entry zone and merge into grouped H1–H6 harness envelopes only after clearing the terminal mouths and straight insertion distance.
+24. The seated cover neither pinches a conductor nor forces a bend inside the declared straight terminal-entry zone.
+25. Each cabinet cap is positively retained: the measured interference between the cap and its recess is greater than zero, and the cap remains removable through a pry feature.
+26. The usable countersink accommodates the declared maximum head envelope plus its declared clearance. A recess smaller than that envelope is a failure.
+27. Any prototype coupon reproduces the corresponding replacement production geometry and is no larger than required to settle an identified physical uncertainty.
+28. The reference assembly represents the selected DORHEA layout: 15 terminal positions per long side, top-operated screws, horizontal outward-facing conductor mouths and two vertical sockets used only by the ESP32 module.
+29. Any housing-mounted strain relief lies beyond the straight terminal-entry zone, remains low profile, accepts the declared harness and does not obstruct terminal installation, screw access or cover removal.
+30. No verification or render treats the vertical ESP32 sockets as external cable connections or reproduces Rev B's above-terminal grouped-cable route.
 
-Any check that depends on an unrecorded physical dimension must be reported as a
-prototype gate, never marked as physically verified.
+## 14. Prototype acceptance gates
 
-## 15. Prototype and installation acceptance
+### 14.0 A prototype print is a legitimate way to close a measurement gate
 
-Print and test in this order:
+Where a part is **small, cheap and quick to print** — this housing is 20 g and
+about an hour — a test print may be made and fitted *before* the §3 starting
+values behind it have been measured, and the result used as the evidence that
+closes them. On a part like this the print is the faster and better instrument:
+callipers on a populated board give the nominal, while a fitted print gives the
+answer to the question actually being asked, which is whether it seats.
 
-1. fit gauge;
-2. base and clamps;
-3. lid;
-4. optional USB plug.
+This does not weaken anything. What it changes is the **order**:
 
-Acceptance criteria:
+1. A print made under this clause is a **prototype**, not a release. It is
+   recorded as one, and §14 acceptance still has to be met before any part is
+   production-approved.
+2. **The result is recorded either way.** A print that fits closes the gates it
+   demonstrably exercises and no others; a print that does not fit is a
+   measurement in its own right and is recorded as one.
+3. The specification states, per gate, **which starting values it rests on**, so
+   that a fit obtained against an unmeasured value is never mistaken for a fit
+   obtained against a measured one.
+4. It does not extend to anything expensive, slow, or consumed by the attempt —
+   a heat-set insert driven into a boss cannot be undone, so a boss geometry
+   change still warrants a fresh part rather than a second attempt in the same
+   hole.
 
-- acquired breakout sits flat without forcing;
-- clamps retain it securely without bending the PCB;
-- ESP32 can be removed and refitted;
-- every used screw terminal remains accessible;
-- all harnesses exit without sharp bends or trapped insulation;
-- cable ties transfer pull load to the housing rather than the terminals;
-- lid fits and removes repeatedly without stressing wires;
-- USB cable inserts and removes cleanly;
-- EN/RESET and BOOT can be operated with a non-conductive tool;
-- no fastener can touch the board or wiring;
-- housing mounts firmly to the selected internal cabinet surface;
-- powered controller completes startup and all local controls behave normally;
-- OTA connects successfully with the lid fitted;
-- no abnormal temperature is observed after at least 30 minutes powered;
-- shake/handling test reveals no board movement or loose hardware.
+The CAD revision is not production-approved until physical checks confirm:
 
-Record the physical board dimensions and final successful parameter values in
-the build report and repository. Those measured values then supersede the CAD
-starting values.
+- the acquired DORHEA board's overall length, width and PCB thickness;
+- the terminal-block height and depth, terminal-port centre height and opening,
+  practical ferrule envelope, mounting-hole pattern and underside features;
+- any replacement carrier-fit coupon accepts the real terminal adapter without
+  stress or excessive play;
+- USB insertion and removal are unobstructed;
+- a representative ferruled production conductor inserts horizontally into
+  each terminal-row type without scraping or being forced to bend at the
+  enclosure wall;
+- all terminal screws are serviceable from above with representative wires fitted;
+- individual conductors clear the terminal mouths before merging into the
+  grouped H1–H6 harnesses;
+- grouped H1–H6 harnesses leave the housing without pinch or sharp bends;
+- the cover can be removed and refitted without disconnecting or disturbing wiring;
+- cabinet fastener installation and insulation are practical;
+- any selected strain-relief arrangement is practical for ordinary wiring and
+  handling and does not load the terminal connections;
+- antenna performance is acceptable;
+- PETG print quality is acceptable without supports;
+- a **vertical** heat-set insert can be driven into a lid-screw boss and the bolt tightened into it with relief beneath — ✅ **confirmed 2026-09-07**, and it is what produced §4.13;
+- the cabinet screw's real head diameter is inside the declared maximum
+  envelope;
+- the insulating cap presses in, stays in and comes out again on the real
+  printer and filament;
+- the recorded 20.00 mm overall assembly height is represented from the actual
+  lowest underside feature to the highest point, without reusing Rev B's
+  incompatible 24.00 mm above-PCB datum;
+- no pull test, load test or dedicated strain-relief coupon is required.
 
-## 16. Change control
+Record the results in the build report before release.
 
-This specification is the authority for the housing architecture. Claude may
-refine fillets, ribs, print reliefs and derived dimensions while preserving the
-requirements and named parameters.
+### 14.1 Results so far — first prototype, 2026-09-07
 
-Stop and return for a design decision if CAD reveals that any of the following
-cannot coexist:
+Printed under §14.0, fitted and installed in the Decca. It fitted first time.
+**Closed by that fit**, each recorded in both verification suites with the
+observer and date: the two locating posts entering the real mounting holes,
+which also confirms the 60 × 57 pitch over the 58 × 56 first reported; the
+carrier fitting by the designed ledge-and-tilt sequence; the lid closing on the
+assembly, which closes the whole height chain from the measured 20.00 mm
+assembly; the enclosure installing in the Decca; nothing under the board outside
+the modelled joint rows; the terminal rows being centred on the 63.00 mm
+dimension; the 9.00 mm block height being the block's own body height; and PETG
+printing this geometry with no support material.
 
-- full terminal screwdriver access;
-- safe electrical separation from all fasteners;
-- USB recovery access;
-- antenna keep-out;
-- removable wiring and controller service;
-- the 90 × 78 × approximately 35 mm target envelope.
+**Not closed by it**, and the distinction is §14.0 point 3: a board that seats
+proves the 4.50 mm pad height works, it does not measure the PCB thickness or
+the below-board protrusion behind it; and a Ø2.60 post fitting the real hole
+does not measure the bore, which sets how much play the board has.
 
-Do not incorporate the separately mounted MOSFET or power-distribution hardware
-to solve a housing-layout conflict.
+**Second report, same day.** The inserts drove and the lid screws pulled the
+lid down; **the terminals are wired**; both cabinet fixings and both insulating
+caps are fitted; and the finish was reported as *"nice simple finish, no
+issues"*. That closes four more: the insert bore against a real Hanglife M3; the
+whole wired condition, which is the entry corridors, top screwdriver access, the
+ferrule envelope and cover-removal-with-wiring-connected — the gates this
+revision exists for, since Rev B could not be wired at all; the cabinet screw
+head inside its declared 6.20 mm envelope together with the caps' 0.12 mm nib
+interference; and surface finish. It also closes the installation gate for the
+cabinet fixing centres.
+
+**Twelve gates are now closed by the fitted prototype**, against seven prototype
+and two installation gates still open.
+
+**The one change it demanded.** Tightening the real bolts showed the bolt has
+nowhere to go once it passes the insert. §4.13 now requires 2.00 mm of relief
+beneath each insert, and it is built and gated — measured off the exported
+triangles as well as in CAD. **It is the first change on this design to come
+from a fitted prototype rather than from a gate**, which is the argument for
+§14.0 made in one edit.
+
+**Still unreported:** the conductor and ferrule sizes actually installed — what
+is established is that the design accommodates them, not what they are; whether
+the grouped wiring is secured outside the housing; and antenna performance with
+the lid fitted.
+
+## 15. Change control
+
+- Continue the work only in the dedicated housing branch and PR until prototype acceptance is complete.
+- Treat every Rev B housing body, STL, STEP, render, slice result and verification result as superseded. Do not print or release them.
+- Prototype printing is governed by §14.0, not by the measurement gate. A test print of a small, cheap part is a legitimate instrument and does not require the §3 starting values behind it to be measured first; its result is recorded under §14.
+- The measurement gate is **CLOSED** as of 2026-09-06 and replacement production CAD is released. The macro geometry in §3 is owner-measured; the terminal-port bore and internal depth are out of scope under §5.3. A supplier photograph still establishes topology, not manufacturing dimensions, and no remaining assumption may be presented as a measurement.
+- Do not merge the housing PR during the amendment sprint.
+- Avoid unrelated wiring, firmware, or printing-work changes.
+- A specification and hardware-identification correction may precede replacement CAD. Once replacement modelling begins, update the generated CAD, verification scripts, exported artefacts, renders, build report and PR description together.
+- If any mandatory envelope or material gate cannot coexist with the clearance and service requirements, stop and document the conflict rather than silently relaxing the gate.

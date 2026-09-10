@@ -29,4 +29,7 @@ duty 0 and the stored commissioning brightness remain unchanged.
   are removed.
 - The lighting tests verify immediate on/off writes and safe initialization.
 - The fade-related portions of ADR-0010 and ADR-0014 are superseded.
-- Firmware v0.27.4 requires OTA deployment and physical verification.
+- Firmware v0.27.4 was deployed successfully by authenticated OTA on 2026-09-09.
+  Physical immediate-transition verification remains open under HW-LGT-01 and
+  Mono/off verification is additionally blocked by the retained switch fault
+  HW-SW-01.

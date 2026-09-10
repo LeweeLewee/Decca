@@ -59,11 +59,11 @@ The three-lamp bank has electrical acceptance. DFRobot DFR0457 is installed as
 the final MOSFET stage;
 its initial steady-light test resolved the flicker. Firmware uses 1 kHz PWM and
 85% / duty 217. That image was uploaded successfully by authenticated OTA and
-returned at `decca.local`. The owner physically approved the earlier v0.27.1
-startup/version timing and both approximately 4.34-second fade directions, with
-no flicker reported. WAGO distribution installation plus pot-stability,
-temperature and current checks remain open under HW-LGT-01. Mono and logical
-standby are off.
+returned at `decca.local`. The v0.27.1 fade observation is historical and
+superseded: installed LEDs held brightness until the delayed final switch, so
+the fade did not provide useful visual feedback. WAGO distribution installation
+plus immediate-transition, pot-stability, temperature and current checks remain
+open under HW-LGT-01. Mono and logical standby are off.
 
 Firmware v0.27.4 removes the fade engine. Stereo/Mono lighting requests update
 PWM duty immediately after the 25 ms debounce, and logical power transitions

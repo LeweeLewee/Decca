@@ -60,13 +60,10 @@ disturbance stopped, but lamp flicker remained.
   On delivery, use one for the +5 V star point, one for common GND and retain
   one spare.
 - Keep the single regulated 5 V supply and common-ground architecture.
-- **Complete:** set `decca::hardware::kDialLightingPwmFrequencyHz` to the
-  controller's specified 1 kHz limit and restore the existing non-blocking soft
-  fade engine. Commit `c6cb9a6` uploaded by authenticated OTA and the ESP32
-  returned at `decca.local` after reboot.
-- **Complete (2026-09-05):** deploy v0.27.1 at commit `d0b1d3c`. The owner
-  approved the 2.2-second firmware-version hold and both approximately
-  4.34-second lighting fades, with no flicker reported.
+- **Historical (superseded):** commit `c6cb9a6` set the controller's 1 kHz limit
+  while retaining the then-current soft fade; v0.27.1 at `d0b1d3c` was deployed
+  on 2026-09-05. Installed observation later showed the LEDs held brightness
+  until the delayed final switch, so ADR-0017 and v0.27.4 removed that engine.
 
 **Locked behaviour:** GPIO18/D18 is the lighting PWM output. After debounce,
 Stereo open/high applies the owner-approved 85% / duty 217 immediately and Mono
@@ -101,3 +98,23 @@ authenticated OTA upload succeeded in 57.956 seconds and the device returned at
 
 **Procurement records:** `hardware/BOM/phase1.csv` and `docs/Parts List.md`.
 **Wiring:** `docs/Wiring.md`, H5 and Power Distribution.
+
+## MECH-HSG-01 — Complete ESP32 housing prototype acceptance
+
+**Status:** OPEN — Rev C was printed, fitted, wired and installed on 2026-09-07
+and passed every geometric mesh check. The fitted prototype closed twelve gates,
+but specification v1.7 still records seven prototype and two installation gates.
+
+Close only against the exact remaining measurements/observations in
+`mechanical/Drawings/Decca_ESP32_Controller_Housing_Spec_v1.0.md` and its Rev C
+build report. Do not infer unmeasured dimensions from the successful fit.
+
+## MECH-C14-01 — Physically validate IEC C14 mounting plate Rev B
+
+**Status:** OPEN — Rev A is rejected. Rev B passes 15/15 CAD checks and the owner
+confirmed the corrected six-sided profile drawing, but no physical Rev B fit is
+recorded.
+
+Before release or mains energisation, confirm the inlet enters without forcing,
+both M3 inlet fixings and all four Decca M2 holes align, the plate clamps flat,
+and rear terminal/wire clearance plus insulation and earthing are acceptable.

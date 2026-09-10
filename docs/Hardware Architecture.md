@@ -79,15 +79,27 @@ The audio-path architecture is locked by ADR-0008 and ADR-0010 as:
 - The dial lighting does **not** receive a separate 6 V or 6.3 V rail. A dedicated
   lamp-only supply is explicitly rejected unless a later hardware constraint
   requires an ADR change.
-- The 5 V supply is **selected and acquired**: **Phihong PSA15R-050P** switching
-  adapter, rated **5.0 V DC at 3.0 A (15 W)**. This closes the 5 V PSU procurement
-  item and provides adequate margin for the controller, OLED and all three lamps.
-  Before connection, confirm the DC plug size and polarity with a multimeter; keep
-  the adapter's enclosed mains side intact and route only its low-voltage output
-  into the control-rail wiring.
+- The 5 V supply is **selected and installed**: **Phihong PSA15R-050P** switching
+  adapter, rated **5.0 V DC at 3.0 A (15 W)**. Its enclosed mains side remains
+  intact; its low-voltage output lead is soldered directly into the Decca wiring
+  through the reused inline fuse holder. The former panel DC socket route is
+  obsolete.
 - ESP32 and dial-lighting **grounds are common**.
 - The original Decca on/off switch remains a **low-voltage ESP32 input only**; it
   does not carry 230 V mains.
+
+### Whole-system mains distribution — active implementation
+
+- The rear inlet is the acquired IEC C14 part measured by the owner. Its
+  corrected Rev B six-sided mounting plate passes 15/15 CAD checks and the owner
+  confirmed the profile drawing; physical fit and rear terminal clearance remain
+  open before release.
+- The external UK C13 lead and enclosed Masterplug four-gang internal distribution
+  block are ordered. Their delivery, secure mounting, cable routing, earthing and
+  final inlet connection remain installation gates.
+- Rev A of the C14 plate is rejected and must not be installed.
+- The original front-panel switch remains a logical input; it does not interrupt
+  the mains feed.
 
 ### WiiM Pro power behaviour — locked
 
@@ -223,12 +235,13 @@ three-lamp current remain commissioning checks.
 The final switch is one **DFRobot Gravity MOSFET Power Controller, DFR0457**,
 now installed. It accepts the 5 V lamp rail and 3.3 V logic/control, with a
 specified switching range of 0–1 kHz. GPIO18/D18 drives the controller input and
-firmware PWM is set to 1 kHz. The initial
-steady-light test resolved the visible flicker. Cold startup and both
-approximately 4.34-second fade directions were subsequently owner-approved on
-v0.27.1 with no flicker. WAGO distribution installation plus pot-stability,
-temperature and current checks remain under HW-LGT-01. The previously tested
-DAOKAI pack is retained as superseded test stock.
+firmware PWM is set to 1 kHz. The initial steady-light test resolved the visible
+flicker. The earlier v0.27.1 fade observations are superseded because installed
+LEDs held brightness until a delayed final switch. Deployed v0.27.4 removes the
+fade engine and applies changed duties immediately. Immediate-transition, WAGO
+distribution, pot-stability, temperature and current checks remain under
+HW-LGT-01. The previously tested DAOKAI pack is retained as superseded test
+stock.
 
 Brightness is a commissioning/configuration value rather than a permanent front-
 panel user control. The owner-approved normal value is 85% / duty 217. Firmware

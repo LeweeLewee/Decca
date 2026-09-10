@@ -235,9 +235,11 @@ Yellow = SDA.
 - Installed final switch: one **DFRobot Gravity MOSFET Power Controller,
   DFR0457**. Its 3.3 V control input is driven by ESP32 **GPIO18 / board label
   D18** and firmware PWM is set to its 1 kHz DC switching limit.
-- Steady-light and earlier v0.27.1 fade testing report no flicker; cold startup and both
-  approximately 4.34-second fade directions are owner-approved. Repeat
-  pot-stability, temperature and lamp-current tests before closing HW-LGT-01.
+- Steady-light testing reports no flicker. The earlier v0.27.1 fade observations
+  are superseded: installed LEDs held brightness and then switched only after the
+  delay. Deployed v0.27.4 removes the fade engine and writes on/off duties
+  immediately. Repeat the immediate transition, pot-stability, temperature and
+  lamp-current checks before closing HW-LGT-01.
 - The previously tested DAOKAI pack is retained as test stock but is superseded
   for the final installation.
 - ESP32 and lighting grounds are **common**.
@@ -273,24 +275,20 @@ installed-holder checks remain open.
 
 The approved low-voltage controller path is:
 
-`external Phihong adapter -> panel DC socket -> 2 A fuse on +5 V -> +5 V / GND distribution -> ESP32 and H5 lighting`
+`external Phihong adapter -> soldered low-voltage connection -> reused inline 2 A fuse on +5 V -> +5 V / GND distribution -> ESP32 and H5 lighting`
 
 - Locked controller architecture: **one regulated 5 V control rail**, with 3.3 V
   derived by the ESP32 board regulator for logic/ADC and the OLED as documented.
 - Selected/acquired supply: **Phihong PSA15R-050P**, **5.0 V DC at 3.0 A
   (15 W)**.
-- The adapter remains enclosed and external by default. Only its isolated
-  low-voltage output enters the cabinet; this controller path adds no internal
-  230 V connection.
-- Purchased input-socket set: **TopHomer ASIN B08HGXYS4J**, pack of five
-  female two-terminal threaded-nut panel sockets, **5.5 mm OD × 2.1 mm ID** and
-  rated **3 A**; one is required.
-- The purchase closes socket procurement, not validation. Confirm the actual
-  Phihong plug fit and centre-positive polarity before drilling or wiring the
-  selected socket.
-- Fit a **2 A low-voltage fuse** in the +5 V conductor immediately after the
-  socket and before distribution. Recheck the rating against measured total lamp
-  current during commissioning.
+- The adapter's enclosed mains side remains intact. Its isolated low-voltage
+  output lead is soldered directly into the Decca low-voltage wiring; the
+  purchased TopHomer panel DC sockets are obsolete and must not be fitted for
+  this route.
+- The original Decca inline fuse holder is implemented in the +5 V conductor
+  immediately after that soldered connection and before distribution. One 2 A
+  fuse is fitted and one is retained as a spare; recheck the rating against
+  measured total lamp current during commissioning.
 - Use two **WAGO 221-415 five-way lever connectors** from Pi Hut pack SKU
   **104130**: one as the +5 V star point and one as the common-GND star point.
   Retain the third connector in the pack as a spare.
@@ -306,8 +304,13 @@ The approved low-voltage controller path is:
 - The WiiM Pro remains continuously powered and uses its own automatic standby.
 - The Fosi ZA3 PSU may remain energised; the amplifier state is controlled by H6
   via its 12 V trigger input.
-- A future single-mains-lead cabinet arrangement remains a separate open design
-  decision and must not be improvised from the low-voltage parts above.
+- The single-mains-lead cabinet arrangement is an active implementation using an
+  acquired IEC C14 inlet, an ordered UK C13 lead and an ordered enclosed
+  Masterplug four-gang distribution block. The Rev B mounting plate is the only
+  active plate design; it is CAD-passed but physical-fit pending. Do not use the
+  rejected Rev A plate, and do not energise mains until inlet fit, fixing
+  alignment, flat clamping, enclosure retention, earthing, terminal insulation
+  and rear wire clearance have been verified.
 - The ESP32 remains powered when the Decca front-panel switch is OFF so it can
   detect the next state change.
 - The ESP32 carries **control and UI only**. It does **not** process or carry

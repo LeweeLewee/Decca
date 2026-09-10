@@ -2,6 +2,21 @@
 
 Dimensioned engineering drawings for fabrication, measurement, and reference.
 
+## ESP32 controller housing — Rev C installed prototype
+
+`Decca_ESP32_Controller_Housing_Spec_v1.0.md` is the controlling v1.7
+specification. `Decca_ESP32_Controller_Housing_Build_Report_revC.md` records the
+verified build and the owner's 2026-09-07 printed, fitted, wired and installed
+prototype. It fitted first time, but seven prototype and two installation gates
+remain open. The Rev B report is retained as superseded history.
+
+## IEC C14 mounting plate — Rev B active / physical fit pending
+
+`Decca_IEC_C14_Mounting_Plate_Spec_revB.md` and its Rev B build report control
+the corrected six-sided inlet profile. All 15 CAD checks pass and the owner
+confirmed the profile drawing. Rev A is rejected; its specification, report and
+view remain only as an explicit failure record. Do not print or install Rev A.
+
 **Intended contents**
 - PDF drawings with critical dimensions and tolerances.
 - Reference sketches for cabinet fit and mounting.

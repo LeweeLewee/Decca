@@ -35,8 +35,8 @@ switch.
 - No ESP32-controlled 230 V relay is required for the ZA3 under this architecture.
 - The ESP32 remains powered when the Decca is logically OFF so it can detect the
   front-panel switch and orchestrate the next startup.
-- The OLED is blanked and the dial lamps are faded to zero in the logical OFF
-  state.
+- The OLED is blanked and the dial lamps switch immediately to zero in the
+  logical OFF state. This transition behaviour is superseded by ADR-0017.
 - User volume is controlled as:
 
   `Decca volume pot -> ESP32 ADC -> WiiM volume`
@@ -49,7 +49,8 @@ switch.
 ### ON
 1. ESP32 detects the original Decca switch closing.
 2. ESP32 asserts the ZA3 12 V trigger through the driver stage.
-3. Dial lamps fade to the stored commissioning brightness.
+3. Dial lamps switch immediately to the stored commissioning brightness
+   (ADR-0017).
 4. OLED enables and runs the startup/dashboard sequence.
 5. WiiM remains physically powered and wakes from automatic standby when playback
    or supported network/control activity requires it.
@@ -58,7 +59,7 @@ switch.
 1. ESP32 detects the original Decca switch opening.
 2. ESP32 stops playback or sends an appropriate supported WiiM control action where
    useful; WiiM then returns to its own automatic standby behaviour.
-3. Dial lamps fade to zero.
+3. Dial lamps switch immediately to zero (ADR-0017).
 4. OLED is blanked.
 5. ESP32 removes the ZA3 12 V trigger.
 6. ESP32 remains powered awaiting the next switch-on.
