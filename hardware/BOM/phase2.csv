@@ -6,3 +6,4 @@ A4,ZA3 trigger driver and 12 V source,1,TBD,TBD,OPEN-DESIGN,"ESP32-controlled in
 A5,ZA3 trigger plug or lead,1,TBD,TBD,OPEN,"Match ZA3 trigger connector and confirmed polarity; length follows final equipment placement."
 A6,Stereo RCA interconnect,1,TBD,TBD,OPEN-LATER,"WiiM Pro line output to ZA3 input; select length after internal placement is fixed."
 A7,Speaker cable and internal harness,1 set,TBD,TBD,OPEN-LATER,"Selected cable specification is 2 x 2.5 mm2 OFC; exact length, brand and terminations follow final placement and speaker selection."
+A8,Turntable,1,Audio-Technica,AT-LP120X,ACQUIRED-EXISTING,"Existing turntable selected for the Decca installation; no turntable purchase required. Verify physical fit and final mounting/clearance in the original turntable bay before installation."
