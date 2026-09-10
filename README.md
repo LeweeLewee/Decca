@@ -72,6 +72,7 @@ Final OLED loom: Brown GND, Red 3V3/VCC, Orange SCL and Yellow SDA.
 - [Decision records](docs/adr/)
 - [Development handover](docs/Development%20Handover.md)
 - [Open issues](docs/Open%20Issues.md)
+- [Branch disposition register](docs/Branch%20Disposition.md)
 - `src/`: firmware modules
 - `test/`: PlatformIO suites
 - `hardware/`: BOM, wiring and electrical design
