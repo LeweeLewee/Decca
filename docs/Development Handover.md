@@ -211,7 +211,7 @@ the user's Wi-Fi or OTA passwords.
     Mono applies duty 0 immediately; power transitions are also immediate.
     Authenticated OTA succeeded and `decca.local` returned at `192.168.1.79`.
 11. **Implemented, physical acceptance open (v0.28.0):** acquired WiiM Pro live
-   HTTPS identity and idle player probes passed. Verify active TIDAL metadata,
+   HTTPS identity, idle player and active TIDAL metadata probes passed. Verify
    VHF source changes, pot volume, logical-OFF stop, network-loss recovery and
    OTA deployment before release.
 12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought

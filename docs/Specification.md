@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.0 implements Phase 2 WiiM Pro HTTPS control in a background worker, using the physically verified VHF and volume inputs without blocking local control. Live identity and idle player responses were captured on 2026-09-11; active TIDAL metadata, source/volume commands, OTA deployment and end-to-end audio/trigger behaviour remain physical acceptance gates. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Status   | Draft. Firmware v0.28.0 implements Phase 2 WiiM Pro HTTPS control in a background worker, using the physically verified VHF and volume inputs without blocking local control. Live identity, idle player and active TIDAL metadata responses were captured on 2026-09-11; source/volume commands, OTA deployment and end-to-end audio/trigger behaviour remain physical acceptance gates. Phase 1 lighting and retained-switch issues remain tracked separately. |
 | Version  | 0.28.0                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
@@ -242,6 +242,11 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
   `getStatusEx` and `getPlayerStatus` requests. The idle player reported no
   active mode, `status=none`, volume 35 and unmuted; idle `getMetaInfo` returned
   an empty response body.
+- **Confirmed 2026-09-11:** active TIDAL playback reported `vendor=Tidal`,
+  `mode=10`, `status=play`, 96 kHz structured metadata, and matching title and
+  artist through both hex player fields and plain-text `getMetaInfo` fields.
+  The published mode table is not used to identify TIDAL because this live
+  firmware reports mode 10 rather than the documented historical mode 32.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.

@@ -177,7 +177,7 @@ succeeded in 57.956 seconds and `decca.local` returned at `192.168.1.79`.
 Physical acceptance remains pending.
 
 Phase 2 WiiM increment (2026-09-11): `test_wiim` fixes the acquired unit's live
-idle player response as a regression case, covers TIDAL Connect mode 32, hex
-fallback fields, structured metadata, empty idle metadata and the locked VHF
+idle player response as a regression case, covers the live TIDAL mode 10 response,
+hex fallback fields, structured 96 kHz metadata, empty idle metadata and the locked VHF
 source-command mapping. Network I/O runs only in the production background
 worker; the test suite exercises parsing and command selection deterministically.

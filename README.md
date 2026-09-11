@@ -22,8 +22,8 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - The Phase 2 WiiM module is implemented as a background HTTPS worker for source,
-  volume, power-state and metadata coordination. Live identity and idle-player
-  probes pass; active TIDAL and OTA acceptance remain open.
+  volume, power-state and metadata coordination. Live identity, idle-player and
+  active TIDAL metadata probes pass; control commands and OTA acceptance remain open.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.

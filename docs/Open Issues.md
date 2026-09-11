@@ -101,16 +101,17 @@ authenticated OTA upload succeeded in 57.956 seconds and the device returned at
 
 ## FW-WIM-01 — Accept Phase 2 WiiM integration
 
-**Status:** OPEN — WiiM Pro acquired and network verified. Live HTTPS
-`getStatusEx` and idle `getPlayerStatus` passed on 2026-09-11. The idle player
-reported mode -1, status none, volume 35 and mute off. `getMetaInfo` returned an
-empty body while idle. Firmware v0.28.0 implements the integration but is not
-yet built, deployed or physically accepted.
+**Status:** OPEN — WiiM Pro acquired and network verified. Live HTTPS identity,
+idle-player and active TIDAL metadata probes passed on 2026-09-11. Active
+playback returned matching hex and structured title/artist fields, `mode=10`,
+`vendor=Tidal`, 96 kHz and status play. The audio-output-mode endpoint returned
+no visible body and remains a WiiM Home configuration/physical check. Firmware
+v0.28.0 is not yet built, deployed or physically accepted.
 
 **Acceptance required:**
 
-1. Capture `getPlayerStatus` and `getMetaInfo` while TIDAL Connect is actively
-   playing; retain sanitised fixtures and confirm title/artist rendering.
+1. **Passed:** captured live `getPlayerStatus` and `getMetaInfo` during active
+   TIDAL playback; sanitised fixtures decode Jolene / Dolly Parton correctly.
 2. Build the release and all nine suites from a trusted toolchain; do not accept
    the checksum-failed PlatformIO package download observed in the Work session.
 3. Add `DECCA_WIIM_HOST` to local `src/secrets.h`, build the credential-enabled
