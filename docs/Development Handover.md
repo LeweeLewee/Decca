@@ -1,6 +1,6 @@
 # Development Handover
 
-> **Close-out date:** 2026-08-31
+> **Last updated:** 2026-09-11
 > **Repository:** `LeweeLewee/Decca`  
 > **Authoritative branch:** `main`
 
@@ -26,8 +26,9 @@ messages and old revision-history entries may describe superseded hardware.
 The production `src/main.cpp` initialises the safe board state, buttons, logical
 power, display, lighting and authenticated ArduinoOTA. It continuously services
 the original on/off switch, pots, VHF source, Stereo/Mono lighting request,
-display and OTA without blocking. WiiM coordination is Phase 2 and is not yet
-implemented. Final lighting hardware acceptance is reopened as HW-LGT-01.
+display and OTA without blocking. Phase 2 WiiM coordination is implemented on a
+separate core-0 worker and awaits active-playback and OTA physical acceptance.
+Final lighting hardware acceptance remains open as HW-LGT-01.
 
 Implemented modules:
 
@@ -41,8 +42,8 @@ Implemented modules:
 | `lighting` | Safe-off PWM with immediate updates for every transition |
 | `ota` | Authenticated LAN OTA, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
-| WiiM interface | Phase 2, not implemented |
-| Main orchestration | Power, pots, VHF source, fitted display, lighting command and OTA integrated; DFR0457 installed, final HW-LGT-01 acceptance open |
+| `wiim` | Phase 2 local-HTTPS source, volume, stop, player state and metadata implemented; live idle responses fixed as parser evidence |
+| Main orchestration | Power, pots, VHF source, fitted display, lighting command, WiiM snapshots and OTA integrated; physical Phase 2 acceptance open |
 
 The ESP32 is control/UI only. It never carries or processes audio.
 
@@ -51,7 +52,7 @@ The ESP32 is control/UI only. It never carries or processes audio.
 The original selector PCB remains as a mechanical carrier, but only the VHF
 state is reliable electrically:
 
-| VHF contact | Logical source | Future WiiM action |
+| VHF contact | Logical source | WiiM action |
 |---|---|---|
 | Closed / latched | Digital Streamer | Restore phone-controlled digital playback |
 | Open / released | Vinyl | Select Line-In |
@@ -209,8 +210,10 @@ the user's Wi-Fi or OTA passwords.
     removed. After the 25 ms debounce, Stereo applies duty 217 immediately and
     Mono applies duty 0 immediately; power transitions are also immediate.
     Authenticated OTA succeeded and `decca.local` returned at `192.168.1.79`.
-11. Add WiiM Pro integration only in Phase 2, after the hardware is available and
-   the live local API is verified.
+11. **Implemented, physical acceptance open (v0.28.0):** acquired WiiM Pro live
+   HTTPS identity and idle player probes passed. Verify active TIDAL metadata,
+   VHF source changes, pot volume, logical-OFF stop, network-loss recovery and
+   OTA deployment before release.
 12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
@@ -220,8 +223,8 @@ the user's Wi-Fi or OTA passwords.
 `docs/Parts List.md` and the CSV BOMs for procurement detail. Immediate open
 items are the ordered WAGO 221-415 distribution-connector pack and final DFR0457
 immediate-transition, pot-stability, temperature, current and holder checks.
-Phase 2 items remain the ZA3 12 V trigger interface, WiiM Pro, Fosi ZA3,
-speakers and final audio interconnects.
+Phase 2 items remain the direct WiiM-to-ZA3 trigger lead verification, Fosi ZA3,
+speakers and final audio interconnects. The WiiM Pro is acquired and network verified.
 
 ## Mechanical status
 
@@ -277,8 +280,8 @@ authenticated OTA upload succeeded and the device returned
 at `decca.local`. Firmware releases use the single version value in
 `src/version.h`; v0.27.4 holds that identifier for 2.2 seconds on the
 cold-start/OTA-reboot screen and removes all lighting fades.
-Then proceed to Phase 2 WiiM integration when its hardware is available.
-Production now coordinates all four pots,
+Phase 2 firmware v0.28.0 now coordinates the acquired WiiM Pro in a background
+worker. Production coordination covers all four pots,
 VHF-derived source, logical power and display while
 continuously servicing OTA. The OLED dims after 60 s, turns pixels off after
 5 min, and blanks standby after 10 s, waking immediately on activity. The

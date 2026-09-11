@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.27.4 removes the lighting fade engine so debounced Stereo/Mono and logical power changes apply their PWM duty immediately. The release and credential-enabled OTA builds pass, all eight on-target suites compile, authenticated OTA succeeded and the device returned at `decca.local` / `192.168.1.79`. Physical transition verification remains open. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. WiiM integration remains outstanding. |
-| Version  | 0.27.4                                            |
+| Status   | Draft. Firmware v0.28.0 implements Phase 2 WiiM Pro HTTPS control in a background worker, using the physically verified VHF and volume inputs without blocking local control. Live identity and idle player responses were captured on 2026-09-11; active TIDAL metadata, source/volume commands, OTA deployment and end-to-end audio/trigger behaviour remain physical acceptance gates. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Version  | 0.28.0                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -238,6 +238,10 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - FR-WIM-01..04 and FR-DSP-03/07 satisfied.
 - VHF-to-digital and released-VHF-to-Line-In switching, volume sync and metadata are verified against a live WiiM Pro.
 - Loss of the streamer does not impair local control (FR-SYS-05, NFR-09).
+- **Confirmed 2026-09-11:** the acquired WiiM Pro answered live HTTPS
+  `getStatusEx` and `getPlayerStatus` requests. The idle player reported no
+  active mode, `status=none`, volume 35 and unmuted; idle `getMetaInfo` returned
+  an empty response body.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.

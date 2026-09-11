@@ -99,6 +99,33 @@ authenticated OTA upload succeeded in 57.956 seconds and the device returned at
 **Procurement records:** `hardware/BOM/phase1.csv` and `docs/Parts List.md`.
 **Wiring:** `docs/Wiring.md`, H5 and Power Distribution.
 
+## FW-WIM-01 — Accept Phase 2 WiiM integration
+
+**Status:** OPEN — WiiM Pro acquired and network verified. Live HTTPS
+`getStatusEx` and idle `getPlayerStatus` passed on 2026-09-11. The idle player
+reported mode -1, status none, volume 35 and mute off. `getMetaInfo` returned an
+empty body while idle. Firmware v0.28.0 implements the integration but is not
+yet built, deployed or physically accepted.
+
+**Acceptance required:**
+
+1. Capture `getPlayerStatus` and `getMetaInfo` while TIDAL Connect is actively
+   playing; retain sanitised fixtures and confirm title/artist rendering.
+2. Build the release and all nine suites from a trusted toolchain; do not accept
+   the checksum-failed PlatformIO package download observed in the Work session.
+3. Add `DECCA_WIIM_HOST` to local `src/secrets.h`, build the credential-enabled
+   OTA target and deploy v0.28.0.
+4. Verify VHF selects the Wi-Fi/digital path and every released-VHF position
+   selects WiiM Line-In.
+5. Verify the Decca volume pot controls WiiM 0–100 smoothly without command
+   chatter, including safe start level and application reflection.
+6. Verify logical OFF stops playback while local lights/display still obey their
+   existing behaviour, and ON restores source/volume without hard-cycling WiiM.
+7. Disconnect/reconnect the network and confirm local controls remain responsive,
+   the unavailable message appears once, and control recovers automatically.
+8. After the ZA3 arrives, verify RCA left/right audio and the direct WiiM-to-ZA3
+   trigger wake/standby behaviour under ADR-0018.
+
 ## MECH-HSG-01 — Complete ESP32 housing prototype acceptance
 
 **Status:** OPEN — Rev C was printed, fitted, wired and installed on 2026-09-07

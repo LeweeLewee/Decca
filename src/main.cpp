@@ -1,5 +1,6 @@
 /** Phase 1 coordinator: logical power/display state plus continuous OTA. */
 #include <Arduino.h>
+#include <cstring>
 #ifndef PIO_UNIT_TESTING
 #include "buttons.h"
 #include "display.h"
@@ -10,6 +11,7 @@
 #include "power.h"
 #include "settings.h"
 #include "version.h"
+#include "wiim.h"
 
 namespace {
 
@@ -18,6 +20,12 @@ decca::buttons::SourceMode g_sourceMode =
     decca::buttons::SourceMode::DigitalStreamer;
 uint16_t g_potValues[4]{};
 constexpr uint16_t kControlPresentationDeadband = 5;
+decca::wiim::Status g_lastWiimStatus = decca::wiim::Status::Disabled;
+decca::wiim::Playback g_lastPlayback = decca::wiim::Playback::None;
+char g_lastTitle[decca::wiim::kTitleCapacity + 1]{};
+char g_lastArtist[decca::wiim::kArtistCapacity + 1]{};
+decca::settings::Source g_lastWiimDisplaySource =
+    decca::settings::Source::DigitalStreamer;
 
 constexpr decca::pots::Pot kPots[4] = {
     decca::pots::Pot::Volume,
@@ -39,6 +47,7 @@ void applySourceState(bool showConfirmation) {
     g_viewState.source = vinyl ? decca::settings::Source::Vinyl
                                : decca::settings::Source::DigitalStreamer;
     g_viewState.functionName = vinyl ? "VINYL" : "DIGITAL STREAMER";
+    decca::wiim::requestSource(g_viewState.source);
 
     if (g_viewState.power == decca::display::PowerState::On) {
         decca::display::setState(g_viewState);
@@ -94,6 +103,11 @@ void updatePotState() {
         const uint8_t index = static_cast<uint8_t>(changedControl);
         decca::display::showControl(kControls[index], g_potValues[index]);
     }
+
+    if (changedControl == 0) {
+        decca::wiim::requestVolume(
+            static_cast<uint8_t>((g_potValues[0] + 5U) / 10U));
+    }
 }
 
 void applyPowerState() {
@@ -101,9 +115,46 @@ void applyPowerState() {
     g_viewState.power = powerOn ? decca::display::PowerState::On
                                 : decca::display::PowerState::Standby;
     decca::display::setState(g_viewState);
+    decca::wiim::requestPower(powerOn);
 
     Serial.print("[POWER] state=");
     Serial.println(powerOn ? "ON" : "STANDBY");
+}
+
+void applyWiimState() {
+    decca::wiim::update();
+    const decca::wiim::Snapshot& snapshot = decca::wiim::snapshot();
+    const bool statusChanged = snapshot.status != g_lastWiimStatus;
+    const bool metadataChanged =
+        snapshot.playback != g_lastPlayback ||
+        std::strncmp(snapshot.title, g_lastTitle, sizeof(g_lastTitle)) != 0 ||
+        std::strncmp(snapshot.artist, g_lastArtist, sizeof(g_lastArtist)) != 0 ||
+        g_viewState.source != g_lastWiimDisplaySource;
+
+    if (statusChanged) {
+        if (snapshot.status == decca::wiim::Status::Error &&
+            g_lastWiimStatus != decca::wiim::Status::Error &&
+            g_viewState.power == decca::display::PowerState::On) {
+            decca::display::showStatus("STREAMER UNAVAILABLE");
+        }
+        g_lastWiimStatus = snapshot.status;
+    }
+
+    if (!metadataChanged) return;
+    g_lastWiimDisplaySource = g_viewState.source;
+    g_lastPlayback = snapshot.playback;
+    std::strncpy(g_lastTitle, snapshot.title, sizeof(g_lastTitle) - 1U);
+    std::strncpy(g_lastArtist, snapshot.artist, sizeof(g_lastArtist) - 1U);
+    g_lastTitle[sizeof(g_lastTitle) - 1U] = '\0';
+    g_lastArtist[sizeof(g_lastArtist) - 1U] = '\0';
+
+    const bool digital =
+        g_viewState.source == decca::settings::Source::DigitalStreamer;
+    g_viewState.title = digital && snapshot.metadataValid ? g_lastTitle : nullptr;
+    g_viewState.artist =
+        digital && snapshot.metadataValid ? g_lastArtist : nullptr;
+    g_viewState.playing = snapshot.playback == decca::wiim::Playback::Playing;
+    decca::display::setState(g_viewState);
 }
 
 void applyLightingState() {
@@ -145,6 +196,11 @@ void setup() {
     applySourceState(false);
     applyPowerState();
     decca::ota::init();
+    decca::wiim::init();
+    decca::wiim::requestSource(g_viewState.source);
+    decca::wiim::requestVolume(
+        static_cast<uint8_t>((g_potValues[0] + 5U) / 10U));
+    decca::wiim::requestPower(decca::power::isOn());
 }
 
 void loop() {
@@ -159,6 +215,7 @@ void loop() {
         applySourceState(true);
     }
     applyLightingState();
+    applyWiimState();
     decca::display::update();
     decca::ota::update();
 }

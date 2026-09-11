@@ -16,7 +16,8 @@ test/
 ├── test_display/           SH1106 frames, timing, refresh + physical bring-up
 ├── test_lighting/          PWM safe-off and immediate switching behaviour
 ├── test_power/             pure logical on/standby transitions
-└── test_ota/               non-blocking authenticated OTA lifecycle
+├── test_ota/               non-blocking authenticated OTA lifecycle
+└── test_wiim/              WiiM response parsing and source-command mapping
 ```
 
 ## Running
@@ -174,3 +175,9 @@ cases. The release build passes and all eight on-target suites compile without
 upload or execution. The credential-enabled OTA build passed, authenticated OTA
 succeeded in 57.956 seconds and `decca.local` returned at `192.168.1.79`.
 Physical acceptance remains pending.
+
+Phase 2 WiiM increment (2026-09-11): `test_wiim` fixes the acquired unit's live
+idle player response as a regression case, covers TIDAL Connect mode 32, hex
+fallback fields, structured metadata, empty idle metadata and the locked VHF
+source-command mapping. Network I/O runs only in the production background
+worker; the test suite exercises parsing and command selection deterministically.

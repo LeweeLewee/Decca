@@ -52,7 +52,7 @@ Each harness is removable at the controller end where practical.
 | H3  | Radio/source button harness |
 | H4  | OLED harness                |
 | H5  | Dial-lighting harness       |
-| H6  | ZA3 12 V trigger harness    |
+| H6  | WiiM-to-ZA3 trigger lead    |
 
 ## Pin Map
 
@@ -74,7 +74,6 @@ labels are simply `D32`, `D33`, `D34` and `D35` respectively.
 | OLED SDA              | GPIO21 (bench-verified) | D21 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | OLED SCL              | GPIO22 (bench-verified) | D22 | I²C         | H4      | Pi Hut SH1106, address 0x3C              |
 | Dial lighting PWM     | GPIO18 (physically verified) | D18 | PWM (LEDC), 1 kHz | H5 | Installed DFRobot DFR0457 control input; three-lamp bank |
-| ZA3 trigger control   | TBD             | TBD | Digital out | H6      | Drives 12 V trigger interface, never 12 V directly |
 
 > GPIO14, GPIO25 and GPIO26 support the required internal pull-ups and avoid the
 > project's excluded ESP32 strapping pins GPIO0, GPIO2, GPIO5, GPIO12 and
@@ -143,9 +142,10 @@ joints and original cable**. It is a simple open/close switch.
 - Confirmed logic: closed/active-low = ON; open = STANDBY. Both directions were
   physically accepted on the former D19 route on 2026-08-30 and on D14 with
   v0.27.3 on 2026-09-08.
-- The switch is a **system-state command**. ON causes the ESP32 to assert the ZA3
-  trigger, illuminate the dial and enable the OLED; OFF reverses those actions
-  and allows the WiiM Pro to use its own automatic standby behaviour.
+- The switch is a **system-state command**. ON makes the ESP32 restore the WiiM
+  source/volume, illuminate the dial and enable the OLED. OFF stops WiiM playback,
+  reverses the local actions and allows WiiM automatic standby to remove its
+  direct trigger output to the ZA3.
 
 ## H3 — Radio/Source Button Bank
 
@@ -260,15 +260,11 @@ installed-holder checks remain open.
 ## H6 — Fosi ZA3 12 V Trigger
 
 - The **Fosi Audio ZA3** is the locked stereo power amplifier.
-- Its operating state is controlled using the amplifier's **12 V trigger input**.
-- The ESP32 must **not** connect directly to or source the 12 V trigger voltage.
-- H6 therefore consists of an ESP32-controlled low-voltage driver stage plus a
-  suitable 12 V source and the cable to the ZA3 trigger input.
-- Exact GPIO, transistor/MOSFET or isolated driver, protection components and 12 V
-  source remain **open implementation items** until component selection and bench
-  verification.
-- Trigger asserted = Decca system ON / ZA3 enabled.
-- Trigger removed = Decca system OFF / ZA3 trigger-controlled off or standby.
+- H6 connects the WiiM Pro **12 V trigger output** directly to the ZA3 trigger
+  input using the correct 2.5 mm-to-3.5 mm lead/adaptor (ADR-0018).
+- The ESP32 must **not** connect to, source or sense the trigger voltage.
+- WiiM awake/playback behaviour asserts the trigger and enables the ZA3; WiiM
+  automatic standby removes it. Exact behaviour and delay require bench acceptance.
 - No ESP32-controlled 230 V mains relay is required for the amplifier.
 
 ## Power Distribution
@@ -302,8 +298,8 @@ The approved low-voltage controller path is:
   correctly sized ferrules at screw and lever terminals.
 - **No dedicated 6 V/6.3 V lighting rail** is required or planned.
 - The WiiM Pro remains continuously powered and uses its own automatic standby.
-- The Fosi ZA3 PSU may remain energised; the amplifier state is controlled by H6
-  via its 12 V trigger input.
+- The Fosi ZA3 PSU may remain energised; the amplifier state is controlled by the
+  direct WiiM-to-ZA3 H6 trigger connection.
 - The single-mains-lead cabinet arrangement is an active implementation using an
   acquired IEC C14 inlet, an ordered UK C13 lead and an ordered enclosed
   Masterplug four-gang distribution block. The Rev B mounting plate is the only

@@ -3,8 +3,9 @@
 ## Status
 Accepted
 
-The lighting-transition details are superseded by ADR-0017. The audio,
-amplifier and system power-control decisions remain accepted.
+The lighting-transition details are superseded by ADR-0017. The custom ESP32
+trigger-driver details are superseded by ADR-0018. The audio, amplifier and
+system power-control decisions remain accepted.
 
 ## Context
 ADR-0008 locked the audio architecture as WiiM Pro feeding a separate stereo

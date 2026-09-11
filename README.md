@@ -8,8 +8,9 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Firmware version: **v0.27.4**, defined once in `src/version.h`, shown during
-  cold-start/OTA-reboot and reported over serial for deployment identification.
+- Installed firmware is **v0.27.4**. The Phase 2 branch advances the source
+  identifier to **v0.28.0**; it is not a deployed release until build, OTA and
+  physical acceptance gates pass.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
@@ -20,6 +21,9 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   but the retained physical switch is faulty and remains open as HW-SW-01.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
+- The Phase 2 WiiM module is implemented as a background HTTPS worker for source,
+  volume, power-state and metadata coordination. Live identity and idle-player
+  probes pass; active TIDAL and OTA acceptance remain open.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
