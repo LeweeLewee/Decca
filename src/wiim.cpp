@@ -17,7 +17,6 @@
 namespace decca::wiim {
 namespace {
 
-constexpr uint8_t kMaximumVolumeCommandStep = 2;
 #ifndef PIO_UNIT_TESTING
 constexpr char kPlayerStatusCommand[] = "getPlayerStatus";
 constexpr char kMetadataCommand[] = "getMetaInfo";
@@ -104,18 +103,6 @@ Playback playbackFrom(const char* value) {
     return Playback::None;
 }
 
-uint8_t nextVolumeCommandValue(uint8_t current, uint8_t target,
-                               bool currentKnown) {
-    if (!currentKnown) return target;
-    if (target > current && (target - current) > kMaximumVolumeCommandStep) {
-        return current + kMaximumVolumeCommandStep;
-    }
-    if (current > target && (current - target) > kMaximumVolumeCommandStep) {
-        return current - kMaximumVolumeCommandStep;
-    }
-    return target;
-}
-
 bool parsePlayer(const char* json, Snapshot& output) {
     if (!hasText(json)) return false;
     StaticJsonDocument<1536> document;
@@ -164,19 +151,14 @@ const char* commandForSource(settings::Source source) {
 }
 
 #ifndef PIO_UNIT_TESTING
-bool request(const char* command, char* response, size_t responseCapacity) {
+bool request(WiFiClientSecure& client, HTTPClient& http, const char* command,
+             char* response, size_t responseCapacity) {
     char url[192];
     const int length = snprintf(url, sizeof(url),
                                 "https://%s/httpapi.asp?command=%s",
                                 DECCA_WIIM_HOST, command);
     if (length <= 0 || static_cast<size_t>(length) >= sizeof(url)) return false;
 
-    WiFiClientSecure client;
-    client.setInsecure();
-    client.setTimeout(kRequestTimeoutMs);
-    HTTPClient http;
-    http.setConnectTimeout(kRequestTimeoutMs);
-    http.setTimeout(kRequestTimeoutMs);
     if (!http.begin(client, url)) return false;
     const int statusCode = http.GET();
     if (statusCode != HTTP_CODE_OK) {
@@ -205,8 +187,14 @@ void worker(void*) {
     uint32_t lastMetadataPollMs = 0;
     uint32_t lastFailureMs = 0;
     uint8_t consecutiveFailures = 0;
-    bool volumeKnown = false;
     char response[3072];
+    WiFiClientSecure client;
+    client.setInsecure();
+    client.setTimeout(kRequestTimeoutMs);
+    HTTPClient http;
+    http.setConnectTimeout(kRequestTimeoutMs);
+    http.setTimeout(kRequestTimeoutMs);
+    http.setReuse(true);
 
     for (;;) {
         if (WiFi.status() != WL_CONNECTED) {
@@ -241,7 +229,7 @@ void worker(void*) {
 
         bool success = true;
         if (powerDirty && !requestedPowerOn) {
-            success = request("setPlayerCmd:stop", nullptr, 0);
+            success = request(client, http, "setPlayerCmd:stop", nullptr, 0);
             if (success) {
                 portENTER_CRITICAL(&g_mux);
                 if (!g_requestedPowerOn) g_powerDirty = false;
@@ -261,39 +249,35 @@ void worker(void*) {
             g_workerSnapshot.title[0] = '\0';
             g_workerSnapshot.artist[0] = '\0';
         } else if (sourceDirty) {
-            success = request(commandForSource(requestedSource), nullptr, 0);
+            success = request(client, http, commandForSource(requestedSource),
+                              nullptr, 0);
             if (success) {
                 portENTER_CRITICAL(&g_mux);
                 if (requestedSource == g_requestedSource) g_sourceDirty = false;
                 portEXIT_CRITICAL(&g_mux);
             }
         } else if (volumeDirty) {
-            const uint8_t commandVolume = nextVolumeCommandValue(
-                g_workerSnapshot.volume, requestedVolume, volumeKnown);
             char command[32];
             snprintf(command, sizeof(command), "setPlayerCmd:vol:%u",
-                     static_cast<unsigned>(commandVolume));
-            success = request(command, nullptr, 0);
+                     static_cast<unsigned>(requestedVolume));
+            success = request(client, http, command, nullptr, 0);
             if (success) {
-                g_workerSnapshot.volume = commandVolume;
-                volumeKnown = true;
                 portENTER_CRITICAL(&g_mux);
-                g_volumeDirty = g_requestedVolume != commandVolume;
+                if (requestedVolume == g_requestedVolume) g_volumeDirty = false;
                 portEXIT_CRITICAL(&g_mux);
             }
         } else if ((now - lastPlayerPollMs) >= kPlayerPollIntervalMs) {
             response[0] = '\0';
-            success = request(kPlayerStatusCommand, response, sizeof(response)) &&
+            success = request(client, http, kPlayerStatusCommand, response,
+                              sizeof(response)) &&
                       parsePlayer(response, g_workerSnapshot);
-            if (success) {
-                lastPlayerPollMs = now;
-                volumeKnown = true;
-            }
+            if (success) lastPlayerPollMs = now;
         } else if ((g_workerSnapshot.playback == Playback::Playing ||
                     g_workerSnapshot.playback == Playback::Paused) &&
                    (now - lastMetadataPollMs) >= kMetadataPollIntervalMs) {
             response[0] = '\0';
-            success = request(kMetadataCommand, response, sizeof(response));
+            success = request(client, http, kMetadataCommand, response,
+                              sizeof(response));
             if (success && hasText(response)) {
                 success = parseMeta(response, g_workerSnapshot);
             }
@@ -409,10 +393,6 @@ bool parseMetadata(const char* json, Snapshot& output) {
 }
 const char* sourceCommand(settings::Source source) {
     return commandForSource(source);
-}
-uint8_t nextVolumeCommand(uint8_t current, uint8_t target,
-                          bool currentKnown) {
-    return nextVolumeCommandValue(current, target, currentKnown);
 }
 }  // namespace testing
 #endif

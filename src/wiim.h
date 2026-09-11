@@ -71,8 +71,6 @@ void reset();
 bool parsePlayerStatus(const char* json, Snapshot& output);
 bool parseMetadata(const char* json, Snapshot& output);
 const char* sourceCommand(settings::Source source);
-uint8_t nextVolumeCommand(uint8_t current, uint8_t target,
-                          bool currentKnown);
 }
 #endif
 
