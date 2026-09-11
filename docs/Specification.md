@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.0 implements Phase 2 WiiM Pro HTTPS control in a background worker, using the physically verified VHF and volume inputs without blocking local control. Live identity, idle player and active TIDAL metadata responses were captured on 2026-09-11; source/volume commands, OTA deployment and end-to-end audio/trigger behaviour remain physical acceptance gates. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Status   | Draft. Firmware v0.28.0 from source commit `56f64f4` is installed by authenticated OTA. WiiM-only source, bounded-step volume, metadata, logical-power and outage-recovery acceptance passed on 2026-09-11. The unique controller mDNS name and ZA3-dependent audio, channel, noise and trigger gates remain open. Phase 1 lighting and retained-switch issues remain tracked separately. |
 | Version  | 0.28.0                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
@@ -247,6 +247,16 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
   artist through both hex player fields and plain-text `getMetaInfo` fields.
   The published mode table is not used to identify TIDAL because this live
   firmware reports mode 10 rather than the documented historical mode 32.
+- **Confirmed 2026-09-11:** v0.28.0 from source commit `56f64f4` built at
+  52,328 bytes RAM (16.0%) and 1,017,057 bytes flash (77.6%); all nine target
+  suites compiled, authenticated OTA passed and the controller returned without
+  USB intervention. Live tests passed both source directions, matching OLED
+  metadata/play state, bounded two-point volume/app reflection, logical
+  standby/resume and persistent outage/recovery behavior.
+- **Open:** the streamer and controller advertise the same mDNS label. Recovery
+  passed by reserved address; assign the controller a unique hostname. The ZA3
+  is not connected, so audible digital/vinyl, channel, noise and trigger gates
+  are not tested.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.

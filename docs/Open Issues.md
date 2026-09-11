@@ -76,10 +76,9 @@ pass, all eight on-target suites compile without upload or execution,
 authenticated OTA succeeded and the device returned on the network. Physical
 transition verification remains pending.
 
-**Device state:** the installed image is firmware v0.27.4 built from commit
-`19c16b6`, using GPIO18 PWM at 1 kHz and an 85% / duty 217 target. Its
-authenticated OTA upload succeeded in 57.956 seconds and the device returned at
-`decca.local` / `192.168.1.79`.
+**Device state:** the installed image is firmware v0.28.0 from source commit
+`56f64f4`. It retains GPIO18 PWM at 1 kHz and the 85% / duty 217 target.
+Authenticated OTA and controller network return passed on 2026-09-11.
 
 **Acceptance required to close:**
 
@@ -101,12 +100,14 @@ authenticated OTA upload succeeded in 57.956 seconds and the device returned at
 
 ## FW-WIM-01 — Accept Phase 2 WiiM integration
 
-**Status:** OPEN — WiiM Pro acquired and network verified. Live HTTPS identity,
-idle-player and active TIDAL metadata probes passed on 2026-09-11. Active
-playback returned matching hex and structured title/artist fields, `mode=10`,
-`vendor=Tidal`, 96 kHz and status play. The audio-output-mode endpoint returned
-no visible body and remains a WiiM Home configuration/physical check. Firmware
-v0.28.0 is not yet built, deployed or physically accepted.
+**Status:** OPEN — firmware v0.28.0 from source commit `56f64f4` is installed by
+authenticated OTA. WiiM-only control acceptance passed on 2026-09-11: both
+source directions, bounded-step volume and app reflection, active metadata,
+logical standby/resume, persistent offline indication and automatic recovery.
+The issue remains open because the ZA3 is not connected, so audio, channel,
+noise and direct-trigger behavior are not tested. The streamer and controller
+also advertise the same mDNS label; controller recovery currently relies on its
+reserved address until a unique controller hostname is assigned.
 
 **WiiM Home configuration confirmed 2026-09-11:** analogue Line Out path,
 Fixed Volume Output off, 2 Vrms line level, EQ off, Auto Headroom on, stereo,
@@ -116,20 +117,23 @@ balance centred and a temporary 70% commissioning volume limit.
 
 1. **Passed:** captured live `getPlayerStatus` and `getMetaInfo` during active
    TIDAL playback; sanitised fixtures decode Jolene / Dolly Parton correctly.
-2. Build the release and all nine suites from a trusted toolchain; do not accept
-   the checksum-failed PlatformIO package download observed in the Work session.
-3. Add `DECCA_WIIM_HOST` to local `src/secrets.h`, build the credential-enabled
-   OTA target and deploy v0.28.0.
-4. Verify VHF selects the Wi-Fi/digital path and every released-VHF position
-   selects WiiM Line-In.
-5. Verify the Decca volume pot controls WiiM 0–100 smoothly without command
-   chatter, including safe start level and application reflection.
-6. Verify logical OFF stops playback while local lights/display still obey their
-   existing behaviour, and ON restores source/volume without hard-cycling WiiM.
-7. Disconnect/reconnect the network and confirm local controls remain responsive,
-   the unavailable message appears once, and control recovers automatically.
-8. After the ZA3 arrives, verify RCA left/right audio and the direct WiiM-to-ZA3
-   trigger wake/standby behaviour under ADR-0018.
+2. **Passed:** credential-enabled release built at 52,328 bytes RAM (16.0%) and
+   1,017,057 bytes flash (77.6%); all nine on-target suites compiled successfully.
+3. **Passed:** authenticated OTA installed v0.28.0 and the controller returned
+   without USB intervention. Private configuration remained ignored/uncommitted.
+4. **Passed:** VHF selected the Wi-Fi/digital path; released VHF selected Line-In;
+   returning to VHF restored network control.
+5. **Passed:** the Decca volume pot controlled WiiM monotonically with application
+   reflection. An observed five-point coalesced jump was corrected to a maximum
+   two-point acknowledged step, with no read errors or chatter in the retest.
+6. **Passed (WiiM/controller):** logical OFF stopped playback; ON restored the
+   selected source and volume without restarting or reflashing the controller.
+7. **Passed by reserved address:** outage warning remained visible throughout the
+   confirmed outage and cleared automatically after recovery. Assign a unique
+   controller mDNS hostname before closing the hostname-specific recovery gate.
+8. **Not tested:** after the ZA3 is connected, verify audible digital and vinyl,
+   RCA left/right channels, noise and direct WiiM-to-ZA3 trigger behavior under
+   ADR-0018.
 
 ## MECH-HSG-01 — Complete ESP32 housing prototype acceptance
 

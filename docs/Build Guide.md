@@ -57,7 +57,7 @@ if (-not (Test-Path src\secrets.h)) {
 notepad src\secrets.h
 ```
 
-Replace the three placeholders locally. Use a long unique OTA password. Never
+Replace the four placeholders locally. Use a long unique OTA password. Never
 commit, paste into chat or publish `src/secrets.h`; it is gitignored.
 
 ### 5.3 Test and flash once by USB
@@ -119,6 +119,13 @@ complete.
 The dual application slots protect against interrupted or rejected transfers.
 Automatic rollback after a fully received image fails to boot remains a Phase 3
 hardening item, so preserve a practical USB recovery route even after OTA passes.
+
+Recorded result (2026-09-11): firmware v0.28.0 from source commit `56f64f4`
+passed the credential-enabled build and authenticated OTA. One upload interrupted
+while the controller was also polling the WiiM; the previous image remained
+bootable, and the retry completed with the WiiM temporarily powered off. The
+streamer and controller currently share an mDNS label, so the commissioning
+upload used the controller's reserved address without recording it in Git.
 
 ## 6. First Power-On
 - Bring-up checklist
