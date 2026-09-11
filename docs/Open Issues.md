@@ -108,6 +108,10 @@ playback returned matching hex and structured title/artist fields, `mode=10`,
 no visible body and remains a WiiM Home configuration/physical check. Firmware
 v0.28.0 is not yet built, deployed or physically accepted.
 
+**WiiM Home configuration confirmed 2026-09-11:** analogue Line Out path,
+Fixed Volume Output off, 2 Vrms line level, EQ off, Auto Headroom on, stereo,
+balance centred and a temporary 70% commissioning volume limit.
+
 **Acceptance required:**
 
 1. **Passed:** captured live `getPlayerStatus` and `getMetaInfo` during active
