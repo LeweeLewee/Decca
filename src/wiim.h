@@ -13,7 +13,10 @@ namespace decca::wiim {
 
 constexpr uint32_t kPlayerPollIntervalMs = 1000;
 constexpr uint32_t kMetadataPollIntervalMs = 2000;
-constexpr uint16_t kRequestTimeoutMs = 750;
+// TLS setup on the ESP32 can be materially slower than the same request from a
+// PC, especially immediately after Wi-Fi reconnect.  The worker runs off the
+// coordinator core, so this allowance does not block local controls or OTA.
+constexpr uint16_t kRequestTimeoutMs = 3000;
 constexpr uint8_t kTitleCapacity = 32;
 constexpr uint8_t kArtistCapacity = 24;
 
@@ -68,6 +71,8 @@ void reset();
 bool parsePlayerStatus(const char* json, Snapshot& output);
 bool parseMetadata(const char* json, Snapshot& output);
 const char* sourceCommand(settings::Source source);
+uint8_t nextVolumeCommand(uint8_t current, uint8_t target,
+                          bool currentKnown);
 }
 #endif
 

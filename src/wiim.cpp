@@ -17,13 +17,18 @@
 namespace decca::wiim {
 namespace {
 
+constexpr uint8_t kMaximumVolumeCommandStep = 2;
 #ifndef PIO_UNIT_TESTING
 constexpr char kPlayerStatusCommand[] = "getPlayerStatus";
 constexpr char kMetadataCommand[] = "getMetaInfo";
 constexpr uint32_t kWorkerDelayMs = 25;
 constexpr uint32_t kRetryIntervalMs = 2000;
+constexpr uint8_t kFailureThreshold = 3;
 constexpr uint8_t kWorkerCore = 0;
-constexpr uint16_t kWorkerStackBytes = 8192;
+// HTTPS requests, the response buffer and ArduinoJson parsing overlap on this
+// task's stack.  Eight KiB resets the installed ESP32 during the first live
+// request, so retain explicit headroom for the TLS/HTTP call chain.
+constexpr uint16_t kWorkerStackBytes = 16384;
 #endif
 
 Snapshot g_publicSnapshot;
@@ -97,6 +102,18 @@ Playback playbackFrom(const char* value) {
     if (std::strcmp(value, "loading") == 0) return Playback::Loading;
     if (std::strcmp(value, "stop") == 0) return Playback::Stopped;
     return Playback::None;
+}
+
+uint8_t nextVolumeCommandValue(uint8_t current, uint8_t target,
+                               bool currentKnown) {
+    if (!currentKnown) return target;
+    if (target > current && (target - current) > kMaximumVolumeCommandStep) {
+        return current + kMaximumVolumeCommandStep;
+    }
+    if (current > target && (current - target) > kMaximumVolumeCommandStep) {
+        return current - kMaximumVolumeCommandStep;
+    }
+    return target;
 }
 
 bool parsePlayer(const char* json, Snapshot& output) {
@@ -187,6 +204,8 @@ void worker(void*) {
     uint32_t lastPlayerPollMs = 0;
     uint32_t lastMetadataPollMs = 0;
     uint32_t lastFailureMs = 0;
+    uint8_t consecutiveFailures = 0;
+    bool volumeKnown = false;
     char response[3072];
 
     for (;;) {
@@ -198,7 +217,7 @@ void worker(void*) {
         }
 
         const uint32_t now = millis();
-        if (g_workerSnapshot.status == Status::Error &&
+        if (consecutiveFailures > 0U &&
             (now - lastFailureMs) < kRetryIntervalMs) {
             vTaskDelay(pdMS_TO_TICKS(kWorkerDelayMs));
             continue;
@@ -249,20 +268,27 @@ void worker(void*) {
                 portEXIT_CRITICAL(&g_mux);
             }
         } else if (volumeDirty) {
+            const uint8_t commandVolume = nextVolumeCommandValue(
+                g_workerSnapshot.volume, requestedVolume, volumeKnown);
             char command[32];
             snprintf(command, sizeof(command), "setPlayerCmd:vol:%u",
-                     static_cast<unsigned>(requestedVolume));
+                     static_cast<unsigned>(commandVolume));
             success = request(command, nullptr, 0);
             if (success) {
+                g_workerSnapshot.volume = commandVolume;
+                volumeKnown = true;
                 portENTER_CRITICAL(&g_mux);
-                if (requestedVolume == g_requestedVolume) g_volumeDirty = false;
+                g_volumeDirty = g_requestedVolume != commandVolume;
                 portEXIT_CRITICAL(&g_mux);
             }
         } else if ((now - lastPlayerPollMs) >= kPlayerPollIntervalMs) {
             response[0] = '\0';
             success = request(kPlayerStatusCommand, response, sizeof(response)) &&
                       parsePlayer(response, g_workerSnapshot);
-            if (success) lastPlayerPollMs = now;
+            if (success) {
+                lastPlayerPollMs = now;
+                volumeKnown = true;
+            }
         } else if ((g_workerSnapshot.playback == Playback::Playing ||
                     g_workerSnapshot.playback == Playback::Paused) &&
                    (now - lastMetadataPollMs) >= kMetadataPollIntervalMs) {
@@ -275,14 +301,23 @@ void worker(void*) {
         }
 
         if (success) {
+            consecutiveFailures = 0;
             g_workerSnapshot.status = Status::Ready;
         } else {
-            g_workerSnapshot.status = Status::Error;
+            if (consecutiveFailures < kFailureThreshold) {
+                ++consecutiveFailures;
+            }
+            g_workerSnapshot.status =
+                consecutiveFailures >= kFailureThreshold
+                    ? Status::Error
+                    : Status::Connecting;
             lastFailureMs = now;
             portENTER_CRITICAL(&g_mux);
             g_sourceDirty = true;
             g_volumeDirty = true;
-            g_powerDirty = true;
+            // ON recovery is source/volume reassertion; only a failed OFF stop
+            // command needs the power request itself retried.
+            g_powerDirty = !g_requestedPowerOn;
             portEXIT_CRITICAL(&g_mux);
         }
         publishWorkerSnapshot();
@@ -374,6 +409,10 @@ bool parseMetadata(const char* json, Snapshot& output) {
 }
 const char* sourceCommand(settings::Source source) {
     return commandForSource(source);
+}
+uint8_t nextVolumeCommand(uint8_t current, uint8_t target,
+                          bool currentKnown) {
+    return nextVolumeCommandValue(current, target, currentKnown);
 }
 }  // namespace testing
 #endif

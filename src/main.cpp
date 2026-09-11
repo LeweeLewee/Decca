@@ -20,7 +20,10 @@ decca::buttons::SourceMode g_sourceMode =
     decca::buttons::SourceMode::DigitalStreamer;
 uint16_t g_potValues[4]{};
 constexpr uint16_t kControlPresentationDeadband = 5;
+constexpr uint32_t kStreamerUnavailableRefreshMs = 1000;
 decca::wiim::Status g_lastWiimStatus = decca::wiim::Status::Disabled;
+uint32_t g_lastStreamerUnavailableRefreshMs = 0;
+bool g_streamerUnavailablePresented = false;
 decca::wiim::Playback g_lastPlayback = decca::wiim::Playback::None;
 char g_lastTitle[decca::wiim::kTitleCapacity + 1]{};
 char g_lastArtist[decca::wiim::kArtistCapacity + 1]{};
@@ -131,12 +134,25 @@ void applyWiimState() {
         std::strncmp(snapshot.artist, g_lastArtist, sizeof(g_lastArtist)) != 0 ||
         g_viewState.source != g_lastWiimDisplaySource;
 
-    if (statusChanged) {
-        if (snapshot.status == decca::wiim::Status::Error &&
-            g_lastWiimStatus != decca::wiim::Status::Error &&
-            g_viewState.power == decca::display::PowerState::On) {
+    const bool streamerUnavailable =
+        snapshot.status == decca::wiim::Status::Error &&
+        g_viewState.power == decca::display::PowerState::On;
+    if (streamerUnavailable) {
+        const uint32_t now = millis();
+        if (!g_streamerUnavailablePresented ||
+            (now - g_lastStreamerUnavailableRefreshMs) >=
+                kStreamerUnavailableRefreshMs) {
             decca::display::showStatus("STREAMER UNAVAILABLE");
+            g_lastStreamerUnavailableRefreshMs = now;
+            g_streamerUnavailablePresented = true;
         }
+    } else {
+        // Once communication recovers, stop extending the transient. The
+        // display returns to its current dashboard without a forced redraw.
+        g_streamerUnavailablePresented = false;
+    }
+
+    if (statusChanged) {
         g_lastWiimStatus = snapshot.status;
     }
 

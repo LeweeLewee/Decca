@@ -86,6 +86,22 @@ void test_source_commands_match_locked_two_state_mapping() {
         decca::wiim::testing::sourceCommand(decca::settings::Source::Vinyl));
 }
 
+void test_volume_command_uses_target_when_current_value_is_unknown() {
+    TEST_ASSERT_EQUAL_UINT8(
+        70, decca::wiim::testing::nextVolumeCommand(0, 70, false));
+}
+
+void test_volume_command_slews_towards_target_by_at_most_two_points() {
+    TEST_ASSERT_EQUAL_UINT8(
+        32, decca::wiim::testing::nextVolumeCommand(30, 50, true));
+    TEST_ASSERT_EQUAL_UINT8(
+        28, decca::wiim::testing::nextVolumeCommand(30, 10, true));
+    TEST_ASSERT_EQUAL_UINT8(
+        31, decca::wiim::testing::nextVolumeCommand(30, 31, true));
+    TEST_ASSERT_EQUAL_UINT8(
+        29, decca::wiim::testing::nextVolumeCommand(30, 29, true));
+}
+
 void runAll() {
     RUN_TEST(test_parses_live_idle_player_response);
     RUN_TEST(test_parses_live_tidal_player_and_hex_fallback);
@@ -93,4 +109,6 @@ void runAll() {
     RUN_TEST(test_empty_idle_metadata_is_rejected_without_destroying_snapshot);
     RUN_TEST(test_stopped_player_clears_stale_metadata);
     RUN_TEST(test_source_commands_match_locked_two_state_mapping);
+    RUN_TEST(test_volume_command_uses_target_when_current_value_is_unknown);
+    RUN_TEST(test_volume_command_slews_towards_target_by_at_most_two_points);
 }
