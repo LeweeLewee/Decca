@@ -120,12 +120,14 @@ The dual application slots protect against interrupted or rejected transfers.
 Automatic rollback after a fully received image fails to boot remains a Phase 3
 hardening item, so preserve a practical USB recovery route even after OTA passes.
 
-Recorded result (2026-09-11): firmware v0.28.0 from source commit `56f64f4`
+Recorded result (2026-09-12): firmware v0.28.0 from source commit `d06e357`
 passed the credential-enabled build and authenticated OTA. One upload interrupted
 while the controller was also polling the WiiM; the previous image remained
 bootable, and the retry completed with the WiiM temporarily powered off. The
 streamer and controller currently share an mDNS label, so the commissioning
 upload used the controller's reserved address without recording it in Git.
+The installed build reuses its secure WiiM connection for direct absolute-volume
+commands; exact 10%, 20% and 30% setpoints were confirmed in WiiM Home.
 
 ## 6. First Power-On
 - Bring-up checklist

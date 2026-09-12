@@ -8,7 +8,7 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Installed firmware is **v0.28.0** from source commit `56f64f4`, deployed by
+- Installed firmware is **v0.28.0** from source commit `d06e357`, deployed by
   authenticated OTA. WiiM-only source, metadata, volume, standby/resume and
   network-recovery acceptance passed; audio, channel, noise and trigger gates
   remain deferred until the ZA3 is connected.
@@ -23,7 +23,8 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
 - The Phase 2 WiiM module is implemented as a background HTTPS worker for source,
-  bounded-step volume, power-state and metadata coordination. Live source,
+  direct absolute volume over a reusable connection, power-state and metadata
+  coordination. Live source,
   volume, active TIDAL metadata, logical-power and outage-recovery checks pass.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while

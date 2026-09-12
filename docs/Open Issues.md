@@ -77,8 +77,8 @@ authenticated OTA succeeded and the device returned on the network. Physical
 transition verification remains pending.
 
 **Device state:** the installed image is firmware v0.28.0 from source commit
-`56f64f4`. It retains GPIO18 PWM at 1 kHz and the 85% / duty 217 target.
-Authenticated OTA and controller network return passed on 2026-09-11.
+`d06e357`. It retains GPIO18 PWM at 1 kHz and the 85% / duty 217 target.
+Authenticated OTA and controller network return passed on 2026-09-12.
 
 **Acceptance required to close:**
 
@@ -100,9 +100,9 @@ Authenticated OTA and controller network return passed on 2026-09-11.
 
 ## FW-WIM-01 — Accept Phase 2 WiiM integration
 
-**Status:** OPEN — firmware v0.28.0 from source commit `56f64f4` is installed by
-authenticated OTA. WiiM-only control acceptance passed on 2026-09-11: both
-source directions, bounded-step volume and app reflection, active metadata,
+**Status:** OPEN — firmware v0.28.0 from source commit `d06e357` is installed by
+authenticated OTA. WiiM-only control acceptance passed on 2026-09-12: both
+source directions, direct absolute volume and app reflection, active metadata,
 logical standby/resume, persistent offline indication and automatic recovery.
 The issue remains open because the ZA3 is not connected, so audio, channel,
 noise and direct-trigger behavior are not tested. The streamer and controller
@@ -118,14 +118,17 @@ balance centred and a temporary 70% commissioning volume limit.
 1. **Passed:** captured live `getPlayerStatus` and `getMetaInfo` during active
    TIDAL playback; sanitised fixtures decode Jolene / Dolly Parton correctly.
 2. **Passed:** credential-enabled release built at 52,328 bytes RAM (16.0%) and
-   1,017,057 bytes flash (77.6%); all nine on-target suites compiled successfully.
+   1,017,193 bytes flash (77.6%); all nine on-target suites compiled successfully.
 3. **Passed:** authenticated OTA installed v0.28.0 and the controller returned
    without USB intervention. Private configuration remained ignored/uncommitted.
 4. **Passed:** VHF selected the Wi-Fi/digital path; released VHF selected Line-In;
    returning to VHF restored network control.
-5. **Passed:** the Decca volume pot controlled WiiM monotonically with application
-   reflection. An observed five-point coalesced jump was corrected to a maximum
-   two-point acknowledged step, with no read errors or chatter in the retest.
+5. **Passed:** the Decca volume pot sends the mapped absolute 0–100 target to the
+   WiiM over a reusable HTTPS connection. Exact 10%, 20% and 30% setpoints matched
+   in WiiM Home; 20% to 30% completed in about 2.2 seconds total and the owner
+   confirmed the final response was much more responsive. The rejected
+   intermediate two-point slew had turned a ten-point move into five delayed
+   steps and is not present in the installed build.
 6. **Passed (WiiM/controller):** logical OFF stopped playback; ON restored the
    selected source and volume without restarting or reflashing the controller.
 7. **Passed by reserved address:** outage warning remained visible throughout the
