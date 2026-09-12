@@ -29,11 +29,12 @@ AI-assisted editing.
 | `display`  | OLED rendering and idle pixel protection          | `hardware`, `settings`|
 | `lighting` | Warm dial illumination (immediate PWM via MOSFET) | `hardware` |
 | `power`    | Pure logical on/standby state handling           | —                     |
-| WiiM iface | WiiM Pro local-API control *(Phase 2)*           | `settings`, Wi-Fi     |
+| `wiim`     | WiiM Pro local-HTTPS control and status worker   | `settings`, Wi-Fi     |
 | `ota`      | Authenticated Wi-Fi firmware update service      | Wi-Fi                 |
 
-> The WiiM interface remains a later Phase 2 module. `power` and `ota` are
-> implemented in `src/` and active in the production runtime.
+> The WiiM interface is implemented for Phase 2. Network requests run on a
+> dedicated core-0 worker so local inputs, lighting, display and OTA coordination
+> remain responsive when the streamer is slow or unavailable.
 
 ### Module notes (confirmed Phase 1 build)
 
@@ -88,6 +89,13 @@ AI-assisted editing.
 - **`power`** owns only the requested logical state. It converts the debounced
   on/off request supplied by `main` into On or Standby and reports transitions;
   it owns no GPIO and does not call display, lighting or network modules.
+- **`wiim`** maps VHF to `switchmode:wifi`, released VHF to
+  `switchmode:line-in`, the volume pot to 0-100 WiiM volume, and logical OFF to
+  `stop`. It polls player state and active metadata over local HTTPS. Its worker
+  owns all potentially blocking network operations; `main` exchanges only
+  fixed-size requests and snapshots through short critical sections. Missing
+  metadata falls back to the mapped function, and network failure never blocks
+  local control.
 
 ## Data Flow
 
@@ -125,7 +133,7 @@ Modules add a small number of typed accessors (e.g. `buttons::nextEvent()`,
 
 - **Phase 1 (Local control):** `hardware`, `settings`, `buttons`, `pots`,
   `display`, `lighting`; authenticated `ota` is brought forward before enclosure.
-- **Phase 2 (WiiM):** add the WiiM interface module; VHF selects digital playback,
+- **Phase 2 (WiiM):** the WiiM interface module makes VHF select digital playback,
   released VHF selects Line-In for Vinyl, and the phone controls digital
   content. Volume and metadata route through `settings`.
 - **Phase 3 (Advanced):** configuration menus, automatic post-boot OTA rollback
