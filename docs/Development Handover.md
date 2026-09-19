@@ -1,6 +1,6 @@
 # Development Handover
 
-> **Last updated:** 2026-09-12
+> **Last updated:** 2026-09-19
 > **Repository:** `LeweeLewee/Decca`  
 > **Authoritative branch:** `main`
 
@@ -27,9 +27,9 @@ The production `src/main.cpp` initialises the safe board state, buttons, logical
 power, display, lighting and authenticated ArduinoOTA. It continuously services
 the original on/off switch, pots, VHF source, Stereo/Mono lighting request,
 display and OTA without blocking. Phase 2 WiiM coordination runs on a separate
-core-0 worker. Firmware v0.28.0 from source commit `d06e357` is installed; its
-WiiM-only physical acceptance passed, with audio/trigger gates deferred until
-the ZA3 is connected.
+core-0 worker. Firmware v0.28.0 from source commit `36d84d1` is installed.
+Digital audio, channel routing and direct-trigger acceptance pass; vinyl and the
+formal noise/interference sweep remain open.
 Final lighting hardware acceptance remains open as HW-LGT-01.
 
 Implemented modules:
@@ -112,12 +112,12 @@ Orange and Yellow are signal wires in H4. Neither is a 5 V conductor.
 - OTA logic passed strict host compilation and its five-case harness.
 - USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
   `esp32dev-ota` upload succeeded and the rebooted ESP32 reported
-  `[OTA] ready at 192.168.1.79 (decca.local)`.
+  `[OTA] ready at 192.168.x.x (decca.local)`.
 - The accepted controls/source/display `esp32dev` release build passed and all
   eight on-target suites passed 53/53 tests on 2026-08-30 (buttons 9, display 15,
   hardware 3, lighting 7, OTA 5, pots 6, power 5 and settings 3). Production
   firmware was restored by USB; serial reported `[POWER] state=ON` and
-  `[OTA] ready at 192.168.1.79 (decca.local)`.
+  `[OTA] ready at 192.168.x.x (decca.local)`.
 - After the previous TX2/GPIO17 Stereo/Mono integration, the release build
   passed and all eight
   on-target suites passed 55/55 (buttons 11, display 15, hardware 3, lighting 7,
@@ -136,7 +136,7 @@ results explicitly.
 
 USB-to-OTA physical acceptance **passed on 2026-08-30**. The authenticated
 `esp32dev-ota` upload succeeded and, after reboot, serial reported
-`[OTA] ready at 192.168.1.79 (decca.local)`. The procedure is retained below for
+`[OTA] ready at 192.168.x.x (decca.local)`. The procedure is retained below for
 future controller replacement or recovery.
 
 On the user's Windows machine, `pio` is not currently on PATH. Use the
@@ -211,7 +211,7 @@ the user's Wi-Fi or OTA passwords.
 10. **Deployed, physical verification pending (v0.27.4):** the fade engine is
     removed. After the 25 ms debounce, Stereo applies duty 217 immediately and
     Mono applies duty 0 immediately; power transitions are also immediate.
-    Authenticated OTA succeeded and `decca.local` returned at `192.168.1.79`.
+    Authenticated OTA succeeded and the controller returned at its reserved address.
 11. **Deployed, WiiM-only acceptance passed (v0.28.0):** source commit `d06e357`
     is installed by authenticated OTA. VHF/Line-In mapping, active metadata,
     direct absolute volume/app reflection, logical-OFF stop, resume, persistent
@@ -219,7 +219,15 @@ the user's Wi-Fi or OTA passwords.
     setpoints matched in WiiM Home; the owner confirmed the final response was
     much more responsive. The streamer/controller
     mDNS-label collision and the ZA3-dependent audio/trigger gates remain open.
-12. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+12. **Deployed and trigger-accepted (v0.28.0, 2026-09-19):** source commit
+    `36d84d1` adds a safe one-step downward volume pulse on logical power-on,
+    followed by immediate restoration to the requested value. This wakes the
+    WiiM and ZA3 even when a stopped TIDAL Connect session cannot be resumed by
+    the local transport API. Authenticated OTA reached 100%, the controller
+    returned, 30-second trigger standby passed and switch-only wake passed.
+    Digital audio and left/right routing pass; vinyl and the formal noise sweep
+    remain open.
+13. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -228,9 +236,9 @@ the user's Wi-Fi or OTA passwords.
 `docs/Parts List.md` and the CSV BOMs for procurement detail. Immediate open
 items are the ordered WAGO 221-415 distribution-connector pack and final DFR0457
 immediate-transition, pot-stability, temperature, current and holder checks.
-Phase 2 items remain the unique controller mDNS name plus direct WiiM-to-ZA3
-trigger, audio, channel and noise verification after the ZA3 and final audio
-interconnects are connected. The WiiM Pro control path is commissioned.
+Phase 2 items are the unique controller mDNS name, vinyl playback and the formal
+noise/interference sweep. Digital audio, channel routing and the direct
+WiiM-to-ZA3 trigger are commissioned.
 
 ## Mechanical status
 
@@ -274,20 +282,23 @@ Treat the live main branch and those documents as authoritative over chat memory
 
 Immediate priorities: physically verify the immediate v0.28.0 lighting behavior,
 repair the retained Stereo/Mono switch under HW-SW-01 and resolve HW-LGT-01.
-DFR0457 is installed on GPIO18, and firmware v0.28.0 from source commit `d06e357`
+DFR0457 is installed on GPIO18, and firmware v0.28.0 from source commit `36d84d1`
 is running after authenticated OTA and network-return verification. Complete the remaining WAGO installation, pot-stability,
 temperature and current checks at 1 kHz and 85% / duty 217. When delivered, use
 WAGO 221-415 five-way connectors as separate +5 V and common-GND star points.
 The shared 5 V PSU is connected to ESP32 VIN/5V and USB is removed.
 
 The Phase 2 branch contains the installed 85% duty 217 setting. The ESP32's
-installed image is firmware v0.28.0 from source commit `d06e357`; authenticated
+installed image is firmware v0.28.0 from source commit `36d84d1`; authenticated
 OTA and network return passed. Firmware releases use the single version value
 in `src/version.h`; v0.28.0 holds that identifier for 2.2 seconds on the
 cold-start/OTA-reboot screen and retains immediate lighting transitions.
 It coordinates the acquired WiiM Pro in a background worker with a 16 KiB stack,
 three-failure outage hysteresis and direct absolute-volume commands over a
 worker-lifetime reusable HTTPS connection.
+Logical power-on also sends a safe one-step downward volume pulse and restores
+the requested value, producing WiiM/ZA3 trigger activity without starting a
+stopped network stream or exceeding the selected listening level.
 Production coordination covers all four pots,
 VHF-derived source, logical power and display while
 continuously servicing OTA. The OLED dims after 60 s, turns pixels off after

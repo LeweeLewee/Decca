@@ -26,5 +26,10 @@ without improving the user behaviour.
 - The front-panel OFF command stops WiiM playback. WiiM automatic standby and
   trigger behaviour then place the ZA3 into standby; the exact delay is accepted
   by physical test rather than assumed in firmware.
+- Physical acceptance on 2026-09-19 uses a 30-second WiiM standby timer. Because
+  stopped TIDAL Connect transport cannot be resumed by the local API, logical ON
+  creates safe device activity with a one-step downward volume pulse and then
+  restores the requested value. This wakes the direct trigger without starting
+  playback or exceeding the selected level.
 - ADR-0010 remains accepted for amplifier choice, signal path and system-state
   architecture, but its custom-trigger-driver clauses are superseded by this ADR.

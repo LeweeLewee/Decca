@@ -75,14 +75,14 @@ by testing extracted libraries under `lib/`. Not required for Phase 1.
 
 USB-to-OTA physical acceptance passed on 2026-08-30: the authenticated
 `esp32dev-ota` upload succeeded and, after reboot, serial reported
-`[OTA] ready at 192.168.1.79 (decca.local)`. Interrupted-transfer acceptance
+`[OTA] ready at 192.168.x.x (decca.local)`. Interrupted-transfer acceptance
 remains a separate outstanding check.
 
 Full on-target result (2026-08-30): the `esp32dev` release build passed cleanly
 and all seven suites passed on the physical ESP32 — buttons 9/9, display 10/10,
 hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6 and settings 3/3 (43/43 total).
 The production safe-bootstrap image was restored by USB after testing and serial
-reconfirmed `[OTA] ready at 192.168.1.79 (decca.local)`.
+reconfirmed `[OTA] ready at 192.168.x.x (decca.local)`.
 
 Display-refinement increment (2026-08-30): the persistent 180-degree calibration
 frame, calibrated viewport contract, safe content band and retained paused
@@ -93,7 +93,7 @@ startup returns to the accepted standby view while OTA remains continuously
 serviced. The final release build passed and the complete physical run passed
 45/45: buttons 9/9, display 12/12, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6
 and settings 3/3. Production was restored by USB and serial reconfirmed
-`[OTA] ready at 192.168.1.79 (decca.local)`.
+`[OTA] ready at 192.168.x.x (decca.local)`.
 
 Power/protection increment (2026-08-30): GPIO19 was physically accepted in both
 positions and the production coordinator now maps the debounced switch to ON or
@@ -102,7 +102,7 @@ five minutes, and blanks standby after ten seconds; relevant activity wakes it.
 The release build passed and all eight physical suites passed 52/52: buttons
 9/9, display 14/14, hardware 3/3, lighting 7/7, OTA 5/5, pots 6/6, power 5/5 and
 settings 3/3. Production was restored over COM3; serial reported
-`[POWER] state=ON` and `[OTA] ready at 192.168.1.79 (decca.local)`.
+`[POWER] state=ON` and `[OTA] ready at 192.168.x.x (decca.local)`.
 
 Controls/source refinement (2026-08-30): production now samples all four pots
 and the sole VHF state. VHF closed maps to Digital Streamer; VHF open maps to
@@ -132,7 +132,7 @@ constants and now includes compile-time guards against duplicate GPIO allocation
 and use of the project's excluded strapping pins. The production build passed
 and all eight on-target suites compiled in PlatformIO; they were not executed
 because no ESP32 was attached. Firmware v0.27.3 was then uploaded by
-authenticated OTA and returned at `decca.local` / `192.168.1.79`. Owner testing
+authenticated OTA and returned at `decca.local` / its reserved address. Owner testing
 accepted the routing and firmware logic. The retained Stereo/Mono switch fault
 is tracked separately as HW-SW-01.
 
@@ -163,7 +163,7 @@ installed-current checks.
 v0.27.3 deployment result (2026-09-08): the `esp32dev-ota` build passed with
 RAM 49,936 bytes / 15.2% and flash 839,409 bytes / 64.0%. Authenticated OTA of
 commit `0a4d3bd` completed with exit code 0 in 60.527 seconds, and the ESP32
-returned at `decca.local` / `192.168.1.79`. The v0.27.3 screen, GPIO14 on/off,
+returned at `decca.local` / its reserved address. The v0.27.3 screen, GPIO14 on/off,
 GPIO26 VHF, GPIO25 Stereo/Mono firmware logic and GPIO18 lighting path were
 checked. The lamps reached fully on; Mono/off remained blocked by the faulty
 retained switch under HW-SW-01.
@@ -173,7 +173,7 @@ removed. `setBrightness()` now writes every changed duty immediately for
 Stereo/Mono and logical power transitions. The lighting suite now contains six
 cases. The release build passes and all eight on-target suites compile without
 upload or execution. The credential-enabled OTA build passed, authenticated OTA
-succeeded in 57.956 seconds and `decca.local` returned at `192.168.1.79`.
+succeeded in 57.956 seconds and the controller returned at its reserved address.
 Physical acceptance remains pending.
 
 Phase 2 WiiM increment (2026-09-11): `test_wiim` fixes the acquired unit's live

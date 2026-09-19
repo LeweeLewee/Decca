@@ -8,10 +8,10 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Installed firmware is **v0.28.0** from source commit `d06e357`, deployed by
-  authenticated OTA. WiiM-only source, metadata, volume, standby/resume and
-  network-recovery acceptance passed; audio, channel, noise and trigger gates
-  remain deferred until the ZA3 is connected.
+- Installed firmware is **v0.28.0** from source commit `36d84d1`, deployed by
+  authenticated OTA. Digital audio, metadata, volume/app synchronisation,
+  left/right channels, logical standby/resume and direct WiiM-to-ZA3 trigger
+  acceptance pass. Vinyl and the formal control/display noise sweep remain open.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
@@ -24,8 +24,9 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   implemented and independently tested.
 - The Phase 2 WiiM module is implemented as a background HTTPS worker for source,
   direct absolute volume over a reusable connection, power-state and metadata
-  coordination. Live source,
-  volume, active TIDAL metadata, logical-power and outage-recovery checks pass.
+  coordination. Logical power-on sends a safe one-step downward volume pulse,
+  then restores the requested value, so a stopped network session wakes the
+  WiiM trigger without starting playback or exceeding the selected volume.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.

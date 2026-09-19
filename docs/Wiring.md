@@ -263,8 +263,10 @@ installed-holder checks remain open.
 - H6 connects the WiiM Pro **12 V trigger output** directly to the ZA3 trigger
   input using the correct 2.5 mm-to-3.5 mm lead/adaptor (ADR-0018).
 - The ESP32 must **not** connect to, source or sense the trigger voltage.
-- WiiM awake/playback behaviour asserts the trigger and enables the ZA3; WiiM
-  automatic standby removes it. Exact behaviour and delay require bench acceptance.
+- WiiM awake/activity asserts the trigger and enables the ZA3; WiiM automatic
+  standby removes it. Physical acceptance on 2026-09-19 passed with a 30-second
+  WiiM standby timer. Firmware commit `36d84d1` creates safe wake activity with
+  a one-step downward volume pulse and immediately restores the requested value.
 - No ESP32-controlled 230 V mains relay is required for the amplifier.
 
 ## Power Distribution

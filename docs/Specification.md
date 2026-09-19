@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.0 from source commit `d06e357` is installed by authenticated OTA. WiiM-only source, direct absolute volume, metadata, logical-power and outage-recovery acceptance passed on 2026-09-12. The unique controller mDNS name and ZA3-dependent audio, channel, noise and trigger gates remain open. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Status   | Draft. Firmware v0.28.0 from source commit `36d84d1` is installed by authenticated OTA. Digital audio, metadata, volume/app synchronisation, channel, logical-power, direct-trigger and outage-recovery acceptance pass. Vinyl, formal noise/interference and the unique controller mDNS name remain open. Phase 1 lighting and retained-switch issues remain tracked separately. |
 | Version  | 0.28.0                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
@@ -230,7 +230,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - **Confirmed 2026-08-30:** after TX2 Stereo/Mono integration, the release build
   passed and all eight on-target suites passed 55/55 (buttons 11, display 15,
   hardware 3, lighting 7, OTA 5, pots 6, power 5, settings 3).
-- **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.1.79 (decca.local)`.
+- **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.x.x (decca.local)`.
 - Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
 - **Confirmed 2026-08-30:** the final `esp32dev` release build passed cleanly (RAM 49,760 bytes / 15.2%; flash 833,321 bytes / 63.6%).
 
@@ -255,10 +255,16 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
   HTTPS connection, logical standby/resume and persistent outage/recovery
   behavior. Exact 10%, 20% and 30% volume targets matched in WiiM Home, and the
   owner confirmed the final response was much more responsive.
-- **Open:** the streamer and controller advertise the same mDNS label. Recovery
-  passed by reserved address; assign the controller a unique hostname. The ZA3
-  is not connected, so audible digital/vinyl, channel, noise and trigger gates
-  are not tested.
+- **Confirmed 2026-09-19:** v0.28.0 from source commit `36d84d1` built at
+  52,328 bytes RAM (16.0%) and 1,016,977 bytes flash (77.6%), uploaded to 100%
+  by authenticated OTA and returned without USB intervention. Digital TIDAL
+  audio and correct left/right routing pass through the ZA3 and B&W DM601 S3
+  speakers. With WiiM automatic standby set to 30 seconds, OFF removes the
+  direct trigger. ON uses a safe one-step downward volume pulse followed by
+  requested-volume restoration to wake the WiiM and ZA3 without app interaction
+  or automatic playback.
+- **Open:** assign the controller a unique mDNS hostname; verify vinyl and run
+  the formal hum/buzz/clipping/switching-thump/OLED-interference sweep.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.

@@ -33,7 +33,7 @@ pins GPIO0, GPIO2, GPIO5, GPIO12 and GPIO15.
 
 Firmware v0.27.3 at commit `0a4d3bd` implements this map. The build and
 authenticated OTA completed successfully, and the ESP32 returned at
-`decca.local` / `192.168.1.79`. Owner testing accepted the routing and firmware
+`decca.local` / its reserved address. Owner testing accepted the routing and firmware
 logic. The retained Stereo/Mono switch has a separate contact fault tracked as
 HW-SW-01.
 
