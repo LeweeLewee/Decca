@@ -86,6 +86,13 @@ void test_source_commands_match_locked_two_state_mapping() {
         decca::wiim::testing::sourceCommand(decca::settings::Source::Vinyl));
 }
 
+void test_wake_volume_never_exceeds_requested_level_except_muted_zero() {
+    TEST_ASSERT_EQUAL_UINT8(1, decca::wiim::testing::wakeVolume(0));
+    TEST_ASSERT_EQUAL_UINT8(0, decca::wiim::testing::wakeVolume(1));
+    TEST_ASSERT_EQUAL_UINT8(29, decca::wiim::testing::wakeVolume(30));
+    TEST_ASSERT_EQUAL_UINT8(99, decca::wiim::testing::wakeVolume(100));
+}
+
 void runAll() {
     RUN_TEST(test_parses_live_idle_player_response);
     RUN_TEST(test_parses_live_tidal_player_and_hex_fallback);
@@ -93,4 +100,5 @@ void runAll() {
     RUN_TEST(test_empty_idle_metadata_is_rejected_without_destroying_snapshot);
     RUN_TEST(test_stopped_player_clears_stale_metadata);
     RUN_TEST(test_source_commands_match_locked_two_state_mapping);
+    RUN_TEST(test_wake_volume_never_exceeds_requested_level_except_muted_zero);
 }

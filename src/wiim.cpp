@@ -43,6 +43,7 @@ bool g_sourceDirty = true;
 bool g_volumeDirty = true;
 bool g_requestedPowerOn = false;
 bool g_powerDirty = true;
+bool g_wakeDirty = false;
 
 bool hasText(const char* value) {
     return value != nullptr && value[0] != '\0';
@@ -150,6 +151,10 @@ const char* commandForSource(settings::Source source) {
                : "setPlayerCmd:switchmode:wifi";
 }
 
+uint8_t wakeVolumeFor(uint8_t requestedVolume) {
+    return requestedVolume == 0U ? 1U : requestedVolume - 1U;
+}
+
 #ifndef PIO_UNIT_TESTING
 bool request(WiFiClientSecure& client, HTTPClient& http, const char* command,
              char* response, size_t responseCapacity) {
@@ -218,6 +223,7 @@ void worker(void*) {
         bool volumeDirty;
         bool requestedPowerOn;
         bool powerDirty;
+        bool wakeDirty;
         portENTER_CRITICAL(&g_mux);
         requestedSource = g_requestedSource;
         requestedVolume = g_requestedVolume;
@@ -225,6 +231,7 @@ void worker(void*) {
         volumeDirty = g_volumeDirty;
         requestedPowerOn = g_requestedPowerOn;
         powerDirty = g_powerDirty;
+        wakeDirty = g_wakeDirty;
         portEXIT_CRITICAL(&g_mux);
 
         bool success = true;
@@ -232,7 +239,10 @@ void worker(void*) {
             success = request(client, http, "setPlayerCmd:stop", nullptr, 0);
             if (success) {
                 portENTER_CRITICAL(&g_mux);
-                if (!g_requestedPowerOn) g_powerDirty = false;
+                if (!g_requestedPowerOn) {
+                    g_powerDirty = false;
+                    g_wakeDirty = false;
+                }
                 portEXIT_CRITICAL(&g_mux);
             }
         } else if (powerDirty && requestedPowerOn) {
@@ -241,6 +251,7 @@ void worker(void*) {
                 g_powerDirty = false;
                 g_sourceDirty = true;
                 g_volumeDirty = true;
+                g_wakeDirty = true;
             }
             portEXIT_CRITICAL(&g_mux);
         } else if (!requestedPowerOn) {
@@ -254,6 +265,19 @@ void worker(void*) {
             if (success) {
                 portENTER_CRITICAL(&g_mux);
                 if (requestedSource == g_requestedSource) g_sourceDirty = false;
+                portEXIT_CRITICAL(&g_mux);
+            }
+        } else if (wakeDirty) {
+            char command[32];
+            snprintf(command, sizeof(command), "setPlayerCmd:vol:%u",
+                     static_cast<unsigned>(wakeVolumeFor(requestedVolume)));
+            success = request(client, http, command, nullptr, 0);
+            if (success) {
+                portENTER_CRITICAL(&g_mux);
+                if (g_requestedPowerOn &&
+                    requestedVolume == g_requestedVolume) {
+                    g_wakeDirty = false;
+                }
                 portEXIT_CRITICAL(&g_mux);
             }
         } else if (volumeDirty) {
@@ -384,6 +408,7 @@ void reset() {
     g_volumeDirty = true;
     g_requestedPowerOn = false;
     g_powerDirty = true;
+    g_wakeDirty = false;
 }
 bool parsePlayerStatus(const char* json, Snapshot& output) {
     return parsePlayer(json, output);
@@ -393,6 +418,9 @@ bool parseMetadata(const char* json, Snapshot& output) {
 }
 const char* sourceCommand(settings::Source source) {
     return commandForSource(source);
+}
+uint8_t wakeVolume(uint8_t requestedVolume) {
+    return wakeVolumeFor(requestedVolume);
 }
 }  // namespace testing
 #endif
