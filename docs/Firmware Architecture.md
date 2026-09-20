@@ -80,10 +80,15 @@ AI-assisted editing.
   presents one priority at a time: identity/standby, a control value and bar,
   source confirmation, status, or title/artist metadata. A small bottom-right
   triangle or two-bar glyph communicates playing or paused without repeating a
-  text label. To limit OLED uneven ageing, activity runs at contrast 0x80, the
+  text label. A three-level controller Wi-Fi-strength glyph occupies the
+  top-left header; long titles clip to its reserved text area. Connectivity
+  status distinguishes controller Wi-Fi loss from an unresponsive WiiM. To
+  limit OLED uneven ageing, activity runs at contrast 0x80, the
   panel dims to 0x20 after 60 seconds, and its pixels turn off after five minutes
   without activity. Standby is shown for ten seconds before pixels turn off.
-  State, control, status and metadata activity wake it immediately. The
+  A power transition wakes the panel, and on-state activity keeps it current;
+  passive telemetry changes while already in standby are retained without
+  waking the sleeping panel. The
   non-blocking full-canvas calibration frame remains available as a service
   diagnostic and is subject to the same protection timer.
 - **`power`** owns only the requested logical state. It converts the debounced
@@ -135,7 +140,10 @@ Modules add a small number of typed accessors (e.g. `buttons::nextEvent()`,
   `display`, `lighting`; authenticated `ota` is brought forward before enclosure.
 - **Phase 2 (WiiM):** the WiiM interface module makes VHF select digital playback,
   released VHF selects Line-In for Vinyl, and the phone controls digital
-  content. Volume and metadata route through `settings`.
+  content. Its core-0 worker reuses the secure control connection, resets it only
+  on a real request/network failure, prioritises new physical source commands
+  over wake activity, bypasses stale retry cooldown for revised controls and
+  reconciles reported Line-In mode. Volume and metadata route through `settings`.
 - **Phase 3 (Advanced):** configuration menus, automatic post-boot OTA rollback
   validation, richer UI and additional legacy controls.
 

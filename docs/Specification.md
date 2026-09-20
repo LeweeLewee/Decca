@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.0 from source commit `36d84d1` is installed by authenticated OTA. Digital audio, metadata, volume/app synchronisation, channel, logical-power, direct-trigger and outage-recovery acceptance pass. Vinyl, formal noise/interference and the unique controller mDNS name remain open. Phase 1 lighting and retained-switch issues remain tracked separately. |
-| Version  | 0.28.0                                            |
+| Status   | Draft. Firmware v0.28.4 from source commit `3195c95` is installed by authenticated OTA. Digital and vinyl audio, metadata, volume/app synchronisation, channel, logical-power, source-response, direct-trigger and outage-recovery acceptance pass. Only the formal Phase 2 noise/interference sweep remains open. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Version  | 0.28.4                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -114,7 +114,8 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
 | FR-DSP-06 | Cold startup and OTA reboot shall show a short, non-blocking monochrome Decca-logo animation, followed by the firmware version in the calibrated visible area. Logical standby/wake shall not replay it. | 1 |
 | FR-DSP-07 | The display shall identify the mapped logical function prominently. Legacy fascia button labels shall not consume space in normal, now-playing or function-confirmation views. | 2 |
-| FR-DSP-08 | The OLED shall reduce uneven ageing by dimming after inactivity, turning pixels off after extended inactivity and while logically off, and waking immediately on relevant activity. | 1 |
+| FR-DSP-08 | The OLED shall reduce uneven ageing by dimming after inactivity, turning pixels off after extended inactivity and while logically off, and waking immediately on relevant user/system activity. Passive telemetry changes while already in standby shall not wake it. | 1 |
+| FR-DSP-09 | The normal header shall show controller Wi-Fi strength without obscuring source/title text, and connectivity diagnostics shall distinguish controller Wi-Fi loss from an unresponsive streamer. | 2 |
 
 ### 5.5 Lighting
 
@@ -263,8 +264,18 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
   direct trigger. ON uses a safe one-step downward volume pulse followed by
   requested-volume restoration to wake the WiiM and ZA3 without app interaction
   or automatic playback.
-- **Open:** assign the controller a unique mDNS hostname; verify vinyl and run
-  the formal hum/buzz/clipping/switching-thump/OLED-interference sweep.
+- **Confirmed 2026-09-20:** v0.28.4 from source commit `3195c95` built at
+  52,336 bytes RAM (16.0%) and 1,018,373 bytes flash (77.7%), passed authenticated
+  OTA and returned on the unique `decca-esp32` hostname. Vinyl playback passed.
+  After an installed 30–60+ second source-delay regression, the worker restored
+  secure-connection reuse, prioritised physical source commands, bypassed stale
+  retry cooldown for new input and reconciled Line-In state; the owner confirmed
+  approximately one-second switching. The top-left header now shows controller
+  Wi-Fi strength and distinguishes controller-network loss from an unresponsive
+  WiiM. Standby shows for ten seconds, blanks, and remains off despite passive
+  telemetry updates. WiiM and display target suites compiled without execution.
+- **Open:** run the formal hum/buzz/clipping/switching-thump/OLED-interference
+  sweep.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.

@@ -8,10 +8,11 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Installed firmware is **v0.28.0** from source commit `36d84d1`, deployed by
-  authenticated OTA. Digital audio, metadata, volume/app synchronisation,
-  left/right channels, logical standby/resume and direct WiiM-to-ZA3 trigger
-  acceptance pass. Vinyl and the formal control/display noise sweep remain open.
+- Installed firmware is **v0.28.4** from source commit `3195c95`, deployed by
+  authenticated OTA. Digital and vinyl audio, metadata, volume/app
+  synchronisation, left/right channels, logical standby/resume, source response,
+  network recovery and direct WiiM-to-ZA3 trigger acceptance pass. Only the
+  formal control/display noise sweep remains open for Phase 2.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
@@ -27,12 +28,15 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   coordination. Logical power-on sends a safe one-step downward volume pulse,
   then restores the requested value, so a stopped network session wakes the
   WiiM trigger without starting playback or exceeding the selected volume.
+- The OLED reports controller Wi-Fi strength in the top-left header and
+  distinguishes controller-network loss from an unresponsive WiiM. Passive
+  telemetry updates while already in standby do not wake the sleeping panel.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
 - USB-to-OTA, GPIO14 power, GPIO26 VHF source selection and the fitted display
   are complete. The DFR0457 replacement stage is installed and its initial
-  steady-light test resolved the flicker. Firmware v0.28.0 retains immediate
+  steady-light test resolved the flicker. Firmware v0.28.4 retains immediate
   lighting transitions. Physical transition verification after HW-SW-01, WAGO
   distribution, pot stability, temperature and current remain open as
   HW-LGT-01. Normal Stereo lighting is 85%; Mono and logical standby request off.

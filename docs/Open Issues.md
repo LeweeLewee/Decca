@@ -76,10 +76,10 @@ pass, all eight on-target suites compile without upload or execution,
 authenticated OTA succeeded and the device returned on the network. Physical
 transition verification remains pending.
 
-**Device state:** the installed image is firmware v0.28.0 from source commit
-`36d84d1`. It retains GPIO18 PWM at 1 kHz and the 85% / duty 217 target.
+**Device state:** the installed image is firmware v0.28.4 from source commit
+`3195c95`. It retains GPIO18 PWM at 1 kHz and the 85% / duty 217 target.
 Authenticated OTA and controller network return most recently passed on
-2026-09-19.
+2026-09-20.
 
 **Acceptance required to close:**
 
@@ -101,13 +101,12 @@ Authenticated OTA and controller network return most recently passed on
 
 ## FW-WIM-01 — Accept Phase 2 WiiM integration
 
-**Status:** OPEN — firmware v0.28.0 from source commit `36d84d1` is installed by
-authenticated OTA. Digital audio, metadata, direct absolute volume/app
-reflection, correct left/right channels, logical standby/resume, direct trigger
-and network-recovery acceptance pass. The issue remains open for vinyl and the
-formal noise/interference sweep. The streamer and controller also advertise the
-same mDNS label; controller recovery currently relies on its reserved address
-until a unique controller hostname is assigned.
+**Status:** OPEN — firmware v0.28.4 from source commit `3195c95` is installed by
+authenticated OTA. Digital and vinyl audio, metadata, direct absolute
+volume/app reflection, correct left/right channels, logical standby/resume,
+source response, direct trigger and network recovery acceptance pass. The
+controller now advertises the unique `decca-esp32` hostname. Only the formal
+noise/interference sweep remains before Phase 2 acceptance closes.
 
 **WiiM Home configuration confirmed 2026-09-11:** analogue Line Out path,
 Fixed Volume Output off, 2 Vrms line level, EQ off, Auto Headroom on, stereo,
@@ -117,11 +116,11 @@ balance centred and a temporary 70% commissioning volume limit.
 
 1. **Passed:** captured live `getPlayerStatus` and `getMetaInfo` during active
    TIDAL playback; sanitised fixtures decode Jolene / Dolly Parton correctly.
-2. **Passed:** final credential-enabled release built at 52,328 bytes RAM
-   (16.0%) and 1,016,977 bytes flash (77.6%); the WiiM target, including the
-   wake-pulse boundary test, compiled successfully. The established CI gate had
-   already compiled all nine on-target suites.
-3. **Passed:** authenticated OTA installed v0.28.0 and the controller returned
+2. **Passed:** final credential-enabled release built at 52,336 bytes RAM
+   (16.0%) and 1,018,373 bytes flash (77.7%); the WiiM and display targets,
+   including source-priority, retry-bypass, RSSI and standby-wake regressions,
+   compiled successfully. These were compile-only hardware-target checks.
+3. **Passed:** authenticated OTA installed v0.28.4 and the controller returned
    without USB intervention. Private configuration remained ignored/uncommitted.
 4. **Passed:** VHF selected the Wi-Fi/digital path; released VHF selected Line-In;
    returning to VHF restored network control.
@@ -133,9 +132,10 @@ balance centred and a temporary 70% commissioning volume limit.
    steps and is not present in the installed build.
 6. **Passed:** logical OFF stopped playback; ON restored the selected source and
    controls without restarting or reflashing the controller.
-7. **Passed by reserved address:** outage warning remained visible throughout the
-   confirmed outage and cleared automatically after recovery. Assign a unique
-   controller mDNS hostname before closing the hostname-specific recovery gate.
+7. **Passed:** outage warning remained visible throughout the confirmed outage
+   and cleared automatically after recovery. The controller has the unique
+   `decca-esp32` hostname; the OLED now distinguishes `NO CONTROLLER WI-FI` from
+   `WIIM NOT RESPONDING` and shows controller RSSI bars in the top-left header.
 8. **Passed (2026-09-19):** TIDAL digital playback was clear through both B&W
    DM601 S3 speakers; an identifiable channel check confirmed correct left and
    right routing, and the owner reported that playback sounded excellent.
@@ -145,8 +145,15 @@ balance centred and a temporary 70% commissioning volume limit.
    restores the requested value; the WiiM and ZA3 woke without app or physical
    volume interaction. The pulse never exceeds the selected volume except the
    silent 0-to-1 boundary needed to create activity.
-10. **Not tested:** vinyl playback and the formal hum/buzz/clipping/switching-
-    thump/OLED-interference sweep remain physical gates.
+10. **Passed (2026-09-20):** vinyl playback through WiiM Line-In was confirmed.
+    An observed 30–60+ second source-selection regression was traced to forced
+    TLS teardown plus retry scheduling; v0.28.4 restores connection reuse,
+    prioritises physical source changes and reconciles WiiM Line-In state. The
+    owner confirmed approximately one-second response after deployment.
+11. **Passed (2026-09-20):** entering standby shows `DECCA STANDBY`, blanks after
+    ten seconds and remains off. Passive RSSI/status updates no longer wake it.
+12. **Not tested:** the formal hum/buzz/clipping/switching-thump/OLED-interference
+    sweep remains the sole Phase 2 physical gate.
 
 ## MECH-HSG-01 — Complete ESP32 housing prototype acceptance
 
