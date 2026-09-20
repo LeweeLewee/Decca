@@ -39,6 +39,7 @@ enum class Playback : uint8_t {
 struct Snapshot {
     Status status = Status::Disabled;
     Playback playback = Playback::None;
+    uint8_t controllerWifiBars = 0;
     int16_t mode = -1;
     uint8_t volume = 0;
     bool muted = false;
@@ -72,6 +73,13 @@ bool parsePlayerStatus(const char* json, Snapshot& output);
 bool parseMetadata(const char* json, Snapshot& output);
 const char* sourceCommand(settings::Source source);
 uint8_t wakeVolume(uint8_t requestedVolume);
+uint8_t wifiBars(bool connected, int32_t rssi);
+bool sourceMatchesMode(settings::Source source, int16_t mode);
+bool shouldAttemptSource(bool requestedPowerOn, bool sourceDirty);
+bool shouldAttemptWake(bool requestedPowerOn, bool sourceDirty, bool wakeDirty);
+bool retryBlocked(uint8_t consecutiveFailures, uint32_t now,
+                  uint32_t lastFailureMs, uint32_t controlRevision,
+                  uint32_t failedControlRevision);
 }
 #endif
 

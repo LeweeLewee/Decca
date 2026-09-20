@@ -93,6 +93,48 @@ void test_wake_volume_never_exceeds_requested_level_except_muted_zero() {
     TEST_ASSERT_EQUAL_UINT8(99, decca::wiim::testing::wakeVolume(100));
 }
 
+void test_controller_wifi_strength_buckets_are_stable() {
+    TEST_ASSERT_EQUAL_UINT8(0, decca::wiim::testing::wifiBars(false, -40));
+    TEST_ASSERT_EQUAL_UINT8(1, decca::wiim::testing::wifiBars(true, -71));
+    TEST_ASSERT_EQUAL_UINT8(2, decca::wiim::testing::wifiBars(true, -70));
+    TEST_ASSERT_EQUAL_UINT8(2, decca::wiim::testing::wifiBars(true, -56));
+    TEST_ASSERT_EQUAL_UINT8(3, decca::wiim::testing::wifiBars(true, -55));
+}
+
+void test_source_mode_reconciliation_distinguishes_line_in() {
+    using decca::settings::Source;
+    TEST_ASSERT_TRUE(decca::wiim::testing::sourceMatchesMode(Source::Vinyl, -1));
+    TEST_ASSERT_TRUE(decca::wiim::testing::sourceMatchesMode(Source::Vinyl, 40));
+    TEST_ASSERT_FALSE(decca::wiim::testing::sourceMatchesMode(Source::Vinyl, 10));
+    TEST_ASSERT_TRUE(
+        decca::wiim::testing::sourceMatchesMode(Source::DigitalStreamer, 10));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::sourceMatchesMode(Source::DigitalStreamer, 40));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::sourceMatchesMode(Source::DigitalStreamer, 43));
+}
+
+void test_source_precedes_wake_without_starvation() {
+    TEST_ASSERT_TRUE(decca::wiim::testing::shouldAttemptSource(true, true));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::shouldAttemptWake(true, true, true));
+    TEST_ASSERT_TRUE(
+        decca::wiim::testing::shouldAttemptWake(true, false, true));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::shouldAttemptWake(false, false, true));
+}
+
+void test_new_control_request_bypasses_retry_cooldown() {
+    TEST_ASSERT_TRUE(
+        decca::wiim::testing::retryBlocked(1, 1500, 1000, 7, 7));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::retryBlocked(1, 1500, 1000, 8, 7));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::retryBlocked(1, 3000, 1000, 7, 7));
+    TEST_ASSERT_FALSE(
+        decca::wiim::testing::retryBlocked(0, 1500, 1000, 7, 7));
+}
+
 void runAll() {
     RUN_TEST(test_parses_live_idle_player_response);
     RUN_TEST(test_parses_live_tidal_player_and_hex_fallback);
@@ -101,4 +143,8 @@ void runAll() {
     RUN_TEST(test_stopped_player_clears_stale_metadata);
     RUN_TEST(test_source_commands_match_locked_two_state_mapping);
     RUN_TEST(test_wake_volume_never_exceeds_requested_level_except_muted_zero);
+    RUN_TEST(test_controller_wifi_strength_buckets_are_stable);
+    RUN_TEST(test_source_mode_reconciliation_distinguishes_line_in);
+    RUN_TEST(test_source_precedes_wake_without_starvation);
+    RUN_TEST(test_new_control_request_bypasses_retry_cooldown);
 }

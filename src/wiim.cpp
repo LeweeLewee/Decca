@@ -17,11 +17,11 @@
 namespace decca::wiim {
 namespace {
 
+constexpr uint32_t kRetryIntervalMs = 2000;
 #ifndef PIO_UNIT_TESTING
 constexpr char kPlayerStatusCommand[] = "getPlayerStatus";
 constexpr char kMetadataCommand[] = "getMetaInfo";
 constexpr uint32_t kWorkerDelayMs = 25;
-constexpr uint32_t kRetryIntervalMs = 2000;
 constexpr uint8_t kFailureThreshold = 3;
 constexpr uint8_t kWorkerCore = 0;
 // HTTPS requests, the response buffer and ArduinoJson parsing overlap on this
@@ -44,6 +44,7 @@ bool g_volumeDirty = true;
 bool g_requestedPowerOn = false;
 bool g_powerDirty = true;
 bool g_wakeDirty = false;
+uint32_t g_controlRevision = 0;
 
 bool hasText(const char* value) {
     return value != nullptr && value[0] != '\0';
@@ -155,7 +156,48 @@ uint8_t wakeVolumeFor(uint8_t requestedVolume) {
     return requestedVolume == 0U ? 1U : requestedVolume - 1U;
 }
 
+uint8_t wifiBarsFor(bool connected, int32_t rssi) {
+    if (!connected) return 0U;
+    if (rssi >= -55) return 3U;
+    if (rssi >= -70) return 2U;
+    return 1U;
+}
+
+bool sourceMatchesModeFor(settings::Source source, int16_t mode) {
+    // A negative mode is the WiiM's idle/unknown state and is not sufficient
+    // evidence to fight the device with repeated source commands.
+    if (mode < 0) return true;
+    if (source == settings::Source::Vinyl) return mode == 40;
+    // WiiM documents 40-43 as its local input modes (AUX, Bluetooth,
+    // external storage and optical).  VHF/digital must leave those modes.
+    return mode < 40 || mode > 43;
+}
+
+bool shouldAttemptSourceFor(bool requestedPowerOn, bool sourceDirty) {
+    return requestedPowerOn && sourceDirty;
+}
+
+bool shouldAttemptWakeFor(bool requestedPowerOn, bool sourceDirty,
+                          bool wakeDirty) {
+    // Source selection is the user's explicit physical request.  A failed
+    // trigger wake pulse must never prevent that request from being attempted.
+    return requestedPowerOn && !sourceDirty && wakeDirty;
+}
+
+bool retryBlockedFor(uint8_t consecutiveFailures, uint32_t now,
+                     uint32_t lastFailureMs, uint32_t controlRevision,
+                     uint32_t failedControlRevision) {
+    return consecutiveFailures > 0U &&
+           controlRevision == failedControlRevision &&
+           (now - lastFailureMs) < kRetryIntervalMs;
+}
+
 #ifndef PIO_UNIT_TESTING
+void resetConnection(WiFiClientSecure& client, HTTPClient& http) {
+    http.end();
+    client.stop();
+}
+
 bool request(WiFiClientSecure& client, HTTPClient& http, const char* command,
              char* response, size_t responseCapacity) {
     char url[192];
@@ -164,10 +206,13 @@ bool request(WiFiClientSecure& client, HTTPClient& http, const char* command,
                                 DECCA_WIIM_HOST, command);
     if (length <= 0 || static_cast<size_t>(length) >= sizeof(url)) return false;
 
-    if (!http.begin(client, url)) return false;
+    if (!http.begin(client, url)) {
+        resetConnection(client, http);
+        return false;
+    }
     const int statusCode = http.GET();
     if (statusCode != HTTP_CODE_OK) {
-        http.end();
+        resetConnection(client, http);
         return false;
     }
 
@@ -192,6 +237,7 @@ void worker(void*) {
     uint32_t lastMetadataPollMs = 0;
     uint32_t lastFailureMs = 0;
     uint8_t consecutiveFailures = 0;
+    uint32_t failedControlRevision = 0;
     char response[3072];
     WiFiClientSecure client;
     client.setInsecure();
@@ -200,18 +246,41 @@ void worker(void*) {
     http.setConnectTimeout(kRequestTimeoutMs);
     http.setTimeout(kRequestTimeoutMs);
     http.setReuse(true);
+    bool wasNetworkConnected = false;
 
     for (;;) {
-        if (WiFi.status() != WL_CONNECTED) {
+        const bool networkConnected = WiFi.status() == WL_CONNECTED;
+        g_workerSnapshot.controllerWifiBars =
+            wifiBarsFor(networkConnected,
+                        networkConnected ? WiFi.RSSI() : -127);
+        if (!networkConnected) {
+            if (wasNetworkConnected) {
+                resetConnection(client, http);
+                consecutiveFailures = 0;
+            }
+            wasNetworkConnected = false;
             g_workerSnapshot.status = Status::WaitingForNetwork;
             publishWorkerSnapshot();
             vTaskDelay(pdMS_TO_TICKS(kWorkerDelayMs));
             continue;
         }
+        if (!wasNetworkConnected) {
+            resetConnection(client, http);
+            consecutiveFailures = 0;
+            portENTER_CRITICAL(&g_mux);
+            g_sourceDirty = true;
+            g_volumeDirty = true;
+            portEXIT_CRITICAL(&g_mux);
+            wasNetworkConnected = true;
+        }
 
         const uint32_t now = millis();
-        if (consecutiveFailures > 0U &&
-            (now - lastFailureMs) < kRetryIntervalMs) {
+        uint32_t controlRevision;
+        portENTER_CRITICAL(&g_mux);
+        controlRevision = g_controlRevision;
+        portEXIT_CRITICAL(&g_mux);
+        if (retryBlockedFor(consecutiveFailures, now, lastFailureMs,
+                            controlRevision, failedControlRevision)) {
             vTaskDelay(pdMS_TO_TICKS(kWorkerDelayMs));
             continue;
         }
@@ -259,7 +328,7 @@ void worker(void*) {
             g_workerSnapshot.metadataValid = false;
             g_workerSnapshot.title[0] = '\0';
             g_workerSnapshot.artist[0] = '\0';
-        } else if (sourceDirty) {
+        } else if (shouldAttemptSourceFor(requestedPowerOn, sourceDirty)) {
             success = request(client, http, commandForSource(requestedSource),
                               nullptr, 0);
             if (success) {
@@ -267,7 +336,8 @@ void worker(void*) {
                 if (requestedSource == g_requestedSource) g_sourceDirty = false;
                 portEXIT_CRITICAL(&g_mux);
             }
-        } else if (wakeDirty) {
+        } else if (shouldAttemptWakeFor(requestedPowerOn, sourceDirty,
+                                        wakeDirty)) {
             char command[32];
             snprintf(command, sizeof(command), "setPlayerCmd:vol:%u",
                      static_cast<unsigned>(wakeVolumeFor(requestedVolume)));
@@ -295,7 +365,15 @@ void worker(void*) {
             success = request(client, http, kPlayerStatusCommand, response,
                               sizeof(response)) &&
                       parsePlayer(response, g_workerSnapshot);
-            if (success) lastPlayerPollMs = now;
+            if (success) {
+                lastPlayerPollMs = now;
+                portENTER_CRITICAL(&g_mux);
+                if (!sourceMatchesModeFor(g_requestedSource,
+                                          g_workerSnapshot.mode)) {
+                    g_sourceDirty = true;
+                }
+                portEXIT_CRITICAL(&g_mux);
+            }
         } else if ((g_workerSnapshot.playback == Playback::Playing ||
                     g_workerSnapshot.playback == Playback::Paused) &&
                    (now - lastMetadataPollMs) >= kMetadataPollIntervalMs) {
@@ -312,6 +390,7 @@ void worker(void*) {
             consecutiveFailures = 0;
             g_workerSnapshot.status = Status::Ready;
         } else {
+            resetConnection(client, http);
             if (consecutiveFailures < kFailureThreshold) {
                 ++consecutiveFailures;
             }
@@ -320,13 +399,7 @@ void worker(void*) {
                     ? Status::Error
                     : Status::Connecting;
             lastFailureMs = now;
-            portENTER_CRITICAL(&g_mux);
-            g_sourceDirty = true;
-            g_volumeDirty = true;
-            // ON recovery is source/volume reassertion; only a failed OFF stop
-            // command needs the power request itself retried.
-            g_powerDirty = !g_requestedPowerOn;
-            portEXIT_CRITICAL(&g_mux);
+            failedControlRevision = controlRevision;
         }
         publishWorkerSnapshot();
         vTaskDelay(pdMS_TO_TICKS(kWorkerDelayMs));
@@ -365,6 +438,7 @@ void requestSource(settings::Source source) {
     if (g_requestedSource != source) {
         g_requestedSource = source;
         g_sourceDirty = true;
+        ++g_controlRevision;
     }
     portEXIT_CRITICAL(&g_mux);
 }
@@ -375,6 +449,7 @@ void requestVolume(uint8_t volume) {
     if (g_requestedVolume != volume) {
         g_requestedVolume = volume;
         g_volumeDirty = true;
+        ++g_controlRevision;
     }
     portEXIT_CRITICAL(&g_mux);
 }
@@ -384,6 +459,7 @@ void requestPower(bool on) {
     if (g_requestedPowerOn != on) {
         g_requestedPowerOn = on;
         g_powerDirty = true;
+        ++g_controlRevision;
     }
     portEXIT_CRITICAL(&g_mux);
 }
@@ -409,6 +485,7 @@ void reset() {
     g_requestedPowerOn = false;
     g_powerDirty = true;
     g_wakeDirty = false;
+    g_controlRevision = 0;
 }
 bool parsePlayerStatus(const char* json, Snapshot& output) {
     return parsePlayer(json, output);
@@ -421,6 +498,25 @@ const char* sourceCommand(settings::Source source) {
 }
 uint8_t wakeVolume(uint8_t requestedVolume) {
     return wakeVolumeFor(requestedVolume);
+}
+uint8_t wifiBars(bool connected, int32_t rssi) {
+    return wifiBarsFor(connected, rssi);
+}
+bool sourceMatchesMode(settings::Source source, int16_t mode) {
+    return sourceMatchesModeFor(source, mode);
+}
+bool shouldAttemptSource(bool requestedPowerOn, bool sourceDirty) {
+    return shouldAttemptSourceFor(requestedPowerOn, sourceDirty);
+}
+bool shouldAttemptWake(bool requestedPowerOn, bool sourceDirty,
+                       bool wakeDirty) {
+    return shouldAttemptWakeFor(requestedPowerOn, sourceDirty, wakeDirty);
+}
+bool retryBlocked(uint8_t consecutiveFailures, uint32_t now,
+                  uint32_t lastFailureMs, uint32_t controlRevision,
+                  uint32_t failedControlRevision) {
+    return retryBlockedFor(consecutiveFailures, now, lastFailureMs,
+                           controlRevision, failedControlRevision);
 }
 }  // namespace testing
 #endif

@@ -20,10 +20,11 @@ decca::buttons::SourceMode g_sourceMode =
     decca::buttons::SourceMode::DigitalStreamer;
 uint16_t g_potValues[4]{};
 constexpr uint16_t kControlPresentationDeadband = 5;
-constexpr uint32_t kStreamerUnavailableRefreshMs = 1000;
+constexpr uint32_t kConnectivityFaultRefreshMs = 1000;
 decca::wiim::Status g_lastWiimStatus = decca::wiim::Status::Disabled;
-uint32_t g_lastStreamerUnavailableRefreshMs = 0;
-bool g_streamerUnavailablePresented = false;
+uint32_t g_lastConnectivityFaultRefreshMs = 0;
+decca::wiim::Status g_presentedConnectivityFault =
+    decca::wiim::Status::Disabled;
 decca::wiim::Playback g_lastPlayback = decca::wiim::Playback::None;
 char g_lastTitle[decca::wiim::kTitleCapacity + 1]{};
 char g_lastArtist[decca::wiim::kArtistCapacity + 1]{};
@@ -128,35 +129,38 @@ void applyWiimState() {
     decca::wiim::update();
     const decca::wiim::Snapshot& snapshot = decca::wiim::snapshot();
     const bool statusChanged = snapshot.status != g_lastWiimStatus;
-    const bool metadataChanged =
+    const bool displayStateChanged =
         snapshot.playback != g_lastPlayback ||
         std::strncmp(snapshot.title, g_lastTitle, sizeof(g_lastTitle)) != 0 ||
         std::strncmp(snapshot.artist, g_lastArtist, sizeof(g_lastArtist)) != 0 ||
-        g_viewState.source != g_lastWiimDisplaySource;
+        g_viewState.source != g_lastWiimDisplaySource ||
+        g_viewState.controllerWifiBars != snapshot.controllerWifiBars;
 
-    const bool streamerUnavailable =
-        snapshot.status == decca::wiim::Status::Error &&
+    const bool connectivityFault =
+        (snapshot.status == decca::wiim::Status::WaitingForNetwork ||
+         snapshot.status == decca::wiim::Status::Error) &&
         g_viewState.power == decca::display::PowerState::On;
-    if (streamerUnavailable) {
+    if (connectivityFault) {
         const uint32_t now = millis();
-        if (!g_streamerUnavailablePresented ||
-            (now - g_lastStreamerUnavailableRefreshMs) >=
-                kStreamerUnavailableRefreshMs) {
-            decca::display::showStatus("STREAMER UNAVAILABLE");
-            g_lastStreamerUnavailableRefreshMs = now;
-            g_streamerUnavailablePresented = true;
+        if (g_presentedConnectivityFault != snapshot.status ||
+            (now - g_lastConnectivityFaultRefreshMs) >=
+                kConnectivityFaultRefreshMs) {
+            decca::display::showStatus(
+                snapshot.status == decca::wiim::Status::WaitingForNetwork
+                    ? "NO CONTROLLER WI-FI"
+                    : "WIIM NOT RESPONDING");
+            g_lastConnectivityFaultRefreshMs = now;
+            g_presentedConnectivityFault = snapshot.status;
         }
     } else {
-        // Once communication recovers, stop extending the transient. The
-        // display returns to its current dashboard without a forced redraw.
-        g_streamerUnavailablePresented = false;
+        g_presentedConnectivityFault = decca::wiim::Status::Disabled;
     }
 
     if (statusChanged) {
         g_lastWiimStatus = snapshot.status;
     }
 
-    if (!metadataChanged) return;
+    if (!displayStateChanged) return;
     g_lastWiimDisplaySource = g_viewState.source;
     g_lastPlayback = snapshot.playback;
     std::strncpy(g_lastTitle, snapshot.title, sizeof(g_lastTitle) - 1U);
@@ -170,6 +174,7 @@ void applyWiimState() {
     g_viewState.artist =
         digital && snapshot.metadataValid ? g_lastArtist : nullptr;
     g_viewState.playing = snapshot.playback == decca::wiim::Playback::Playing;
+    g_viewState.controllerWifiBars = snapshot.controllerWifiBars;
     decca::display::setState(g_viewState);
 }
 

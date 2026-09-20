@@ -31,6 +31,8 @@ constexpr uint8_t kViewportWidth = 120;
 constexpr uint8_t kViewportHeight = 52;
 constexpr uint8_t kContentTop = 24;
 constexpr uint8_t kContentBottom = 60;
+constexpr uint8_t kWifiIndicatorX = 7;
+constexpr uint8_t kWifiIndicatorBaselineY = 33;
 constexpr uint8_t kPanelContrast = 0x80;
 constexpr uint8_t kDimmedContrast = 0x20;
 constexpr uint32_t kDimAfterMs = 60'000;
@@ -86,6 +88,8 @@ struct ViewState {
     const char* title = nullptr;
     const char* artist = nullptr;
     bool playing = false;
+    /** Controller Wi-Fi strength: 0 disconnected, 1 weak, 2 fair, 3 strong. */
+    uint8_t controllerWifiBars = 0;
 };
 
 /** @brief Semantic frame types used by the renderer and its test observer. */
@@ -127,7 +131,12 @@ PanelPowerState panelPowerState();
 /** @brief Wake the OLED and restart its inactivity timers. */
 void noteActivity();
 
-/** @brief Supply a complete display snapshot; pointed-to text is copied. */
+/**
+ * @brief Supply a complete display snapshot; pointed-to text is copied.
+ *
+ * Entering standby and every on-state change wake the panel. Passive state
+ * changes while already in standby are retained without waking a sleeping OLED.
+ */
 void setState(const ViewState& state);
 
 /**
