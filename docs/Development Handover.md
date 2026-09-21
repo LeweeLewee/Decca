@@ -1,6 +1,6 @@
 # Development Handover
 
-> **Last updated:** 2026-09-19
+> **Last updated:** 2026-09-21
 > **Repository:** `LeweeLewee/Decca`  
 > **Authoritative branch:** `main`
 
@@ -29,8 +29,10 @@ the original on/off switch, pots, VHF source, Stereo/Mono lighting request,
 display and OTA without blocking. Phase 2 WiiM coordination runs on a separate
 core-0 worker. Firmware v0.28.4 from source commit `3195c95` is installed.
 Digital and vinyl audio, channel routing, source response, network recovery,
-standby display behaviour and direct-trigger acceptance pass; only the formal
-noise/interference sweep remains open for Phase 2.
+standby display behaviour and direct-trigger acceptance pass. The owner confirmed
+all formal noise/interference checks passed with no issues on 2026-09-21,
+completing Phase 2 physical acceptance. PR #11 remains draft pending approval
+to progress.
 Final lighting hardware acceptance remains open as HW-LGT-01.
 
 Implemented modules:
@@ -46,7 +48,7 @@ Implemented modules:
 | `ota` | Authenticated LAN OTA as unique `decca-esp32`, reconnect handling, dual-app partitions |
 | `power` | GPIO-independent logical on/standby state implemented and tested |
 | `wiim` | Phase 2 local-HTTPS source, direct absolute volume over a reusable connection, source-priority/reconciliation, stop, player state, metadata and failure hysteresis implemented and live-tested |
-| Main orchestration | Power, pots, VHF source, fitted display, lighting command, persistent connectivity UI, WiiM snapshots and OTA integrated; installed acceptance passed except the formal noise sweep |
+| Main orchestration | Power, pots, VHF source, fitted display, lighting command, persistent connectivity UI, WiiM snapshots and OTA integrated; installed Phase 2 physical acceptance passed, including owner-confirmed noise sweep on 2026-09-21 |
 
 The ESP32 is control/UI only. It never carries or processes audio.
 
@@ -238,7 +240,10 @@ the user's Wi-Fi or OTA passwords.
     telemetry updates. The build passed at 52,336 bytes RAM / 1,018,373 bytes
     flash, both affected target suites compiled without execution, authenticated
     OTA passed, and only the formal Phase 2 noise sweep remains open.
-14. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
+14. **Complete (owner confirmation 2026-09-21):** all formal noise checks passed
+    with no hum, buzz, clipping, switching thumps or OLED/control interference.
+    FW-WIM-01 is complete; PR #11 remains draft pending approval to progress.
+15. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
 ## Open procurement and electrical work
@@ -247,9 +252,10 @@ the user's Wi-Fi or OTA passwords.
 `docs/Parts List.md` and the CSV BOMs for procurement detail. Immediate open
 items are the ordered WAGO 221-415 distribution-connector pack and final DFR0457
 immediate-transition, pot-stability, temperature, current and holder checks.
-The only remaining Phase 2 item is the formal noise/interference sweep. Digital
-and vinyl audio, channel routing, source response, recovery, standby behaviour
-and the direct WiiM-to-ZA3 trigger are commissioned.
+Phase 2 physical acceptance is complete, including the owner-confirmed formal
+noise/interference sweep on 2026-09-21. Digital and vinyl audio, channel routing,
+source response, recovery, standby behaviour and the direct WiiM-to-ZA3 trigger
+are commissioned. The separate lighting and retained-switch issues remain open.
 
 ## Mechanical status
 
