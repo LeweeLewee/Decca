@@ -107,7 +107,7 @@ volume/app reflection, correct left/right channels, logical standby/resume,
 source response, direct trigger and network recovery acceptance pass. The
 controller now advertises the unique `decca-esp32` hostname. The owner confirmed all formal
 noise/interference checks passed with no issues on 2026-09-21, closing Phase 2
-physical acceptance. PR #11 remains draft pending approval to progress.
+physical acceptance. The owner approved PR #11 for review on 2026-09-21; merge requires a separate explicit instruction.
 
 **WiiM Home configuration confirmed 2026-09-11:** analogue Line Out path,
 Fixed Volume Output off, 2 Vrms line level, EQ off, Auto Headroom on, stereo,
