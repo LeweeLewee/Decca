@@ -1,10 +1,56 @@
 # Home Assistant health trial
 
-Status: isolated development only; no firmware upload and no live HA installation.
+Status: **DEFERRED by owner decision (2026-09-21). Retain unmerged; do not deploy.**
 Branch: `feat/ha-health-trial`.
 Baseline main: `02eee2c24b9c3aa3f986b885837a86aa76e4b321`.
 Installed firmware remains v0.28.5, as recorded in the development handover.
 Trial builds identify as `0.28.6-h1`; normal builds retain v0.28.5.
+
+## Decision: defer deployment and retain the unmerged branch
+
+**Owner decision — 2026-09-21:** retain this work as a documented fallback.
+Leave `feat/ha-health-trial` and [draft PR #12](https://github.com/LeweeLewee/Decca/pull/12)
+unmerged. Do not install the trial firmware or HA dashboard now. Further
+implementation, spare-board testing and HA setup are deferred.
+
+### Reasons
+
+- Preserve the current working deployment while assessing whether stability
+  issues persist. Additional monitoring is optional, not required for operation.
+- MQTT adds traffic, task stacks and network allocations. Introducing those
+  during the existing Wi-Fi investigation could change the behaviour being
+  investigated and complicate comparison with the current baseline.
+- Offline builds and tests passed, but runtime resource headroom, broker-failure
+  behaviour and live HA integration have not been verified.
+- Automatic post-boot firmware rollback is not implemented. A verified recovery
+  image and rehearsed USB recovery are prerequisites to any installed trial.
+- Keeping the prototype, dashboard and test evidence on this branch preserves
+  the work without adding an ongoing dependency to the installed Decca.
+
+This decision does **not** close FW-WIFI-01 or assert that Wi-Fi stability is
+resolved. No continuous monitoring or scheduled follow-up is being established.
+
+### When to reconsider
+
+Revisit this branch if recurring disconnects, unexplained resets, sustained
+packet loss or control/source-response interruptions persist, and existing
+observations cannot explain them well enough. Record the symptoms, timing and
+operating state first; an isolated RSSI snapshot is not sufficient evidence.
+
+If the owner elects to proceed:
+1. Read current main, the development handover and open issues; confirm the
+   actual installed firmware and configuration. The v0.28.5 baseline in this
+   document is historical and must not be assumed current after further work.
+2. Reconcile this branch with those changes, review telemetry's diagnostic value,
+   and repeat affected builds/tests against the intended baseline.
+3. Confirm the test HA/MQTT setup and spare ESP32, then complete the spare-board
+   and HA acceptance gates below using the agreed five-minute summaries.
+4. Prepare and prove recovery against the then-current deployment before
+   considering an installed-device trial. Keep main and the live system
+   unchanged until that decision is made.
+
+If stability is satisfactory, leave the branch deferred; there is no requirement
+to merge or deploy it merely because the prototype builds successfully.
 
 ## Scope and architecture
 
@@ -201,8 +247,12 @@ Local Windows checks (2026-09-21):
   buffers and TCP resources. Actual headroom remains unmeasured.
 - Five offline Python tests pass: field coverage, dashboard entity references,
   expiry/isolation, recovery/reboot fixtures and upload-target rejection.
-- C++ aggregation execution and all target-suite compilation are configured in
-  the branch CI; consult the PR checks for their results.
+- Final implementation CI passed at `af61012`: C++ aggregation/recovery/timer-wrap
+  tests, the five Python checks, comparison builds and all nine hardware-suite
+  compilations. Hardware tests were compiled only, not executed on a board.
+  [HA trial checks](https://github.com/LeweeLewee/Decca/actions/runs/35643306763)
+  and [firmware checks](https://github.com/LeweeLewee/Decca/actions/runs/35643306633)
+  preserve the evidence.
 - No production credentials copied, no firmware uploaded, no HA installation.
 
 Physical/spare-board and live HA acceptance are NOT run. No rollback image
