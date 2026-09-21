@@ -181,3 +181,19 @@ idle player response as a regression case, covers the live TIDAL mode 10 respons
 hex fallback fields, structured 96 kHz metadata, empty idle metadata and the locked VHF
 source-command mapping. Network I/O runs only in the production background
 worker; the test suite exercises parsing and command selection deterministically.
+
+
+## Security acceptance
+
+See [Security Acceptance](../docs/Security%20Acceptance.md). `test_security`
+adds response-capacity and hostile-JSON cases. Compile it with
+`pio test -e esp32dev -f test_security --without-uploading --without-testing`;
+execution requires a spare ESP32. Compile success is not a test pass.
+The Python OTA probe has five host regression tests:
+`python -m unittest discover -s security -p test_ota_auth_probe.py -v`.
+The live probe sends no firmware; its first rejection check passed on 2026-09-21.
+The wider security gate remains open.
+
+Native guard execution: `python security/run_host_tests.py` (or `--zig <path>`).
+Ten native cases passed for candidate v0.28.6-s1; see the security record for
+coverage and the distinction from ESP32/TLS integration execution.

@@ -1,4 +1,6 @@
 #include "wiim.h"
+#include "bounded_response.h"
+#include "guarded_client.h"
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -193,12 +195,17 @@ bool retryBlockedFor(uint8_t consecutiveFailures, uint32_t now,
 }
 
 #ifndef PIO_UNIT_TESTING
-void resetConnection(WiFiClientSecure& client, HTTPClient& http) {
+struct RequestClock { static uint32_t now() { return millis(); } };
+using HttpClient = GuardedClient<WiFiClientSecure, RequestClock>;
+constexpr uint32_t kTransactionBudgetMs = 6000;
+constexpr size_t kResponseWireLimit = 8192;
+void resetConnection(HttpClient& client, HTTPClient& http) {
     http.end();
     client.stop();
+    client.endRequest();
 }
 
-bool request(WiFiClientSecure& client, HTTPClient& http, const char* command,
+bool request(HttpClient& client, HTTPClient& http, const char* command,
              char* response, size_t responseCapacity) {
     char url[192];
     const int length = snprintf(url, sizeof(url),
@@ -206,23 +213,41 @@ bool request(WiFiClientSecure& client, HTTPClient& http, const char* command,
                                 DECCA_WIIM_HOST, command);
     if (length <= 0 || static_cast<size_t>(length) >= sizeof(url)) return false;
 
+    client.beginRequest(kTransactionBudgetMs, kResponseWireLimit);
     if (!http.begin(client, url)) {
         resetConnection(client, http);
         return false;
     }
     const int statusCode = http.GET();
-    if (statusCode != HTTP_CODE_OK) {
+    if (statusCode != HTTP_CODE_OK || !client.requestOk()) {
         resetConnection(client, http);
         return false;
     }
 
     if (response != nullptr && responseCapacity > 0U) {
-        const String payload = http.getString();
-        const size_t bytes = min(payload.length(), responseCapacity - 1U);
-        std::memcpy(response, payload.c_str(), bytes);
-        response[bytes] = '\0';
+        response[0] = '\0';
+        const int declaredSize = http.getSize();
+        if (declaredSize >= 0 &&
+            static_cast<size_t>(declaredSize) >= responseCapacity) {
+            resetConnection(client, http);
+            return false;
+        }
+        BoundedResponse body(response, responseCapacity);
+        const int received = http.writeToStream(&body);
+        if (received < 0 || body.failed() ||
+            static_cast<size_t>(received) != body.size()) {
+            response[0] = '\0';
+            resetConnection(client, http);
+            return false;
+        }
+    }
+    if (!client.requestOk()) {
+        if (response != nullptr && responseCapacity > 0U) response[0] = '\0';
+        resetConnection(client, http);
+        return false;
     }
     http.end();
+    client.endRequest();
     return true;
 }
 
@@ -239,9 +264,11 @@ void worker(void*) {
     uint8_t consecutiveFailures = 0;
     uint32_t failedControlRevision = 0;
     char response[3072];
-    WiFiClientSecure client;
+    HttpClient client;
     client.setInsecure();
-    client.setTimeout(kRequestTimeoutMs);
+    // WiFiClientSecure uses seconds; HTTPClient uses milliseconds.
+    client.setTimeout((kRequestTimeoutMs + 999U) / 1000U);
+    client.setHandshakeTimeout((kRequestTimeoutMs + 999U) / 1000U);
     HTTPClient http;
     http.setConnectTimeout(kRequestTimeoutMs);
     http.setTimeout(kRequestTimeoutMs);

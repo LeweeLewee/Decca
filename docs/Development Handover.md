@@ -349,3 +349,11 @@ docs/BOM/status references with each change, verify before committing, and push
 logical changes to main. Rev Q bezel PR #7 is merged, complete and approved;
 the Rev P.5 carrier remains frozen.
 ```
+
+
+## Security acceptance gate (2026-09-21)
+
+FW-SEC-01 is open. See [Security Acceptance](Security%20Acceptance.md) before
+claiming security readiness. The initial live OTA negative test passed; the
+candidate v0.28.6-s1 adds response/transport limits and security tests; it is not
+deployed. See [OTA Candidate](OTA%20Candidate.md) before any upload.
