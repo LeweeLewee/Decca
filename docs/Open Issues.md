@@ -101,12 +101,13 @@ Authenticated OTA and controller network return most recently passed on
 
 ## FW-WIM-01 — Accept Phase 2 WiiM integration
 
-**Status:** OPEN — firmware v0.28.4 from source commit `3195c95` is installed by
+**Status:** COMPLETE (owner confirmation 2026-09-21) — firmware v0.28.4 from source commit `3195c95` is installed by
 authenticated OTA. Digital and vinyl audio, metadata, direct absolute
 volume/app reflection, correct left/right channels, logical standby/resume,
 source response, direct trigger and network recovery acceptance pass. The
-controller now advertises the unique `decca-esp32` hostname. Only the formal
-noise/interference sweep remains before Phase 2 acceptance closes.
+controller now advertises the unique `decca-esp32` hostname. The owner confirmed all formal
+noise/interference checks passed with no issues on 2026-09-21, closing Phase 2
+physical acceptance. PR #11 remains draft pending approval to progress.
 
 **WiiM Home configuration confirmed 2026-09-11:** analogue Line Out path,
 Fixed Volume Output off, 2 Vrms line level, EQ off, Auto Headroom on, stereo,
@@ -152,8 +153,9 @@ balance centred and a temporary 70% commissioning volume limit.
     owner confirmed approximately one-second response after deployment.
 11. **Passed (2026-09-20):** entering standby shows `DECCA STANDBY`, blanks after
     ten seconds and remains off. Passive RSSI/status updates no longer wake it.
-12. **Not tested:** the formal hum/buzz/clipping/switching-thump/OLED-interference
-    sweep remains the sole Phase 2 physical gate.
+12. **Passed (owner confirmation 2026-09-21):** all formal noise checks are
+    complete, with no hum, buzz, clipping, switching thumps or OLED/control
+    interference reported. This closes the final Phase 2 physical gate.
 
 ## MECH-HSG-01 — Complete ESP32 housing prototype acceptance
 
