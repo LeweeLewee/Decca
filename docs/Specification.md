@@ -276,7 +276,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
   telemetry updates. WiiM and display target suites compiled without execution.
 - **Confirmed by the owner 2026-09-21:** all formal noise checks passed with no
   hum, buzz, clipping, switching thumps or OLED/control interference. Phase 2
-  physical acceptance is complete. The owner approved PR #11 for review on 2026-09-21; merge requires a separate explicit instruction.
+  physical acceptance is complete. The owner approved PR #11 for review and explicitly authorised merge on 2026-09-21.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.
