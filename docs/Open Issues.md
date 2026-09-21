@@ -5,6 +5,32 @@ This is the canonical short list of unresolved integration issues. Read it with
 the revision history remain valid records of what was tested at the time, but do
 not close a later issue listed here.
 
+## FW-WIFI-01 — Investigate Wi-Fi reliability / packet loss
+
+**Status:** OPEN — retained after the owner-authorised v0.28.5 merge on
+2026-09-21. The TX-power update is deployed; Wi-Fi reliability is not resolved.
+
+**Observed:** authenticated OTA and subsequent discovery confirmed v0.28.5 at
+`decca-esp32.local`, power saving disabled (`WIFI_PS_NONE`), and an effective
+19.5 dBm TX ceiling despite the accepted 20 dBm request. Connection-time RSSI
+was -48 dBm. Before-update numeric RSSI/TX readbacks were unavailable.
+Post-update ping samples returned 28/30 and 26/30 replies: 6/60 lost (10%),
+with latency up to 646 ms. The baseline was only four successful pings, so
+these samples cannot establish improvement or regression. Fresh OTA discovery
+remained available; serial boot/watchdog/power logs were unavailable remotely.
+
+**Next diagnostics / acceptance:**
+
+1. Correlate AP client retries, disconnect reasons and a longer simultaneous
+   LAN latency observation; distinguish controller, AP and test-host effects.
+2. If warranted, inspect antenna placement and interference. The -48 dBm
+   snapshot alone does not establish weak signal as the cause.
+3. Obtain boot/watchdog/power logs if resets or functional symptoms occur.
+4. Record a sustained representative run with stable connectivity and no
+   unexplained control/audio interruptions before closing this issue.
+
+See `docs/Build Guide.md` for deployment evidence and telemetry limitations.
+
 ## HW-GPIO-01 — Verify final controller-side GPIO routing
 
 **Status:** COMPLETE — owner testing on 2026-09-08 confirmed the final routing

@@ -416,3 +416,56 @@ its reserved address. Physical immediate-transition verification remains open.
 ### 7.7 Remaining commissioning
 
 - Confirming final holder fit and measuring the installed three-lamp current
+
+
+### Wi-Fi reliability update — 2026-09-21 (v0.28.5)
+
+The installed controller is the 30-pin ESP32 DevKit V1/DOIT-style board using
+Arduino/PlatformIO, not ESPHome or ESP32-C3. The current OTA target is
+`decca-esp32.local`; the older `decca.local` examples above are historical.
+
+Power saving was already disabled and remains intentionally disabled with
+`WiFi.setSleep(false)` / `WIFI_PS_NONE` (equivalent to ESPHome
+`power_save_mode: none`). TX power was previously implicit. v0.28.5 requests an
+explicit **20.0 dBm ceiling** through `esp_wifi_set_max_tx_power(80)` after
+association and on reconnection, to improve Wi-Fi reliability in the permanently
+mains-powered installation. The installed ESP-IDF 4.4.7 header documents 80 in
+quarter-dBm units as the maximum 20 dBm level. Actual RF output remains subject
+to PHY, modulation and country limits. No credentials or unrelated settings change.
+
+The existing `_arduino._tcp` service advertises `firmware`, `tx_power_qdbm`,
+`power_save`, `rssi_at_connect` and `uptime_ms_at_connect`. These are snapshots
+when the OTA service starts, not continuous telemetry; power-save value 0 means
+`WIFI_PS_NONE`, and TX value 80 means 20 dBm. Getter failures omit the respective
+field. Setter failures are logged on serial. No new remote control endpoint is added.
+
+Baseline: the authenticated OTA service was reachable; four ping replies had
+0% loss, 32–224 ms (mean 164 ms). Numeric RSSI, runtime TX/power-save readback
+and uptime were not exposed by v0.28.4. Source inspection confirms sleep disabled,
+but is not a runtime measurement. Authenticated OTA succeeded (114.14 s, uploader result OK). The rebooted
+`decca-esp32.local` advertised firmware 0.28.5, power_save=0 and TX readback
+78 quarter-dBm = **19.5 dBm** despite the accepted 20 dBm request. Thus 20 dBm
+is the requested ceiling; the running radio clamps it to 19.5 dBm. Do not claim
+20 dBm actual output, or an increase over the old implicit TX setting: no old
+runtime readback exists. Connection-time RSSI was **-48 dBm**, at uptime 1321 ms.
+The readbacks demonstrate the new application booted and reached connected OTA
+service state. ESPHome/API checks do not apply to this Arduino firmware.
+
+Validation: credential-enabled production build passed (52,336 bytes RAM,
+1,020,161 bytes flash); test_ota compiled successfully without upload/execution.
+Private Phase 2 settings were preserved and remain gitignored. No USB was used.
+Serial boot/watchdog/power logs are not available over this firmware's LAN
+interface; absence of those faults cannot be certified from discovery and ping.
+Before/after numeric RSSI comparison is unavailable. Continue monitoring for
+reconnects and control/audio symptoms; RSSI alone does not prove improvement.
+
+Post-update observation: first 30 pings returned 28 replies (2 lost), 5-327 ms,
+mean 108 ms. A second 30 returned 26 replies (4 lost), 7-646 ms, mean 154 ms.
+Combined loss was 6/60 (10%). Fresh mDNS queries through 13:24 local time
+continued to return v0.28.5 and the same connection snapshot. No persistent
+outage was observed, but reliability is NOT resolved. The four-packet baseline
+is too small to establish improvement or regression. Next diagnostic: compare
+access-point client retry/disconnect counters and a longer simultaneous LAN
+latency sample; inspect antenna placement/interference if loss persists. Obtain
+boot/watchdog/power logs if resets or functional symptoms occur. Do not increase
+power beyond the driver-supported ceiling or make unrelated recovery changes.

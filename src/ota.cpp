@@ -2,6 +2,9 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <WiFi.h>
+#include <ESPmDNS.h>
+#include <esp_wifi.h>
+#include "version.h"
 #if __has_include("secrets.h")
 #include "secrets.h"
 #endif
@@ -53,6 +56,7 @@ void startConnection(){
  if(g_connectAction){g_connectAction();return;}
 #endif
  WiFi.mode(WIFI_STA); WiFi.persistent(false); WiFi.setAutoReconnect(true);
+ // Permanently mains-powered: keep modem power saving disabled.
  WiFi.setSleep(false);
  WiFi.setHostname(kHostname); WiFi.begin(DECCA_WIFI_SSID,DECCA_WIFI_PASSWORD);
  Serial.println("[OTA] connecting to Wi-Fi");
@@ -61,7 +65,21 @@ void beginService(){
 #ifdef PIO_UNIT_TESTING
  if(g_beginAction){g_beginAction();return;}
 #endif
+ // ESP-IDF 4.4 uses quarter-dBm units; 80 requests its 20 dBm ceiling.
+ // Apply after association, and again when the OTA service reconnects.
+ const esp_err_t txResult=esp_wifi_set_max_tx_power(80);
+ if(txResult!=ESP_OK)Serial.printf("[OTA] TX power configuration failed: %d\n",static_cast<int>(txResult));
  ArduinoOTA.begin();
+ // Connection-time diagnostics on the existing service, not live telemetry.
+ int8_t txPower=0;
+ wifi_ps_type_t powerSave=WIFI_PS_NONE;
+ MDNS.addServiceTxt("arduino","tcp","firmware",version::kFirmwareVersion);
+ if(esp_wifi_get_max_tx_power(&txPower)==ESP_OK)
+  MDNS.addServiceTxt("arduino","tcp","tx_power_qdbm",String(txPower));
+ if(esp_wifi_get_ps(&powerSave)==ESP_OK)
+  MDNS.addServiceTxt("arduino","tcp","power_save",String(static_cast<int>(powerSave)));
+ MDNS.addServiceTxt("arduino","tcp","rssi_at_connect",String(WiFi.RSSI()));
+ MDNS.addServiceTxt("arduino","tcp","uptime_ms_at_connect",String(millis()));
 }
 void handleService(){
 #ifdef PIO_UNIT_TESTING

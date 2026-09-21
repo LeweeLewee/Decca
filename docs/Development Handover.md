@@ -30,7 +30,10 @@ The production `src/main.cpp` initialises the safe board state, buttons, logical
 power, display, lighting and authenticated ArduinoOTA. It continuously services
 the original on/off switch, pots, VHF source, Stereo/Mono lighting request,
 display and OTA without blocking. Phase 2 WiiM coordination runs on a separate
-core-0 worker. Firmware v0.28.4 from source commit `3195c95` is installed.
+core-0 worker. Firmware v0.28.5 is installed by authenticated OTA (2026-09-21).
+It retains disabled Wi-Fi sleep and requests a 20 dBm TX ceiling; device
+readback is 19.5 dBm. Post-update packet loss remains OPEN as FW-WIFI-01.
+The following physical acceptance was recorded on v0.28.4 (`3195c95`).
 Digital and vinyl audio, channel routing, source response, network recovery,
 standby display behaviour and direct-trigger acceptance pass. The owner confirmed
 all formal noise/interference checks passed with no issues on 2026-09-21,
