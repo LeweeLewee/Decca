@@ -1,0 +1,76 @@
+{
+  "title": "Decca Health Trial",
+  "views": [
+    {
+      "title": "Health",
+      "path": "health",
+      "icon": "mdi:heart-pulse",
+      "cards": [
+        {
+          "type": "markdown",
+          "content": "## Decca health trial\nFive-minute summaries. Blank or unavailable means no fresh report; it does not prove controller failure. Minima and maximum loop gaps cover the report window; counters reset on reboot. Fixture data must stay on a test broker."
+        },
+        {
+          "type": "entities",
+          "title": "Controller and report",
+          "entities": [
+            "sensor.decca_health_trial_firmware",
+            "sensor.decca_health_trial_uptime_s",
+            "sensor.decca_health_trial_reset_reason",
+            "sensor.decca_health_trial_interval_s",
+            "sensor.decca_health_trial_samples",
+            "sensor.decca_health_trial_power",
+            "sensor.decca_health_trial_source",
+            "sensor.decca_health_trial_wiim_status"
+          ]
+        },
+        {
+          "type": "history-graph",
+          "title": "Wi-Fi signal — last 24 hours",
+          "hours_to_show": 24,
+          "entities": [
+            "sensor.decca_health_trial_rssi_dbm",
+            "sensor.decca_health_trial_min_rssi_dbm"
+          ]
+        },
+        {
+          "type": "history-graph",
+          "title": "Memory — last 24 hours",
+          "hours_to_show": 24,
+          "entities": [
+            "sensor.decca_health_trial_free_heap_b",
+            "sensor.decca_health_trial_min_heap_b"
+          ]
+        },
+        {
+          "type": "history-graph",
+          "title": "Fault counters — since boot",
+          "hours_to_show": 24,
+          "entities": [
+            "sensor.decca_health_trial_wifi_disconnects",
+            "sensor.decca_health_trial_wiim_faults",
+            "sensor.decca_health_trial_mqtt_disconnects"
+          ]
+        },
+        {
+          "type": "history-graph",
+          "title": "Worst loop gap — each report window",
+          "hours_to_show": 24,
+          "entities": [
+            "sensor.decca_health_trial_max_loop_gap_us"
+          ]
+        },
+        {
+          "type": "history-graph",
+          "title": "Operating context",
+          "hours_to_show": 24,
+          "entities": [
+            "sensor.decca_health_trial_power",
+            "sensor.decca_health_trial_source",
+            "sensor.decca_health_trial_wiim_status"
+          ]
+        }
+      ]
+    }
+  ]
+}

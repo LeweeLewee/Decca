@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "firmware": "0.28.6-h1",
+  "uptime_s": 3900,
+  "reset_reason": "power_on",
+  "free_heap_b": 110000,
+  "min_heap_b": 96000,
+  "rssi_dbm": -48,
+  "min_rssi_dbm": -81,
+  "wifi_disconnects": 2,
+  "wiim_faults": 1,
+  "mqtt_disconnects": 1,
+  "max_loop_gap_us": 9500,
+  "samples": 300,
+  "interval_s": 300,
+  "power": "on",
+  "source": "digital",
+  "wiim_status": "ready"
+}

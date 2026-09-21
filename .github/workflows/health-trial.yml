@@ -1,0 +1,37 @@
+name: HA health trial
+on:
+  push:
+    branches: [feat/ha-health-trial]
+  pull_request:
+    paths:
+      - 'src/health*'
+      - 'src/main.cpp'
+      - 'src/version.h'
+      - 'platformio.ini'
+      - 'tools/**'
+      - 'test/fixtures/**'
+      - 'home-assistant/**'
+      - '.github/workflows/health-trial.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install platformio==6.1.19
+      - name: Execute aggregation and failure recovery tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror tools/tests/health_model_test.cpp -o /tmp/health-test
+          /tmp/health-test
+      - name: Check HA artifact contracts
+        run: python tools/test_health_contract.py
+      - name: Compile disabled and enabled network paths
+        run: pio run -e esp32dev-network-baseline -e esp32dev-health-compile
+      - name: Compile target suites without upload
+        run: pio test -e esp32dev --without-uploading --without-testing
