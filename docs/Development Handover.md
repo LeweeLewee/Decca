@@ -349,3 +349,11 @@ docs/BOM/status references with each change, verify before committing, and push
 logical changes to main. Rev Q bezel PR #7 is merged, complete and approved;
 the Rev P.5 carrier remains frozen.
 ```
+
+## Isolated HA health development branch
+
+The branch feat/ha-health-trial adds an optional read-only telemetry experiment
+and HA dashboard assets. The default build disables it, and trial targets block
+uploads. This is not an installed release. Follow docs/HA Health Trial.md for
+the five-minute cadence, offline tests, spare-board gates and rollback plan.
+Installed v0.28.5 and FW-WIFI-01 remain unchanged.

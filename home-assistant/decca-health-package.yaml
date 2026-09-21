@@ -1,0 +1,332 @@
+{
+  "mqtt": {
+    "sensor": [
+      {
+        "name": "Firmware",
+        "unique_id": "decca_health_trial_firmware",
+        "default_entity_id": "sensor.decca_health_trial_firmware",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.firmware }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        }
+      },
+      {
+        "name": "Uptime",
+        "unique_id": "decca_health_trial_uptime_s",
+        "default_entity_id": "sensor.decca_health_trial_uptime_s",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.uptime_s }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "s",
+        "device_class": "duration",
+        "state_class": "measurement"
+      },
+      {
+        "name": "Reset reason",
+        "unique_id": "decca_health_trial_reset_reason",
+        "default_entity_id": "sensor.decca_health_trial_reset_reason",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.reset_reason }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        }
+      },
+      {
+        "name": "Free heap",
+        "unique_id": "decca_health_trial_free_heap_b",
+        "default_entity_id": "sensor.decca_health_trial_free_heap_b",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.free_heap_b }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "B",
+        "device_class": "data_size",
+        "state_class": "measurement"
+      },
+      {
+        "name": "Minimum heap since boot",
+        "unique_id": "decca_health_trial_min_heap_b",
+        "default_entity_id": "sensor.decca_health_trial_min_heap_b",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.min_heap_b }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "B",
+        "device_class": "data_size",
+        "state_class": "measurement"
+      },
+      {
+        "name": "Wi-Fi RSSI",
+        "unique_id": "decca_health_trial_rssi_dbm",
+        "default_entity_id": "sensor.decca_health_trial_rssi_dbm",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.rssi_dbm }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "dBm",
+        "device_class": "signal_strength",
+        "state_class": "measurement"
+      },
+      {
+        "name": "Minimum RSSI in report window",
+        "unique_id": "decca_health_trial_min_rssi_dbm",
+        "default_entity_id": "sensor.decca_health_trial_min_rssi_dbm",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.min_rssi_dbm }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "dBm",
+        "device_class": "signal_strength",
+        "state_class": "measurement"
+      },
+      {
+        "name": "Wi-Fi disconnects since boot",
+        "unique_id": "decca_health_trial_wifi_disconnects",
+        "default_entity_id": "sensor.decca_health_trial_wifi_disconnects",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.wifi_disconnects }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "state_class": "total_increasing"
+      },
+      {
+        "name": "WiiM fault episodes since boot",
+        "unique_id": "decca_health_trial_wiim_faults",
+        "default_entity_id": "sensor.decca_health_trial_wiim_faults",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.wiim_faults }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "state_class": "total_increasing"
+      },
+      {
+        "name": "MQTT disconnects since boot",
+        "unique_id": "decca_health_trial_mqtt_disconnects",
+        "default_entity_id": "sensor.decca_health_trial_mqtt_disconnects",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.mqtt_disconnects }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "state_class": "total_increasing"
+      },
+      {
+        "name": "Maximum loop gap in report window",
+        "unique_id": "decca_health_trial_max_loop_gap_us",
+        "default_entity_id": "sensor.decca_health_trial_max_loop_gap_us",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.max_loop_gap_us }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "µs",
+        "state_class": "measurement"
+      },
+      {
+        "name": "Samples in report window",
+        "unique_id": "decca_health_trial_samples",
+        "default_entity_id": "sensor.decca_health_trial_samples",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.samples }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        }
+      },
+      {
+        "name": "Report interval",
+        "unique_id": "decca_health_trial_interval_s",
+        "default_entity_id": "sensor.decca_health_trial_interval_s",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.interval_s }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        },
+        "unit_of_measurement": "s",
+        "device_class": "duration"
+      },
+      {
+        "name": "Logical power",
+        "unique_id": "decca_health_trial_power",
+        "default_entity_id": "sensor.decca_health_trial_power",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.power }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        }
+      },
+      {
+        "name": "Requested source",
+        "unique_id": "decca_health_trial_source",
+        "default_entity_id": "sensor.decca_health_trial_source",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.source }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        }
+      },
+      {
+        "name": "WiiM worker status",
+        "unique_id": "decca_health_trial_wiim_status",
+        "default_entity_id": "sensor.decca_health_trial_wiim_status",
+        "state_topic": "decca/trial/health/state",
+        "value_template": "{{ value_json.wiim_status }}",
+        "availability_topic": "decca/trial/health/availability",
+        "expire_after": 660,
+        "force_update": true,
+        "entity_category": "diagnostic",
+        "device": {
+          "identifiers": [
+            "decca_health_trial"
+          ],
+          "name": "Decca Health Trial",
+          "manufacturer": "Decca restoration",
+          "model": "ESP32 DevKit"
+        }
+      }
+    ]
+  }
+}

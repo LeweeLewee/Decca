@@ -12,6 +12,7 @@
 #include "settings.h"
 #include "version.h"
 #include "wiim.h"
+#include "health.h"
 
 namespace {
 
@@ -218,6 +219,9 @@ void setup() {
     applyPowerState();
     decca::ota::init();
     decca::wiim::init();
+#if DECCA_HEALTH_ENABLED
+    decca::health::init();
+#endif
     decca::wiim::requestSource(g_viewState.source);
     decca::wiim::requestVolume(
         static_cast<uint8_t>((g_potValues[0] + 5U) / 10U));
@@ -239,5 +243,19 @@ void loop() {
     applyWiimState();
     decca::display::update();
     decca::ota::update();
+#if DECCA_HEALTH_ENABLED
+    const auto wiimStatus = decca::wiim::snapshot().status;
+    const char* statusText = "disabled";
+    switch (wiimStatus) {
+        case decca::wiim::Status::WaitingForNetwork: statusText = "waiting_for_network"; break;
+        case decca::wiim::Status::Connecting: statusText = "connecting"; break;
+        case decca::wiim::Status::Ready: statusText = "ready"; break;
+        case decca::wiim::Status::Error: statusText = "error"; break;
+        default: break;
+    }
+    decca::health::update({decca::power::isOn(),
+        g_sourceMode == decca::buttons::SourceMode::Vinyl,
+        wiimStatus == decca::wiim::Status::Error, statusText});
+#endif
 }
 #endif

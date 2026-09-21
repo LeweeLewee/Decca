@@ -153,3 +153,12 @@ Modules currently live in `src/`. As interfaces stabilise, self-contained
 modules may migrate to `lib/` as PlatformIO libraries with their own unit tests
 under `test/`, further enforcing independence. This is an intended path, not a
 requirement for Phase 1.
+
+## Optional HA health trial (not deployed)
+
+The isolated, compile-time-disabled-by-default health module is coordinated in
+main using a fixed-size input contract. It publishes five-minute MQTT summaries
+from a separate worker, with no commands, NVS writes or lateral module calls.
+See [HA Health Trial](HA%20Health%20Trial.md) for data semantics, resource gates,
+separate dashboard, compile-only targets and recovery limitations. Production
+behaviour and installed firmware remain unchanged.
