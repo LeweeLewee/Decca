@@ -315,7 +315,11 @@ void renderStartup(uint8_t frame) {
         char identity[24]{};
         std::snprintf(identity,
                       sizeof(identity),
+#if defined(DECCA_HEALTH_ENABLED) && DECCA_HEALTH_ENABLED
+                      "HA TRIAL v%s",
+#else
                       "MUSIC CENTRE v%s",
+#endif
                       version::kFirmwareVersion);
         g_panel.setTextSize(1);
         printCentredClipped(identity, 20, 50);
