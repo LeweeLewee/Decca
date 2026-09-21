@@ -14,7 +14,9 @@ adversarial HTTP/OTA resilience, network exposure, credentials, dependency
 advisories and firmware/physical protection remain open.
 
 The isolated security candidate replaces body-sized HTTP String allocation
-with a fixed-capacity rejecting sink and adds security tests. It is not deployed.
+with a fixed-capacity rejecting sink and adds security tests. v0.28.6-s1 is
+deployed; fresh discovery and OTA authentication rejection passed. Physical
+display/source/standby/volume acceptance remains pending.
 See [Security Acceptance](Security%20Acceptance.md) for evidence, limitations,
 bench procedures and the explicit closure gate.
 

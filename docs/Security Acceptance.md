@@ -44,7 +44,7 @@ ESP32 with representative firmware and a verified USB recovery route.
 
 | ID | Priority | Finding / test | Acceptance evidence required | Status |
 |---|---|---|---|---|
-| SEC-01 | High | OTA authentication | Missing credentials require challenge; incorrect proof rejected; correct-password update still works on candidate firmware | Single live negative probe PASS; candidate positive test pending |
+| SEC-01 | High | OTA authentication | Missing credentials require challenge; incorrect proof rejected; correct-password update still works on candidate firmware | Positive deployment and post-update invalid-proof rejection PASS on 0.28.6-s1 |
 | SEC-02 | High | WiiM peer identity | Reject an impersonated peer using a trusted certificate/pin provisioned through an independently verified channel; prove genuine WiiM reconnect after restart/update | OPEN: `client.setInsecure()` remains in wiim.cpp |
 | SEC-03 | High | Oversized HTTP bodies | Reject declared and streamed overflow without heap growth proportional to body size, partial JSON acceptance or unsafe control changes | Bounded body sink and transport guard implemented; native guard tests pass; ESP32 integration execution pending |
 | SEC-04 | High | Malformed/stalled responses | Malformed, deeply nested, huge, chunked, missing-length and slow/trickled bodies plus long HTTP headers; bounded request duration, heap recovery and local controls responsive | Ten native guard cases pass, including stalls/trickle/rollover; real TLS/HTTP adversarial integration pending |
@@ -128,7 +128,7 @@ This inventory is not a finding that those versions are vulnerability-free.
 - [Espressif HTTPClient implementation](https://github.com/espressif/arduino-esp32/blob/2.0.17/libraries/HTTPClient/src/HTTPClient.cpp)
 - [ESP32 secure boot guidance](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/security/secure-boot-v2.html)
 
-## Continuation: candidate 0.28.6-s1 (not uploaded)
+## Continuation: 0.28.6-s1 (deployed; physical acceptance pending)
 
 The initial long prerelease label was shortened to fit the existing OLED startup
 buffer. No display layout change is required. Changes are confined to WiiM HTTP
@@ -190,3 +190,22 @@ Approval to upload the candidate is a controlled integration trial, not closure
 of this security gate. Peer certificate verification, supported-SDK migration,
 physical protections, router isolation and destructive recovery/abuse tests stay
 open. No eFuse or firmware-signing migration is included.
+
+### Upload attempt blocked (2026-09-21 20:27 BST)
+
+Owner-authorised upload was rejected at authentication before transfer. Device
+remains on v0.28.5. Candidate configuration needs the owner's current OTA password
+and a rebuild; candidate presence checks establish inclusion, not credential
+validity. See OTA Candidate for the failed-attempt record.
+
+### Deployment completed (2026-09-21 21:03 BST)
+
+The saved credential was recovered from the prior successful deployment folder.
+Only that private configuration changed; candidate/recovery images were rebuilt.
+The corrected credential scan found zero matches in 3,126 Git objects and 208
+nonignored files. After two interrupted authenticated transfers, a TCP_NODELAY
+sender retry reached 100%, returned exit 0 and fresh discovery confirmed 0.28.6-s1.
+The post-update invalid-proof rejection test passed. WiiM remained stopped at
+47%, unmuted. No hardware test-suite execution or physical acceptance is claimed.
+See OTA Candidate for corrected hashes and full deployment evidence. SEC-01 has
+positive and negative OTA evidence on the new image; the security gate stays open.

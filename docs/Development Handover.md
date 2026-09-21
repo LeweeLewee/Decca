@@ -30,7 +30,9 @@ The production `src/main.cpp` initialises the safe board state, buttons, logical
 power, display, lighting and authenticated ArduinoOTA. It continuously services
 the original on/off switch, pots, VHF source, Stereo/Mono lighting request,
 display and OTA without blocking. Phase 2 WiiM coordination runs on a separate
-core-0 worker. Firmware v0.28.5 is installed by authenticated OTA (2026-09-21).
+core-0 worker. Firmware v0.28.6-s1 is installed by authenticated OTA (2026-09-21).
+Fresh version discovery and OTA authentication rejection passed; physical
+acceptance is pending. See [OTA Candidate](OTA%20Candidate.md).
 It retains disabled Wi-Fi sleep and requests a 20 dBm TX ceiling; device
 readback is 19.5 dBm. Post-update packet loss remains OPEN as FW-WIFI-01.
 The following physical acceptance was recorded on v0.28.4 (`3195c95`).
@@ -355,5 +357,5 @@ the Rev P.5 carrier remains frozen.
 
 FW-SEC-01 is open. See [Security Acceptance](Security%20Acceptance.md) before
 claiming security readiness. The initial live OTA negative test passed; the
-candidate v0.28.6-s1 adds response/transport limits and security tests; it is not
-deployed. See [OTA Candidate](OTA%20Candidate.md) before any upload.
+v0.28.6-s1 adds response/transport limits and security tests and is deployed;
+physical acceptance and the wider security gate remain open. See [OTA Candidate](OTA%20Candidate.md) before any upload.
