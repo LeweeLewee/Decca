@@ -31,8 +31,8 @@ core-0 worker. Firmware v0.28.4 from source commit `3195c95` is installed.
 Digital and vinyl audio, channel routing, source response, network recovery,
 standby display behaviour and direct-trigger acceptance pass. The owner confirmed
 all formal noise/interference checks passed with no issues on 2026-09-21,
-completing Phase 2 physical acceptance. PR #11 remains draft pending approval
-to progress.
+completing Phase 2 physical acceptance. The owner approved PR #11 for review on 2026-09-21;
+merge requires a separate explicit instruction.
 Final lighting hardware acceptance remains open as HW-LGT-01.
 
 Implemented modules:
@@ -242,7 +242,7 @@ the user's Wi-Fi or OTA passwords.
     OTA passed, and only the formal Phase 2 noise sweep remains open.
 14. **Complete (owner confirmation 2026-09-21):** all formal noise checks passed
     with no hum, buzz, clipping, switching thumps or OLED/control interference.
-    FW-WIM-01 is complete; PR #11 remains draft pending approval to progress.
+    FW-WIM-01 is complete; The owner approved PR #11 for review on 2026-09-21; merge requires a separate explicit instruction.
 15. Keep automatic failed-boot OTA rollback as Phase 3 unless separately brought
    forward.
 
