@@ -11,8 +11,8 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 - Installed firmware is **v0.28.4** from source commit `3195c95`, deployed by
   authenticated OTA. Digital and vinyl audio, metadata, volume/app
   synchronisation, left/right channels, logical standby/resume, source response,
-  network recovery and direct WiiM-to-ZA3 trigger acceptance pass. Only the
-  formal control/display noise sweep remains open for Phase 2.
+  network recovery and direct WiiM-to-ZA3 trigger acceptance pass. The owner confirmed all formal noise/interference checks passed with no
+  issues on 2026-09-21, completing Phase 2 physical acceptance.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
