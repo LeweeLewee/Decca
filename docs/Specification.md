@@ -5,7 +5,7 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.28.4 from source commit `3195c95` is installed by authenticated OTA. Digital and vinyl audio, metadata, volume/app synchronisation, channel, logical-power, source-response, direct-trigger and outage-recovery acceptance pass. Only the formal Phase 2 noise/interference sweep remains open. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Status   | Draft. Firmware v0.28.4 from source commit `3195c95` is installed by authenticated OTA. Digital and vinyl audio, metadata, volume/app synchronisation, channel, logical-power, source-response, direct-trigger and outage-recovery acceptance pass. Phase 2 physical acceptance is complete: the owner confirmed all formal noise/interference checks passed with no issues on 2026-09-21. Phase 1 lighting and retained-switch issues remain tracked separately. |
 | Version  | 0.28.4                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
@@ -274,8 +274,9 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
   Wi-Fi strength and distinguishes controller-network loss from an unresponsive
   WiiM. Standby shows for ten seconds, blanks, and remains off despite passive
   telemetry updates. WiiM and display target suites compiled without execution.
-- **Open:** run the formal hum/buzz/clipping/switching-thump/OLED-interference
-  sweep.
+- **Confirmed by the owner 2026-09-21:** all formal noise checks passed with no
+  hum, buzz, clipping, switching thumps or OLED/control interference. Phase 2
+  physical acceptance is complete. PR #11 remains draft pending approval to progress.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.
