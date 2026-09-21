@@ -16,7 +16,7 @@
 #endif
 namespace decca::ota {
 namespace {
-constexpr char kHostname[]="decca";
+constexpr char kHostname[]="decca-esp32";
 Status g_status=Status::Disabled;
 bool g_serviceStarted=false;
 uint32_t g_lastConnectAttemptMs=0;
@@ -53,6 +53,7 @@ void startConnection(){
  if(g_connectAction){g_connectAction();return;}
 #endif
  WiFi.mode(WIFI_STA); WiFi.persistent(false); WiFi.setAutoReconnect(true);
+ WiFi.setSleep(false);
  WiFi.setHostname(kHostname); WiFi.begin(DECCA_WIFI_SSID,DECCA_WIFI_PASSWORD);
  Serial.println("[OTA] connecting to Wi-Fi");
 }
@@ -91,7 +92,7 @@ void init(){
 void update(){
  if(g_status==Status::Disabled)return;
  if(networkConnected()){
-  if(!g_serviceStarted){beginService();g_serviceStarted=true;g_status=Status::Ready;Serial.print("[OTA] ready at ");Serial.print(WiFi.localIP());Serial.println(" (decca.local)");}
+  if(!g_serviceStarted){beginService();g_serviceStarted=true;g_status=Status::Ready;Serial.print("[OTA] ready at ");Serial.print(WiFi.localIP());Serial.println(" (decca-esp32.local)");}
   handleService();return;
  }
  if(g_serviceStarted){endService();g_serviceStarted=false;}

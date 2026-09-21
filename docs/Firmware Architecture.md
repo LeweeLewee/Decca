@@ -29,11 +29,12 @@ AI-assisted editing.
 | `display`  | OLED rendering and idle pixel protection          | `hardware`, `settings`|
 | `lighting` | Warm dial illumination (immediate PWM via MOSFET) | `hardware` |
 | `power`    | Pure logical on/standby state handling           | —                     |
-| WiiM iface | WiiM Pro local-API control *(Phase 2)*           | `settings`, Wi-Fi     |
+| `wiim`     | WiiM Pro local-HTTPS control and status worker   | `settings`, Wi-Fi     |
 | `ota`      | Authenticated Wi-Fi firmware update service      | Wi-Fi                 |
 
-> The WiiM interface remains a later Phase 2 module. `power` and `ota` are
-> implemented in `src/` and active in the production runtime.
+> The WiiM interface is implemented for Phase 2. Network requests run on a
+> dedicated core-0 worker so local inputs, lighting, display and OTA coordination
+> remain responsive when the streamer is slow or unavailable.
 
 ### Module notes (confirmed Phase 1 build)
 
@@ -79,15 +80,27 @@ AI-assisted editing.
   presents one priority at a time: identity/standby, a control value and bar,
   source confirmation, status, or title/artist metadata. A small bottom-right
   triangle or two-bar glyph communicates playing or paused without repeating a
-  text label. To limit OLED uneven ageing, activity runs at contrast 0x80, the
+  text label. A three-level controller Wi-Fi-strength glyph occupies the
+  top-left header; long titles clip to its reserved text area. Connectivity
+  status distinguishes controller Wi-Fi loss from an unresponsive WiiM. To
+  limit OLED uneven ageing, activity runs at contrast 0x80, the
   panel dims to 0x20 after 60 seconds, and its pixels turn off after five minutes
   without activity. Standby is shown for ten seconds before pixels turn off.
-  State, control, status and metadata activity wake it immediately. The
+  A power transition wakes the panel, and on-state activity keeps it current;
+  passive telemetry changes while already in standby are retained without
+  waking the sleeping panel. The
   non-blocking full-canvas calibration frame remains available as a service
   diagnostic and is subject to the same protection timer.
 - **`power`** owns only the requested logical state. It converts the debounced
   on/off request supplied by `main` into On or Standby and reports transitions;
   it owns no GPIO and does not call display, lighting or network modules.
+- **`wiim`** maps VHF to `switchmode:wifi`, released VHF to
+  `switchmode:line-in`, the volume pot to 0-100 WiiM volume, and logical OFF to
+  `stop`. It polls player state and active metadata over local HTTPS. Its worker
+  owns all potentially blocking network operations; `main` exchanges only
+  fixed-size requests and snapshots through short critical sections. Missing
+  metadata falls back to the mapped function, and network failure never blocks
+  local control.
 
 ## Data Flow
 
@@ -125,9 +138,12 @@ Modules add a small number of typed accessors (e.g. `buttons::nextEvent()`,
 
 - **Phase 1 (Local control):** `hardware`, `settings`, `buttons`, `pots`,
   `display`, `lighting`; authenticated `ota` is brought forward before enclosure.
-- **Phase 2 (WiiM):** add the WiiM interface module; VHF selects digital playback,
+- **Phase 2 (WiiM):** the WiiM interface module makes VHF select digital playback,
   released VHF selects Line-In for Vinyl, and the phone controls digital
-  content. Volume and metadata route through `settings`.
+  content. Its core-0 worker reuses the secure control connection, resets it only
+  on a real request/network failure, prioritises new physical source commands
+  over wake activity, bypasses stale retry cooldown for revised controls and
+  reconciles reported Line-In mode. Volume and metadata route through `settings`.
 - **Phase 3 (Advanced):** configuration menus, automatic post-boot OTA rollback
   validation, richer UI and additional legacy controls.
 

@@ -265,6 +265,33 @@ void printCentredClipped(const char* text,
     printClipped(text, maxCharacters);
 }
 
+void drawControllerWifiBars() {
+    const uint8_t bars =
+        min(g_state.controllerWifiBars, static_cast<uint8_t>(3));
+    for (uint8_t index = 0; index < bars; ++index) {
+        const int16_t height = static_cast<int16_t>((index + 1U) * 3U);
+        g_panel.fillRect(kWifiIndicatorX + static_cast<int16_t>(index * 4U),
+                         kWifiIndicatorBaselineY - height, 2, height,
+                         SH110X_WHITE);
+    }
+}
+
+void renderDashboardHeader(const char* text) {
+    // Reserve the left of the header for controller connectivity.  Short text
+    // remains centred across the viewport; long titles clip within the space
+    // to the right rather than colliding with the indicator.
+    constexpr uint8_t kHeaderTextX = 20;
+    constexpr uint8_t kHeaderCharacters = 17;
+    const size_t length = std::strlen(textOrEmpty(text));
+    const uint8_t visibleLength = static_cast<uint8_t>(
+        length > kHeaderCharacters ? kHeaderCharacters : length);
+    int16_t x = centredViewportX(visibleLength * 6);
+    if (x < kHeaderTextX) x = kHeaderTextX;
+    g_panel.setCursor(x, kContentTop);
+    printClipped(text, kHeaderCharacters);
+    drawControllerWifiBars();
+}
+
 void renderStartup(uint8_t frame) {
     constexpr char kWordmark[] = "DECCA";
     char revealed[sizeof(kWordmark)]{};
@@ -318,14 +345,14 @@ void renderPrimaryFunction(int16_t y) {
 
 void renderLocalDashboard() {
     g_panel.setTextSize(1);
-    printCentredClipped("SOURCE", 19, kContentTop);
+    renderDashboardHeader("SOURCE");
     g_panel.drawFastHLine(18, 34, 92, SH110X_WHITE);
     renderPrimaryFunction(38);
 }
 
 void renderNowPlaying() {
     g_panel.setTextSize(1);
-    printCentredClipped(g_title, 19, kContentTop);
+    renderDashboardHeader(g_title);
     g_panel.drawFastHLine(18, 34, 92, SH110X_WHITE);
     printCentredClipped(g_artist, 19, 39);
     if (g_state.playing) {
@@ -513,6 +540,8 @@ bool statesEqual(const ViewState& state) {
            g_state.treble == clampedControl(state.treble) &&
            g_state.balance == clampedControl(state.balance) &&
            g_state.playing == state.playing &&
+           g_state.controllerWifiBars ==
+               min(state.controllerWifiBars, static_cast<uint8_t>(3)) &&
            std::strncmp(g_functionName,
                         textOrEmpty(state.functionName),
                         kFunctionCapacity) == 0 &&
@@ -532,6 +561,8 @@ void copyState(const ViewState& state) {
     g_state.treble = clampedControl(state.treble);
     g_state.balance = clampedControl(state.balance);
     g_state.playing = state.playing;
+    g_state.controllerWifiBars =
+        min(state.controllerWifiBars, static_cast<uint8_t>(3));
     copyText(g_functionName, state.functionName);
     copyText(g_title, state.title);
     copyText(g_artist, state.artist);
@@ -663,8 +694,12 @@ void setState(const ViewState& state) {
     if (statesEqual(state)) {
         return;
     }
-    wakePanel();
+    const bool powerChanged = g_state.power != state.power;
+    const bool shouldWake = powerChanged || state.power == PowerState::On;
     copyState(state);
+    if (shouldWake) {
+        wakePanel();
+    }
     g_dirty = true;
 }
 

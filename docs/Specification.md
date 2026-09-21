@@ -5,8 +5,8 @@
 | Field    | Value                                             |
 |----------|---------------------------------------------------|
 | Project  | decca — ESP32 music centre restoration            |
-| Status   | Draft. Firmware v0.27.4 removes the lighting fade engine so debounced Stereo/Mono and logical power changes apply their PWM duty immediately. The release and credential-enabled OTA builds pass, all eight on-target suites compile, authenticated OTA succeeded and the device returned at `decca.local` / `192.168.1.79`. Physical transition verification remains open. Stereo/Mono firmware logic uses GPIO25, but the retained switch has a physical contact fault open as HW-SW-01. HW-LGT-01 remains open for Mono/off re-verification after switch repair, WAGO distribution installation, pot stability, temperature and current checks. WiiM integration remains outstanding. |
-| Version  | 0.27.4                                            |
+| Status   | Draft. Firmware v0.28.4 from source commit `3195c95` is installed by authenticated OTA. Digital and vinyl audio, metadata, volume/app synchronisation, channel, logical-power, source-response, direct-trigger and outage-recovery acceptance pass. Phase 2 physical acceptance is complete: the owner confirmed all formal noise/interference checks passed with no issues on 2026-09-21. Phase 1 lighting and retained-switch issues remain tracked separately. |
+| Version  | 0.28.4                                            |
 | Owner    | LeweeLewee                                        |
 | Related  | `README.md`, `docs/Development Handover.md`, `docs/Firmware Architecture.md`, `docs/Hardware Architecture.md`, `docs/Wiring.md`, `docs/adr/` |
 
@@ -114,7 +114,8 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 | FR-DSP-05 | The display shall present SW as **unavailable / no function**, not as a working selector. | 1 |
 | FR-DSP-06 | Cold startup and OTA reboot shall show a short, non-blocking monochrome Decca-logo animation, followed by the firmware version in the calibrated visible area. Logical standby/wake shall not replay it. | 1 |
 | FR-DSP-07 | The display shall identify the mapped logical function prominently. Legacy fascia button labels shall not consume space in normal, now-playing or function-confirmation views. | 2 |
-| FR-DSP-08 | The OLED shall reduce uneven ageing by dimming after inactivity, turning pixels off after extended inactivity and while logically off, and waking immediately on relevant activity. | 1 |
+| FR-DSP-08 | The OLED shall reduce uneven ageing by dimming after inactivity, turning pixels off after extended inactivity and while logically off, and waking immediately on relevant user/system activity. Passive telemetry changes while already in standby shall not wake it. | 1 |
+| FR-DSP-09 | The normal header shall show controller Wi-Fi strength without obscuring source/title text, and connectivity diagnostics shall distinguish controller Wi-Fi loss from an unresponsive streamer. | 2 |
 
 ### 5.5 Lighting
 
@@ -230,7 +231,7 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - **Confirmed 2026-08-30:** after TX2 Stereo/Mono integration, the release build
   passed and all eight on-target suites passed 55/55 (buttons 11, display 15,
   hardware 3, lighting 7, OTA 5, pots 6, power 5, settings 3).
-- **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.1.79 (decca.local)`.
+- **Confirmed 2026-08-30:** one USB bootstrap flash and one authenticated OTA upload both succeeded; after reboot serial reported `[OTA] ready at 192.168.x.x (decca.local)`.
 - Interrupted-transfer behaviour is verified to retain the previous bootable firmware.
 - **Confirmed 2026-08-30:** the final `esp32dev` release build passed cleanly (RAM 49,760 bytes / 15.2%; flash 833,321 bytes / 63.6%).
 
@@ -238,6 +239,44 @@ See `docs/Wiring.md` and the ADRs in `docs/adr/` for the confirmed detail.
 - FR-WIM-01..04 and FR-DSP-03/07 satisfied.
 - VHF-to-digital and released-VHF-to-Line-In switching, volume sync and metadata are verified against a live WiiM Pro.
 - Loss of the streamer does not impair local control (FR-SYS-05, NFR-09).
+- **Confirmed 2026-09-11:** the acquired WiiM Pro answered live HTTPS
+  `getStatusEx` and `getPlayerStatus` requests. The idle player reported no
+  active mode, `status=none`, volume 35 and unmuted; idle `getMetaInfo` returned
+  an empty response body.
+- **Confirmed 2026-09-11:** active TIDAL playback reported `vendor=Tidal`,
+  `mode=10`, `status=play`, 96 kHz structured metadata, and matching title and
+  artist through both hex player fields and plain-text `getMetaInfo` fields.
+  The published mode table is not used to identify TIDAL because this live
+  firmware reports mode 10 rather than the documented historical mode 32.
+- **Confirmed 2026-09-12:** v0.28.0 from source commit `d06e357` built at
+  52,328 bytes RAM (16.0%) and 1,017,193 bytes flash (77.6%); all nine target
+  suites compiled, authenticated OTA passed and the controller returned without
+  USB intervention. Live tests passed both source directions, matching OLED
+  metadata/play state, direct absolute volume/app reflection through a reusable
+  HTTPS connection, logical standby/resume and persistent outage/recovery
+  behavior. Exact 10%, 20% and 30% volume targets matched in WiiM Home, and the
+  owner confirmed the final response was much more responsive.
+- **Confirmed 2026-09-19:** v0.28.0 from source commit `36d84d1` built at
+  52,328 bytes RAM (16.0%) and 1,016,977 bytes flash (77.6%), uploaded to 100%
+  by authenticated OTA and returned without USB intervention. Digital TIDAL
+  audio and correct left/right routing pass through the ZA3 and B&W DM601 S3
+  speakers. With WiiM automatic standby set to 30 seconds, OFF removes the
+  direct trigger. ON uses a safe one-step downward volume pulse followed by
+  requested-volume restoration to wake the WiiM and ZA3 without app interaction
+  or automatic playback.
+- **Confirmed 2026-09-20:** v0.28.4 from source commit `3195c95` built at
+  52,336 bytes RAM (16.0%) and 1,018,373 bytes flash (77.7%), passed authenticated
+  OTA and returned on the unique `decca-esp32` hostname. Vinyl playback passed.
+  After an installed 30–60+ second source-delay regression, the worker restored
+  secure-connection reuse, prioritised physical source commands, bypassed stale
+  retry cooldown for new input and reconciled Line-In state; the owner confirmed
+  approximately one-second switching. The top-left header now shows controller
+  Wi-Fi strength and distinguishes controller-network loss from an unresponsive
+  WiiM. Standby shows for ten seconds, blanks, and remains off despite passive
+  telemetry updates. WiiM and display target suites compiled without execution.
+- **Confirmed by the owner 2026-09-21:** all formal noise checks passed with no
+  hum, buzz, clipping, switching thumps or OLED/control interference. Phase 2
+  physical acceptance is complete. The owner approved PR #11 for review and explicitly authorised merge on 2026-09-21.
 
 ### Phase 3 — Advanced Features
 - FR-ADV-01, FR-ADV-03, FR-ADV-04 and FR-DSP-04 satisfied.

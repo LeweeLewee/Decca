@@ -8,8 +8,11 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
 
 ## Current state
 
-- Firmware version: **v0.27.4**, defined once in `src/version.h`, shown during
-  cold-start/OTA-reboot and reported over serial for deployment identification.
+- Installed firmware is **v0.28.4** from source commit `3195c95`, deployed by
+  authenticated OTA. Digital and vinyl audio, metadata, volume/app
+  synchronisation, left/right channels, logical standby/resume, source response,
+  network recovery and direct WiiM-to-ZA3 trigger acceptance pass. The owner confirmed all formal noise/interference checks passed with no
+  issues on 2026-09-21, completing Phase 2 physical acceptance.
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
 - The reliable VHF contact is the sole source input:
@@ -20,16 +23,23 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   but the retained physical switch is faulty and remains open as HW-SW-01.
 - The display, buttons, pots, settings, lighting and logical power modules are
   implemented and independently tested.
+- The Phase 2 WiiM module is implemented as a background HTTPS worker for source,
+  direct absolute volume over a reusable connection, power-state and metadata
+  coordination. Logical power-on sends a safe one-step downward volume pulse,
+  then restores the requested value, so a stopped network session wakes the
+  WiiM trigger without starting playback or exceeding the selected volume.
+- The OLED reports controller Wi-Fi strength in the top-left header and
+  distinguishes controller-network loss from an unresponsive WiiM. Passive
+  telemetry updates while already in standby do not wake the sleeping panel.
 - Production coordinates power, all four pots, the VHF-derived source state and
   the accepted OLED views, and 85% Stereo/off Mono dial lighting while
   continuously servicing authenticated OTA.
 - USB-to-OTA, GPIO14 power, GPIO26 VHF source selection and the fitted display
   are complete. The DFR0457 replacement stage is installed and its initial
-  steady-light test resolved the flicker. Firmware v0.27.4 was deployed by
-  authenticated OTA and returned at `decca.local`; it removes every lighting
-  fade. Physical transition verification after HW-SW-01, WAGO distribution,
-  pot stability, temperature and current remain open as HW-LGT-01. Normal
-  Stereo lighting is 85%; Mono and logical standby request off.
+  steady-light test resolved the flicker. Firmware v0.28.4 retains immediate
+  lighting transitions. Physical transition verification after HW-SW-01, WAGO
+  distribution, pot stability, temperature and current remain open as
+  HW-LGT-01. Normal Stereo lighting is 85%; Mono and logical standby request off.
 - v0.27.4 removes the fade engine: Stereo/Mono and logical power changes now
   apply the required LED duty immediately.
 - ESP32 controller housing Rev C was printed, fitted, wired and installed as a

@@ -9,6 +9,7 @@
 
 #include "display.h"
 #include "hardware.h"
+#include "version.h"
 
 using decca::display::Control;
 using decca::display::FrameKind;
@@ -108,6 +109,7 @@ void test_display_physical_sh1106_snapshot() {
     state.treble = 500;
     state.balance = 500;
     state.functionName = "VINYL";
+    state.controllerWifiBars = 3;
     decca::display::setState(state);
 
     for (uint8_t frame = 1; frame < decca::display::kStartupFrameCount;
@@ -177,7 +179,8 @@ void test_display_animates_startup_without_blocking() {
         TEST_ASSERT_EQUAL_UINT8(frame, g_lastStartupFrame);
     }
 
-    TEST_ASSERT_EQUAL_STRING("0.27.3", g_lastFirmwareVersion);
+    TEST_ASSERT_EQUAL_STRING(decca::version::kFirmwareVersion,
+                             g_lastFirmwareVersion);
     TEST_ASSERT_EQUAL_UINT32(2200,
                              decca::display::kStartupFinalFrameHoldMs);
     g_nowMs += decca::display::kStartupFinalFrameHoldMs - 1U;
@@ -218,6 +221,10 @@ void test_display_dashboard_carries_function_and_controls() {
     TEST_ASSERT_EQUAL_UINT16(600, g_lastState.bass);
     TEST_ASSERT_EQUAL_UINT16(400, g_lastState.treble);
     TEST_ASSERT_EQUAL_UINT16(500, g_lastState.balance);
+    TEST_ASSERT_EQUAL_UINT8(3, g_lastState.controllerWifiBars);
+    TEST_ASSERT_EQUAL_UINT8(7, decca::display::kWifiIndicatorX);
+    TEST_ASSERT_EQUAL_UINT8(33,
+                            decca::display::kWifiIndicatorBaselineY);
 }
 
 void test_display_copies_and_clears_now_playing_metadata() {
@@ -401,17 +408,29 @@ void test_display_dims_sleeps_and_wakes_after_inactivity() {
                       static_cast<int>(decca::display::panelPowerState()));
 }
 
-void test_display_standby_blanks_quickly_and_state_change_wakes() {
+void test_display_standby_stays_asleep_during_background_changes() {
     startInjected();
+    ViewState state;
+    state.power = PowerState::On;
+    decca::display::setState(state);
     finishStartup();
-    decca::display::noteActivity();
+
+    state.power = PowerState::Standby;
+    decca::display::setState(state);
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
+                      static_cast<int>(decca::display::panelPowerState()));
 
     g_nowMs += decca::display::kStandbySleepAfterMs;
     decca::display::update();
     TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Sleeping),
                       static_cast<int>(decca::display::panelPowerState()));
 
-    ViewState state;
+    state.controllerWifiBars = 3;
+    decca::display::setState(state);
+    decca::display::update();
+    TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Sleeping),
+                      static_cast<int>(decca::display::panelPowerState()));
+
     state.power = PowerState::On;
     decca::display::setState(state);
     TEST_ASSERT_EQUAL(static_cast<int>(PanelPowerState::Awake),
@@ -472,6 +491,6 @@ void runAll() {
     RUN_TEST(test_display_renders_diagnostics_and_sw_unavailable);
     RUN_TEST(test_display_begin_failure_is_safe);
     RUN_TEST(test_display_dims_sleeps_and_wakes_after_inactivity);
-    RUN_TEST(test_display_standby_blanks_quickly_and_state_change_wakes);
+    RUN_TEST(test_display_standby_stays_asleep_during_background_changes);
     RUN_TEST(test_display_formats_unipolar_and_centred_controls);
 }

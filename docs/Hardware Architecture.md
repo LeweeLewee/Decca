@@ -45,7 +45,7 @@ audio signal path is separate from the controller.
                                                    ▼
                                            Passive speakers
 
-                 Decca on/off -> ESP32 -> 12 V trigger driver -> ZA3 trigger
+                 WiiM Pro trigger out -> trigger lead/adaptor -> ZA3 trigger in
 ```
 
 ## Locked Audio Architecture
@@ -109,9 +109,8 @@ The audio-path architecture is locked by ADR-0008 and ADR-0010 as:
   unit remains network-aware and can wake without a full boot cycle.
 - Turning the Decca on does not require mains switching of the WiiM. Playback or a
   supported WiiM/network control action may wake it from standby.
-- The ESP32 may later issue a deterministic wake/control request if bench testing
-  confirms a suitable supported local-API behaviour, but the hardware design does
-  **not depend on that**.
+- Phase 2 firmware issues supported source, volume and stop commands over the
+  local HTTPS API. The hardware design does not depend on hard power cycling.
 - On Decca off, the ESP32 should stop playback or issue an appropriate supported
   control action where useful, then allow WiiM auto-standby to provide the normal
   idle state.
@@ -122,10 +121,9 @@ The audio-path architecture is locked by ADR-0008 and ADR-0010 as:
 - The ZA3 is **not mains-switched by the original Decca switch**.
 - Its PSU may remain energised; amplifier operating state is controlled through
   the ZA3's **12 V trigger input**.
-- The ESP32 controls a dedicated low-voltage trigger-driver stage that generates
-  or switches the required 12 V trigger signal. The exact transistor/MOSFET,
-  12 V source and ESP32 GPIO remain open implementation details pending component
-  selection and bench verification.
+- The WiiM Pro trigger output connects directly to the ZA3 trigger input through
+  the correct trigger lead/adaptor (ADR-0018).
+- The ESP32 has no electrical connection to the 12 V trigger line.
 - No ESP32-controlled 230 V relay is required for the amplifier in the locked
   architecture.
 
@@ -136,11 +134,10 @@ switch.
 
 **ON sequence**
 1. Original switch closes and the ESP32 detects the active state.
-2. ESP32 asserts the ZA3 12 V trigger through the trigger-driver stage.
-3. ESP32 switches the three dial lamps to their stored commissioning brightness.
-4. ESP32 enables the OLED and runs the normal startup/dashboard sequence.
-5. WiiM remains physically powered and wakes from automatic standby when playback
-   or supported network/control activity requires it.
+2. ESP32 restores the selected WiiM source and volume over the local network.
+3. WiiM playback/wake state asserts its direct trigger output to the ZA3.
+4. ESP32 switches the three dial lamps to their stored commissioning brightness.
+5. ESP32 enables the OLED and runs the normal startup/dashboard sequence.
 
 **OFF sequence**
 1. ESP32 detects the original switch opening.
@@ -148,8 +145,8 @@ switch.
    WiiM then uses its own automatic standby behaviour.
 3. ESP32 switches the dial lamps immediately to zero.
 4. ESP32 blanks the OLED.
-5. ESP32 removes the 12 V trigger so the ZA3 enters its trigger-controlled off/
-   standby state.
+5. WiiM standby removes its direct trigger output so the ZA3 enters standby; the
+   observed delay is a physical acceptance item.
 6. ESP32 and its 5 V control supply remain powered so the next switch-on can be
    detected immediately.
 
@@ -252,11 +249,11 @@ temporary commissioning input if convenient, but it is not reserved as a
 permanent lighting control. Behaviours: immediate switching, configurable stored
 brightness and safe boot state.
 
-### ZA3 trigger output
-The ESP32 controls a dedicated interface to the ZA3 **12 V trigger input**. The
-ESP32 GPIO must not source 12 V directly. A suitable transistor/MOSFET or isolated
-low-voltage driver and a 12 V source are required. Exact implementation and GPIO
-remain **open/proposed** until the driver is selected and bench-tested.
+### ZA3 trigger connection
+The WiiM Pro **12 V trigger output** connects directly to the ZA3 trigger input
+with the correct 2.5 mm-to-3.5 mm lead/adaptor (ADR-0018). The ESP32 must not
+source, receive or sense this trigger line. Final installation requires physical
+verification of polarity, wake, standby and silence.
 
 ## Networking (Phase 2)
 

@@ -57,7 +57,7 @@ if (-not (Test-Path src\secrets.h)) {
 notepad src\secrets.h
 ```
 
-Replace the three placeholders locally. Use a long unique OTA password. Never
+Replace the four placeholders locally. Use a long unique OTA password. Never
 commit, paste into chat or publish `src/secrets.h`; it is gitignored.
 
 ### 5.3 Test and flash once by USB
@@ -113,12 +113,29 @@ Pass criteria:
 
 Recorded result (2026-08-30): the authenticated `esp32dev-ota` upload succeeded.
 After the ESP32 rebooted, serial reported
-`[OTA] ready at 192.168.1.79 (decca.local)`. USB-to-OTA physical acceptance is
+`[OTA] ready at 192.168.x.x (decca.local)`. USB-to-OTA physical acceptance is
 complete.
 
 The dual application slots protect against interrupted or rejected transfers.
 Automatic rollback after a fully received image fails to boot remains a Phase 3
 hardening item, so preserve a practical USB recovery route even after OTA passes.
+
+Recorded result (2026-09-12): firmware v0.28.0 from source commit `d06e357`
+passed the credential-enabled build and authenticated OTA. One upload interrupted
+while the controller was also polling the WiiM; the previous image remained
+bootable, and the retry completed with the WiiM temporarily powered off. The
+streamer and controller currently share an mDNS label, so the commissioning
+upload used the controller's reserved address without recording it in Git.
+The installed build reuses its secure WiiM connection for direct absolute-volume
+commands; exact 10%, 20% and 30% setpoints were confirmed in WiiM Home.
+
+Recorded result (2026-09-19): source commit `36d84d1` built at 52,328 bytes RAM
+(16.0%) and 1,016,977 bytes flash (77.6%) and was installed by authenticated
+OTA; the transfer reached 100% and the controller returned without USB
+intervention. The final logical-power acceptance used a 30-second WiiM standby
+timer. OFF removed the direct trigger and placed the ZA3 in standby. ON sent a
+safe one-step downward volume pulse, restored the requested value and woke the
+WiiM and ZA3 without app interaction or automatic playback.
 
 ## 6. First Power-On
 - Bring-up checklist
@@ -394,7 +411,7 @@ path reached the fully-on target. Mono/off re-verification awaits HW-SW-01.
 
 Current firmware (2026-09-09): v0.27.4 removes all fades and was deployed by
 authenticated OTA from commit `19c16b6`; `decca.local` returned at
-`192.168.1.79`. Physical immediate-transition verification remains open.
+its reserved address. Physical immediate-transition verification remains open.
 
 ### 7.7 Remaining commissioning
 
