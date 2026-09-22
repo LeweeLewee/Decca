@@ -5,6 +5,22 @@ This is the canonical short list of unresolved integration issues. Read it with
 the revision history remain valid records of what was tested at the time, but do
 not close a later issue listed here.
 
+## FW-SEC-01 — Complete ESP32 security acceptance
+
+**Status:** OPEN — added 2026-09-21. Functional commissioning does not establish
+security acceptance. A live no-payload OTA probe required authentication and
+rejected an invalid proof. WiiM certificate verification remains disabled;
+adversarial HTTP/OTA resilience, network exposure, credentials, dependency
+advisories and firmware/physical protection remain open.
+
+The isolated security candidate replaces body-sized HTTP String allocation
+with a fixed-capacity rejecting sink and adds security tests. v0.28.6-s1 is
+deployed; fresh discovery and OTA authentication rejection passed. The owner confirmed
+display/source/standby/volume acceptance passed on 2026-09-22. The wider
+security gate remains open; this confirmation does not close FW-SEC-01.
+See [Security Acceptance](Security%20Acceptance.md) for evidence, limitations,
+bench procedures and the explicit closure gate.
+
 ## FW-WIFI-01 — Investigate Wi-Fi reliability / packet loss
 
 **Status:** OPEN — retained after the owner-authorised v0.28.5 merge on

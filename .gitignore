@@ -41,3 +41,6 @@ mechanical/CAD/__pycache__/
 # is written by Decca_Display_Bezel_revQ_fusion.py export(). Remove this line if
 # you ever want a CAD/-side 3MF tracked deliberately.
 mechanical/CAD/Front_Bezel_revQ.3mf
+
+# Python security tooling
+__pycache__/
