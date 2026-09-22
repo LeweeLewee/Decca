@@ -15,8 +15,9 @@ advisories and firmware/physical protection remain open.
 
 The isolated security candidate replaces body-sized HTTP String allocation
 with a fixed-capacity rejecting sink and adds security tests. v0.28.6-s1 is
-deployed; fresh discovery and OTA authentication rejection passed. Physical
-display/source/standby/volume acceptance remains pending.
+deployed; fresh discovery and OTA authentication rejection passed. The owner confirmed
+display/source/standby/volume acceptance passed on 2026-09-22. The wider
+security gate remains open; this confirmation does not close FW-SEC-01.
 See [Security Acceptance](Security%20Acceptance.md) for evidence, limitations,
 bench procedures and the explicit closure gate.
 

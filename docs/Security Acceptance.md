@@ -128,7 +128,7 @@ This inventory is not a finding that those versions are vulnerability-free.
 - [Espressif HTTPClient implementation](https://github.com/espressif/arduino-esp32/blob/2.0.17/libraries/HTTPClient/src/HTTPClient.cpp)
 - [ESP32 secure boot guidance](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/security/secure-boot-v2.html)
 
-## Continuation: 0.28.6-s1 (deployed; physical acceptance pending)
+## Continuation: 0.28.6-s1 (deployed; owner physical acceptance passed 2026-09-22)
 
 The initial long prerelease label was shortened to fit the existing OLED startup
 buffer. No display layout change is required. Changes are confined to WiiM HTTP
@@ -193,8 +193,8 @@ open. No eFuse or firmware-signing migration is included.
 
 ### Upload attempt blocked (2026-09-21 20:27 BST)
 
-Owner-authorised upload was rejected at authentication before transfer. Device
-remains on v0.28.5. Candidate configuration needs the owner's current OTA password
+Owner-authorised upload was rejected at authentication before transfer. At that point the device
+remained on v0.28.5 and the candidate required credential recovery
 and a rebuild; candidate presence checks establish inclusion, not credential
 validity. See OTA Candidate for the failed-attempt record.
 
@@ -206,6 +206,15 @@ The corrected credential scan found zero matches in 3,126 Git objects and 208
 nonignored files. After two interrupted authenticated transfers, a TCP_NODELAY
 sender retry reached 100%, returned exit 0 and fresh discovery confirmed 0.28.6-s1.
 The post-update invalid-proof rejection test passed. WiiM remained stopped at
-47%, unmuted. No hardware test-suite execution or physical acceptance is claimed.
+47%, unmuted. No hardware test-suite execution is claimed. Physical acceptance
+was subsequently confirmed by the owner on 2026-09-22 (see below).
 See OTA Candidate for corrected hashes and full deployment evidence. SEC-01 has
 positive and negative OTA evidence on the new image; the security gate stays open.
+
+### Owner acceptance (2026-09-22)
+
+The owner confirmed the requested display, standby/wake, source-selection and
+physical-volume checks passed on installed v0.28.6-s1, and authorised updating
+and merging the repository. This is owner-reported functional acceptance, not
+execution of the ESP32 security suites or adversarial TLS/recovery tests.
+FW-SEC-01 and FW-WIFI-01 remain open. No additional firmware upload is required.

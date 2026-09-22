@@ -65,7 +65,8 @@ printing them. If firmware changes again, rerun affected checks and confirm the 
 
 After an approved upload, verify fresh discovery and advertised `0.28.6-s1`
 version (not merely ping), authentication rejection, and read-only WiiM status.
-The owner must verify display, standby/wake, source and physical volume response.
+The owner confirmed display, standby/wake, source and physical volume response
+passed on 2026-09-22.
 If there is a regression, stop and assess recovery with the owner. Do not run
 flood/corrupt-image/power-cut/eFuse tests on the installed music centre.
 
@@ -76,13 +77,9 @@ manifest matched; fresh discovery identified Decca v0.28.5 with authentication
 required. The uploader received Authentication Failed and exited 1 before any
 firmware transfer. No update or intentional reboot occurred.
 
-The local saved OTA password is not accepted by the installed image; no newer
-DECCA_OTA_PASSWORD environment value was available. Obtain the correct private
-installation configuration from the owner. Correct src/secrets.h and rebuild
-both candidate and recovery images before another attempt: merely using a newer
-uploader password with the old candidate would install the stale password.
-Recheck the relevant tests, known-secret scan, configuration presence and image
-hashes. The hashes above identify the attempted candidate, not a future rebuild.
+The saved OTA password was stale. Credential recovery and rebuilding were
+required before another attempt. This was resolved as recorded below; the image
+table above now contains the corrected, successfully deployed image hashes.
 
 ## Credential recovery and successful deployment
 
@@ -110,5 +107,6 @@ auth_upload=yes, uptime_ms_at_connect=770, power_save=0, tx_power_qdbm=78
 (19.5 dBm) and rssi_at_connect=-76 dBm. These are connection-time snapshots,
 not continuous uptime/RSSI measurements. The invalid-proof OTA test passed.
 Read-only WiiM status remained stopped, volume 47%, unmuted, mode 10.
-No playback command was sent. Physical display/standby/source/volume acceptance
-remains pending; SDK/certificate and wider security acceptance issues stay open.
+No playback command was sent during automated postflight. The owner confirmed
+physical display/standby/source/volume acceptance passed on 2026-09-22.
+SDK/certificate and wider security acceptance issues stay open.

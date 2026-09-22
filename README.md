@@ -16,7 +16,7 @@ the locked Phase 2 path is **WiiM Pro → Fosi Audio ZA3 → passive speakers**.
   network recovery and direct WiiM-to-ZA3 trigger acceptance pass. The owner confirmed all formal noise/interference checks passed with no
   issues on 2026-09-21, completing Phase 2 physical acceptance.
 - Security resource-limit update is deployed; fresh version discovery and OTA
-  authentication rejection passed. Physical checks remain pending. See
+  authentication rejection passed. The owner confirmed physical checks passed on 2026-09-22. See
   [deployment record](docs/OTA%20Candidate.md).
 - Safe board initialisation and authenticated local-network OTA are implemented.
 - Four analogue controls and the SH1106 OLED are bench-verified.
